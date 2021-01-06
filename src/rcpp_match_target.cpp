@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // MATCH AMPLICON BY POSITION
 // fast, vectorised
-// [[Rcpp::export]]
+// [[Rcpp::export("rcpp_match_amplicon_vector")]]
 std::vector<int> rcpp_match_amplicon_vector(std::vector<std::string> read_chr,  // chr of reads
                                             std::vector<int> read_start,        // start pos of reads
                                             std::vector<int> read_end,          // end pos of reads
@@ -34,7 +34,7 @@ std::vector<int> rcpp_match_amplicon_vector(std::vector<std::string> read_chr,  
 
 // MATCH CAPTURE BY OVERLAP
 // fast, vectorised
-// [[Rcpp::export]]
+// [[Rcpp::export("rcpp_match_capture_vector")]]
 std::vector<int> rcpp_match_capture_vector(std::vector<std::string> read_chr,  // chr of reads
                                            std::vector<int> read_start,        // start pos of reads
                                            std::vector<int> read_end,          // end pos of reads

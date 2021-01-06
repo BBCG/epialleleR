@@ -6,7 +6,7 @@ using namespace Rcpp;
 // rname (factor), strand (factor), pos, ctx (char), meth (0|1), unmeth (0|1)
 
 // CX report, vectorised, the main one now
-// [[Rcpp::export]]
+// [[Rcpp::export("rcpp_parse_xm_vector")]]
 std::vector<int> rcpp_parse_xm_vector(std::vector<int> rname,       // int value for factorised BAM rname field
                                       std::vector<int> strand,      // int value for factorised BAM strand field
                                       std::vector<int> start,       // read start = min(pos,mpos) of BAM fields

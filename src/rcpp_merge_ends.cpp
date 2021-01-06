@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 
 // 'std::copy' version, vectorised, the main one now
-// [[Rcpp::export]]
+// [[Rcpp::export("rcpp_merge_ends_vector")]]
 std::vector<std::string> rcpp_merge_ends_vector(std::vector<int> read1_pos,         // BAM pos field for read 1
                                                 std::vector<std::string> read1_seq, // normalised BAM XM field for read 1
                                                 std::vector<int> read2_pos,         // BAM pos field for read 2

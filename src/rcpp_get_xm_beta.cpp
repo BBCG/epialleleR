@@ -5,7 +5,7 @@ using namespace Rcpp;
 //
 
 // fast, vectorised
-// [[Rcpp::export]]
+// [[Rcpp::export("rcpp_get_xm_beta_vector")]]
 std::vector<double> rcpp_get_xm_beta_vector(std::vector<std::string> xm,  // merged normalised BAM XM fields
                                             std::string ctx_meth,         // methylated context string, e.g. "XZ". NON-EMPTY
                                             std::string ctx_unmeth) {     // unmethylated context string, e.g. "xz". NON-EMPTY

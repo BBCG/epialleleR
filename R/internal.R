@@ -1,3 +1,31 @@
+#' @importFrom Rsamtools testPairedEndBam 
+#' @importFrom Rsamtools scanBamFlag
+#' @importFrom Rsamtools bamFlagAND
+#' @importFrom Rsamtools ScanBamParam
+#' @importFrom Rsamtools scanBam
+#' @importFrom dplyr as_tibble 
+#' @importFrom dplyr mutate
+#' @importFrom dplyr group_by
+#' @importFrom dplyr summarise
+#' @importFrom dplyr select
+#' @importFrom dplyr bind_cols
+#' @importFrom dplyr `%>%`
+#' @importFrom dplyr n
+#' @importFrom GenomicAlignments sequenceLayer
+#' @importFrom Biostrings BStringSet
+#' @importFrom stringi stri_length
+#' @importFrom data.table fread
+#' @importFrom GenomicRanges makeGRangesFromDataFrame
+#' @importFrom GenomicRanges seqnames
+#' @importFrom GenomicRanges start
+#' @importFrom GenomicRanges end
+#' @importFrom data.table as.data.table
+#' @importFrom data.table dcast
+#' @importFrom Rcpp sourceCpp
+#' @importFrom Rcpp evalCpp
+#' @useDynLib epialleleR, .registration=TRUE
+
+
 # internal constants and helper functions 
 #
 
@@ -6,7 +34,7 @@
 ################################################################################
 
 # descr: methylation context to XM bases
-#' noRd
+
 .context.to.bases <- list (
   "CG"  = list (ctx.meth   = "Z",    ctx.unmeth   = "z",
                 ooctx.meth = "XHU",  ooctx.unmeth = "xhu"),
@@ -26,7 +54,7 @@
 
 # descr: reads BAM files using Rsamtools
 # value: unprocessed list output from Rsamtools::scanBam
-#' noRd
+
 .readBam <- function (bam.file,
                       min.mapq,
                       skip.duplicates,
@@ -61,7 +89,7 @@
 
 # descr: process BAM data, merge reads if necessary
 # value: tibble with fields qname, rname, strand, start, XM
-#' noRd
+
 .processBam <- function (bam,
                          verbose)
 {
@@ -108,9 +136,10 @@
       bam.data.merged <- bam.data.first %>%
         dplyr::mutate(start=base::pmin.int(pos, mpos),
                       width=abs(isize),
-                      XM=rcpp_merge_ends_vector(bam.data.first$pos, bam.data.first$XM.norm,
-                                                bam.data.second$pos, bam.data.second$XM.norm,
-                                                bam.data.second$isize)) %>%
+                      XM=rcpp_merge_ends_vector(
+                        bam.data.first$pos, bam.data.first$XM.norm,
+                        bam.data.second$pos, bam.data.second$XM.norm,
+                        bam.data.second$isize)) %>%
         dplyr::select(qname, rname, strand=XG, start, XM, width)
       
       if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
@@ -128,7 +157,7 @@
 
 # descr: apply thresholding criteria to processed BAM reads
 # value: bool vector with true for reads passing the threshold
-#' noRd
+
 .thresholdReads <- function (bam.processed,
                              ctx.meth, ctx.unmeth, ooctx.meth, ooctx.unmeth,
                              min.context.sites, min.context.beta, max.outofcontext.beta,
@@ -155,7 +184,7 @@
 # value: tibble with Bismark-formatted cytosine report
 # TODO: rewrite "summarise" in C++
 #   std::map<int, std::map<int, std::array<int,2>>>
-#' noRd
+
 .getCytosineReport <- function (bam.processed,
                                 ctx,
                                 verbose)
@@ -190,7 +219,7 @@
 
 # descr: (fast) writes the report
 # value: void
-#' noRd
+
 .writeReport <- function (report,
                           report.file,
                           gzip,
@@ -210,7 +239,7 @@
 
 # descr: (fast) reads BED file with amplicons
 # value: GRanges
-#' noRd
+
 .readBed <- function (bed.file,
                       zero.based.bed,
                       verbose)
@@ -232,7 +261,7 @@
 
 # descr: matching BED target (amplicon/capture)
 # value: numeric vector
-#' noRd
+
 .matchTarget <- function (bam.processed, bed, bed.type,
                           match.tolerance, match.min.overlap)
 {
@@ -257,7 +286,7 @@
 
 # descr: BED-assisted (amplicon/capture) report
 # value: tibble
-#' noRd
+
 .getBedReport <- function (bam.processed, bed, bed.type,
                            match.tolerance, match.min.overlap,
                            verbose)
@@ -272,7 +301,7 @@
     dplyr::mutate(pass=factor(pass, levels=c(TRUE,FALSE), labels=c("above","below")),
                   match=bed.match) %>%
     dplyr::group_by(match, pass, strand, .drop=FALSE) %>%
-    dplyr::summarise(nreads=n(), .groups="drop") %>%
+    dplyr::summarise(nreads=dplyr::n(), .groups="drop") %>%
     data.table::as.data.table() %>%
     data.table::dcast(match~pass+strand, value.var=c("nreads"), sep="", drop=FALSE)
   
@@ -292,7 +321,7 @@
 
 # descr: calculates beta values and returns ECDF functions for BED file entries
 # value: list of lists with context and out-of-context ECDF functions
-#' noRd
+
 .getBedEcdf <- function (bam.processed, bed, bed.type, bed.rows,
                          match.tolerance, match.min.overlap,
                          ctx.meth, ctx.unmeth, ooctx.meth, ooctx.unmeth,

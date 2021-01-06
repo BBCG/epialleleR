@@ -14,7 +14,7 @@ IntegerVector rcpp_fast_factor_template( const Vector<RTYPE>& x ) {
   return out;
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export("rcpp_fast_factor")]]
 SEXP rcpp_fast_factor( SEXP x ) {
   switch( TYPEOF(x) ) {
   case INTSXP: return rcpp_fast_factor_template<INTSXP>(x);

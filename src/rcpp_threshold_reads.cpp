@@ -6,7 +6,7 @@ using namespace Rcpp;
 //
 
 // thresholding, vectorised, ascii-based
-// [[Rcpp::export]]
+// [[Rcpp::export("rcpp_threshold_reads_vector")]]
 std::vector<bool> rcpp_threshold_reads_vector(std::vector<std::string> xm,  // merged normalised BAM XM fields
                                               std::string ctx_meth,         // methylated context string, e.g. "XZ". NON-EMPTY
                                               std::string ctx_unmeth,       // unmethylated context string, e.g. "xz". NON-EMPTY

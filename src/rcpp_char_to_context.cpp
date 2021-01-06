@@ -5,7 +5,7 @@ using namespace Rcpp;
 //
 
 // fast, vectorised
-// [[Rcpp::export]]
+// [[Rcpp::export("rcpp_char_to_context_vector")]]
 std::vector<std::string> rcpp_char_to_context_vector(std::vector<int> ctx) {
   std::map <int, std::string> ctx_map = {
     {'z',"CG"},  {'Z',"CG"},  {'x',"CHG"}, {'X',"CHG"},
