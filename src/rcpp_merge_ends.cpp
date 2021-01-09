@@ -8,15 +8,17 @@ using namespace Rcpp;
 
 
 // 'std::copy' version, vectorised, the main one now
-// [[Rcpp::export("rcpp_merge_ends_vector")]]
-std::vector<std::string> rcpp_merge_ends_vector(std::vector<int> read1_pos,         // BAM pos field for read 1
-                                                std::vector<std::string> read1_seq, // normalised BAM XM field for read 1
-                                                std::vector<int> read2_pos,         // BAM pos field for read 2
-                                                std::vector<std::string> read2_seq, // normalised BAM XM field for read 2
-                                                std::vector<int> isize) {           // BAM isize field
+// [[Rcpp::export("rcpp_merge_ends")]]
+std::vector<std::string> rcpp_merge_ends(std::vector<int> read1_pos,         // BAM pos field for read 1
+                                         std::vector<std::string> read1_seq, // normalised BAM XM field for read 1
+                                         std::vector<int> read2_pos,         // BAM pos field for read 2
+                                         std::vector<std::string> read2_seq, // normalised BAM XM field for read 2
+                                         std::vector<int> isize)             // BAM isize field
+{
   std::vector<std::string> res;
-  for (int x=0; x<read1_pos.size(); x++) {
-    int start=read1_pos[x]<read2_pos[x]?read1_pos[x]:read2_pos[x];
+  
+  for (unsigned int x=0; x<read1_pos.size(); x++) {
+    unsigned int start=read1_pos[x]<read2_pos[x] ? read1_pos[x] : read2_pos[x];
     std::string insert(abs(isize[x]),'.');
     std::copy(read2_seq[x].begin(), read2_seq[x].end(), insert.begin()+read2_pos[x]-start);
     std::copy(read1_seq[x].begin(), read1_seq[x].end(), insert.begin()+read1_pos[x]-start);
@@ -30,17 +32,31 @@ std::vector<std::string> rcpp_merge_ends_vector(std::vector<int> read1_pos,     
 //
 
 /*** R
-rcpp_merge_ends_vector(c(31094072,156777322,9960854,70350904),
-                       c("A........x.....hhh.........hh...x.hhh.hh.h.h..xh......x.z.......zxhhh.hhhh..z.h..Z.........x.....h.B",
-                         "Ezxh.h....h.z.h.z..h.hh......h..h...z.h...z...z..x........h....h..xhh...z...hh....x...h..z.h........F",
-                         "I...h.............h...hh......hhx...hx.......x...h..h......hh.h.....h.hh..x...h..............h.x....J",
-                         "M........h.h.h..h.......Z....hx......h.h.................h........h.x..xZ...Z.Z.....h.h.H.hx......hhN"),
-                       c(31094061,156777252,9960907,70351011),
-                       c("C...h......x........x.....hhh.........hh...x.hhh.hh.h.h..xh......x.z.......zxhhh.hhhh..z.h..Z.......D",
-                         "G...z.z.hh..x.z..zxhh.zxh.zx.zx.zx...zxhh..z.h....x...z.z....h.z.h.h.z.zxh.h....h.z.h.z..h.hh......hH",
-                         "K.....hh.h.....h.hh..x...h..............h.x....hh.h...h.........h..x.....h..x..............hh......L",
-                         "O.Z.....xZ....Z...x....h.Z.....x.......Z.....h.hhx...h...h.........hhxZ..h.h............h..........P"),
-                       c(-111,-171,153,207)) 
+rcpp_merge_ends(c(31094072,156777322,9960854,70350904),
+                c("A........x.....hhh.........hh...x.hhh.hh.h.h..xh......x.z.......zxhhh.hhhh..z.h..Z.........x.....h.B",
+                  "Ezxh.h....h.z.h.z..h.hh......h..h...z.h...z...z..x........h....h..xhh...z...hh....x...h..z.h........F",
+                  "I...h.............h...hh......hhx...hx.......x...h..h......hh.h.....h.hh..x...h..............h.x....J",
+                  "M........h.h.h..h.......Z....hx......h.h.................h........h.x..xZ...Z.Z.....h.h.H.hx......hhN"),
+                c(31094061,156777252,9960907,70351011),
+                c("C...h......x........x.....hhh.........hh...x.hhh.hh.h.h..xh......x.z.......zxhhh.hhhh..z.h..Z.......D",
+                  "G...z.z.hh..x.z..zxhh.zxh.zx.zx.zx...zxhh..z.h....x...z.z....h.z.h.h.z.zxh.h....h.z.h.z..h.hh......hH",
+                  "K.....hh.h.....h.hh..x...h..............h.x....hh.h...h.........h..x.....h..x..............hh......L",
+                  "O.Z.....xZ....Z...x....h.Z.....x.......Z.....h.hhx...h...h.........hhxZ..h.h............h..........P"),
+                c(-111,-171,153,207))
+
+n <- 10000
+read1_pos <- rep(c(31094072,156777322,9960854,70350904), n)
+read1_seq <- rep(c("A........x.....hhh.........hh...x.hhh.hh.h.h..xh......x.z.......zxhhh.hhhh..z.h..Z.........x.....h.B",
+                   "Ezxh.h....h.z.h.z..h.hh......h..h...z.h...z...z..x........h....h..xhh...z...hh....x...h..z.h........F",
+                   "I...h.............h...hh......hhx...hx.......x...h..h......hh.h.....h.hh..x...h..............h.x....J",
+                   "M........h.h.h..h.......Z....hx......h.h.................h........h.x..xZ...Z.Z.....h.h.H.hx......hhN"), n)
+read2_pos <- rep(c(31094061,156777252,9960907,70351011), n)
+read2_seq <- rep(c("C...h......x........x.....hhh.........hh...x.hhh.hh.h.h..xh......x.z.......zxhhh.hhhh..z.h..Z.......D",
+                   "G...z.z.hh..x.z..zxhh.zxh.zx.zx.zx...zxhh..z.h....x...z.z....h.z.h.h.z.zxh.h....h.z.h.z..h.hh......hH",
+                   "K.....hh.h.....h.hh..x...h..............h.x....hh.h...h.........h..x.....h..x..............hh......L",
+                   "O.Z.....xZ....Z...x....h.Z.....x.......Z.....h.hhx...h...h.........hhxZ..h.h............h..........P"), n)
+isize     <- rep(c(-111,-171,153,207), n)
+# microbenchmark::microbenchmark(rcpp_merge_ends(read1_pos, read1_seq, read2_pos, read2_seq, isize))
 */
 
 // Sourcing:

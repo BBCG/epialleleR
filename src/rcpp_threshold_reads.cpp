@@ -6,43 +6,46 @@ using namespace Rcpp;
 //
 
 // thresholding, vectorised, ascii-based
-// [[Rcpp::export("rcpp_threshold_reads_vector")]]
-std::vector<bool> rcpp_threshold_reads_vector(std::vector<std::string> xm,  // merged normalised BAM XM fields
-                                              std::string ctx_meth,         // methylated context string, e.g. "XZ". NON-EMPTY
-                                              std::string ctx_unmeth,       // unmethylated context string, e.g. "xz". NON-EMPTY
-                                              std::string ooctx_meth,       // methylated out-of-context string, e.g. "HU". Can be empty
-                                              std::string ooctx_unmeth,     // unmethylated out-of-context string, e.g. "hu". Can be empty
-                                              int min_n_ctx,                // minimum number of context bases in xm field
-                                              double min_ctx_meth_frac,     // minimum fraction of methylated to total context bases (min context beta value)
-                                              double max_ooctx_meth_frac    // maximum fraction of methylated to total out-of-context bases (max out-of-context beta value)
-                                           ) {
+// [[Rcpp::export("rcpp_threshold_reads")]]
+std::vector<bool> rcpp_threshold_reads(std::vector<std::string> xm,  // merged normalised BAM XM fields
+                                       std::string ctx_meth,         // methylated context string, e.g. "XZ". NON-EMPTY
+                                       std::string ctx_unmeth,       // unmethylated context string, e.g. "xz". NON-EMPTY
+                                       std::string ooctx_meth,       // methylated out-of-context string, e.g. "HU". Can be empty
+                                       std::string ooctx_unmeth,     // unmethylated out-of-context string, e.g. "hu". Can be empty
+                                       int min_n_ctx,                // minimum number of context bases in xm field
+                                       double min_ctx_meth_frac,     // minimum fraction of methylated to total context bases (min context beta value)
+                                       double max_ooctx_meth_frac)   // maximum fraction of methylated to total out-of-context bases (max out-of-context beta value)
+{
   std::vector<bool> res (xm.size(), true);
-  for (int x=0; x<xm.size(); x++) {
-    int ascii_map [128] = {0};
+  for (unsigned int x=0; x<xm.size(); x++) {
+    unsigned int ascii_map [128] = {0};
     std::for_each(xm[x].begin(), xm[x].end(), [&ascii_map] (char const &c) {
       ascii_map[c]++;
     });
-    int n_ctx_meth = 0;
+    unsigned int n_ctx_meth = 0;
     std::for_each(ctx_meth.begin(), ctx_meth.end(), [&n_ctx_meth, &ascii_map] (char const &c) {
       n_ctx_meth += ascii_map[c];
     });
-    int n_ctx_unmeth = 0;
+    unsigned int n_ctx_unmeth = 0;
     std::for_each(ctx_unmeth.begin(), ctx_unmeth.end(), [&n_ctx_unmeth, &ascii_map] (char const &c) {
       n_ctx_unmeth += ascii_map[c];
     });
-    int n_ooctx_meth = 0;
+    unsigned int n_ooctx_meth = 0;
     std::for_each(ooctx_meth.begin(), ooctx_meth.end(), [&n_ooctx_meth, &ascii_map] (char const &c) {
       n_ooctx_meth += ascii_map[c];
     });
-    int n_ooctx_unmeth = 0;
+    unsigned int n_ooctx_unmeth = 0;
     std::for_each(ooctx_unmeth.begin(), ooctx_unmeth.end(), [&n_ooctx_unmeth, &ascii_map] (char const &c) {
       n_ooctx_unmeth += ascii_map[c];
     });
     
-    int n_ctx_all = n_ctx_meth + n_ctx_unmeth;
-    int n_ooctx_all = n_ooctx_meth + n_ooctx_unmeth;
-    double ctx_meth_frac = (double)n_ctx_meth / std::max(n_ctx_all,1);
-    double ooctx_meth_frac = (double)n_ooctx_meth / std::max(n_ooctx_all,1);
+    unsigned int n_ctx_all = n_ctx_meth + n_ctx_unmeth;
+    if (n_ctx_all==0) n_ctx_all=1;
+    double ctx_meth_frac = (double)n_ctx_meth / n_ctx_all;
+    
+    unsigned int n_ooctx_all = n_ooctx_meth + n_ooctx_unmeth;
+    if (n_ooctx_all==0) n_ooctx_all=1;
+    double ooctx_meth_frac = (double)n_ooctx_meth / n_ooctx_all;
     
     if (n_ctx_all<min_n_ctx)
       res[x] = false;
@@ -59,7 +62,7 @@ std::vector<bool> rcpp_threshold_reads_vector(std::vector<std::string> xm,  // m
 //
 
 /*** R
-rcpp_threshold_reads_vector(c("..z..Zh..Zh..z..","..z..Zh..zh..z..","..z..Zh..ZH..z..","..x..Zh..xh..x.."),
+rcpp_threshold_reads(c("..z..Zh..Zh..z..","..z..Zh..zh..z..","..z..Zh..ZH..z..","..x..Zh..xh..x.."),
                             "Z", "z", "XHU", "xhu", 2, 0.5, 0.1)
 */
 
@@ -90,7 +93,7 @@ rcpp_threshold_reads_vector(c("..z..Zh..Zh..z..","..z..Zh..zh..z..","..z..Zh..ZH
 
 // // filtering, vectorised - slower than R!
 // // [[Rcpp::export]]
-// std::vector<bool> rcpp_filter_reads_vector(std::vector<std::string> xm,  // merged normalised BAM XM fields
+// std::vector<bool> rcpp_filter_reads(std::vector<std::string> xm,  // merged normalised BAM XM fields
 //                                            std::string ctx_meth,         // methylated context string, e.g. "XZ". NON-EMPTY
 //                                            std::string ctx_unmeth,       // unmethylated context string, e.g. "xz". NON-EMPTY
 //                                            std::string ooctx_meth,       // methylated out-of-context string, e.g. "HU". Can be empty

@@ -5,19 +5,22 @@ using namespace Rcpp;
 // Output report is an int array with six fields for every cytosine:
 // rname (factor), strand (factor), pos, ctx (char), meth (0|1), unmeth (0|1)
 
-// CX report, vectorised, the main one now
-// [[Rcpp::export("rcpp_parse_xm_vector")]]
-std::vector<int> rcpp_parse_xm_vector(std::vector<int> rname,       // int value for factorised BAM rname field
-                                      std::vector<int> strand,      // int value for factorised BAM strand field
-                                      std::vector<int> start,       // read start = min(pos,mpos) of BAM fields
-                                      std::vector<std::string> xm,  // merged normalised BAM XM fields
-                                      std::vector<bool> pass,       // boolean: if read has passed filtering
-                                      std::string ctx) {            // context string for bases to report
+// CX report, vectorised, non-summarizing, the main one now
+// [[Rcpp::export("rcpp_parse_xm")]]
+std::vector<int> rcpp_parse_xm(std::vector<int> rname,       // int value for factorised BAM rname field
+                               std::vector<int> strand,      // int value for factorised BAM strand field
+                               std::vector<int> start,       // read start = min(pos,mpos) of BAM fields
+                               std::vector<std::string> xm,  // merged normalised BAM XM fields
+                               std::vector<bool> pass,       // boolean: if read has passed filtering
+                               std::string ctx)              // context string for bases to report
+{
   std::vector<int> res;                                             // { (rname, strand, pos, ctx, meth, unmeth) * n }
-  for (int x=0; x<rname.size(); x++) {
+  res.reserve(rname.size()*60);                                     // reserving space for 10 context bases per read - saves some milliseconds
+  
+  for (unsigned int x=0; x<rname.size(); x++) {
     std::vector<int> row = {rname[x], strand[x], 0, 0, 0, 0};       // rname, strand, pos, ctx, meth, unmeth
-    for (int i=0; i<ctx.size(); i++) {
-      row[3] = ctx[i];
+    for (unsigned int i=0; i<ctx.size(); i++) {
+      row[3] = ctx[i] | 32;                                         // lowercasing reported context
       bool is_meth = (pass[x] && ctx[i]>='A' && ctx[i]<='Z') ? true : false;
       int found = xm[x].find(ctx[i], 0);
       while (found != std::string::npos) {
@@ -37,11 +40,22 @@ std::vector<int> rcpp_parse_xm_vector(std::vector<int> rname,       // int value
 //
 
 /*** R
-matrix(rcpp_parse_xm_vector(c(2,2), c(1,1), c(3689466,3689466),
-                            c("z......xh....Z.......Z......z...Zx...x..xh.hhhh..xhh.Zxh......xhh.......xh..x..x..x..............z......Z",
-                              "z......xh....Z.......Z......z...Zx...x..xh.hhhh..xhh.Zxh......xhh.......xh..x..x..x..............z......Z"),
-                            c(TRUE,FALSE), "zZ"),
+matrix(rcpp_parse_xm(c(2,2), c(1,1), c(3689466,3689466),
+                     c("z......xh....Z.......Z......z...Zx...x..xh.hhhh..xhh.Zxh......xhh.......xh..x..x..x..............z......Z",
+                       "z......xh....Z.......Z......z...Zx...x..xh.hhhh..xhh.Zxh......xhh.......xh..x..x..x..............z......Z"),
+                     c(TRUE,FALSE), "zZ"),
        ncol=6, byrow=TRUE)
+
+n <- 50000
+rname  <- rep(c(2,2), n)
+strand <- rep(c(1,1), n)
+start  <- rep(c(3689466,3689466), n)
+xm     <- rep(c("z......xh....Z.......Z......z...Zx...x..xh.hhhh..xhh.Zxh......xhh.......xh..x..x..x..............z......Z",
+                "z......xh....Z.......Z......z...Zx...x..xh.hhhh..xhh.Zxh......xhh.......xh..x..x..x..............z......Z"), n)
+pass   <- rep(c(TRUE,FALSE), n)
+ctx    <- "zZ"
+microbenchmark::microbenchmark(rcpp_parse_xm(rname, strand, start, xm, pass, ctx))
+# mean: 22.8 ms
 */
 
 // Sourcing:

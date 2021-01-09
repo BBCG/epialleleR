@@ -7,7 +7,7 @@
 #' details
 #'
 #' @param bam param desc
-#' @param bed.file param desc
+#' @param bed param desc
 #' @param report.file param desc
 #' @param zero.based.bed param desc
 #' @param bed.type param desc
@@ -30,7 +30,7 @@
 #' }
 #' @export
 generateBedReport <- function (bam,
-                               bed.file,
+                               bed,
                                report.file=NULL,
                                zero.based.bed=FALSE,
                                bed.type=c("amplicon", "capture"),
@@ -43,25 +43,24 @@ generateBedReport <- function (bam,
                                max.outofcontext.beta=0.1, # double 0 to 1
                                report.context=threshold.context,
                                min.mapq=0,
-                               skip.duplicates=FALSE, # http://www.htslib.org/doc/samtools-markdup.html https://support.illumina.com/content/dam/illumina-support/help/Illumina_DRAGEN_Bio_IT_Platform_v3_7_1000000141465/Content/SW/Informatics/Dragen/DuplicateMarking_fDG.htm
+                               skip.duplicates=FALSE,
                                verbose=TRUE)
 {
   bed.type          <- match.arg(bed.type, bed.type)
   threshold.context <- match.arg(threshold.context, threshold.context)
   report.context    <- match.arg(report.context, report.context)
   
-  bed <- .readBed(bed.file=bed.file, zero.based.bed=zero.based.bed,
-                  verbose=verbose)
+  if (!is(bed, "GRanges"))
+    bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed,
+                    verbose=verbose)
   
   if (is.character(bam))
-    bam <- .readBam(bam.file=bam, min.mapq=min.mapq,
-                    skip.duplicates=skip.duplicates, verbose=verbose)
-  
-  bam.processed <- .processBam(bam=bam, verbose=verbose)
+    bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq,
+                         skip.duplicates=skip.duplicates, verbose=verbose)
   
   if (threshold.reads) {
-    bam.processed$pass <- .thresholdReads(
-      bam.processed=bam.processed,
+    bam$pass <- .thresholdReads(
+      bam.processed=bam,
       ctx.meth=.context.to.bases[[threshold.context]][["ctx.meth"]],
       ctx.unmeth=.context.to.bases[[threshold.context]][["ctx.unmeth"]],
       ooctx.meth=.context.to.bases[[threshold.context]][["ooctx.meth"]],
@@ -72,11 +71,11 @@ generateBedReport <- function (bam,
       verbose=verbose
     )
   } else {
-    bam.processed$pass <- TRUE
+    bam$pass <- TRUE
   }
   
   bed.report <- .getBedReport(
-    bam.processed=bam.processed, bed=bed, bed.type=bed.type,
+    bam.processed=bam, bed=bed, bed.type=bed.type,
     match.tolerance=match.tolerance, match.min.overlap=match.min.overlap,
     verbose=verbose
   )

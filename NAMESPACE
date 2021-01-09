@@ -3,6 +3,7 @@
 export(generateBedEcdf)
 export(generateBedReport)
 export(generateCytosineReport)
+export(preprocessBam)
 importFrom(Biostrings,BStringSet)
 importFrom(GenomicAlignments,sequenceLayer)
 importFrom(GenomicRanges,end)

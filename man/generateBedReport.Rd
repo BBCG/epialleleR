@@ -6,7 +6,7 @@
 \usage{
 generateBedReport(
   bam,
-  bed.file,
+  bed,
   report.file = NULL,
   zero.based.bed = FALSE,
   bed.type = c("amplicon", "capture"),
@@ -26,7 +26,7 @@ generateBedReport(
 \arguments{
 \item{bam}{param desc}
 
-\item{bed.file}{param desc}
+\item{bed}{param desc}
 
 \item{report.file}{param desc}
 

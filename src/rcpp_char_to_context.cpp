@@ -5,14 +5,15 @@ using namespace Rcpp;
 //
 
 // fast, vectorised
-// [[Rcpp::export("rcpp_char_to_context_vector")]]
-std::vector<std::string> rcpp_char_to_context_vector(std::vector<int> ctx) {
-  std::map <int, std::string> ctx_map = {
+// [[Rcpp::export("rcpp_char_to_context")]]
+std::vector<std::string> rcpp_char_to_context(std::vector<unsigned char> ctx)  // char
+{
+  std::map <unsigned char, std::string> ctx_map = {
     {'z',"CG"},  {'Z',"CG"},  {'x',"CHG"}, {'X',"CHG"},
-    {'h',"CHH"}, {'H',"CHH"}, {'u',"UNK"}, {'U',"UNK"}
+    {'h',"CHH"}, {'H',"CHH"}, {'u',"CN"},  {'U',"CN"}
   };
   std::vector<std::string> res (ctx.size());
-  for (int x=0; x<ctx.size(); x++) {
+  for (unsigned int x=0; x<ctx.size(); x++) {
     res[x] = ctx_map[ctx[x]];
   }
   return res;
@@ -23,7 +24,10 @@ std::vector<std::string> rcpp_char_to_context_vector(std::vector<int> ctx) {
 //
 
 /*** R
-rcpp_char_to_context_vector(utf8ToInt("ZHUX.zhux-+"))
+rcpp_char_to_context(utf8ToInt("ZHUX.zhux-+"))
+
+z <- rep(utf8ToInt("ZHUX.zhux-+"),100000)
+microbenchmark::microbenchmark(rcpp_char_to_context(z))
 */
 
 // Sourcing:

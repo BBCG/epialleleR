@@ -6,10 +6,10 @@
 \usage{
 generateBedEcdf(
   bam,
-  bed.file,
+  bed,
   bed.type = c("amplicon", "capture"),
   bed.rows = c(1),
-  zero.based.bed = TRUE,
+  zero.based.bed = FALSE,
   match.tolerance = 1,
   match.min.overlap = 1,
   ecdf.context = c("CG", "CHG", "CHH", "CxG", "CX"),
@@ -21,7 +21,7 @@ generateBedEcdf(
 \arguments{
 \item{bam}{param desc}
 
-\item{bed.file}{param desc}
+\item{bed}{param desc}
 
 \item{bed.type}{param desc}
 

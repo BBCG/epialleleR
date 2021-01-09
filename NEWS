@@ -10,3 +10,7 @@ Changes in version 0.3.2 (2021-01-06)
 + temporary method for ECDF (generateBedEcdf)
 + uploaded to GitHub
 
+Changes in version 0.3.5 (2021-01-09)
++ lots of refactoring
++ new method: preprocessBam() to save time on loading/preprocessing
++ new C++ sub for CX report with std::map summary (5-10x speedup)

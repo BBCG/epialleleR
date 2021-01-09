@@ -33,19 +33,21 @@
 # Constants
 ################################################################################
 
-# descr: methylation context to XM bases
+# descr: methylation context to XM bases.
+#        The "u" and "U" are simply ignored - just as Bismark does
+#        in order to save us from confusion at the analysis stage
 
 .context.to.bases <- list (
-  "CG"  = list (ctx.meth   = "Z",    ctx.unmeth   = "z",
-                ooctx.meth = "XHU",  ooctx.unmeth = "xhu"),
-  "CHG" = list (ctx.meth   = "X",    ctx.unmeth   = "x",
-                ooctx.meth = "ZHU",  ooctx.unmeth = "zhu"),
-  "CHH" = list (ctx.meth   = "H",    ctx.unmeth   = "h",
-                ooctx.meth = "ZXU",  ooctx.unmeth = "zxu"),
-  "CxG" = list (ctx.meth   = "ZX",   ctx.unmeth   = "zx",
-                ooctx.meth = "HU",   ooctx.unmeth = "hu"),
-  "CX"  = list (ctx.meth   = "ZXHU", ctx.unmeth   = "zxhu",
-                ooctx.meth = "",     ooctx.unmeth = "")
+  "CG"  = list (ctx.meth   = "Z",   ctx.unmeth   = "z",
+                ooctx.meth = "XH",  ooctx.unmeth = "xh"),
+  "CHG" = list (ctx.meth   = "X",   ctx.unmeth   = "x",
+                ooctx.meth = "ZH",  ooctx.unmeth = "zh"),
+  "CHH" = list (ctx.meth   = "H",   ctx.unmeth   = "h",
+                ooctx.meth = "ZX",  ooctx.unmeth = "zx"),
+  "CxG" = list (ctx.meth   = "ZX",  ctx.unmeth   = "zx",
+                ooctx.meth = "H",   ooctx.unmeth = "h"),
+  "CX"  = list (ctx.meth   = "ZXH", ctx.unmeth   = "zxh",
+                ooctx.meth = "",    ooctx.unmeth = "")
 )
 
 ################################################################################
@@ -93,7 +95,7 @@
 .processBam <- function (bam,
                          verbose)
 {
-  if (verbose) message("Processing BAM data:")
+  if (verbose) message("Preprocessing BAM data:")
   tm <- proc.time()
   
   if (any(
@@ -136,7 +138,7 @@
       bam.data.merged <- bam.data.first %>%
         dplyr::mutate(start=base::pmin.int(pos, mpos),
                       width=abs(isize),
-                      XM=rcpp_merge_ends_vector(
+                      XM=rcpp_merge_ends(
                         bam.data.first$pos, bam.data.first$XM.norm,
                         bam.data.second$pos, bam.data.second$XM.norm,
                         bam.data.second$isize)) %>%
@@ -168,7 +170,7 @@
   
   # fast thresholding, vectorised
   # Rcpp::sourceCpp("rcpp_threshold_reads.cpp")
-  pass <- rcpp_threshold_reads_vector(
+  pass <- rcpp_threshold_reads(
     bam.processed$XM,
     ctx.meth, ctx.unmeth, ooctx.meth, ooctx.unmeth,
     min.context.sites, min.context.beta, max.outofcontext.beta
@@ -195,20 +197,20 @@
   # reporting, vectorised
   # Rcpp::sourceCpp("rcpp_parse_xm.cpp")
   cx.report <- dplyr::as_tibble(matrix(
-    rcpp_parse_xm_vector(as.integer(bam.processed$rname),
-                         as.integer(bam.processed$strand),
-                         bam.processed$start, bam.processed$XM,
-                         bam.processed$pass, ctx),
-      ncol=6, byrow=TRUE, dimnames=list(NULL, c("rname","strand","pos","ctx","meth","unmeth"))
+    rcpp_cx_report(as.integer(bam.processed$rname),
+                   as.integer(bam.processed$strand),
+                   bam.processed$start, bam.processed$XM,
+                   bam.processed$pass, ctx),
+      ncol=6, byrow=TRUE, dimnames=list(NULL, c("rname","pos","strand","context","meth","unmeth"))
     )) %>%
-      dplyr::group_by(rname,pos,strand) %>%
-      dplyr::summarise(meth=sum(meth),
-                       unmeth=sum(unmeth),
-                       ctx=ctx[1],
-                       .groups="drop") %>%
+      # dplyr::group_by(rname,pos,strand,context) %>%
+      # dplyr::summarise(meth=sum(meth),
+      #                  unmeth=sum(unmeth),
+      #                  .groups="drop") %>%
+      dplyr::select(rname,strand,pos,context,meth,unmeth) %>%
       dplyr::mutate(rname=levels(bam.processed$rname)[rname],
                     strand=levels(bam.processed$strand)[strand],
-                    ctx=rcpp_char_to_context_vector(ctx),
+                    context=rcpp_char_to_context(context),
                     triad="NNN")
   
   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
@@ -268,12 +270,12 @@
   # fast, vectorised
   # Rcpp::sourceCpp("rcpp_match_target.cpp")
   if (bed.type=="amplicon") {
-    bed.match <- rcpp_match_amplicon_vector(
+    bed.match <- rcpp_match_amplicon(
       as.character(bam.processed$rname), bam.processed$start, bam.processed$start+bam.processed$width-1,
       as.character(GenomicRanges::seqnames(bed)), GenomicRanges::start(bed), GenomicRanges::end(bed),
       match.tolerance)
   } else if (bed.type=="capture") {
-    bed.match <- rcpp_match_capture_vector(
+    bed.match <- rcpp_match_capture(
       as.character(bam.processed$rname), bam.processed$start, bam.processed$start+bam.processed$width-1,
       as.character(GenomicRanges::seqnames(bed)), GenomicRanges::start(bed), GenomicRanges::end(bed),
       match.min.overlap)
@@ -334,8 +336,8 @@
                             match.tolerance=match.tolerance, match.min.overlap=match.min.overlap)
   
   # Rcpp::sourceCpp("rcpp_get_xm_beta.cpp")
-  ctx.beta=rcpp_get_xm_beta_vector(bam.processed$XM, ctx.meth, ctx.unmeth)
-  ooctx.beta=rcpp_get_xm_beta_vector(bam.processed$XM, ooctx.meth, ooctx.unmeth)
+  ctx.beta=rcpp_get_xm_beta(bam.processed$XM, ctx.meth, ctx.unmeth)
+  ooctx.beta=rcpp_get_xm_beta(bam.processed$XM, ooctx.meth, ooctx.unmeth)
 
   all.bed.rows <- sort(unique(bed.match), na.last=FALSE)
   if (is.null(bed.rows))

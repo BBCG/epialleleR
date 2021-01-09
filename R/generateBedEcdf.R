@@ -7,7 +7,7 @@
 #' details
 #'
 #' @param bam param desc
-#' @param bed.file param desc
+#' @param bed param desc
 #' @param bed.type param desc
 #' @param bed.rows param desc
 #' @param zero.based.bed param desc
@@ -25,7 +25,7 @@
 #' }
 #' @export
 generateBedEcdf <- function (bam,
-                             bed.file,
+                             bed,
                              bed.type=c("amplicon", "capture"),
                              bed.rows=c(1),
                              zero.based.bed=FALSE,
@@ -33,23 +33,22 @@ generateBedEcdf <- function (bam,
                              match.min.overlap=1,
                              ecdf.context=c("CG", "CHG", "CHH", "CxG", "CX"),
                              min.mapq=0,
-                             skip.duplicates=FALSE, # http://www.htslib.org/doc/samtools-markdup.html https://support.illumina.com/content/dam/illumina-support/help/Illumina_DRAGEN_Bio_IT_Platform_v3_7_1000000141465/Content/SW/Informatics/Dragen/DuplicateMarking_fDG.htm
+                             skip.duplicates=FALSE,
                              verbose=TRUE)
 {
   bed.type     <- match.arg(bed.type, bed.type)
   ecdf.context <- match.arg(ecdf.context, ecdf.context)
   
-  bed <- .readBed(bed.file=bed.file, zero.based.bed=zero.based.bed,
-                  verbose=verbose)
+  if (!is(bed, "GRanges"))
+    bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed,
+                    verbose=verbose)
   
   if (is.character(bam))
-    bam <- .readBam(bam.file=bam, min.mapq=min.mapq,
-                    skip.duplicates=skip.duplicates, verbose=verbose)
-  
-  bam.processed <- .processBam(bam=bam, verbose=verbose)
+    bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq,
+                         skip.duplicates=skip.duplicates, verbose=verbose)
   
   ecdf.list <- .getBedEcdf(
-    bam.processed=bam.processed, bed=bed, bed.type=bed.type, bed.rows=bed.rows,
+    bam.processed=bam, bed=bed, bed.type=bed.type, bed.rows=bed.rows,
     match.tolerance=match.tolerance, match.min.overlap=match.min.overlap,
     ctx.meth=.context.to.bases[[ecdf.context]][["ctx.meth"]],
     ctx.unmeth=.context.to.bases[[ecdf.context]][["ctx.unmeth"]],
