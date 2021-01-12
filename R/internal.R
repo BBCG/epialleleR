@@ -3,24 +3,19 @@
 #' @importFrom Rsamtools bamFlagAND
 #' @importFrom Rsamtools ScanBamParam
 #' @importFrom Rsamtools scanBam
-#' @importFrom dplyr as_tibble 
-#' @importFrom dplyr mutate
-#' @importFrom dplyr group_by
-#' @importFrom dplyr summarise
-#' @importFrom dplyr select
-#' @importFrom dplyr bind_cols
-#' @importFrom dplyr `%>%`
-#' @importFrom dplyr n
+#' @importFrom data.table fread
+#' @importFrom data.table as.data.table
+#' @importFrom data.table dcast
+#' @importFrom data.table merge.data.table
+#' @importFrom data.table setorder
+#' @importFrom data.table setkey
 #' @importFrom GenomicAlignments sequenceLayer
 #' @importFrom Biostrings BStringSet
 #' @importFrom stringi stri_length
-#' @importFrom data.table fread
 #' @importFrom GenomicRanges makeGRangesFromDataFrame
 #' @importFrom GenomicRanges seqnames
 #' @importFrom GenomicRanges start
 #' @importFrom GenomicRanges end
-#' @importFrom data.table as.data.table
-#' @importFrom data.table dcast
 #' @importFrom Rcpp sourceCpp
 #' @importFrom Rcpp evalCpp
 #' @useDynLib epialleleR, .registration=TRUE
@@ -107,52 +102,39 @@
           "For paired-end sequencing files following BAM fields should be ",
           "included as well: 'mpos', 'isize'.")
   
-  bam.data <- dplyr::as_tibble(data.frame(bam, stringsAsFactors=FALSE),
-                               .name_repair="minimal")
-  colnames(bam.data) <- gsub("tag.", "", colnames(bam.data), fixed=TRUE)
+  bam.data <- data.table::as.data.table(
+    c( bam[[1]][setdiff(names(bam[[1]]),"tag")], bam[[1]][["tag"]] )
+  )
   
   if (verbose) message("  Applying CIGARs to methylation tags", appendLF=FALSE)
-  bam.data <- bam.data %>% 
-    dplyr::mutate(
-      rname=as.factor(rname),
-      XG=factor(XG, levels=c("CT","GA"), labels=c("+","-")),
-      isfirst=bitwAnd(flag,128)==0,
-      XM.norm=as.character(
-        GenomicAlignments::sequenceLayer(Biostrings::BStringSet(XM, use.names=FALSE), cigar),
-        use.names=FALSE
-      )
-    )
+  bam.data[, `:=` (rname   = factor(rname),
+                   XG      = factor(XG, levels=c("CT","GA"), labels=c("+","-")),
+                   isfirst = bitwAnd(flag,128)==0,
+                   XM.norm = as.character(GenomicAlignments::sequenceLayer(Biostrings::BStringSet(bam.data$XM, use.names=FALSE), bam.data$cigar), use.names=FALSE) )]
+  
   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
 
   # fast merge reads, vectorised
-  # Rcpp::sourceCpp("rcpp_merge_ends.cpp")
-  system.time(
-    if (any(colnames(bam.data)=="mpos")) {
-      if (verbose) message("  Merging read pairs", appendLF=FALSE)
-      tm <- proc.time()
-      
-      bam.data.first  <- bam.data[bam.data$isfirst,]
-      bam.data.second <- bam.data[!bam.data$isfirst,]
-      if (!identical(bam.data.first$qname, bam.data.second$qname))
-        stop("Ungrouped reads?? Please sort input BAM file by QNAME using 'samtools -n'")
-      bam.data.merged <- bam.data.first %>%
-        dplyr::mutate(start=base::pmin.int(pos, mpos),
-                      width=abs(isize),
-                      XM=rcpp_merge_ends(
-                        bam.data.first$pos, bam.data.first$XM.norm,
-                        bam.data.second$pos, bam.data.second$XM.norm,
-                        bam.data.second$isize)) %>%
-        dplyr::select(qname, rname, strand=XG, start, XM, width)
-      
-      if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
-    } else {
-      bam.data.merged <- bam.data %>%
-        dplyr::mutate(width=stringi::stri_length(XM.norm)) %>%
-        dplyr::select(qname, rname, strand=XG, start=pos, XM=XM.norm, width)
-    }
-  )
-  
-  return(bam.data.merged)
+  if (any(colnames(bam.data)=="mpos")) {
+    if (verbose) message("  Merging read pairs", appendLF=FALSE)
+    tm <- proc.time()
+    
+    bam.data.first  <- bam.data[ bam.data$isfirst,]
+    bam.data.second <- bam.data[!bam.data$isfirst,]
+    if (!identical(bam.data.first$qname, bam.data.second$qname))
+      stop("Ungrouped reads?? Please sort input BAM file by QNAME using 'samtools -n'")
+    bam.data.first[, `:=` (start=base::pmin.int(pos, mpos),
+                           width=abs(isize))]
+    bam.data.first$XM <- rcpp_merge_ends(bam.data.first$pos,  bam.data.first$XM.norm,
+                                         bam.data.second$pos, bam.data.second$XM.norm,
+                                         bam.data.second$isize)
+    data.table::setorder(bam.data.first, rname, start)
+    if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+    return(bam.data.first[,.(qname, rname, strand=XG, start, XM, width)])
+  } else {
+    data.table::setorder(bam.data, rname, pos)
+    return(bam.data[,.(qname, rname, strand=XG, start=pos, XM=XM.norm, width)])
+  }
 }
 
 ################################################################################
@@ -169,7 +151,6 @@
   tm <- proc.time()
   
   # fast thresholding, vectorised
-  # Rcpp::sourceCpp("rcpp_threshold_reads.cpp")
   pass <- rcpp_threshold_reads(
     bam.processed$XM,
     ctx.meth, ctx.unmeth, ooctx.meth, ooctx.unmeth,
@@ -184,8 +165,6 @@
 
 # descr: prepare cytosine report for processed reads according to filter
 # value: tibble with Bismark-formatted cytosine report
-# TODO: rewrite "summarise" in C++
-#   std::map<int, std::map<int, std::array<int,2>>>
 
 .getCytosineReport <- function (bam.processed,
                                 ctx,
@@ -194,27 +173,22 @@
   if (verbose) message("Preparing cytosine report", appendLF=FALSE)
   tm <- proc.time()
   
+  # check if ordered? reorder if not
   # reporting, vectorised
-  # Rcpp::sourceCpp("rcpp_parse_xm.cpp")
-  cx.report <- dplyr::as_tibble(matrix(
-    rcpp_cx_report(as.integer(bam.processed$rname),
-                   as.integer(bam.processed$strand),
-                   bam.processed$start, bam.processed$XM,
-                   bam.processed$pass, ctx),
+  cx.report <- data.table::as.data.table(
+    matrix(
+      rcpp_cx_report(as.integer(bam.processed$rname), as.integer(bam.processed$strand),
+                     bam.processed$start, bam.processed$XM, bam.processed$pass, ctx),
       ncol=6, byrow=TRUE, dimnames=list(NULL, c("rname","pos","strand","context","meth","unmeth"))
-    )) %>%
-      # dplyr::group_by(rname,pos,strand,context) %>%
-      # dplyr::summarise(meth=sum(meth),
-      #                  unmeth=sum(unmeth),
-      #                  .groups="drop") %>%
-      dplyr::select(rname,strand,pos,context,meth,unmeth) %>%
-      dplyr::mutate(rname=levels(bam.processed$rname)[rname],
-                    strand=levels(bam.processed$strand)[strand],
-                    context=rcpp_char_to_context(context),
-                    triad="NNN")
-  
+    )
+  )
+  cx.report[, `:=` (rname   = levels(bam.processed$rname )[rname ],
+                    strand  = levels(bam.processed$strand)[strand],
+                    context = rcpp_char_to_context(context),
+                    triad   = "NNN")]
+
   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
-  return(cx.report)
+  return(cx.report[,.(rname, strand, pos, context, meth, unmeth, triad)])
 }
 
 ################################################################################
@@ -268,7 +242,6 @@
                           match.tolerance, match.min.overlap)
 {
   # fast, vectorised
-  # Rcpp::sourceCpp("rcpp_match_target.cpp")
   if (bed.type=="amplicon") {
     bed.match <- rcpp_match_amplicon(
       as.character(bam.processed$rname), bam.processed$start, bam.processed$start+bam.processed$width-1,
@@ -295,28 +268,27 @@
 {
   if (verbose) message("Preparing ", bed.type, " report", appendLF=FALSE)
   tm <- proc.time()
-
-  bed.match <- .matchTarget(bam.processed=bam.processed, bed=bed, bed.type=bed.type,
-                            match.tolerance=match.tolerance, match.min.overlap=match.min.overlap)
   
-  bed.report <- bam.processed %>%
-    dplyr::mutate(pass=factor(pass, levels=c(TRUE,FALSE), labels=c("above","below")),
-                  match=bed.match) %>%
-    dplyr::group_by(match, pass, strand, .drop=FALSE) %>%
-    dplyr::summarise(nreads=dplyr::n(), .groups="drop") %>%
-    data.table::as.data.table() %>%
-    data.table::dcast(match~pass+strand, value.var=c("nreads"), sep="", drop=FALSE)
+  bam.processed[, `:=` (bedmatch=.matchTarget(bam.processed=bam.processed,
+                                              bed=bed, bed.type=bed.type,
+                                              match.tolerance=match.tolerance,
+                                              match.min.overlap=match.min.overlap),
+                        pass=factor(pass, levels=c(TRUE,FALSE)))]
+  data.table::setkey(bam.processed, bedmatch)
+  bam.dt <- data.table::dcast(bam.processed[, list(nreads=.N), by=list(bedmatch, strand, pass), nomatch=0],
+                              bedmatch~pass+strand, value.var=c("nreads"), sep="", drop=FALSE, fill=0)
+  bam.dt[,`:=` (`nreads+`=`FALSE+`+`TRUE+`,
+                `nreads-`=`FALSE-`+`TRUE-`,
+                VEF=(`TRUE+`+`TRUE-`)/(`FALSE+`+`TRUE+`+`FALSE-`+`TRUE-`) )]
+  bed.dt <- data.table::as.data.table(bed)
+  bed.cl <- colnames(bed.dt)
+  bed.dt[, bedmatch:=.I]
+  bed.report <- data.table::merge.data.table(bed.dt, bam.dt, by="bedmatch", all=TRUE)
   
-  bed.report <- dplyr::bind_cols(data.frame(bed, stringsAsFactors=FALSE)[bed.report$match,],
-                                 #bed.report[,-c("match")],
-                                 `nreads+`=bed.report$`above+` + bed.report$`below+`,
-                                 `nreads-`=bed.report$`above-` + bed.report$`below-`,
-                                 VEF=(bed.report$`above+` + bed.report$`above-`)/(bed.report$`above+` + bed.report$`below+` +
-                                                                                  bed.report$`above-` + bed.report$`below-`)) %>%
-    dplyr::as_tibble(.name_repair="minimal")
-
   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
-  return(bed.report)
+  return(bed.report[,setdiff(names(bed.report),
+                             c("bedmatch","FALSE+","FALSE-","TRUE+","TRUE-")),
+                    with=FALSE])
 }
 
 ################################################################################
@@ -361,3 +333,295 @@
 }
 
 ################################################################################
+################################################################################
+###
+###
+### Below is just a working copy of dplyr-dependent code
+###
+###
+################################################################################
+################################################################################
+# @importFrom dplyr as_tibble 
+# @importFrom dplyr mutate
+# @importFrom dplyr group_by
+# @importFrom dplyr summarise
+# @importFrom dplyr select
+# @importFrom dplyr bind_cols
+# @importFrom dplyr `%>%`
+# @importFrom dplyr n
+# 
+# # descr: process BAM data, merge reads if necessary
+# # value: tibble with fields qname, rname, strand, start, XM
+# 
+# .processBam <- function (bam,
+#                          verbose)
+# {
+#   if (verbose) message("Preprocessing BAM data:")
+#   tm <- proc.time()
+#   
+#   if (any(
+#     sapply(c(bam[[1]][c("qname","flag","rname","strand","pos", "mapq","cigar")],
+#              bam[[1]][[c("tag")]]), is.null)
+#   )) stop("BAM list object must contain data for the following BAM fields: ",
+#           "'qname', 'flag', 'rname', 'strand', 'pos', 'mapq', 'cigar' ",
+#           "and following tags: 'XM', 'XG'. ",
+#           "For paired-end sequencing files following BAM fields should be ",
+#           "included as well: 'mpos', 'isize'.")
+#   
+#   bam.data <- dplyr::as_tibble(data.frame(bam, stringsAsFactors=FALSE),
+#                                .name_repair="minimal")
+#   colnames(bam.data) <- gsub("tag.", "", colnames(bam.data), fixed=TRUE)
+#   
+#   if (verbose) message("  Applying CIGARs to methylation tags", appendLF=FALSE)
+#   bam.data <- bam.data %>% 
+#     dplyr::mutate(
+#       rname=as.factor(rname),
+#       XG=factor(XG, levels=c("CT","GA"), labels=c("+","-")),
+#       isfirst=bitwAnd(flag,128)==0,
+#       XM.norm=as.character(
+#         GenomicAlignments::sequenceLayer(Biostrings::BStringSet(XM, use.names=FALSE), cigar),
+#         use.names=FALSE
+#       )
+#     )
+#   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+#   
+#   # fast merge reads, vectorised
+#   # Rcpp::sourceCpp("rcpp_merge_ends.cpp")
+#   system.time(
+#     if (any(colnames(bam.data)=="mpos")) {
+#       if (verbose) message("  Merging read pairs", appendLF=FALSE)
+#       tm <- proc.time()
+#       
+#       bam.data.first  <- bam.data[bam.data$isfirst,]
+#       bam.data.second <- bam.data[!bam.data$isfirst,]
+#       if (!identical(bam.data.first$qname, bam.data.second$qname))
+#         stop("Ungrouped reads?? Please sort input BAM file by QNAME using 'samtools -n'")
+#       bam.data.merged <- bam.data.first %>%
+#         dplyr::mutate(start=base::pmin.int(pos, mpos),
+#                       width=abs(isize),
+#                       XM=rcpp_merge_ends(
+#                         bam.data.first$pos, bam.data.first$XM.norm,
+#                         bam.data.second$pos, bam.data.second$XM.norm,
+#                         bam.data.second$isize)) %>%
+#         dplyr::select(qname, rname, strand=XG, start, XM, width)
+#       
+#       if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+#     } else {
+#       bam.data.merged <- bam.data %>%
+#         dplyr::mutate(width=stringi::stri_length(XM.norm)) %>%
+#         dplyr::select(qname, rname, strand=XG, start=pos, XM=XM.norm, width)
+#     }
+#   )
+#   
+#   return(bam.data.merged)
+# }
+# 
+# ################################################################################
+# 
+# # descr: apply thresholding criteria to processed BAM reads
+# # value: bool vector with true for reads passing the threshold
+# 
+# .thresholdReads <- function (bam.processed,
+#                              ctx.meth, ctx.unmeth, ooctx.meth, ooctx.unmeth,
+#                              min.context.sites, min.context.beta, max.outofcontext.beta,
+#                              verbose)
+# {
+#   if (verbose) message("Thresholding reads", appendLF=FALSE)
+#   tm <- proc.time()
+#   
+#   # fast thresholding, vectorised
+#   # Rcpp::sourceCpp("rcpp_threshold_reads.cpp")
+#   pass <- rcpp_threshold_reads(
+#     bam.processed$XM,
+#     ctx.meth, ctx.unmeth, ooctx.meth, ooctx.unmeth,
+#     min.context.sites, min.context.beta, max.outofcontext.beta
+#   )
+#   
+#   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+#   return(pass)
+# }
+# 
+# ################################################################################
+# 
+# # descr: prepare cytosine report for processed reads according to filter
+# # value: tibble with Bismark-formatted cytosine report
+# 
+# .getCytosineReport <- function (bam.processed,
+#                                 ctx,
+#                                 verbose)
+# {
+#   if (verbose) message("Preparing cytosine report", appendLF=FALSE)
+#   tm <- proc.time()
+#   
+#   bam.processed <- bam.processed[order(bam.processed$rname, bam.processed$start),]
+#   # reporting, vectorised
+#   cx.report <- dplyr::as_tibble(matrix(
+#     rcpp_cx_report(as.integer(bam.processed$rname),
+#                    as.integer(bam.processed$strand),
+#                    bam.processed$start, bam.processed$XM,
+#                    bam.processed$pass, ctx),
+#     ncol=6, byrow=TRUE, dimnames=list(NULL, c("rname","pos","strand","context","meth","unmeth"))
+#   )) %>%
+#     # dplyr::group_by(rname,pos,strand,context) %>%
+#     # dplyr::summarise(meth=sum(meth),
+#     #                  unmeth=sum(unmeth),
+#     #                  .groups="drop") %>%
+#     dplyr::select(rname,strand,pos,context,meth,unmeth) %>%
+#     dplyr::mutate(rname=levels(bam.processed$rname)[rname],
+#                   strand=levels(bam.processed$strand)[strand],
+#                   context=rcpp_char_to_context(context),
+#                   triad="NNN")
+#   
+#   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+#   return(cx.report)
+# }
+# 
+# ################################################################################
+# 
+# # descr: (fast) writes the report
+# # value: void
+# 
+# .writeReport <- function (report,
+#                           report.file,
+#                           gzip,
+#                           verbose)
+# {
+#   if (verbose) message("Writing the report", appendLF=FALSE)
+#   tm <- proc.time()
+#   
+#   if (gzip)
+#     report.file <- base::gzfile(base::sub("(\\.gz)?$", ".gz", report.file, ignore.case=TRUE), "w")
+#   write.table(report, file=report.file, quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
+#   
+#   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+# }
+# 
+# ################################################################################
+# 
+# # descr: (fast) reads BED file with amplicons
+# # value: GRanges
+# 
+# .readBed <- function (bed.file,
+#                       zero.based.bed,
+#                       verbose)
+# {
+#   if (verbose) message("Reading BED file", appendLF=FALSE)
+#   tm <- proc.time()
+#   
+#   bed.df <- data.table::fread(file=bed.file, sep="\t", blank.lines.skip=TRUE, data.table=FALSE)
+#   colnames(bed.df)[1:3] <- c("chr", "start", "end")
+#   bed    <- GenomicRanges::makeGRangesFromDataFrame(bed.df, keep.extra.columns=TRUE, ignore.strand=TRUE,
+#                                                     starts.in.df.are.0based=zero.based.bed)
+#   
+#   
+#   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+#   return(bed)
+# }
+# 
+# ################################################################################
+# 
+# # descr: matching BED target (amplicon/capture)
+# # value: numeric vector
+# 
+# .matchTarget <- function (bam.processed, bed, bed.type,
+#                           match.tolerance, match.min.overlap)
+# {
+#   # fast, vectorised
+#   # Rcpp::sourceCpp("rcpp_match_target.cpp")
+#   if (bed.type=="amplicon") {
+#     bed.match <- rcpp_match_amplicon(
+#       as.character(bam.processed$rname), bam.processed$start, bam.processed$start+bam.processed$width-1,
+#       as.character(GenomicRanges::seqnames(bed)), GenomicRanges::start(bed), GenomicRanges::end(bed),
+#       match.tolerance)
+#   } else if (bed.type=="capture") {
+#     bed.match <- rcpp_match_capture(
+#       as.character(bam.processed$rname), bam.processed$start, bam.processed$start+bam.processed$width-1,
+#       as.character(GenomicRanges::seqnames(bed)), GenomicRanges::start(bed), GenomicRanges::end(bed),
+#       match.min.overlap)
+#   }
+#   
+#   return(bed.match)
+# }
+# 
+# ################################################################################
+# 
+# # descr: BED-assisted (amplicon/capture) report
+# # value: tibble
+# 
+# .getBedReport <- function (bam.processed, bed, bed.type,
+#                            match.tolerance, match.min.overlap,
+#                            verbose)
+# {
+#   if (verbose) message("Preparing ", bed.type, " report", appendLF=FALSE)
+#   tm <- proc.time()
+#   
+#   bed.match <- .matchTarget(bam.processed=bam.processed, bed=bed, bed.type=bed.type,
+#                             match.tolerance=match.tolerance, match.min.overlap=match.min.overlap)
+#   
+#   bed.report <- bam.processed %>%
+#     dplyr::mutate(pass=factor(pass, levels=c(TRUE,FALSE), labels=c("above","below")),
+#                   match=bed.match) %>%
+#     dplyr::group_by(match, pass, strand, .drop=FALSE) %>%
+#     dplyr::summarise(nreads=dplyr::n(), .groups="drop") %>%
+#     data.table::as.data.table() %>%
+#     data.table::dcast(match~pass+strand, value.var=c("nreads"), sep="", drop=FALSE)
+#   
+#   bed.report <- dplyr::bind_cols(data.frame(bed, stringsAsFactors=FALSE)[bed.report$match,],
+#                                  #bed.report[,-c("match")],
+#                                  `nreads+`=bed.report$`above+` + bed.report$`below+`,
+#                                  `nreads-`=bed.report$`above-` + bed.report$`below-`,
+#                                  VEF=(bed.report$`above+` + bed.report$`above-`)/(bed.report$`above+` + bed.report$`below+` +
+#                                                                                     bed.report$`above-` + bed.report$`below-`)) %>%
+#     dplyr::as_tibble(.name_repair="minimal")
+#   
+#   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+#   return(bed.report)
+# }
+# 
+# ################################################################################
+# 
+# # descr: calculates beta values and returns ECDF functions for BED file entries
+# # value: list of lists with context and out-of-context ECDF functions
+# 
+# .getBedEcdf <- function (bam.processed, bed, bed.type, bed.rows,
+#                          match.tolerance, match.min.overlap,
+#                          ctx.meth, ctx.unmeth, ooctx.meth, ooctx.unmeth,
+#                          verbose)
+# {
+#   if (verbose) message("Computing ECDFs for within- and out-of-context per-read beta values", appendLF=FALSE)
+#   tm <- proc.time()
+#   
+#   bed.match <- .matchTarget(bam.processed=bam.processed, bed=bed, bed.type=bed.type,
+#                             match.tolerance=match.tolerance, match.min.overlap=match.min.overlap)
+#   
+#   # Rcpp::sourceCpp("rcpp_get_xm_beta.cpp")
+#   ctx.beta=rcpp_get_xm_beta(bam.processed$XM, ctx.meth, ctx.unmeth)
+#   ooctx.beta=rcpp_get_xm_beta(bam.processed$XM, ooctx.meth, ooctx.unmeth)
+#   
+#   all.bed.rows <- sort(unique(bed.match), na.last=FALSE)
+#   if (is.null(bed.rows))
+#     bed.rows <- all.bed.rows
+#   else
+#     bed.rows <- intersect(bed.rows, all.bed.rows)
+#   
+#   bed.match.isna <- is.na(bed.match)
+#   bed.ecdf <- lapply(bed.rows, function (n) {
+#     matched.rows <- if (is.na(n))
+#       c(bed.match.isna)
+#     else
+#       c(!bed.match.isna & bed.match==n)
+#     return(c(context=ecdf(ctx.beta[matched.rows]),
+#              out.of.context=ecdf(ooctx.beta[matched.rows])))
+#   })
+#   names(bed.ecdf) <- as.character(as.character(bed)[bed.rows])
+#   
+#   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+#   return(bed.ecdf)
+# }
+# 
+# ################################################################################
+
+
+
+
+

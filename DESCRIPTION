@@ -1,6 +1,6 @@
 Package: epialleleR
 Title: title
-Version: 0.3.5
+Version: 0.3.7
 Authors@R: 
   person(given = "Oleksii",
     family = "Nikolaienko",
@@ -15,6 +15,7 @@ Depends:
   R (>= 4.0)
 Imports:
   Rcpp,
+  BH,
   Rsamtools,
   GenomicAlignments,
   GenomicRanges,
@@ -24,9 +25,11 @@ Imports:
   stringi,
   data.table
 LinkingTo:
-  Rcpp
+  Rcpp,
+  BH
 Suggests:
   Rcpp,
+  BH,
   RUnit,
   knitr,
   rmarkdown

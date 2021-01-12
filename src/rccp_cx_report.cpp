@@ -1,72 +1,84 @@
 #include <Rcpp.h>
+#include <boost/container/flat_map.hpp>
 using namespace Rcpp;
 
 // Using C++17 for std::map::try_emplace
+// Not sure if required for boost::container::flat_map
 // [[Rcpp::plugins(cpp17)]]
+
+// Using boost::container::flat_map here as it is >3x faster than any of std::*
+// [[Rcpp::depends(BH)]]
+// sparse_map - https://www.codeproject.com/Articles/866996/Fast-Implementations-of-Maps-with-Integer-Keys-in
+// can actually be the fastest map for the task, however I didn't try it yet
+// because it hequires me to include non-standard header and change the way I
+// emplace new items. Besides, looks like genome-assisted counting is 
+// inevitable, and it might be faster for very large (whole genome) data.
+// For the smaller (any MiSeq file in any context) flat_map is acceptable.
 
 // Parses XM tags and outputs SUMMARISED CX report according to filter/context.
 // Output report is an int array with six fields for every cytosine:
-// rname (factor), pos, strand (factor), ctx (char), meth (0|1), unmeth (0|1)
+// rname (factor), pos, strand (factor), ctx (char), meth, unmeth
+
 
 // CX report, vectorised, SUMMARISING by rname+pos+strand+context
 // [[Rcpp::export("rcpp_cx_report")]]
-std::vector<int> rcpp_cx_report(std::vector<int> rname,       // int value for factorised BAM rname field
-                                std::vector<int> strand,      // int value for factorised BAM strand field
-                                std::vector<int> start,       // read start = min(pos,mpos) of BAM fields
-                                std::vector<std::string> xm,  // merged normalised BAM XM fields
-                                std::vector<bool> pass,       // boolean: if read has passed filtering
-                                std::string ctx)              // context string for bases to report
+std::vector<int> rcpp_cx_report(std::vector<int> rname,            // int value for factorised BAM rname field
+                                std::vector<int> strand,           // int value for factorised BAM strand field
+                                std::vector<int> start,            // read start = min(pos,mpos) of BAM fields
+                                std::vector<std::string> xm,       // merged normalised BAM XM fields
+                                std::vector<bool> pass,            // boolean: if read has passed filtering
+                                std::string ctx)                   // context string for bases to report
 {
-  // walking trough all reads <- filling the std::map
-  // {rname, pos, strand, context} -> {meth, unmeth}
-  // std::map<std::array<int,4>, std::array<int,2>> OR
-  // std::unordered_map<std::array<int,4>, std::array<int,2>>
-  // with custom hashing: pos<<8 | chr
+  // walking trough all reads <- filling the map
+  // uint64_t -> {rname, pos, strand, context, meth, unmeth}
+  // boost::container::flat_map<uint64_t, std::array<int,6>>
   
   // main typedefs
-  typedef std::array<unsigned int,4> T_key;                   // {0:rname, 1:pos, 2:strand, 3:context
-  typedef std::array<unsigned int,2> T_val;                   // {0:meth, 1:unmeth}
-  typedef std::map<T_key, T_val> T_cx_map;
-  struct key_hasher {
-    std::size_t operator()(const T_key & k) const {
-      std::size_t h = (k[1]<<8) | k[0];
-      return(h);
-    }
-  };
-  typedef std::unordered_map<T_key, T_val, key_hasher> T_cx_umap;
-
+  typedef uint64_t T_key;                                          // {16bit:rname, 32bit:pos, 8bit:strand, 8bit:context
+  typedef std::array<int,6> T_val;                                 // {0:rname, 1:pos, 2:strand, 3:context, 4:meth, 5:unmeth}
+  typedef boost::container::flat_map<T_key, T_val> T_cx_fmap;      // attaboy
+  // typedef std::map<T_key, T_val> T_cx_map;                      // 2x slower than boost::container::flat_map
+  // typedef std::unordered_map<T_key, T_val> T_cx_umap;           // not used since slower than ordered std::map even w/o sorting
+  
   // iterating over XM vector
-  T_cx_map cx_map;
-  T_key map_key = {0, 0, 0, 0};
-  T_val map_val = {0, 0};
+  // for 1'618'360 reads, all pass, "zxhZXH": cycling without try_emplace takes 1.12s
+  // compared to 3.25s with try_emplace but w/o it->second[idx_to_increase]++
+  // it->second[idx_to_increase]++ takes no time, most time is taken by try_emplace
+  // hint is correct most of the time, I believe
+  T_cx_fmap cx_map;
+  T_cx_fmap::iterator it = cx_map.end();
+  T_key map_key = 0;
+  T_val map_val = {0, 0, 0, 0, 0, 0};
+  unsigned int idx_to_increase = 0;
+  cx_map.reserve(rname.size()*pow(ctx.size(),2));                  // exclusive to flat_map, up to 20% faster
   for (unsigned int x=0; x<rname.size(); x++) {
-    map_key[0] = rname[x];
-    map_key[2] = strand[x];
-    for (unsigned int i=0; i<ctx.size(); i++) {
-      map_key[3] = ctx[i] | 32;                               // lowercasing reported context
-      unsigned char idx_to_increase = (pass[x] && ctx[i]>='A' && ctx[i]<='Z') ? 0 : 1;
-      int found = xm[x].find(ctx[i], 0);
-      while (found != std::string::npos) {
-        map_key[1] = start[x] + found;
-        auto [it, exists] = cx_map.try_emplace(map_key, map_val);
-        it->second[idx_to_increase]++;
-        found = xm[x].find(ctx[i], found+1);
-      }
+    map_val[0] = rname[x];
+    map_val[2] = strand[x];
+    int found = xm[x].find_first_of(ctx, 0);
+    while (found != std::string::npos) {
+      map_val[1] = start[x] + found;
+      idx_to_increase = (pass[x] && xm[x][found]>='A' && xm[x][found]<='Z') ? 4 : 5;
+      map_val[3] = xm[x][found] | 32;                              // lowercasing reported context
+      map_key = ((T_key)map_val[0] << 48) |
+                ((T_key)map_val[1] << 16) |
+                ((T_key)map_val[2] << 8 ) |
+                ((T_key)map_val[3]);
+      it = cx_map.try_emplace(it, map_key, map_val);
+      it->second[idx_to_increase]++;
+      found = xm[x].find_first_of(ctx, found+1);
     }
   }
-
+  
   // walking through the map, returning the int vector of
   // { (rname, pos, strand, ctx, meth, unmeth) * n }
-  // there must be a better and more efficient way - iter+insert takes ~10% time
-  T_cx_map::iterator it;
+  // there must be a better and more efficient way - iter+insert takes ~5-10% time
   std::vector<int> res;
   res.reserve(cx_map.size()*6);
   for (it=cx_map.begin(); it!=cx_map.end(); it++) {
-    res.insert(res.end(), it->first.begin(), it->first.end());
     res.insert(res.end(), it->second.begin(), it->second.end());
   }
   return res;
-
+  
 }
 
 
@@ -80,44 +92,17 @@ matrix(rcpp_cx_report(c(2,2), c(1,1), c(3689466,3689466),
                       c(TRUE,FALSE), "zZ"),
        ncol=6, byrow=TRUE)
 
-n <- 1000
-rname  <- as.integer(.bam.proc$rname) # rep(c(1:20), 5*n) # 20*5
-strand <- as.integer(.bam.proc$strand) # rep(c(1,2), 50*n) # 2*50
-start  <- .bam.proc$start # rep(c(1:(n*20)), 5) + 1000000
-xm     <- .bam.proc$XM # rep("z......xh....Z.......Z......z...Zx...x..xh.hhhh..xhh.Zxh......xhh.......xh..x..x..x..z....z......z......Z", 100*n)
-pass   <- .bam.proc$pass # rep(c(TRUE,FALSE), 50*n)
+.bam   <- bam.processed[order(bam.processed$rname, bam.processed$start),]
+rname  <- as.integer(.bam$rname)
+strand <- as.integer(.bam$strand)
+start  <- .bam$start
+xm     <- .bam$XM
+pass   <- rep(TRUE, length(rname))
 ctx    <- "zxhZXH"
 # microbenchmark::microbenchmark(rcpp_cx_report(rname, strand, start, xm, pass, ctx), times=10)
 # 
 res <- matrix(rcpp_cx_report(rname, strand, start, xm, pass, ctx), ncol=6, byrow=TRUE)
 dim(res)
-# 
-# simple rcpp_parse_xm mean time: 32-35 ms for n=1000
-# ordered std::map takes 132 ms for n=1000 (130 ms if memory was reserved for res )
-# std::unordered_map takes 71 ms for n=1000 (with memory reserved)
-# 
-# real data - 1006 capture (1'618'360 reads, 2'011'500 positions to report in zZ context):
-# 10 times, mo mapping (parse_xm), mean time: 0.83s
-# 10 times, std::unordered_map, mean time: 2.80s
-# 10 times, ordered std::map, mean time: 2.41s
-# report by "generateCytosineReport" with rcpp_parse_xm+summarise takes 6-8s
-# report by "generateCytosineReport" with rcpp_cx_report+summarise takes 10-12s
-# report by "generateCytosineReport" with rcpp_cx_report takes 2.9-3.0s
-# 
-# real data - 1006 capture (1'618'360 reads, 18'765'434 positions to report in zxhZXH context):
-# 10 times, std::unordered_map, mean time: 20.1s
-# 10 times, ordered std::map, mean time: 12.6s
-# report by "generateCytosineReport" with rcpp_parse_xm+summarise takes 66-72s"
-# report by "generateCytosineReport" with rcpp_parse_xm+summarise takes 90-97s"
-# report by "generateCytosineReport" with rcpp_cx_report takes 23-25s with unordered_map and 15-17s with std::map
-# 
-# real data - WHIP050-D501-D701 amplicon (167'241 reads, 27'903 positions to report in zZ context):
-# 10 times, std::unordered_map, mean time: 137ms
-# 10 times, ordered std::map, mean time: 200ms
-# 
-# real data - WHIP050-D501-D701 amplicon (167'241 reads, 409'589 positions to report in zxhZXH context):
-# 10 times, std::unordered_map, mean time: 1.12s
-# 10 times, ordered std::map, mean time: 1.43s
 */
 
 // Sourcing:
@@ -149,6 +134,7 @@ dim(res)
 // 
 // 
 // #############################################################################
+// 
 // // old rcpp_parse_xm
 // std::vector<int> res;
 // for (int x=0; x<rname.size(); x++) {
@@ -167,3 +153,67 @@ dim(res)
 //   }
 // }
 // return res;
+// 
+// #############################################################################
+// 
+// Perfectly optimised std version, but still 2x slower than flat_map:
+// // [[Rcpp::export("rcpp_cx_report")]]
+// std::vector<int> rcpp_cx_report(std::vector<int> rname,            // int value for factorised BAM rname field
+//                                 std::vector<int> strand,           // int value for factorised BAM strand field
+//                                 std::vector<int> start,            // read start = min(pos,mpos) of BAM fields
+//                                 std::vector<std::string> xm,       // merged normalised BAM XM fields
+//                                 std::vector<bool> pass,            // boolean: if read has passed filtering
+//                                 std::string ctx)                   // context string for bases to report
+// {
+//   // walking trough all reads <- filling the std::map
+//   // uint64_t -> {rname, pos, strand, context, meth, unmeth}
+//   // std::map<uint64_t, std::array<int,6>>
+//   
+//   // main typedefs
+//   typedef uint64_t T_key;                                          // {16bit:rname, 32bit:pos, 8bit:strand, 8bit:context
+//   typedef std::array<int,6> T_val;                                 // {0:rname, 1:pos, 2:strand, 3:context, 4:meth, 5:unmeth}
+//   typedef std::map<T_key, T_val> T_cx_map;
+//   // typedef std::unordered_map<T_key, T_val> T_cx_umap;           // not used since slower even w/o sorting
+//   
+//   // iterating over XM vector
+//   // for 1'618'360 reads, all pass, "zxhZXH": cycling without try_emplace takes 1.10s
+//   // compared to 7.80s with try_emplace but w/o it->second[idx_to_increase]++
+//   // it->second[idx_to_increase]++ takes no time, most time is taken by try_emplace
+//   // even if hint is correct most of the time (I believe)
+//   T_cx_map cx_map;
+//   T_cx_map::iterator it = cx_map.end();
+//   T_key map_key = 0;
+//   T_val map_val = {0, 0, 0, 0, 0, 0};
+//   unsigned int idx_to_increase = 0;
+//   for (unsigned int x=0; x<rname.size(); x++) {
+//     map_val[0] = rname[x];
+//     map_val[2] = strand[x];
+//     for (unsigned int i=0; i<ctx.size(); i++) {
+//       map_val[3] = ctx[i] | 32;                                     // lowercasing reported context
+//       idx_to_increase = (pass[x] && ctx[i]>='A' && ctx[i]<='Z') ? 4 : 5;
+//       int found = xm[x].find(ctx[i], 0);
+//       while (found != std::string::npos) {
+//         map_val[1] = start[x] + found;
+//         map_key = ((T_key)map_val[0] << 48) |
+//           ((T_key)map_val[1] << 16) |
+//           ((T_key)map_val[2] << 8 ) |
+//           ((T_key)map_val[3]);
+//         it = cx_map.try_emplace(it, map_key, map_val);
+//         it->second[idx_to_increase]++;
+//         it++;
+//         found = xm[x].find(ctx[i], found+1);
+//       }
+//     }
+//   }
+//   
+//   // walking through the map, returning the int vector of
+//   // { (rname, pos, strand, ctx, meth, unmeth) * n }
+//   // there must be a better and more efficient way - iter+insert takes ~5-10% time
+//   std::vector<int> res;
+//   res.reserve(cx_map.size()*6);
+//   for (it=cx_map.begin(); it!=cx_map.end(); it++) {
+//     res.insert(res.end(), it->second.begin(), it->second.end());
+//   }
+//   return res;
+//   
+// }

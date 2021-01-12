@@ -63,7 +63,8 @@ return desc
 `generateBedReport` desc. Epiallele-aware. GENERIC
 }
 \details{
-details
+details. Add two functions here: generateAmpliconReport and
+generateCaptureReport
 }
 \examples{
 \dontrun{

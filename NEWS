@@ -14,3 +14,8 @@ Changes in version 0.3.5 (2021-01-09)
 + lots of refactoring
 + new method: preprocessBam() to save time on loading/preprocessing
 + new C++ sub for CX report with std::map summary (5-10x speedup)
+
+Changes in version 0.3.7 (2021-01-12)
++ lots of refactoring again
++ CX report sub now uses boost::container::flat_map (additional 2x speedup)
++ removed dplyr as a dependence, whole package uses data.table now

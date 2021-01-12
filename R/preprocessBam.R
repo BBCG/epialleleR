@@ -28,9 +28,11 @@ preprocessBam <- function (bam.file,
     bam <- .readBam(bam.file=bam.file, min.mapq=min.mapq,
                     skip.duplicates=skip.duplicates, verbose=verbose)
     bam.processed <- .processBam(bam=bam, verbose=verbose)
+    return(bam.processed)
+  } else {
+    warning("Already preprocessed BAM supplied as an input")
+    return(bam.file)
   }
-
-  return(bam.processed)
 }
 
 

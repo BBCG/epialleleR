@@ -4,7 +4,8 @@
 #' `generateBedReport` desc. Epiallele-aware. GENERIC
 #'
 #' @details
-#' details
+#' details. Add two functions here: generateAmpliconReport and
+#' generateCaptureReport
 #'
 #' @param bam param desc
 #' @param bed param desc
