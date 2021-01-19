@@ -5,6 +5,18 @@
 
 using namespace Rcpp;
 
+// rcpp_apply_cigar
+std::vector<std::string> rcpp_apply_cigar(std::vector<std::string> cigar, std::vector<std::string> query);
+RcppExport SEXP _epialleleR_rcpp_apply_cigar(SEXP cigarSEXP, SEXP querySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::vector<std::string> >::type cigar(cigarSEXP);
+    Rcpp::traits::input_parameter< std::vector<std::string> >::type query(querySEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_apply_cigar(cigar, query));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_cx_report
 std::vector<int> rcpp_cx_report(std::vector<int> rname, std::vector<int> strand, std::vector<int> start, std::vector<std::string> xm, std::vector<bool> pass, std::string ctx);
 RcppExport SEXP _epialleleR_rcpp_cx_report(SEXP rnameSEXP, SEXP strandSEXP, SEXP startSEXP, SEXP xmSEXP, SEXP passSEXP, SEXP ctxSEXP) {
@@ -40,6 +52,24 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< SEXP >::type x(xSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_fast_factor(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_get_base_freqs
+NumericMatrix rcpp_get_base_freqs(std::vector<int> read_rname, std::vector<int> read_strand, std::vector<int> read_start, std::vector<int> read_end, std::vector<std::string> read_seq, std::vector<bool> pass, std::vector<int> vcf_chr, std::vector<int> vcf_pos);
+RcppExport SEXP _epialleleR_rcpp_get_base_freqs(SEXP read_rnameSEXP, SEXP read_strandSEXP, SEXP read_startSEXP, SEXP read_endSEXP, SEXP read_seqSEXP, SEXP passSEXP, SEXP vcf_chrSEXP, SEXP vcf_posSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::vector<int> >::type read_rname(read_rnameSEXP);
+    Rcpp::traits::input_parameter< std::vector<int> >::type read_strand(read_strandSEXP);
+    Rcpp::traits::input_parameter< std::vector<int> >::type read_start(read_startSEXP);
+    Rcpp::traits::input_parameter< std::vector<int> >::type read_end(read_endSEXP);
+    Rcpp::traits::input_parameter< std::vector<std::string> >::type read_seq(read_seqSEXP);
+    Rcpp::traits::input_parameter< std::vector<bool> >::type pass(passSEXP);
+    Rcpp::traits::input_parameter< std::vector<int> >::type vcf_chr(vcf_chrSEXP);
+    Rcpp::traits::input_parameter< std::vector<int> >::type vcf_pos(vcf_posSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_get_base_freqs(read_rname, read_strand, read_start, read_end, read_seq, pass, vcf_chr, vcf_pos));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -91,8 +121,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_merge_ends
-std::vector<std::string> rcpp_merge_ends(std::vector<int> read1_pos, std::vector<std::string> read1_seq, std::vector<int> read2_pos, std::vector<std::string> read2_seq, std::vector<int> isize);
-RcppExport SEXP _epialleleR_rcpp_merge_ends(SEXP read1_posSEXP, SEXP read1_seqSEXP, SEXP read2_posSEXP, SEXP read2_seqSEXP, SEXP isizeSEXP) {
+std::vector<std::string> rcpp_merge_ends(std::vector<int> read1_pos, std::vector<std::string> read1_seq, std::vector<int> read2_pos, std::vector<std::string> read2_seq, std::vector<int> isize, char gap);
+RcppExport SEXP _epialleleR_rcpp_merge_ends(SEXP read1_posSEXP, SEXP read1_seqSEXP, SEXP read2_posSEXP, SEXP read2_seqSEXP, SEXP isizeSEXP, SEXP gapSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -101,7 +131,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::vector<int> >::type read2_pos(read2_posSEXP);
     Rcpp::traits::input_parameter< std::vector<std::string> >::type read2_seq(read2_seqSEXP);
     Rcpp::traits::input_parameter< std::vector<int> >::type isize(isizeSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_merge_ends(read1_pos, read1_seq, read2_pos, read2_seq, isize));
+    Rcpp::traits::input_parameter< char >::type gap(gapSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_merge_ends(read1_pos, read1_seq, read2_pos, read2_seq, isize, gap));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -141,13 +172,15 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_epialleleR_rcpp_apply_cigar", (DL_FUNC) &_epialleleR_rcpp_apply_cigar, 2},
     {"_epialleleR_rcpp_cx_report", (DL_FUNC) &_epialleleR_rcpp_cx_report, 6},
     {"_epialleleR_rcpp_char_to_context", (DL_FUNC) &_epialleleR_rcpp_char_to_context, 1},
     {"_epialleleR_rcpp_fast_factor", (DL_FUNC) &_epialleleR_rcpp_fast_factor, 1},
+    {"_epialleleR_rcpp_get_base_freqs", (DL_FUNC) &_epialleleR_rcpp_get_base_freqs, 8},
     {"_epialleleR_rcpp_get_xm_beta", (DL_FUNC) &_epialleleR_rcpp_get_xm_beta, 3},
     {"_epialleleR_rcpp_match_amplicon", (DL_FUNC) &_epialleleR_rcpp_match_amplicon, 7},
     {"_epialleleR_rcpp_match_capture", (DL_FUNC) &_epialleleR_rcpp_match_capture, 7},
-    {"_epialleleR_rcpp_merge_ends", (DL_FUNC) &_epialleleR_rcpp_merge_ends, 5},
+    {"_epialleleR_rcpp_merge_ends", (DL_FUNC) &_epialleleR_rcpp_merge_ends, 6},
     {"_epialleleR_rcpp_parse_xm", (DL_FUNC) &_epialleleR_rcpp_parse_xm, 6},
     {"_epialleleR_rcpp_threshold_reads", (DL_FUNC) &_epialleleR_rcpp_threshold_reads, 8},
     {NULL, NULL, 0}

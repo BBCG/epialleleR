@@ -30,7 +30,9 @@ preprocessBam <- function (bam.file,
     bam.processed <- .processBam(bam=bam, verbose=verbose)
     return(bam.processed)
   } else {
-    warning("Already preprocessed BAM supplied as an input")
+    if (verbose) 
+      message("Already preprocessed BAM supplied as an input. Options",
+              " 'min.mapq' and 'skip.duplicates' will have no effect.")
     return(bam.file)
   }
 }

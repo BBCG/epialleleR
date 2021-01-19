@@ -82,6 +82,26 @@ std::vector<int> rcpp_cx_report(std::vector<int> rname,            // int value 
 }
 
 
+// TODO: there will be another function
+// 1) all XM positions counted in int[16]: index is equal to char+2>>2&00001111
+// 2) when gap in reads or another chr - spit map to res, clear map
+// 3) find max - spit if within context
+// Here's the array
+// char  bin       +2        >>2&15  dec0b
+// +     00101011  00101101  1011    11
+// -     00101101  00101111  1011    11
+// .     00101110  00110000  1100    12
+// H     01001000  01001010  0010    2
+// U     01010101  01010111  0101    5
+// X     01011000  01011010  0110    6
+// Z     01011010  01011100  0111    7
+// h     01101000  01101010  1010    10
+// u     01110101  01110111  1101    13
+// x     01111000  01111010  1110    14
+// z     01111010  01111100  1111    15
+// 
+
+
 // test code in R
 //
 

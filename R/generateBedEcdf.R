@@ -42,10 +42,9 @@ generateBedEcdf <- function (bam,
   if (!is(bed, "GRanges"))
     bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed,
                     verbose=verbose)
-  
-  if (is.character(bam))
-    bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq,
-                         skip.duplicates=skip.duplicates, verbose=verbose)
+
+  bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq,
+                       skip.duplicates=skip.duplicates, verbose=verbose)
   
   ecdf.list <- .getBedEcdf(
     bam.processed=bam, bed=bed, bed.type=bed.type, bed.rows=bed.rows,

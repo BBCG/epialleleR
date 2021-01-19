@@ -48,7 +48,11 @@ generateCytosineReport(
 return desc
 }
 \description{
-`generateCytosineReport` desc. Epiallele-aware
+`generateCytosineReport` desc. Epiallele-aware reporter. Allele-specific
+methylation extractor? Haplotype-specific methylation? Check the terms.
+Sensitive to low-freq allele-specific methylation
+Source of terms: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3508712/
+Other tools: https://jordiabante.github.io/CpelAsm.jl/dev/
 }
 \details{
 details

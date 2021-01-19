@@ -1,26 +1,15 @@
-#' generateCytosineReport
+#' generateBaseFreqReport
 #'
 #' @description
-#' `generateCytosineReport` desc. Epiallele-aware reporter. Allele-specific
-#' methylation extractor? Haplotype-specific methylation? Check the terms.
-#' Sensitive to low-freq allele-specific methylation
-#' Source of terms: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3508712/
-#' Other tools: https://jordiabante.github.io/CpelAsm.jl/dev/
+#' `generateBaseFreqReport` desc. Epiallele-aware. VCF...
 #'
 #' @details
 #' details
 #'
 #' @param bam param desc
-#' @param report.file param desc
-#' @param threshold.reads param desc
-#' @param threshold.context param desc
-#' @param min.context.sites param desc
-#' @param min.context.beta param desc
-#' @param max.outofcontext.beta param desc
-#' @param report.context param desc
+#' @param vcf param desc
 #' @param min.mapq param desc
 #' @param skip.duplicates param desc
-#' @param gzip param desc
 #' @param verbose param desc
 #' @return return desc
 #' @seealso whatelse
@@ -29,25 +18,34 @@
 #'   sessionInfo()
 #' }
 #' @export
-generateCytosineReport <- function (bam,
-                                    report.file=NULL,
+generateBaseFreqReport <- function (bam,
+                                    vcf,
+                                    vcf.style=NULL,
+                                    bed=NULL,
+                                    zero.based.bed=FALSE,
                                     threshold.reads=TRUE,
                                     threshold.context=c("CG", "CHG", "CHH", "CxG", "CX"),
                                     min.context.sites=2,
                                     min.context.beta=0.5,
                                     max.outofcontext.beta=0.1, # double 0 to 1
-                                    report.context=threshold.context,
                                     min.mapq=0,
                                     skip.duplicates=FALSE,
-                                    gzip=FALSE,
                                     verbose=TRUE)
 {
   threshold.context <- match.arg(threshold.context, threshold.context)
-  report.context    <- match.arg(report.context, report.context)
+  
+  if (!is(vcf, "CollapsedVCF")) {
+    if (!is.null(bed) & !is(bed, "GRanges"))
+      bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed, verbose=verbose)
+    vcf <- .readVcf(vcf.file=vcf, vcf.style=vcf.style, bed=bed, verbose=verbose)
+  } else {
+    if (verbose)
+      message("Already preprocessed VCF supplied as an input. Options",
+              " 'bed' and 'zero.based.bed' will have no effect.")
+  }
   
   bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq,
                        skip.duplicates=skip.duplicates, verbose=verbose)
-  
   if (threshold.reads) {
     bam$pass <- .thresholdReads(
       bam.processed=bam,
@@ -64,24 +62,13 @@ generateCytosineReport <- function (bam,
     bam$pass <- TRUE
   }
   
-  cx.report <- .getCytosineReport(
-    bam.processed=bam,
-    ctx=paste0(.context.to.bases[[report.context]][["ctx.meth"]],
-               .context.to.bases[[report.context]][["ctx.unmeth"]]),
-    verbose=verbose
-  )
+  bf.report <- .getBaseFreqReport(bam.processed=bam, vcf=vcf, verbose=verbose)
   
-  # clean up by genome context below!
-  # if genome not avail, remove the least frequent context?
-  
-  if (is.null(report.file))
-    return(cx.report)
-  else
-    .writeReport(report=cx.report, report.file=report.file, gzip=gzip,
-                 verbose=verbose)
+  return(bf.report[,grep("nam|ran|ref|alt|fep",colnames(bf.report), ignore.case=TRUE), with=FALSE])
 }
 
 
 #|[c]{}^
 
 # ##############################################################################
+

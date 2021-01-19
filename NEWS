@@ -19,3 +19,7 @@ Changes in version 0.3.7 (2021-01-12)
 + lots of refactoring again
 + CX report sub now uses boost::container::flat_map (additional 2x speedup)
 + removed dplyr as a dependence, whole package uses data.table now
+
+Changes in version 0.3.9 (2021-01-)
++ fast C++ CIGAR parser to lay queries in reference space
++ new method to extract base frequences: generateBaseFreqReport

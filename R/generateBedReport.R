@@ -51,13 +51,12 @@ generateBedReport <- function (bam,
   threshold.context <- match.arg(threshold.context, threshold.context)
   report.context    <- match.arg(report.context, report.context)
   
-  if (!is(bed, "GRanges"))
+  if (!methods::is(bed, "GRanges"))
     bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed,
                     verbose=verbose)
   
-  if (is.character(bam))
-    bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq,
-                         skip.duplicates=skip.duplicates, verbose=verbose)
+  bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq,
+                       skip.duplicates=skip.duplicates, verbose=verbose)
   
   if (threshold.reads) {
     bam$pass <- .thresholdReads(
@@ -80,6 +79,8 @@ generateBedReport <- function (bam,
     match.tolerance=match.tolerance, match.min.overlap=match.min.overlap,
     verbose=verbose
   )
+  
+  if (!threshold.reads) bed.report$VEF <- NA
   
   if (is.null(report.file))
     return(bed.report)
