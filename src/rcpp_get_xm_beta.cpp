@@ -1,5 +1,5 @@
 #include <Rcpp.h>
-using namespace Rcpp;
+// using namespace Rcpp;
 
 // Parses XM tags and outputs average beta value according to context.
 //
@@ -12,6 +12,9 @@ std::vector<double> rcpp_get_xm_beta(std::vector<std::string> xm,  // merged nor
 {
   std::vector<double> res (xm.size(), 0);
   for (unsigned int x=0; x<xm.size(); x++) {
+    // checking for the interrupt
+    if (x & 1048575 == 0) Rcpp::checkUserInterrupt();
+    
     unsigned int ascii_map [128] = {0};
     std::for_each(xm[x].begin(), xm[x].end(), [&ascii_map] (char const &c) {
       ascii_map[c]++;
@@ -38,6 +41,11 @@ std::vector<double> rcpp_get_xm_beta(std::vector<std::string> xm,  // merged nor
 
 /*** R
 rcpp_get_xm_beta(c("..z..Zh..Zh..z..","..z..Zh..zh..z..","..z..Zh..XH..z..","..x..Zh..xh..x..","..h..Hh..hh..H.."), "ZX", "zx")
+
+xm         <- bam$XM
+ctx.meth   <- "ZX"
+ctx.unmeth <- "zx"
+microbenchmark::microbenchmark(rcpp_get_xm_beta(xm, ctx.meth, ctx.unmeth), times=10)
 */
 
 // Sourcing:

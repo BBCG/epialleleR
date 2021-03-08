@@ -2,8 +2,14 @@
 % Please edit documentation in R/generateBedReport.R
 \name{generateBedReport}
 \alias{generateBedReport}
+\alias{generateAmpliconReport}
+\alias{generateCaptureReport}
 \title{generateBedReport}
 \usage{
+generateAmpliconReport(...)
+
+generateCaptureReport(...)
+
 generateBedReport(
   bam,
   bed,

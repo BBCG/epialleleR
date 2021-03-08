@@ -13,6 +13,7 @@
 #' @importFrom GenomicAlignments sequenceLayer
 #' @importFrom Biostrings BStringSet
 #' @importFrom stringi stri_length
+#' @importFrom IRanges CharacterList
 #' @importFrom GenomicRanges makeGRangesFromDataFrame
 #' @importFrom GenomicRanges seqnames
 #' @importFrom BiocGenerics start
@@ -24,6 +25,8 @@
 #' @importFrom Rcpp sourceCpp
 #' @importFrom Rcpp evalCpp
 #' @importFrom stats ecdf
+#' @importFrom stats fisher.test
+#' @importFrom stats setNames
 #' @importFrom methods is
 #' @importFrom utils globalVariables
 #' @useDynLib epialleleR, .registration=TRUE
@@ -33,14 +36,21 @@
 #
 
 ################################################################################
-# Globals
+# Globals, unload
 ################################################################################
 
 utils::globalVariables(
   c(".", ".I", ".N", ":=", "FALSE+", "FALSE-", "TRUE+", "TRUE-", "XG", "XM",
     "XM.norm", "bedmatch", "cigar", "context", "flag", "isize", "meth", "mpos",
-    "pass", "pos", "qname", "rname", "strand", "triad", "unmeth", "width")
+    "pass", "pos", "qname", "rname", "strand", "triad", "unmeth", "width",
+    "isfirst", "ALT", "M+A", "M+Alt", "M+C", "M+G", "M+Ref", "M+T", "M-A",
+    "M-Alt", "M-C", "M-G", "M-Ref", "M-T", "REF", "U+A", "U+Alt", "U+C", "U+G",
+    "U+Ref", "U+T", "U-A", "U-Alt", "U-C", "U-G", "U-Ref", "U-T")
 )
+
+.onUnload <- function (libpath) {
+  library.dynam.unload("epialleleR", libpath)
+}
 
 ################################################################################
 # Constants
@@ -143,7 +153,7 @@ utils::globalVariables(
     if (!is.null(vcf.style))
       GenomeInfoDb::seqlevelsStyle(bed) <- vcf.style
     bed.levels <- levels(GenomicRanges::seqnames(bed))
-    vcf.genome <- setNames(rep("unknown", length(bed.levels)), bed.levels)
+    vcf.genome <- stats::setNames(rep("unknown", length(bed.levels)), bed.levels)
     vcf.param  <- VariantAnnotation::ScanVcfParam(info=NA, geno=NA, which=bed)
   }
   
@@ -213,7 +223,7 @@ utils::globalVariables(
   bam.data <- data.table::as.data.table(data.frame(bam, stringsAsFactors=FALSE))
   colnames(bam.data) <- sub("^tag.X", "X", colnames(bam.data))
   
-  if (verbose) message("  Transforming queries", appendLF=FALSE)
+  if (verbose) message("  Transforming sequences", appendLF=FALSE)
   bam.data[, `:=` (isfirst = bitwAnd(flag,128)==0,
                    seq     = rcpp_apply_cigar(cigar, seq),
                    XM      = rcpp_apply_cigar(cigar, XM))]
@@ -413,9 +423,10 @@ utils::globalVariables(
   if (verbose) message("Extracting base frequences", appendLF=FALSE)
   tm <- proc.time()
   
-  vcf.ranges <- BiocGenerics::sort(SummarizedExperiment::rowRanges(vcf))
+  vcf.ranges <- unique(BiocGenerics::sort(SummarizedExperiment::rowRanges(vcf)))
   vcf.ranges <- vcf.ranges[BiocGenerics::width(vcf.ranges)==1 &
                            sapply(IRanges::CharacterList(vcf.ranges$ALT), length)==1]
+  vcf.ranges <- vcf.ranges[sapply(IRanges::CharacterList(vcf.ranges$ALT), stringi::stri_length)==1]
   GenomeInfoDb::seqlevels(vcf.ranges) <- levels(bam.processed$rname)
   freqs <- rcpp_get_base_freqs(as.integer(bam.processed$rname),
                                as.integer(bam.processed$strand),
@@ -435,7 +446,7 @@ utils::globalVariables(
     seqnames=as.character(GenomicRanges::seqnames(vcf.ranges)),
     range=BiocGenerics::start(vcf.ranges),
     REF=as.character(vcf.ranges$REF),
-    ALT=sapply(IRanges::CharacterList(vcf.ranges$ALT) , paste, collapse=","),
+    ALT=sapply(IRanges::CharacterList(vcf.ranges$ALT), paste, collapse=","),
     freqs[,grep("[ACTG]$",colnames(freqs))]
   )
   
@@ -465,7 +476,7 @@ utils::globalVariables(
                                        `M+Alt`=`M+T`,       `U+Alt`=`U+T`,       `M-Alt`=`M-T`,       `U-Alt`=`U-T`      )]
   bf.report[, `:=` (SumRef=rowSums(bf.report[,.(`M+Ref`,`U+Ref`,`M-Ref`,`U-Ref`)], na.rm=TRUE),
                     SumAlt=rowSums(bf.report[,.(`M+Alt`,`U+Alt`,`M-Alt`,`U-Alt`)], na.rm=TRUE))]
-  FEp <- function (x) { if (any(is.na(x))) NA else fisher.test(matrix(x, nrow=2))$p.value }
+  FEp <- function (x) { if (any(is.na(x))) NA else stats::fisher.test(matrix(x, nrow=2))$p.value }
   bf.report[, `:=` (`FEp+`=apply(bf.report[,.(`M+Ref`,`U+Ref`,`M+Alt`,`U+Alt`)], 1, FEp),
                     `FEp-`=apply(bf.report[,.(`M-Ref`,`U-Ref`,`M-Alt`,`U-Alt`)], 1, FEp))]
   

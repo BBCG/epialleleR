@@ -1,23 +1,29 @@
 #' preprocessBam
 #'
 #' @description
-#' `preprocessBam` desc. Epiallele-aware
+#' `preprocessBam` This function reads and preprocesses BAM file
 #'
 #' @details
-#' details
+#' The function loads and preprocesses BAM file, saving time when multiple
+#' analyses are to be performed on large input files. Currently, Rsamtools
+#' package is used to read the data, but this will change in a future with a
+#' goal of speeding up this step even further.
 #'
-#' @param bam.file param desc
-#' @param min.mapq param desc
-#' @param skip.duplicates param desc
-#    http://www.htslib.org/doc/samtools-markdup.html
-#    https://support.illumina.com/content/dam/illumina-support/help/Illumina_DRAGEN_Bio_IT_Platform_v3_7_1000000141465/Content/SW/Informatics/Dragen/DuplicateMarking_fDG.htm
-#' @param verbose param desc
-#' @return return desc
-#' @seealso whatelse
+#' @param bam.file BAM file location string
+#' @param min.mapq non-negative integer threshold for minimum read mapping
+#' quality (default: 0)
+#' @param skip.duplicates boolean defining if duplicate aligned reads should be
+#' skipped (default: FALSE). Option has no effect if duplicate reads were not
+#' marked by alignment software
+#' @param verbose boolean to report progress and timings (default: TRUE)
+#' @return \code{\link[data.table]{data.table}} object containing preprocessed
+#' BAM data
+#' @seealso \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{Sequence Alignment/Map format specifications},
+#' duplicate alighments marking by \href{http://www.htslib.org/doc/samtools-markdup.html}{Samtools}
+#' and \href{https://support.illumina.com/content/dam/illumina-support/help/Illumina_DRAGEN_Bio_IT_Platform_v3_7_1000000141465/Content/SW/Informatics/Dragen/DuplicateMarking_fDG.htm}{Illumina DRAGEN Bio IT Platform}
 #' @examples
-#' \dontrun{
-#'   sessionInfo()
-#' }
+#'   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
+#'   bam.data    <- preprocessBam(capture.bam)
 #' @export
 preprocessBam <- function (bam.file,
                            min.mapq=0,

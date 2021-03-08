@@ -13,10 +13,6 @@ rcpp_char_to_context <- function(ctx) {
     .Call(`_epialleleR_rcpp_char_to_context`, ctx)
 }
 
-rcpp_fast_factor <- function(x) {
-    .Call(`_epialleleR_rcpp_fast_factor`, x)
-}
-
 rcpp_get_base_freqs <- function(read_rname, read_strand, read_start, read_end, read_seq, pass, vcf_chr, vcf_pos) {
     .Call(`_epialleleR_rcpp_get_base_freqs`, read_rname, read_strand, read_start, read_end, read_seq, pass, vcf_chr, vcf_pos)
 }
@@ -35,10 +31,6 @@ rcpp_match_capture <- function(read_chr, read_start, read_end, capt_chr, capt_st
 
 rcpp_merge_ends <- function(read1_pos, read1_seq, read2_pos, read2_seq, isize, gap) {
     .Call(`_epialleleR_rcpp_merge_ends`, read1_pos, read1_seq, read2_pos, read2_seq, isize, gap)
-}
-
-rcpp_parse_xm <- function(rname, strand, start, xm, pass, ctx) {
-    .Call(`_epialleleR_rcpp_parse_xm`, rname, strand, start, xm, pass, ctx)
 }
 
 rcpp_threshold_reads <- function(xm, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac) {

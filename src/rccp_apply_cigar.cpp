@@ -1,5 +1,5 @@
 #include <Rcpp.h>
-using namespace Rcpp;
+// using namespace Rcpp;
 
 // Applies CIGAR to the sequence given (such as XM tag)
 // Outpus query strings in a reference space
@@ -16,6 +16,9 @@ std::vector<std::string> rcpp_apply_cigar(std::vector<std::string> cigar,       
 
   // iterating over input
   for (unsigned int x=0; x<cigar.size(); x++) {
+    // checking for the interrupt
+    if (x & 1048575 == 0) Rcpp::checkUserInterrupt();
+      
     // move to first nondigit
     int found = 0;
     while (found<cigar[x].size() & cigar[x][found]>='0' & cigar[x][found]<='9')
@@ -55,7 +58,7 @@ std::vector<std::string> rcpp_apply_cigar(std::vector<std::string> cigar,       
         case 'P' :
           break;
         default :
-          stop("Unknown CIGAR operation at BAM line ", x);
+          Rcpp::stop("Unknown CIGAR operation at BAM line ", x);
       }
 
       // next op

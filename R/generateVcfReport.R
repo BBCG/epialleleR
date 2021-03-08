@@ -1,13 +1,21 @@
-#' generateBaseFreqReport
+#' generateVcfReport
 #'
 #' @description
-#' `generateBaseFreqReport` desc. Epiallele-aware. VCF...
+#' `generateVcfReport` desc. Epiallele-aware. VCF...
 #'
 #' @details
 #' details
 #'
 #' @param bam param desc
 #' @param vcf param desc
+#' @param vcf.style param desc
+#' @param bed param desc
+#' @param zero.based.bed param desc
+#' @param threshold.reads param desc
+#' @param threshold.context param desc
+#' @param min.context.sites param desc
+#' @param min.context.beta param desc
+#' @param max.outofcontext.beta param desc
 #' @param min.mapq param desc
 #' @param skip.duplicates param desc
 #' @param verbose param desc
@@ -18,19 +26,19 @@
 #'   sessionInfo()
 #' }
 #' @export
-generateBaseFreqReport <- function (bam,
-                                    vcf,
-                                    vcf.style=NULL,
-                                    bed=NULL,
-                                    zero.based.bed=FALSE,
-                                    threshold.reads=TRUE,
-                                    threshold.context=c("CG", "CHG", "CHH", "CxG", "CX"),
-                                    min.context.sites=2,
-                                    min.context.beta=0.5,
-                                    max.outofcontext.beta=0.1, # double 0 to 1
-                                    min.mapq=0,
-                                    skip.duplicates=FALSE,
-                                    verbose=TRUE)
+generateVcfReport <- function (bam,
+                               vcf,
+                               vcf.style=NULL,
+                               bed=NULL,
+                               zero.based.bed=FALSE,
+                               threshold.reads=TRUE,
+                               threshold.context=c("CG", "CHG", "CHH", "CxG", "CX"),
+                               min.context.sites=2,
+                               min.context.beta=0.5,
+                               max.outofcontext.beta=0.1, # double 0 to 1
+                               min.mapq=0,
+                               skip.duplicates=FALSE,
+                               verbose=TRUE)
 {
   threshold.context <- match.arg(threshold.context, threshold.context)
   
@@ -62,9 +70,9 @@ generateBaseFreqReport <- function (bam,
     bam$pass <- TRUE
   }
   
-  bf.report <- .getBaseFreqReport(bam.processed=bam, vcf=vcf, verbose=verbose)
+  vcf.report <- .getBaseFreqReport(bam.processed=bam, vcf=vcf, verbose=verbose)
   
-  return(bf.report[,grep("nam|ran|ref|alt|fep",colnames(bf.report), ignore.case=TRUE), with=FALSE])
+  return(vcf.report[,grep("nam|ran|ref|alt|fep",colnames(vcf.report), ignore.case=TRUE), with=FALSE])
 }
 
 

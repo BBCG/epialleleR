@@ -1,10 +1,14 @@
 #include <Rcpp.h>
-using namespace Rcpp;
+// using namespace Rcpp;
 
-// Matches reads to amplicons by start OR end plus/minus tolerance.
-// Return value: 1-based amplicon index or NA for non-matched.
+// Matches reads to targets by start *or* end plus/minus tolerance (amplicons)
+// OR overlap (capture).
+// Return value: 1-based target index or NA for non-matched.
 // Only first match is taken.
 //
+// Currently this code doesn't take advantage from the fact that both reads and
+// targets can be sorted. Thus it is possible to speed it up quite a bit, taking
+// the VCF code as an example
 
 // MATCH AMPLICON BY POSITION
 // fast, vectorised
@@ -19,6 +23,9 @@ std::vector<int> rcpp_match_amplicon(std::vector<std::string> read_chr,  // chr 
 {
   std::vector<int> res (read_start.size(), NA_INTEGER);
   for (unsigned int x=0; x<read_start.size(); x++) {
+    // checking for the interrupt
+    if (x & 1048575 == 0) Rcpp::checkUserInterrupt();
+    
     for (unsigned int i=0; i<ampl_start.size(); i++) {
       if ((std::abs(read_start[x]-ampl_start[i]) <= tolerance ||
            std::abs(read_end[x]-ampl_end[i]) <= tolerance) &&
@@ -46,6 +53,9 @@ std::vector<int> rcpp_match_capture(std::vector<std::string> read_chr,  // chr o
 {
   std::vector<int> res (read_start.size(), NA_INTEGER);
   for (unsigned int x=0; x<read_start.size(); x++) {
+    // checking for the interrupt
+    if (x & 1048575 == 0) Rcpp::checkUserInterrupt();
+    
     for (unsigned int i=0; i<capt_start.size(); i++) {
       signed int overlap = std::min(read_end[x], capt_end[i]) - std::max(read_start[x], capt_start[i]) + 1;
       if (overlap >= min_overlap && read_chr[x] == capt_chr[i]) {

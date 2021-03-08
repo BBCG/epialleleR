@@ -1,5 +1,5 @@
 Package: epialleleR
-Title: title
+Title: Fast, epiallele-aware methylation reporter
 Version: 0.3.9
 Authors@R: 
   person(given = "Oleksii",
@@ -8,7 +8,14 @@ Authors@R:
     email = "oleksii.nikolaienko@gmail.com",
     comment = c(ORCID = "0000-0002-5910-4934"))
 Comment: Maintainer: Oleksii Nikolaienko <oleksii.nikolaienko@gmail.com>
-Description: Epiallele-aware methylation reports
+Description: Epialleles are specific DNA methylation patterns that are
+  mitotically and/or meiotically inherited. This package calls hypermethylated
+  epiallele frequencies at the level of genomic regions or individual cytosines
+  in next-generation sequencing data using binary alignment map (BAM) files as
+  an input. Other functionality includes computing the empirical cumulative
+  distribution function for per-read beta values, and testing the significance
+  of the association between epiallele methylation status and base frequencies
+  at particular genomic positions (SNPs).
 SystemRequirements: C++17
 NeedsCompilation: yes
 Depends:
@@ -21,9 +28,13 @@ Imports:
   utils,
   Rsamtools,
   GenomicAlignments,
+  IRanges,
   GenomicRanges,
   Biostrings,
   BiocGenerics,
+  GenomeInfoDb,
+  SummarizedExperiment,
+  VariantAnnotation,
   stringi,
   data.table
 LinkingTo:
@@ -37,7 +48,6 @@ License: Artistic-2.0
 URL: https://github.com/BBCG/epialleleR
 BugReports: https://github.com/BBCG/epialleleR/issues
 Encoding: UTF-8
-LazyData: true
 biocViews: DNAMethylation, Epigenetics, MethylSeq
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr

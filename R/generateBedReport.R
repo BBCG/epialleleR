@@ -1,4 +1,8 @@
-#' generateBedReport
+#' @name generateBedReport
+#' @aliases generateAmpliconReport
+#' @aliases generateCaptureReport
+#'
+#'@title generateBedReport
 #'
 #' @description
 #' `generateBedReport` desc. Epiallele-aware. GENERIC
@@ -29,6 +33,15 @@
 #' \dontrun{
 #'   sessionInfo()
 #' }
+#' @rdname generateBedReport
+#' @export
+generateAmpliconReport <- function (...)
+  generateBedReport(..., bed.type="amplicon")
+#' @rdname generateBedReport
+#' @export
+generateCaptureReport <- function (...)
+  generateBedReport(..., bed.type="capture")
+#' @rdname generateBedReport
 #' @export
 generateBedReport <- function (bam,
                                bed,

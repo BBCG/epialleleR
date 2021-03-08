@@ -1,5 +1,5 @@
 #include <Rcpp.h>
-using namespace Rcpp;
+// using namespace Rcpp;
 
 // Matches reads with given 1-base positions (VCF) and returns base frequences.
 // FUNCTION ASSUMES THAT BOTH READS AND VCF ENTRIES ARE SORTED!
@@ -17,20 +17,23 @@ using namespace Rcpp;
 // MATCH VCF ENTRIES, RETURN BASE FREQS
 // fast, vectorised
 // [[Rcpp::export("rcpp_get_base_freqs")]]
-NumericMatrix rcpp_get_base_freqs(std::vector<int> read_rname,          // factor for read chr
-                                  std::vector<int> read_strand,         // factor for read strand
-                                  std::vector<int> read_start,          // start pos of reads
-                                  std::vector<int> read_end,            // end pos of reads
-                                  std::vector<std::string> read_seq,    // seq of reads
-                                  std::vector<bool> pass,               // read passes the threshold?
-                                  std::vector<int> vcf_chr,             // factor for VCF entries chr
-                                  std::vector<int> vcf_pos)             // pos of VCF entries
+Rcpp::NumericMatrix rcpp_get_base_freqs(std::vector<int> read_rname,          // factor for read chr
+                                        std::vector<int> read_strand,         // factor for read strand
+                                        std::vector<int> read_start,          // start pos of reads
+                                        std::vector<int> read_end,            // end pos of reads
+                                        std::vector<std::string> read_seq,    // seq of reads
+                                        std::vector<bool> pass,               // read passes the threshold?
+                                        std::vector<int> vcf_chr,             // factor for VCF entries chr
+                                        std::vector<int> vcf_pos)             // pos of VCF entries
 {
-  NumericMatrix res(vcf_pos.size(),32);
+  Rcpp::NumericMatrix res(vcf_pos.size(),32);
   
   int cur_read=0;
   for (unsigned int i=0; i<vcf_pos.size(); i++) {
     for (unsigned int x=cur_read; x<read_start.size(); x++) {
+      // checking for the interrupt
+      if (x & 1048575 == 0) Rcpp::checkUserInterrupt();
+      
       if (read_rname[x]<vcf_chr[i] || read_end[x]<vcf_pos[i]) {         // skip reads if VCF is ahead
         cur_read=x;
         continue;

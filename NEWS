@@ -20,6 +20,16 @@ Changes in version 0.3.7 (2021-01-12)
 + CX report sub now uses boost::container::flat_map (additional 2x speedup)
 + removed dplyr as a dependence, whole package uses data.table now
 
-Changes in version 0.3.9 (2021-01-)
+Changes in version 0.3.9 (2021-01-19)
 + fast C++ CIGAR parser to lay queries in reference space
 + new method to extract base frequences: generateBaseFreqReport
+
+Changes in version 0.4.0 (2021-03-08)
++ going public
++ CX report now includes only the context present in more than 50% of the reads
++ generateVcfReport (capable of dealing with SNVs only for now)
++ added documentation to some of the methods
++ added several examples
++ added sample data for amplicon and capture NGS
++ added some tests based on sample data
++ README.md
