@@ -32,7 +32,7 @@ Rcpp::NumericMatrix rcpp_get_base_freqs(std::vector<int> read_rname,          //
   for (unsigned int i=0; i<vcf_pos.size(); i++) {
     for (unsigned int x=cur_read; x<read_start.size(); x++) {
       // checking for the interrupt
-      if (x & 1048575 == 0) Rcpp::checkUserInterrupt();
+      if ((x & 1048575) == 0) Rcpp::checkUserInterrupt();
       
       if (read_rname[x]<vcf_chr[i] || read_end[x]<vcf_pos[i]) {         // skip reads if VCF is ahead
         cur_read=x;

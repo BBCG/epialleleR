@@ -103,7 +103,7 @@ std::vector<int> rcpp_cx_report(std::vector<int> rname,            // int value 
   cx_map.reserve(100000);                                          // reserving helps
   for (unsigned int x=0; x<rname.size(); x++) {
     // checking for the interrupt
-    if (x & 1048575 == 0) Rcpp::checkUserInterrupt();
+    if ((x & 1048575) == 0) Rcpp::checkUserInterrupt();
     
     if (start[x]>map_val[1] || rname[x]!=map_val[0]) {
       spit_results;

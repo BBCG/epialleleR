@@ -24,7 +24,7 @@ std::vector<int> rcpp_match_amplicon(std::vector<std::string> read_chr,  // chr 
   std::vector<int> res (read_start.size(), NA_INTEGER);
   for (unsigned int x=0; x<read_start.size(); x++) {
     // checking for the interrupt
-    if (x & 1048575 == 0) Rcpp::checkUserInterrupt();
+    if ((x & 1048575) == 0) Rcpp::checkUserInterrupt();
     
     for (unsigned int i=0; i<ampl_start.size(); i++) {
       if ((std::abs(read_start[x]-ampl_start[i]) <= tolerance ||

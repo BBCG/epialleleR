@@ -17,7 +17,7 @@ std::vector<std::string> rcpp_apply_cigar(std::vector<std::string> cigar,       
   // iterating over input
   for (unsigned int x=0; x<cigar.size(); x++) {
     // checking for the interrupt
-    if (x & 1048575 == 0) Rcpp::checkUserInterrupt();
+    if ((x & 1048575) == 0) Rcpp::checkUserInterrupt();
       
     // move to first nondigit
     int found = 0;
