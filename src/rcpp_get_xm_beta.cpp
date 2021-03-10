@@ -16,15 +16,15 @@ std::vector<double> rcpp_get_xm_beta(std::vector<std::string> xm,  // merged nor
     if ((x & 1048575) == 0) Rcpp::checkUserInterrupt();
     
     unsigned int ascii_map [128] = {0};
-    std::for_each(xm[x].begin(), xm[x].end(), [&ascii_map] (char const &c) {
+    std::for_each(xm[x].begin(), xm[x].end(), [&ascii_map] (unsigned int const &c) {
       ascii_map[c]++;
     });
     unsigned int n_ctx_meth = 0;
-    std::for_each(ctx_meth.begin(), ctx_meth.end(), [&n_ctx_meth, &ascii_map] (char const &c) {
+    std::for_each(ctx_meth.begin(), ctx_meth.end(), [&n_ctx_meth, &ascii_map] (unsigned int const &c) {
       n_ctx_meth += ascii_map[c];
     });
     unsigned int n_ctx_unmeth = 0;
-    std::for_each(ctx_unmeth.begin(), ctx_unmeth.end(), [&n_ctx_unmeth, &ascii_map] (char const &c) {
+    std::for_each(ctx_unmeth.begin(), ctx_unmeth.end(), [&n_ctx_unmeth, &ascii_map] (unsigned int const &c) {
       n_ctx_unmeth += ascii_map[c];
     });
     unsigned int n_ctx_all = n_ctx_meth + n_ctx_unmeth;

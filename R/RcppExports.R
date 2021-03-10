@@ -5,12 +5,12 @@ rcpp_apply_cigar <- function(cigar, query) {
     .Call(`_epialleleR_rcpp_apply_cigar`, cigar, query)
 }
 
-rcpp_cx_report <- function(rname, strand, start, xm, pass, ctx) {
-    .Call(`_epialleleR_rcpp_cx_report`, rname, strand, start, xm, pass, ctx)
-}
-
 rcpp_char_to_context <- function(ctx) {
     .Call(`_epialleleR_rcpp_char_to_context`, ctx)
+}
+
+rcpp_cx_report <- function(rname, strand, start, xm, pass, ctx) {
+    .Call(`_epialleleR_rcpp_cx_report`, rname, strand, start, xm, pass, ctx)
 }
 
 rcpp_get_base_freqs <- function(read_rname, read_strand, read_start, read_end, read_seq, pass, vcf_chr, vcf_pos) {

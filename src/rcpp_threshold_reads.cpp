@@ -12,7 +12,7 @@ std::vector<bool> rcpp_threshold_reads(std::vector<std::string> xm,  // merged n
                                        std::string ctx_unmeth,       // unmethylated context string, e.g. "xz". NON-EMPTY
                                        std::string ooctx_meth,       // methylated out-of-context string, e.g. "HU". Can be empty
                                        std::string ooctx_unmeth,     // unmethylated out-of-context string, e.g. "hu". Can be empty
-                                       int min_n_ctx,                // minimum number of context bases in xm field
+                                       unsigned int min_n_ctx,       // minimum number of context bases in xm field
                                        double min_ctx_meth_frac,     // minimum fraction of methylated to total context bases (min context beta value)
                                        double max_ooctx_meth_frac)   // maximum fraction of methylated to total out-of-context bases (max out-of-context beta value)
 {
@@ -22,12 +22,12 @@ std::vector<bool> rcpp_threshold_reads(std::vector<std::string> xm,  // merged n
     if ((x & 1048575) == 0) Rcpp::checkUserInterrupt();
     
     unsigned int ascii_map [128] = {0};
-    std::for_each(xm[x].begin(), xm[x].end(), [&ascii_map] (char const &c) {
+    std::for_each(xm[x].begin(), xm[x].end(), [&ascii_map] (unsigned int const &c) {
       ascii_map[c]++;
     });
     
     unsigned int n_ctx_meth = 0;
-    std::for_each(ctx_meth.begin(), ctx_meth.end(), [&n_ctx_meth, &ascii_map] (char const &c) {
+    std::for_each(ctx_meth.begin(), ctx_meth.end(), [&n_ctx_meth, &ascii_map] (unsigned int const &c) {
       n_ctx_meth += ascii_map[c];
     });
     if (n_ctx_meth==0) {
@@ -36,7 +36,7 @@ std::vector<bool> rcpp_threshold_reads(std::vector<std::string> xm,  // merged n
     }
     
     unsigned int n_ctx_unmeth = 0;
-    std::for_each(ctx_unmeth.begin(), ctx_unmeth.end(), [&n_ctx_unmeth, &ascii_map] (char const &c) {
+    std::for_each(ctx_unmeth.begin(), ctx_unmeth.end(), [&n_ctx_unmeth, &ascii_map] (unsigned int const &c) {
       n_ctx_unmeth += ascii_map[c];
     });
     unsigned int n_ctx_all = n_ctx_meth + n_ctx_unmeth;
@@ -51,12 +51,12 @@ std::vector<bool> rcpp_threshold_reads(std::vector<std::string> xm,  // merged n
     }
     
     unsigned int n_ooctx_meth = 0;
-    std::for_each(ooctx_meth.begin(), ooctx_meth.end(), [&n_ooctx_meth, &ascii_map] (char const &c) {
+    std::for_each(ooctx_meth.begin(), ooctx_meth.end(), [&n_ooctx_meth, &ascii_map] (unsigned int const &c) {
       n_ooctx_meth += ascii_map[c];
     });
     if (n_ooctx_meth>0) {
       unsigned int n_ooctx_unmeth = 0;
-      std::for_each(ooctx_unmeth.begin(), ooctx_unmeth.end(), [&n_ooctx_unmeth, &ascii_map] (char const &c) {
+      std::for_each(ooctx_unmeth.begin(), ooctx_unmeth.end(), [&n_ooctx_unmeth, &ascii_map] (unsigned int const &c) {
         n_ooctx_unmeth += ascii_map[c];
       });
       

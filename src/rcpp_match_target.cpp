@@ -54,7 +54,7 @@ std::vector<int> rcpp_match_capture(std::vector<std::string> read_chr,  // chr o
   std::vector<int> res (read_start.size(), NA_INTEGER);
   for (unsigned int x=0; x<read_start.size(); x++) {
     // checking for the interrupt
-    if (x & 1048575 == 0) Rcpp::checkUserInterrupt();
+    if ((x & 1048575) == 0) Rcpp::checkUserInterrupt();
     
     for (unsigned int i=0; i<capt_start.size(); i++) {
       signed int overlap = std::min(read_end[x], capt_end[i]) - std::max(read_start[x], capt_start[i]) + 1;

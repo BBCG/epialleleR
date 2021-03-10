@@ -20,18 +20,18 @@ std::vector<std::string> rcpp_apply_cigar(std::vector<std::string> cigar,       
     if ((x & 1048575) == 0) Rcpp::checkUserInterrupt();
       
     // move to first nondigit
-    int found = 0;
-    while (found<cigar[x].size() & cigar[x][found]>='0' & cigar[x][found]<='9')
+    size_t found = 0;
+    while (found<cigar[x].size() && cigar[x][found]>='0' && cigar[x][found]<='9')
       found++;
     
     // quick copy if simple match
-    if (found==cigar[x].size()-1 & cigar[x][found]=='M') {
+    if (found==cigar[x].size()-1 && cigar[x][found]=='M') {
       res[x] = query[x];
       continue;
     }
 
-    int prev = 0;                                                               // previous cigar_op position
-    int query_pos = 0;                                                          // current position within the query string
+    size_t prev = 0;                                                            // previous cigar_op position
+    size_t query_pos = 0;                                                       // current position within the query string
 
     while (found<cigar[x].size()) {
       int cigar_oplen = std::stoi(cigar[x].substr(prev, found-prev));
@@ -63,7 +63,7 @@ std::vector<std::string> rcpp_apply_cigar(std::vector<std::string> cigar,       
 
       // next op
       prev = ++found;
-      while (found<cigar[x].size() & cigar[x][found]>='0' & cigar[x][found]<='9')
+      while (found<cigar[x].size() && cigar[x][found]>='0' && cigar[x][found]<='9')
         found++;
     }
 

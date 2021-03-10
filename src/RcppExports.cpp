@@ -17,6 +17,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_char_to_context
+std::vector<std::string> rcpp_char_to_context(std::vector<unsigned char> ctx);
+RcppExport SEXP _epialleleR_rcpp_char_to_context(SEXP ctxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::vector<unsigned char> >::type ctx(ctxSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_char_to_context(ctx));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_cx_report
 std::vector<int> rcpp_cx_report(std::vector<int> rname, std::vector<int> strand, std::vector<int> start, std::vector<std::string> xm, std::vector<bool> pass, std::string ctx);
 RcppExport SEXP _epialleleR_rcpp_cx_report(SEXP rnameSEXP, SEXP strandSEXP, SEXP startSEXP, SEXP xmSEXP, SEXP passSEXP, SEXP ctxSEXP) {
@@ -30,17 +41,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::vector<bool> >::type pass(passSEXP);
     Rcpp::traits::input_parameter< std::string >::type ctx(ctxSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_cx_report(rname, strand, start, xm, pass, ctx));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpp_char_to_context
-std::vector<std::string> rcpp_char_to_context(std::vector<unsigned char> ctx);
-RcppExport SEXP _epialleleR_rcpp_char_to_context(SEXP ctxSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::vector<unsigned char> >::type ctx(ctxSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_char_to_context(ctx));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -126,7 +126,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_threshold_reads
-std::vector<bool> rcpp_threshold_reads(std::vector<std::string> xm, std::string ctx_meth, std::string ctx_unmeth, std::string ooctx_meth, std::string ooctx_unmeth, int min_n_ctx, double min_ctx_meth_frac, double max_ooctx_meth_frac);
+std::vector<bool> rcpp_threshold_reads(std::vector<std::string> xm, std::string ctx_meth, std::string ctx_unmeth, std::string ooctx_meth, std::string ooctx_unmeth, unsigned int min_n_ctx, double min_ctx_meth_frac, double max_ooctx_meth_frac);
 RcppExport SEXP _epialleleR_rcpp_threshold_reads(SEXP xmSEXP, SEXP ctx_methSEXP, SEXP ctx_unmethSEXP, SEXP ooctx_methSEXP, SEXP ooctx_unmethSEXP, SEXP min_n_ctxSEXP, SEXP min_ctx_meth_fracSEXP, SEXP max_ooctx_meth_fracSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -136,7 +136,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::string >::type ctx_unmeth(ctx_unmethSEXP);
     Rcpp::traits::input_parameter< std::string >::type ooctx_meth(ooctx_methSEXP);
     Rcpp::traits::input_parameter< std::string >::type ooctx_unmeth(ooctx_unmethSEXP);
-    Rcpp::traits::input_parameter< int >::type min_n_ctx(min_n_ctxSEXP);
+    Rcpp::traits::input_parameter< unsigned int >::type min_n_ctx(min_n_ctxSEXP);
     Rcpp::traits::input_parameter< double >::type min_ctx_meth_frac(min_ctx_meth_fracSEXP);
     Rcpp::traits::input_parameter< double >::type max_ooctx_meth_frac(max_ooctx_meth_fracSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_threshold_reads(xm, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac));
@@ -146,8 +146,8 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_epialleleR_rcpp_apply_cigar", (DL_FUNC) &_epialleleR_rcpp_apply_cigar, 2},
-    {"_epialleleR_rcpp_cx_report", (DL_FUNC) &_epialleleR_rcpp_cx_report, 6},
     {"_epialleleR_rcpp_char_to_context", (DL_FUNC) &_epialleleR_rcpp_char_to_context, 1},
+    {"_epialleleR_rcpp_cx_report", (DL_FUNC) &_epialleleR_rcpp_cx_report, 6},
     {"_epialleleR_rcpp_get_base_freqs", (DL_FUNC) &_epialleleR_rcpp_get_base_freqs, 8},
     {"_epialleleR_rcpp_get_xm_beta", (DL_FUNC) &_epialleleR_rcpp_get_xm_beta, 3},
     {"_epialleleR_rcpp_match_amplicon", (DL_FUNC) &_epialleleR_rcpp_match_amplicon, 7},
