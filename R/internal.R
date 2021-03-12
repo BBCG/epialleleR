@@ -192,7 +192,7 @@ utils::globalVariables(
   #   report.file <- base::gzfile(base::sub("(\\.gz)?$", ".gz", report.file, ignore.case=TRUE), "w")
   # write.table(report, file=report.file, quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
   data.table::fwrite(report, file=report.file, quote=FALSE, sep="\t",
-                     row.names=FALSE, col.names=FALSE,
+                     row.names=FALSE, col.names=TRUE,
                      compress=if (gzip) "gzip" else "none")
   
   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
