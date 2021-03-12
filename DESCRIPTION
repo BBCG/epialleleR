@@ -7,7 +7,7 @@ Authors@R:
     role = c("aut", "cre"),
     email = "oleksii.nikolaienko@gmail.com",
     comment = c(ORCID = "0000-0002-5910-4934"))
-Comment: Maintainer: Oleksii Nikolaienko <oleksii.nikolaienko@gmail.com>
+CommentMaintainer: Oleksii Nikolaienko <oleksii.nikolaienko@gmail.com>
 Description: Epialleles are specific DNA methylation patterns that are
   mitotically and/or meiotically inherited. This package calls hypermethylated
   epiallele frequencies at the level of genomic regions or individual cytosines
@@ -16,10 +16,10 @@ Description: Epialleles are specific DNA methylation patterns that are
   distribution function for per-read beta values, and testing the significance
   of the association between epiallele methylation status and base frequencies
   at particular genomic positions (SNPs).
-SystemRequirements: C++17
+CommentSystemRequirements: C++17
 NeedsCompilation: yes
 Depends:
-  R (>= 4.0)
+  R (>= 3.6)
 Imports:
   Rcpp,
   BH,
