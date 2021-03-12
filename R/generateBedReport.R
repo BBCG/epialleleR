@@ -58,6 +58,7 @@ generateBedReport <- function (bam,
                                report.context=threshold.context,
                                min.mapq=0,
                                skip.duplicates=FALSE,
+                               gzip=FALSE,
                                verbose=TRUE)
 {
   bed.type          <- match.arg(bed.type, bed.type)
@@ -98,7 +99,7 @@ generateBedReport <- function (bam,
   if (is.null(report.file))
     return(bed.report)
   else
-    .writeReport(report=bed.report, report.file=report.file, gzip=FALSE,
+    .writeReport(report=bed.report, report.file=report.file, gzip=gzip,
                  verbose=verbose)
 }
 

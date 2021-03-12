@@ -9,6 +9,7 @@ generateVcfReport(
   vcf,
   vcf.style = NULL,
   bed = NULL,
+  report.file = NULL,
   zero.based.bed = FALSE,
   threshold.reads = TRUE,
   threshold.context = c("CG", "CHG", "CHH", "CxG", "CX"),
@@ -17,6 +18,7 @@ generateVcfReport(
   max.outofcontext.beta = 0.1,
   min.mapq = 0,
   skip.duplicates = FALSE,
+  gzip = FALSE,
   verbose = TRUE
 )
 }

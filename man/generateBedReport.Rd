@@ -26,6 +26,7 @@ generateBedReport(
   report.context = threshold.context,
   min.mapq = 0,
   skip.duplicates = FALSE,
+  gzip = FALSE,
   verbose = TRUE
 )
 }

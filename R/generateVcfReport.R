@@ -30,6 +30,7 @@ generateVcfReport <- function (bam,
                                vcf,
                                vcf.style=NULL,
                                bed=NULL,
+                               report.file=NULL,
                                zero.based.bed=FALSE,
                                threshold.reads=TRUE,
                                threshold.context=c("CG", "CHG", "CHH", "CxG", "CX"),
@@ -38,6 +39,7 @@ generateVcfReport <- function (bam,
                                max.outofcontext.beta=0.1, # double 0 to 1
                                min.mapq=0,
                                skip.duplicates=FALSE,
+                               gzip=FALSE,
                                verbose=TRUE)
 {
   threshold.context <- match.arg(threshold.context, threshold.context)
@@ -72,7 +74,13 @@ generateVcfReport <- function (bam,
   
   vcf.report <- .getBaseFreqReport(bam.processed=bam, vcf=vcf, verbose=verbose)
   
-  return(vcf.report[,grep("nam|ran|ref|alt|fep",colnames(vcf.report), ignore.case=TRUE), with=FALSE])
+  vcf.report <- vcf.report[,grep("nam|ran|ref|alt|fep",colnames(vcf.report), ignore.case=TRUE), with=FALSE]
+  
+  if (is.null(report.file))
+    return(vcf.report)
+  else
+    .writeReport(report=vcf.report, report.file=report.file, gzip=gzip,
+                 verbose=verbose)
 }
 
 
