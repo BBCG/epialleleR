@@ -61,6 +61,8 @@ generateBedReport(
 
 \item{skip.duplicates}{param desc}
 
+\item{gzip}{boolean to compress the report (default: FALSE)}
+
 \item{verbose}{param desc}
 }
 \value{

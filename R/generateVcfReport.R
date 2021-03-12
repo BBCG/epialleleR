@@ -10,6 +10,9 @@
 #' @param vcf param desc
 #' @param vcf.style param desc
 #' @param bed param desc
+#' @param report.file file location string to write the VCF report. If NULL
+#' (the default) then report is returned as a
+#' \code{\link[data.table]{data.table}} object
 #' @param zero.based.bed param desc
 #' @param threshold.reads param desc
 #' @param threshold.context param desc
@@ -18,6 +21,7 @@
 #' @param max.outofcontext.beta param desc
 #' @param min.mapq param desc
 #' @param skip.duplicates param desc
+#' @param gzip boolean to compress the report (default: FALSE)
 #' @param verbose param desc
 #' @return return desc
 #' @seealso whatelse

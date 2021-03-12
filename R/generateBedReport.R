@@ -26,6 +26,7 @@
 #' @param report.context param desc
 #' @param min.mapq param desc
 #' @param skip.duplicates param desc
+#' @param gzip boolean to compress the report (default: FALSE)
 #' @param verbose param desc
 #' @return return desc
 #' @seealso whatelse

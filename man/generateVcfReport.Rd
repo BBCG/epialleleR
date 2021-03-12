@@ -31,6 +31,10 @@ generateVcfReport(
 
 \item{bed}{param desc}
 
+\item{report.file}{file location string to write the VCF report. If NULL
+(the default) then report is returned as a
+\code{\link[data.table]{data.table}} object}
+
 \item{zero.based.bed}{param desc}
 
 \item{threshold.reads}{param desc}
@@ -46,6 +50,8 @@ generateVcfReport(
 \item{min.mapq}{param desc}
 
 \item{skip.duplicates}{param desc}
+
+\item{gzip}{boolean to compress the report (default: FALSE)}
 
 \item{verbose}{param desc}
 }
