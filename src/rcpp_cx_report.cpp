@@ -1,4 +1,5 @@
 #include <Rcpp.h>
+#include <array>
 #include <boost/container/flat_map.hpp>
 // using namespace Rcpp;
 
@@ -10,7 +11,7 @@
 // [[Rcpp::depends(BH)]]
 // sparse_map - https://www.codeproject.com/Articles/866996/Fast-Implementations-of-Maps-with-Integer-Keys-in
 // can actually be the fastest map for the task, however I didn't try it yet
-// because it hequires me to include non-standard header and change the way I
+// because it requires me to include non-standard header and change the way I
 // emplace new items.
 
 
