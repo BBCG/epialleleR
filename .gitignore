@@ -1,0 +1,6 @@
+.Rproj.user
+inst/doc
+.Rbuildignore
+.Rhistory
+epialleleR.Rproj
+.playground.R
