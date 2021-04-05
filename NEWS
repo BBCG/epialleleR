@@ -35,6 +35,6 @@ Changes in version 0.4.0 (2021-03-08)
 + README.md
 
 Changes in version 0.4.5 (2021-04-0x)
-+ works on Apple Silicon
++ works on Apple Silicon now
 + fully documented methods
 + fully covered with tests and examples
