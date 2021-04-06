@@ -2,46 +2,140 @@
 #' @aliases generateAmpliconReport
 #' @aliases generateCaptureReport
 #'
-#'@title generateBedReport
+#' @title generateBedReport
 #'
 #' @description
-#' `generateBedReport` desc. Epiallele-aware. GENERIC
+#' `generateBedReport` This function
 #'
 #' @details
 #' details. Add two functions here: generateAmpliconReport and
 #' generateCaptureReport
 #'
-#' @param bam param desc
-#' @param bed param desc
-#' @param report.file param desc
-#' @param zero.based.bed param desc
-#' @param bed.type param desc
-#' @param match.tolerance param desc
-#' @param match.min.overlap param desc
-#' @param threshold.reads param desc
-#' @param threshold.context param desc
-#' @param min.context.sites param desc
-#' @param min.context.beta param desc
-#' @param max.outofcontext.beta param desc
-#' @param report.context param desc
-#' @param min.mapq param desc
-#' @param skip.duplicates param desc
-#' @param gzip boolean to compress the report (default: FALSE)
-#' @param verbose param desc
-#' @return return desc
-#' @seealso whatelse
-#' @examples
-#' \dontrun{
-#'   sessionInfo()
+#' @param bam BAM file location string OR preprocessed output of
+#' \code{\link{preprocessBam}} function
+#' @param bed Browser Extensible Data (BED) file location string OR object of
+#' class \code{\link[GenomicRanges]{GRanges}} holding genomic coordinates of
+#' regions of interest 
+#' @param report.file file location string to write the cytosine report. If NULL
+#' (the default) then report is returned as a
+#' \code{\link[data.table]{data.table}} object
+#' @param zero.based.bed boolean defining if BED coordinates are zero based
+#' (default: FALSE)
+#' @param bed.type character string for the type of assay that was used to
+#' produce sequence reads
+#' \itemize{
+#'   \item "amplicon" (the default) -- used for amplicon-based next-generation
+#'   sequencing when exact coordinates of sequenced fragments are known.
+#'   Matching of reads to genomic ranges are then performed by the read's start
+#'   or end positions, either of which should be no further than
+#'   `match.tolerance` bases away from the start or end position of genomic
+#'   ranges given in BED file/\code{\link[GenomicRanges]{GRanges}} object
+#'   \item "capture" -- used for capture-based next-generation sequencing when
+#'   reads partially overlap with the capture target regions. Read is considered
+#'   to match the genomic range when their overlap is more or equal to
+#'   `match.min.overlap`. If read matches two or more BED genomic regions, only
+#'   the first match is taken (input \code{\link[GenomicRanges]{GRanges}} are
+#'   not sorted internally)
 #' }
+#' @param match.tolerance integer for the largest difference between read's and
+#' BED \code{\link[GenomicRanges]{GRanges}} start or end positions during
+#' matching of amplicon-based NGS reads (default: 1)
+#' @param match.min.overlap integer for the smallest overlap between read's and
+#' BED \code{\link[GenomicRanges]{GRanges}} start or end positions during
+#' matching of capture-based NGS reads (default: 1). If read matches two or more
+#' BED genomic regions, only the first match is taken (input
+#' \code{\link[GenomicRanges]{GRanges}} are not sorted internally) 
+#' @param threshold.reads boolean defining if sequence reads should be
+#' thresholded before counting reads belonging to variant epialleles (default:
+#' TRUE). Disabling thresholding is possible but makes no sense in this context,
+#' as will result in VEF==1
+#' @param threshold.context string defining cytosine methylation context used
+#' for thresholdning the reads
+#' \itemize{
+#'   \item "CG" (the default) -- within-the-context: CpG cytosines (called as
+#'   zZ), out-of-context: all the other cytosines (hHxX)
+#'   \item "CHG" -- within-the-context: CHG cytosines (xX), out-of-context: hHzZ
+#'   \item "CHH" -- within-the-context: CHH cytosines (hH), out-of-context: xXzZ
+#'   \item "CxG" -- within-the-context: CG and CHG cytosines (zZxX),
+#'   out-of-context: CHH cytosines (hH)
+#'   \item "CX" -- all cytosines are considered within-the-context, this
+#'   effectively results in no thresholdning
+#' }
+#' This option has no effect when read thresholding is disabled
+#' @param min.context.sites non-negative integer for minimum number of cytosines
+#' within the `threshold.context` (default: 2). Reads containing *fewer*
+#' within-the-context cytosines are considered completely unmethylated (all C
+#' are counted as T). This option has no effect when read thresholding is
+#' disabled
+#' @param min.context.beta real number in the range [0;1] (default: 0.5). Reads
+#' with average beta value for within-the-context cytosines *below* this
+#' threshold are considered completely unmethylated (all C are counted as T).
+#' This option has no effect when read thresholding is disabled
+#' @param max.outofcontext.beta real number in the range [0;1] (default: 0.1).
+#' Reads with average beta value for out-of-context cytosines *above* this
+#' threshold are considered completely unmethylated (all C are counted as T).
+#' This option has no effect when read thresholding is disabled
+#' @param min.mapq non-negative integer threshold for minimum read mapping
+#' quality (default: 0). Option has no effect if preprocessed BAM data was
+#' supplied as an input
+#' @param skip.duplicates boolean defining if duplicate aligned reads should be
+#' skipped (default: FALSE). Option has no effect if preprocessed BAM data was
+#' supplied as an input OR duplicate reads were not marked by alignment software
+#' @param gzip boolean to compress the report (default: FALSE)
+#' @param verbose boolean to report progress and timings (default: TRUE)
+#' @return \code{\link[data.table]{data.table}} object containing VEF report for
+#' BED \code{\link[GenomicRanges]{GRanges}} or NULL if report.file was
+#' specified. If BAM file contains reads that would not match to any of BED
+#' \code{\link[GenomicRanges]{GRanges}}, the first row in the report will
+#' contain information on such reads (with seqnames, start and end equal to NA)
+#' @seealso \code{\link{preprocessBam}} for preloading BAM data,
+#' \code{\link{generateCytosineReport}} for methylation statistics at the level
+#' of individual cytosines, \code{\link{generateVcfReport}} for evaluating
+#' epiallele-SNV associations, and `epialleleR` vignettes for the description of
+#' usage and sample data
+#' @examples
+#'   amplicon.bam <- system.file("extdata", "amplicon010meth.bam", package="epialleleR")
+#'   amplicon.bed <- system.file("extdata", "amplicon.bed", package="epialleleR")
+#'   amplicon.report <- generateAmpliconReport(bam=amplicon.bam, bed=amplicon.bed)
+#'   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
+#'   capture.bed <- system.file("extdata", "capture.bed", package="epialleleR")
+#'   capture.report <- generateCaptureReport(bam=capture.bam, bed=capture.bed)
+#'   bed.report <- generateBedReport(bam=capture.bam, bed=capture.bed, bed.type="capture")
+#'   identical(capture.report, bed.report)
 #' @rdname generateBedReport
 #' @export
-generateAmpliconReport <- function (...)
-  generateBedReport(..., bed.type="amplicon")
+generateAmpliconReport <- function (
+  bam, bed, report.file=NULL, zero.based.bed=FALSE, match.tolerance=1,
+  threshold.reads=TRUE, threshold.context=c("CG", "CHG", "CHH", "CxG", "CX"),
+  min.context.sites=2, min.context.beta=0.5, max.outofcontext.beta=0.1,
+  min.mapq=0, skip.duplicates=FALSE, gzip=FALSE, verbose=TRUE)
+{
+  generateBedReport(
+    bam=bam, bed=bed, report.file=report.file, zero.based.bed=zero.based.bed,
+    bed.type="amplicon", match.tolerance=match.tolerance,
+    threshold.reads=threshold.reads, threshold.context=threshold.context,
+    min.context.sites=min.context.sites, min.context.beta=min.context.beta,
+    max.outofcontext.beta=max.outofcontext.beta, min.mapq=min.mapq,
+    skip.duplicates=skip.duplicates, gzip=gzip, verbose=verbose
+  )
+}
 #' @rdname generateBedReport
 #' @export
-generateCaptureReport <- function (...)
-  generateBedReport(..., bed.type="capture")
+generateCaptureReport <- function (
+  bam, bed, report.file=NULL, zero.based.bed=FALSE, match.min.overlap=1,
+  threshold.reads=TRUE, threshold.context=c("CG", "CHG", "CHH", "CxG", "CX"),
+  min.context.sites=2, min.context.beta=0.5, max.outofcontext.beta=0.1,
+  min.mapq=0, skip.duplicates=FALSE, gzip=FALSE, verbose=TRUE)
+{
+  generateBedReport(
+    bam=bam, bed=bed, report.file=report.file, zero.based.bed=zero.based.bed,
+    bed.type="capture", match.min.overlap=match.min.overlap,
+    threshold.reads=threshold.reads, threshold.context=threshold.context,
+    min.context.sites=min.context.sites, min.context.beta=min.context.beta,
+    max.outofcontext.beta=max.outofcontext.beta, min.mapq=min.mapq,
+    skip.duplicates=skip.duplicates, gzip=gzip, verbose=verbose
+  )
+}
 #' @rdname generateBedReport
 #' @export
 generateBedReport <- function (bam,
@@ -56,7 +150,6 @@ generateBedReport <- function (bam,
                                min.context.sites=2,
                                min.context.beta=0.5,
                                max.outofcontext.beta=0.1, # double 0 to 1
-                               report.context=threshold.context,
                                min.mapq=0,
                                skip.duplicates=FALSE,
                                gzip=FALSE,
@@ -64,7 +157,6 @@ generateBedReport <- function (bam,
 {
   bed.type          <- match.arg(bed.type, bed.type)
   threshold.context <- match.arg(threshold.context, threshold.context)
-  report.context    <- match.arg(report.context, report.context)
   
   if (!methods::is(bed, "GRanges"))
     bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed,
