@@ -6,9 +6,39 @@
 \alias{generateCaptureReport}
 \title{generateBedReport}
 \usage{
-generateAmpliconReport(...)
+generateAmpliconReport(
+  bam,
+  bed,
+  report.file = NULL,
+  zero.based.bed = FALSE,
+  match.tolerance = 1,
+  threshold.reads = TRUE,
+  threshold.context = c("CG", "CHG", "CHH", "CxG", "CX"),
+  min.context.sites = 2,
+  min.context.beta = 0.5,
+  max.outofcontext.beta = 0.1,
+  min.mapq = 0,
+  skip.duplicates = FALSE,
+  gzip = FALSE,
+  verbose = TRUE
+)
 
-generateCaptureReport(...)
+generateCaptureReport(
+  bam,
+  bed,
+  report.file = NULL,
+  zero.based.bed = FALSE,
+  match.min.overlap = 1,
+  threshold.reads = TRUE,
+  threshold.context = c("CG", "CHG", "CHH", "CxG", "CX"),
+  min.context.sites = 2,
+  min.context.beta = 0.5,
+  max.outofcontext.beta = 0.1,
+  min.mapq = 0,
+  skip.duplicates = FALSE,
+  gzip = FALSE,
+  verbose = TRUE
+)
 
 generateBedReport(
   bam,
@@ -23,7 +53,6 @@ generateBedReport(
   min.context.sites = 2,
   min.context.beta = 0.5,
   max.outofcontext.beta = 0.1,
-  report.context = threshold.context,
   min.mapq = 0,
   skip.duplicates = FALSE,
   gzip = FALSE,
@@ -31,55 +60,153 @@ generateBedReport(
 )
 }
 \arguments{
-\item{bam}{param desc}
+\item{bam}{BAM file location string OR preprocessed output of
+\code{\link{preprocessBam}} function}
 
-\item{bed}{param desc}
+\item{bed}{Browser Extensible Data (BED) file location string OR object of
+class \code{\link[GenomicRanges]{GRanges}} holding genomic coordinates for
+regions of interest}
 
-\item{report.file}{param desc}
+\item{report.file}{file location string to write the BED report. If NULL
+(the default) then report is returned as a
+\code{\link[data.table]{data.table}} object}
 
-\item{zero.based.bed}{param desc}
+\item{zero.based.bed}{boolean defining if BED coordinates are zero based
+(default: FALSE)}
 
-\item{bed.type}{param desc}
+\item{match.tolerance}{integer for the largest difference between read's and
+BED \code{\link[GenomicRanges]{GRanges}} start or end positions during
+matching of amplicon-based NGS reads (default: 1)}
 
-\item{match.tolerance}{param desc}
+\item{threshold.reads}{boolean defining if sequence reads should be
+thresholded before counting reads belonging to variant epialleles (default:
+TRUE). Disabling thresholding is possible but makes no sense in this context,
+as will result in VEF==1 (NA VEF values are returned in order to avoid
+confusion)}
 
-\item{match.min.overlap}{param desc}
+\item{threshold.context}{string defining cytosine methylation context used
+for thresholdning the reads
+\itemize{
+  \item "CG" (the default) -- within-the-context: CpG cytosines (called as
+  zZ), out-of-context: all the other cytosines (hHxX)
+  \item "CHG" -- within-the-context: CHG cytosines (xX), out-of-context: hHzZ
+  \item "CHH" -- within-the-context: CHH cytosines (hH), out-of-context: xXzZ
+  \item "CxG" -- within-the-context: CG and CHG cytosines (zZxX),
+  out-of-context: CHH cytosines (hH)
+  \item "CX" -- all cytosines are considered within-the-context, this
+  effectively results in no thresholdning
+}
+This option has no effect when read thresholding is disabled}
 
-\item{threshold.reads}{param desc}
+\item{min.context.sites}{non-negative integer for minimum number of cytosines
+within the `threshold.context` (default: 2). Reads containing *fewer*
+within-the-context cytosines are considered completely unmethylated (all C
+are counted as T). This option has no effect when read thresholding is
+disabled}
 
-\item{threshold.context}{param desc}
+\item{min.context.beta}{real number in the range [0;1] (default: 0.5). Reads
+with average beta value for within-the-context cytosines *below* this
+threshold are considered completely unmethylated (all C are counted as T).
+This option has no effect when read thresholding is disabled}
 
-\item{min.context.sites}{param desc}
+\item{max.outofcontext.beta}{real number in the range [0;1] (default: 0.1).
+Reads with average beta value for out-of-context cytosines *above* this
+threshold are considered completely unmethylated (all C are counted as T).
+This option has no effect when read thresholding is disabled}
 
-\item{min.context.beta}{param desc}
+\item{min.mapq}{non-negative integer threshold for minimum read mapping
+quality (default: 0). Option has no effect if preprocessed BAM data was
+supplied as an input}
 
-\item{max.outofcontext.beta}{param desc}
-
-\item{report.context}{param desc}
-
-\item{min.mapq}{param desc}
-
-\item{skip.duplicates}{param desc}
+\item{skip.duplicates}{boolean defining if duplicate aligned reads should be
+skipped (default: FALSE). Option has no effect if preprocessed BAM data was
+supplied as an input OR duplicate reads were not marked by alignment software}
 
 \item{gzip}{boolean to compress the report (default: FALSE)}
 
-\item{verbose}{param desc}
+\item{verbose}{boolean to report progress and timings (default: TRUE)}
+
+\item{match.min.overlap}{integer for the smallest overlap between read's and
+BED \code{\link[GenomicRanges]{GRanges}} start or end positions during
+matching of capture-based NGS reads (default: 1). If read matches two or more
+BED genomic regions, only the first match is taken (input
+\code{\link[GenomicRanges]{GRanges}} are *not* sorted internally)}
+
+\item{bed.type}{character string for the type of assay that was used to
+produce sequence reads
+\itemize{
+  \item "amplicon" (the default) -- used for amplicon-based next-generation
+  sequencing when exact coordinates of sequenced fragments are known.
+  Matching of reads to genomic ranges are then performed by the read's start
+  or end positions, either of which should be no further than
+  `match.tolerance` bases away from the start or end position of genomic
+  ranges given in BED file/\code{\link[GenomicRanges]{GRanges}} object
+  \item "capture" -- used for capture-based next-generation sequencing when
+  reads partially overlap with the capture target regions. Read is considered
+  to match the genomic range when their overlap is more or equal to
+  `match.min.overlap`. If read matches two or more BED genomic regions, only
+  the first match is taken (input \code{\link[GenomicRanges]{GRanges}} are
+  *not* sorted internally)
+}}
 }
 \value{
-return desc
+\code{\link[data.table]{data.table}} object containing VEF report for
+BED \code{\link[GenomicRanges]{GRanges}} or NULL if report.file was
+specified. If BAM file contains reads that would not match to any of BED
+\code{\link[GenomicRanges]{GRanges}}, the first row in the report will
+contain information on such reads (with seqnames, start and end equal to NA).
+The report columns are:
+\itemize{
+  \item seqnames -- reference sequence name
+  \item start -- start of genomic region
+  \item end -- end of genomic region
+  \item width -- width of genomic region
+  \item strand -- strand
+  \item ... -- other columns that were present in BED or metadata columns of
+  \code{\link[GenomicRanges]{GRanges}} abject 
+  \item nreads+ -- number of reads mapped to the forward ("+") strand
+  \item nreads- -- number of reads mapped to the reverse ("-") strand
+  \item VEF -- frequency of reads passing the threshold
+}
 }
 \description{
-`generateBedReport` desc. Epiallele-aware. GENERIC
+`generateBedReport` This function
+
+Assuming the default thresholding parameters (threshold.reads
+= TRUE, threshold.context = "CG", min.context.sites = 2, min.context.beta =
+0.5, max.outofcontext.beta = 0.1), the input and results will look as
+following:
+
+| read chr:strand:start | methylation string | threshold | reason |
+| chr1:+:1 | ...Z..x+.h..x..h. | below | min.context.sites < 2 (only one zZ base) |
+| chr1:+:1 | ...Z..z.h..x..h.  | above | pass all criteria |
+| chr1:+:1 | ...Z..z.h..X..h.  | below | max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) |
+| chr1:+:1 | ...Z..z.h..z-.h.  | below | min.context.beta < 0.5 (1Z / 3zZ = 0.33) |
+
+Only the second read will satisfy all the thresholding criteria, leading to
+the following BED report (for `bed = as("chr1:1-100", "GRanges")`):
+
+| seqnames | start | end | width | strand | nreads+ | nreads- | VEF |
+| chr1 | 1 | 100 | 100 | * | 4 | 0 | 0.25 |
 }
 \details{
 details. Add two functions here: generateAmpliconReport and
 generateCaptureReport
 }
 \examples{
-\dontrun{
-  sessionInfo()
-}
+  amplicon.bam <- system.file("extdata", "amplicon010meth.bam", package="epialleleR")
+  amplicon.bed <- system.file("extdata", "amplicon.bed", package="epialleleR")
+  amplicon.report <- generateAmpliconReport(bam=amplicon.bam, bed=amplicon.bed)
+  capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
+  capture.bed <- system.file("extdata", "capture.bed", package="epialleleR")
+  capture.report <- generateCaptureReport(bam=capture.bam, bed=capture.bed)
+  bed.report <- generateBedReport(bam=capture.bam, bed=capture.bed, bed.type="capture")
+  identical(capture.report, bed.report)
 }
 \seealso{
-whatelse
+\code{\link{preprocessBam}} for preloading BAM data,
+\code{\link{generateCytosineReport}} for methylation statistics at the level
+of individual cytosines, \code{\link{generateVcfReport}} for evaluating
+epiallele-SNV associations, and `epialleleR` vignettes for the description of
+usage and sample data
 }

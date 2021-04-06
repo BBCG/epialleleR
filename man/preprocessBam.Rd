@@ -30,6 +30,13 @@ The function loads and preprocesses BAM file, saving time when multiple
 analyses are to be performed on large input files. Currently, Rsamtools
 package is used to read the data, but this will change in a future with a
 goal of speeding up this step even further.
+
+This function is also used internally when BAM file location is supplied as
+an input for other `epialleleR` methods
+
+Please also note that for all its methods, `epialleleR` requires methylation
+call string to be present in a BAM file - i.e. methylation calling must be
+performed after read mapping/alignment by your software of choice.
 }
 \examples{
   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
