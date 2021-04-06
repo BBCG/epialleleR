@@ -203,7 +203,7 @@ utils::globalVariables(
 ################################################################################
 
 # descr: process BAM data, merge reads if necessary
-# value: tibble with fields qname, rname, strand, start, XM
+# value: data.table with fields qname, rname, strand, start, XM
 
 .processBam <- function (bam,
                          verbose)
@@ -227,8 +227,7 @@ utils::globalVariables(
   bam.data[, `:=` (isfirst = bitwAnd(flag,128)==0,
                    seq     = rcpp_apply_cigar(cigar, seq),
                    XM      = rcpp_apply_cigar(cigar, XM))]
-                   # XM.norm = as.character(GenomicAlignments::sequenceLayer(Biostrings::BStringSet(XM, use.names=FALSE), cigar), use.names=FALSE) )] # reference function
-  
+ 
   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
 
   # fast merge reads, vectorised
@@ -309,7 +308,7 @@ utils::globalVariables(
 ################################################################################
 
 # descr: prepare cytosine report for processed reads according to filter
-# value: tibble with Bismark-formatted cytosine report
+# value: data.table with Bismark-formatted cytosine report
 
 .getCytosineReport <- function (bam.processed,
                                 ctx,
@@ -340,7 +339,6 @@ utils::globalVariables(
 ################################################################################
 
 # descr: BED-assisted (amplicon/capture) report
-# value: tibble
 
 .getBedReport <- function (bam.processed, bed, bed.type,
                            match.tolerance, match.min.overlap,
@@ -414,8 +412,8 @@ utils::globalVariables(
 
 ################################################################################
 
-# descr: calculates beta values and returns ECDF functions for BED file entries
-# value: list of lists with context and out-of-context ECDF functions
+# descr: calculates base frequences at particular positions
+# value: data.table with base freqs
 
 .getBaseFreqReport <- function (bam.processed, vcf,
                                 verbose)
