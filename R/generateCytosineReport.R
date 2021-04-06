@@ -18,7 +18,7 @@
 #' following:
 #' 
 #' | read chr:strand:start | methylation string | threshold | reason | methylation reported |
-#' | chr1:+:1 | ...Z..x+.h..x..h. | below | min.context.sites < 2 (only one "zZ" base) | C at position 4: unmethylated |
+#' | chr1:+:1 | ...Z..x+.h..x..h. | below | min.context.sites < 2 (only one zZ base) | C at position 4: unmethylated |
 #' | chr1:+:1 | ...Z..z.h..x..h.  | above | pass all criteria | C4: methylated, C7: unmethylated |
 #' | chr1:+:1 | ...Z..z.h..X..h.  | below | max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) | C4 and C7: unmethylated |
 #' | chr1:+:1 | ...Z..z.h..z-.h.  | below | min.context.beta < 0.5 (1Z / 3zZ = 0.33) | C4 and C7: unmethylated |
@@ -109,7 +109,18 @@
 #' @param gzip boolean to compress the report (default: FALSE)
 #' @param verbose boolean to report progress and timings (default: TRUE)
 #' @return \code{\link[data.table]{data.table}} object containing cytosine
-#' report in Bismark format or NULL if report.file was specified
+#' report in Bismark format or NULL if report.file was specified. The report
+#' columns are:
+#' \itemize{
+#'   \item rname -- reference sequence name (as in BAM)
+#'   \item strand -- strand
+#'   \item pos -- cytosine position
+#'   \item context -- methylation context
+#'   \item meth -- number of methylated cytosines
+#'   \item unmeth -- number of unmethylated cytosines
+#'   \item triad -- sequence spanning region [<pos>:<pos+2>]. Always equals to
+#'   "NNN" due to the reference genome-independent reporting
+#' }
 #' @seealso \code{\link{preprocessBam}} for preloading BAM data,
 #' \code{\link{generateBedReport}} for genomic region-based statistics,
 #' \code{\link{generateVcfReport}} for evaluating epiallele-SNV associations,
@@ -126,7 +137,7 @@ generateCytosineReport <- function (bam,
                                     threshold.context=c("CG", "CHG", "CHH", "CxG", "CX"),
                                     min.context.sites=2,
                                     min.context.beta=0.5,
-                                    max.outofcontext.beta=0.1, # double 0 to 1
+                                    max.outofcontext.beta=0.1,
                                     report.context=threshold.context,
                                     min.mapq=0,
                                     skip.duplicates=FALSE,

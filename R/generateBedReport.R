@@ -6,6 +6,23 @@
 #'
 #' @description
 #' `generateBedReport` This function
+#' 
+#' Assuming the default thresholding parameters (threshold.reads
+#' = TRUE, threshold.context = "CG", min.context.sites = 2, min.context.beta =
+#' 0.5, max.outofcontext.beta = 0.1), the input and results will look as
+#' following:
+#' 
+#' | read chr:strand:start | methylation string | threshold | reason |
+#' | chr1:+:1 | ...Z..x+.h..x..h. | below | min.context.sites < 2 (only one zZ base) |
+#' | chr1:+:1 | ...Z..z.h..x..h.  | above | pass all criteria |
+#' | chr1:+:1 | ...Z..z.h..X..h.  | below | max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) |
+#' | chr1:+:1 | ...Z..z.h..z-.h.  | below | min.context.beta < 0.5 (1Z / 3zZ = 0.33) |
+#' 
+#' Only the second read will satisfy all the thresholding criteria, leading to
+#' the following BED report (for `bed = as("chr1:1-100", "GRanges")`):
+#' 
+#' | seqnames | start | end | width | strand | nreads+ | nreads- | VEF |
+#' | chr1 | 1 | 100 | 100 | * | 4 | 0 | 0.25 |
 #'
 #' @details
 #' details. Add two functions here: generateAmpliconReport and
@@ -14,9 +31,9 @@
 #' @param bam BAM file location string OR preprocessed output of
 #' \code{\link{preprocessBam}} function
 #' @param bed Browser Extensible Data (BED) file location string OR object of
-#' class \code{\link[GenomicRanges]{GRanges}} holding genomic coordinates of
+#' class \code{\link[GenomicRanges]{GRanges}} holding genomic coordinates for
 #' regions of interest 
-#' @param report.file file location string to write the cytosine report. If NULL
+#' @param report.file file location string to write the BED report. If NULL
 #' (the default) then report is returned as a
 #' \code{\link[data.table]{data.table}} object
 #' @param zero.based.bed boolean defining if BED coordinates are zero based
@@ -35,7 +52,7 @@
 #'   to match the genomic range when their overlap is more or equal to
 #'   `match.min.overlap`. If read matches two or more BED genomic regions, only
 #'   the first match is taken (input \code{\link[GenomicRanges]{GRanges}} are
-#'   not sorted internally)
+#'   *not* sorted internally)
 #' }
 #' @param match.tolerance integer for the largest difference between read's and
 #' BED \code{\link[GenomicRanges]{GRanges}} start or end positions during
@@ -44,11 +61,12 @@
 #' BED \code{\link[GenomicRanges]{GRanges}} start or end positions during
 #' matching of capture-based NGS reads (default: 1). If read matches two or more
 #' BED genomic regions, only the first match is taken (input
-#' \code{\link[GenomicRanges]{GRanges}} are not sorted internally) 
+#' \code{\link[GenomicRanges]{GRanges}} are *not* sorted internally) 
 #' @param threshold.reads boolean defining if sequence reads should be
 #' thresholded before counting reads belonging to variant epialleles (default:
 #' TRUE). Disabling thresholding is possible but makes no sense in this context,
-#' as will result in VEF==1
+#' as will result in VEF==1 (NA VEF values are returned in order to avoid
+#' confusion)
 #' @param threshold.context string defining cytosine methylation context used
 #' for thresholdning the reads
 #' \itemize{
@@ -87,7 +105,20 @@
 #' BED \code{\link[GenomicRanges]{GRanges}} or NULL if report.file was
 #' specified. If BAM file contains reads that would not match to any of BED
 #' \code{\link[GenomicRanges]{GRanges}}, the first row in the report will
-#' contain information on such reads (with seqnames, start and end equal to NA)
+#' contain information on such reads (with seqnames, start and end equal to NA).
+#' The report columns are:
+#' \itemize{
+#'   \item seqnames -- reference sequence name
+#'   \item start -- start of genomic region
+#'   \item end -- end of genomic region
+#'   \item width -- width of genomic region
+#'   \item strand -- strand
+#'   \item ... -- other columns that were present in BED or metadata columns of
+#'   \code{\link[GenomicRanges]{GRanges}} abject 
+#'   \item nreads+ -- number of reads mapped to the forward ("+") strand
+#'   \item nreads- -- number of reads mapped to the reverse ("-") strand
+#'   \item VEF -- frequency of reads passing the threshold
+#' }
 #' @seealso \code{\link{preprocessBam}} for preloading BAM data,
 #' \code{\link{generateCytosineReport}} for methylation statistics at the level
 #' of individual cytosines, \code{\link{generateVcfReport}} for evaluating
@@ -149,7 +180,7 @@ generateBedReport <- function (bam,
                                threshold.context=c("CG", "CHG", "CHH", "CxG", "CX"),
                                min.context.sites=2,
                                min.context.beta=0.5,
-                               max.outofcontext.beta=0.1, # double 0 to 1
+                               max.outofcontext.beta=0.1,
                                min.mapq=0,
                                skip.duplicates=FALSE,
                                gzip=FALSE,
