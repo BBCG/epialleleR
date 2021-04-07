@@ -165,6 +165,9 @@ After counting, function checks if certain bases occur more often within
 reads belonging to certain epialleles using Fisher's Exact test
 (\code{\link[stats]{fisher.test}}) and reports separate p-values for reads
 mapped to \strong{"+"} (forward) and \strong{"-"} (reverse) DNA strands.
+
+Please note that currently final report includes only the VCF entries with
+single-base REF and ALT alleles. This will be fixed in the future.
 }
 \examples{
   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
