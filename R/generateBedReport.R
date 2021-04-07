@@ -6,8 +6,8 @@
 #'
 #' @description
 #' `generateBedReport`, `generateAmpliconReport`, `generateCaptureReport` --
-#' These functions match reads to the set of genomic locations and return the
-#' fraction of reads with an average methylation level passing an arbitrary
+#' These functions match BAM reads to the set of genomic locations and return
+#' the fraction of reads with an average methylation level passing an arbitrary
 #' threshold
 #'
 #' @details
