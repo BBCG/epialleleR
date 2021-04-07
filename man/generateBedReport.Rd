@@ -65,7 +65,8 @@ generateBedReport(
 
 \item{bed}{Browser Extensible Data (BED) file location string OR object of
 class \code{\link[GenomicRanges]{GRanges}} holding genomic coordinates for
-regions of interest}
+regions of interest. The seqlevels of BED file/object must be the same as
+seqlevels of BAM file/object used}
 
 \item{report.file}{file location string to write the BED report. If NULL
 (the default) then report is returned as a
@@ -81,7 +82,8 @@ matching of amplicon-based NGS reads (default: 1)}
 \item{threshold.reads}{boolean defining if sequence reads should be
 thresholded before counting reads belonging to variant epialleles (default:
 TRUE). Disabling thresholding is possible but makes no sense in this context,
-as will result in VEF==1 (NA VEF values are returned in order to avoid
+as all the reads will be assigned to the variant epiallele, which will result
+in VEF==1 (in such case `NA` VEF values are returned in order to avoid
 confusion)}
 
 \item{threshold.context}{string defining cytosine methylation context used
@@ -100,19 +102,21 @@ This option has no effect when read thresholding is disabled}
 
 \item{min.context.sites}{non-negative integer for minimum number of cytosines
 within the `threshold.context` (default: 2). Reads containing *fewer*
-within-the-context cytosines are considered completely unmethylated (all C
-are counted as T). This option has no effect when read thresholding is
-disabled}
+within-the-context cytosines are considered completely unmethylated (thus
+belonging to the reference epiallele). This option has no effect when read
+thresholding is disabled}
 
 \item{min.context.beta}{real number in the range [0;1] (default: 0.5). Reads
 with average beta value for within-the-context cytosines *below* this
-threshold are considered completely unmethylated (all C are counted as T).
-This option has no effect when read thresholding is disabled}
+threshold are considered completely unmethylated (thus belonging to the
+reference epiallele). This option has no effect when read thresholding is
+disabled}
 
 \item{max.outofcontext.beta}{real number in the range [0;1] (default: 0.1).
 Reads with average beta value for out-of-context cytosines *above* this
-threshold are considered completely unmethylated (all C are counted as T).
-This option has no effect when read thresholding is disabled}
+threshold are considered completely unmethylated (thus belonging to the
+reference epiallele). This option has no effect when read thresholding is
+disabled}
 
 \item{min.mapq}{non-negative integer threshold for minimum read mapping
 quality (default: 0). Option has no effect if preprocessed BAM data was
@@ -171,8 +175,8 @@ The report columns are:
 }
 \description{
 `generateBedReport`, `generateAmpliconReport`, `generateCaptureReport` --
-These functions match reads to the set of genomic locations and return the
-fraction of reads with an average methylation level passing an arbitrary
+These functions match BAM reads to the set of genomic locations and return
+the fraction of reads with an average methylation level passing an arbitrary
 threshold
 }
 \details{
