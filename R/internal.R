@@ -20,6 +20,7 @@
 #' @importFrom BiocGenerics end
 #' @importFrom VariantAnnotation ScanVcfParam
 #' @importFrom VariantAnnotation readVcf
+#' @importFrom VariantAnnotation expand
 #' @importFrom GenomeInfoDb seqlevelsStyle
 #' @importFrom SummarizedExperiment rowRanges
 #' @importFrom Rcpp sourceCpp
@@ -421,10 +422,10 @@ utils::globalVariables(
   if (verbose) message("Extracting base frequences", appendLF=FALSE)
   tm <- proc.time()
   
-  vcf.ranges <- unique(BiocGenerics::sort(SummarizedExperiment::rowRanges(vcf)))
+  vcf.ranges <- VariantAnnotation::expand(SummarizedExperiment::rowRanges(vcf))
   vcf.ranges <- vcf.ranges[BiocGenerics::width(vcf.ranges)==1 &
-                           sapply(IRanges::CharacterList(vcf.ranges$ALT), length)==1]
-  vcf.ranges <- vcf.ranges[sapply(IRanges::CharacterList(vcf.ranges$ALT), stringi::stri_length)==1]
+                           sapply(as.character(vcf.ranges$ALT),
+                                  stringi::stri_length, USE.NAMES=FALSE)==1]
   GenomeInfoDb::seqlevels(vcf.ranges) <- levels(bam.processed$rname)
   freqs <- rcpp_get_base_freqs(as.integer(bam.processed$rname),
                                as.integer(bam.processed$strand),
@@ -494,3 +495,69 @@ utils::globalVariables(
 ################################################################################
 # 
 # 
+# .getBaseFreqReport <- function (bam.processed, vcf,
+#                                 verbose)
+# {
+#   if (verbose) message("Extracting base frequences", appendLF=FALSE)
+#   tm <- proc.time()
+#   
+#   vcf.ranges <- unique(BiocGenerics::sort(SummarizedExperiment::rowRanges(vcf)))
+#   vcf.ranges <- vcf.ranges[BiocGenerics::width(vcf.ranges)==1 &
+#                              sapply(IRanges::CharacterList(vcf.ranges$ALT), length)==1]
+#   vcf.ranges <- vcf.ranges[sapply(IRanges::CharacterList(vcf.ranges$ALT), stringi::stri_length)==1]
+#   GenomeInfoDb::seqlevels(vcf.ranges) <- levels(bam.processed$rname)
+#   freqs <- rcpp_get_base_freqs(as.integer(bam.processed$rname),
+#                                as.integer(bam.processed$strand),
+#                                bam.processed$start,
+#                                bam.processed$start+bam.processed$width-1,
+#                                bam.processed$seq,
+#                                bam.processed$pass,
+#                                as.integer(GenomicRanges::seqnames(vcf.ranges)),
+#                                BiocGenerics::start(vcf.ranges))
+#   colnames(freqs) <- c("","U+A","","U+C","U+T","","U+N","U+G",
+#                        "","U-A","","U-C","U-T","","U-N","U-G",
+#                        "","M+A","","M+C","M+T","","M+N","M+G",
+#                        "","M-A","","M-C","M-T","","M-N","M-G")
+#   
+#   bf.report <- data.table::data.table(
+#     name=names(vcf.ranges),
+#     seqnames=as.character(GenomicRanges::seqnames(vcf.ranges)),
+#     range=BiocGenerics::start(vcf.ranges),
+#     REF=as.character(vcf.ranges$REF),
+#     ALT=sapply(IRanges::CharacterList(vcf.ranges$ALT), paste, collapse=","),
+#     freqs[,grep("[ACTG]$",colnames(freqs))]
+#   )
+#   
+#   bf.report[REF=="A" & ALT=="C", `:=` (`M+Ref`=`M+A`,       `U+Ref`=`U+A`,       `M-Ref`=`M-A`,       `U-Ref`=`U-A`,
+#                                        `M+Alt`=`M+C`+`M+T`, `U+Alt`=`U+C`+`U+T`, `M-Alt`=`M-C`,       `U-Alt`=`U-C`      )]
+#   bf.report[REF=="A" & ALT=="T", `:=` (`M+Ref`=`M+A`,       `U+Ref`=`U+A`,       `M-Ref`=`M-A`,       `U-Ref`=`U-A`,
+#                                        `M+Alt`=`M+T`,       `U+Alt`=`U+T`,       `M-Alt`=`M-T`,       `U-Alt`=`U-T`      )]
+#   bf.report[REF=="A" & ALT=="G", `:=` (`M+Ref`=`M+A`,       `U+Ref`=`U+A`,       `M-Ref`=NA,          `U-Ref`=NA,
+#                                        `M+Alt`=`M+G`,       `U+Alt`=`U+G`,       `M-Alt`=NA,          `U-Alt`=NA         )]
+#   bf.report[REF=="C" & ALT=="A", `:=` (`M+Ref`=`M+C`+`M+T`, `U+Ref`=`U+C`+`U+T`, `M-Ref`=`M-C`,       `U-Ref`=`U-C`,
+#                                        `M+Alt`=`M+A`,       `U+Alt`=`U+A`,       `M-Alt`=`M-A`,       `U-Alt`=`U-A`      )]
+#   bf.report[REF=="C" & ALT=="T", `:=` (`M+Ref`=NA,          `U+Ref`=NA,          `M-Ref`=`M-C`,       `U-Ref`=`U-C`,
+#                                        `M+Alt`=NA,          `U+Alt`=NA,          `M-Alt`=`M-T`,       `U-Alt`=`U-T`      )]
+#   bf.report[REF=="C" & ALT=="G", `:=` (`M+Ref`=`M+C`+`M+T`, `U+Ref`=`U+C`+`U+T`, `M-Ref`=`M-C`,       `U-Ref`=`U-C`,
+#                                        `M+Alt`=`M+G`,       `U+Alt`=`U+G`,       `M-Alt`=`M-A`+`M-G`, `U-Alt`=`U-A`+`U-G`)]
+#   bf.report[REF=="T" & ALT=="A", `:=` (`M+Ref`=`M+T`,       `U+Ref`=`U+T`,       `M-Ref`=`M-T`,       `U-Ref`=`U-T`,
+#                                        `M+Alt`=`M+A`,       `U+Alt`=`U+A`,       `M-Alt`=`M-A`,       `U-Alt`=`U-A`      )]
+#   bf.report[REF=="T" & ALT=="C", `:=` (`M+Ref`=NA,          `U+Ref`=NA,          `M-Ref`=`M-T`,       `U-Ref`=`U-T`,
+#                                        `M+Alt`=NA,          `U+Alt`=NA,          `M-Alt`=`M-C`,       `U-Alt`=`U-C`      )]
+#   bf.report[REF=="T" & ALT=="G", `:=` (`M+Ref`=`M+T`,       `U+Ref`=`U+T`,       `M-Ref`=`M-T`,       `U-Ref`=`U-T`,
+#                                        `M+Alt`=`M+G`,       `U+Alt`=`U+G`,       `M-Alt`=`M-A`+`M-G`, `U-Alt`=`U-A`+`U-G`)]
+#   bf.report[REF=="G" & ALT=="A", `:=` (`M+Ref`=`M+G`,       `U+Ref`=`U+G`,       `M-Ref`=NA,          `U-Ref`=NA,
+#                                        `M+Alt`=`M+A`,       `U+Alt`=`U+A`,       `M-Alt`=NA,          `U-Alt`=NA         )]
+#   bf.report[REF=="G" & ALT=="C", `:=` (`M+Ref`=`M+G`,       `U+Ref`=`U+G`,       `M-Ref`=`M-A`+`M-G`, `U-Ref`=`U-A`+`U-G`,
+#                                        `M+Alt`=`M+C`+`M+T`, `U+Alt`=`U+C`+`U+T`, `M-Alt`=`M-C`,       `U-Alt`=`U-C`      )]
+#   bf.report[REF=="G" & ALT=="T", `:=` (`M+Ref`=`M+G`,       `U+Ref`=`U+G`,       `M-Ref`=`M-A`+`M-G`, `U-Ref`=`U-A`+`U-G`,
+#                                        `M+Alt`=`M+T`,       `U+Alt`=`U+T`,       `M-Alt`=`M-T`,       `U-Alt`=`U-T`      )]
+#   bf.report[, `:=` (SumRef=rowSums(bf.report[,.(`M+Ref`,`U+Ref`,`M-Ref`,`U-Ref`)], na.rm=TRUE),
+#                     SumAlt=rowSums(bf.report[,.(`M+Alt`,`U+Alt`,`M-Alt`,`U-Alt`)], na.rm=TRUE))]
+#   FEp <- function (x) { if (any(is.na(x))) NA else stats::fisher.test(matrix(x, nrow=2))$p.value }
+#   bf.report[, `:=` (`FEp+`=apply(bf.report[,.(`M+Ref`,`U+Ref`,`M+Alt`,`U+Alt`)], 1, FEp),
+#                     `FEp-`=apply(bf.report[,.(`M-Ref`,`U-Ref`,`M-Alt`,`U-Alt`)], 1, FEp))]
+#   
+#   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+#   return(bf.report)
+# }
