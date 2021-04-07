@@ -170,12 +170,27 @@ The report columns are:
 }
 }
 \description{
-`generateBedReport` This function
+`generateBedReport`, `generateAmpliconReport`, `generateCaptureReport` --
+These functions match reads to the set of genomic locations and return the
+fraction of reads with an average methylation level passing an arbitrary
+threshold
+}
+\details{
+Functions report hypermethylated variant epiallele frequencies (VEF) per
+genomic region of interest using BAM and BED files as input. Reads are
+matched to genomic locations by exact coordinates (`generateAmpliconReport`
+or `generateBedReport` with an option bed.type="amplicon") or minimum overlap
+(`generateCaptureReport` or `generateBedReport` with an option
+bed.type="capture") - the former to be used for amplicon-based NGS data,
+while the latter - for the capture-based NGS data. Here's a simple example to
+clarify the logic:
 
-Assuming the default thresholding parameters (threshold.reads
-= TRUE, threshold.context = "CG", min.context.sites = 2, min.context.beta =
-0.5, max.outofcontext.beta = 0.1), the input and results will look as
-following:
+Let's suppose we have a BAM file with four reads mapped to chromosome 1 
+positions 1-16 and a genomic range supplied as parameter
+`bed = as("chr1:1-100", "GRanges")`. Assuming the default thresholding
+parameters (threshold.reads = TRUE, threshold.context = "CG",
+min.context.sites = 2, min.context.beta = 0.5, max.outofcontext.beta = 0.1),
+the input and results will look as following:
 
 | read chr:strand:start | methylation string | threshold | reason |
 | chr1:+:1 | ...Z..x+.h..x..h. | below | min.context.sites < 2 (only one zZ base) |
@@ -183,15 +198,11 @@ following:
 | chr1:+:1 | ...Z..z.h..X..h.  | below | max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) |
 | chr1:+:1 | ...Z..z.h..z-.h.  | below | min.context.beta < 0.5 (1Z / 3zZ = 0.33) |
 
-Only the second read will satisfy all the thresholding criteria, leading to
-the following BED report (for `bed = as("chr1:1-100", "GRanges")`):
+Only the second read will satisfy all of the thresholding criteria, leading
+to the following BED report:
 
 | seqnames | start | end | width | strand | nreads+ | nreads- | VEF |
 | chr1 | 1 | 100 | 100 | * | 4 | 0 | 0.25 |
-}
-\details{
-details. Add two functions here: generateAmpliconReport and
-generateCaptureReport
 }
 \examples{
   amplicon.bam <- system.file("extdata", "amplicon010meth.bam", package="epialleleR")

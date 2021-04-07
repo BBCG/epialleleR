@@ -11,6 +11,7 @@
 #' thresholded by their average methylation level before counting methylated
 #' bases, effectively resulting in hypermethylated Variant Epiallele Frequency
 #' (VEF) being reported instead of beta value. Here's how it works:
+#' 
 #' Let's suppose we have a BAM file with four reads mapped to chromosome 1 
 #' positions 1-16. Assuming the default thresholding parameters (threshold.reads
 #' = TRUE, threshold.context = "CG", min.context.sites = 2, min.context.beta =
@@ -23,8 +24,8 @@
 #' | chr1:+:1 | ...Z..z.h..X..h.  | below | max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) | C4 and C7: unmethylated |
 #' | chr1:+:1 | ...Z..z.h..z-.h.  | below | min.context.beta < 0.5 (1Z / 3zZ = 0.33) | C4 and C7: unmethylated |
 #' 
-#' Only the second read will satisfy all the thresholding criteria, leading to
-#' the following CX report:
+#' Only the second read will satisfy all of the thresholding criteria, leading
+#' to the following CX report:
 #' 
 #' | rname | strand | pos | context | meth | unmeth | triad |
 #' | chr1 | + | 4 | CG | 1 | 3 | NNN |
