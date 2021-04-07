@@ -13,7 +13,6 @@
 #' @importFrom GenomicAlignments sequenceLayer
 #' @importFrom Biostrings BStringSet
 #' @importFrom stringi stri_length
-#' @importFrom IRanges CharacterList
 #' @importFrom GenomicRanges makeGRangesFromDataFrame
 #' @importFrom GenomicRanges seqnames
 #' @importFrom BiocGenerics start
@@ -422,11 +421,12 @@ utils::globalVariables(
   if (verbose) message("Extracting base frequences", appendLF=FALSE)
   tm <- proc.time()
   
-  vcf.ranges <- VariantAnnotation::expand(SummarizedExperiment::rowRanges(vcf))
+  vcf.ranges <- BiocGenerics::sort(SummarizedExperiment::rowRanges(vcf))
   vcf.ranges <- vcf.ranges[BiocGenerics::width(vcf.ranges)==1 &
                            sapply(as.character(vcf.ranges$ALT),
                                   stringi::stri_length, USE.NAMES=FALSE)==1]
-  GenomeInfoDb::seqlevels(vcf.ranges) <- levels(bam.processed$rname)
+  GenomeInfoDb::seqlevels(vcf.ranges, pruning.mode="coarse") <-
+    levels(bam.processed$rname)
   freqs <- rcpp_get_base_freqs(as.integer(bam.processed$rname),
                                as.integer(bam.processed$strand),
                                bam.processed$start,
@@ -445,7 +445,7 @@ utils::globalVariables(
     seqnames=as.character(GenomicRanges::seqnames(vcf.ranges)),
     range=BiocGenerics::start(vcf.ranges),
     REF=as.character(vcf.ranges$REF),
-    ALT=sapply(IRanges::CharacterList(vcf.ranges$ALT), paste, collapse=","),
+    ALT=as.character(vcf.ranges$ALT),
     freqs[,grep("[ACTG]$",colnames(freqs))]
   )
   

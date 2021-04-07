@@ -165,7 +165,7 @@ generateVcfReport <- function (bam,
 {
   threshold.context <- match.arg(threshold.context, threshold.context)
   
-  if (!is(vcf, "CollapsedVCF")) {
+  if (!any(is(vcf, "CollapsedVCF"), is(vcf, "ExpandedVCF"))) {
     if (!is.null(bed) & !is(bed, "GRanges"))
       bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed, verbose=verbose)
     vcf <- .readVcf(vcf.file=vcf, vcf.style=vcf.style, bed=bed, verbose=verbose)
@@ -174,6 +174,8 @@ generateVcfReport <- function (bam,
       message("Already preprocessed VCF supplied as an input. Options",
               " 'bed' and 'zero.based.bed' will have no effect.")
   }
+  if (is(vcf, "CollapsedVCF"))
+    vcf <- VariantAnnotation::expand(vcf, row.names=TRUE)
   
   bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq,
                        skip.duplicates=skip.duplicates, verbose=verbose)
