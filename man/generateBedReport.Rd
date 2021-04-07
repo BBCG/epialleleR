@@ -61,33 +61,33 @@ generateBedReport(
 }
 \arguments{
 \item{bam}{BAM file location string OR preprocessed output of
-\code{\link{preprocessBam}} function}
+\code{\link{preprocessBam}} function.}
 
 \item{bed}{Browser Extensible Data (BED) file location string OR object of
 class \code{\link[GenomicRanges]{GRanges}} holding genomic coordinates for
 regions of interest. The seqlevels of BED file/object must be the same as
-seqlevels of BAM file/object used}
+seqlevels of BAM file/object used.}
 
 \item{report.file}{file location string to write the BED report. If NULL
 (the default) then report is returned as a
-\code{\link[data.table]{data.table}} object}
+\code{\link[data.table]{data.table}} object.}
 
 \item{zero.based.bed}{boolean defining if BED coordinates are zero based
-(default: FALSE)}
+(default: FALSE).}
 
 \item{match.tolerance}{integer for the largest difference between read's and
 BED \code{\link[GenomicRanges]{GRanges}} start or end positions during
-matching of amplicon-based NGS reads (default: 1)}
+matching of amplicon-based NGS reads (default: 1).}
 
 \item{threshold.reads}{boolean defining if sequence reads should be
 thresholded before counting reads belonging to variant epialleles (default:
 TRUE). Disabling thresholding is possible but makes no sense in this context,
 as all the reads will be assigned to the variant epiallele, which will result
 in VEF==1 (in such case `NA` VEF values are returned in order to avoid
-confusion)}
+confusion).}
 
 \item{threshold.context}{string defining cytosine methylation context used
-for thresholdning the reads
+for thresholdning the reads:
 \itemize{
   \item "CG" (the default) -- within-the-context: CpG cytosines (called as
   zZ), out-of-context: all the other cytosines (hHxX)
@@ -98,46 +98,47 @@ for thresholdning the reads
   \item "CX" -- all cytosines are considered within-the-context, this
   effectively results in no thresholdning
 }
-This option has no effect when read thresholding is disabled}
+This option has no effect when read thresholding is disabled.}
 
 \item{min.context.sites}{non-negative integer for minimum number of cytosines
 within the `threshold.context` (default: 2). Reads containing \strong{fewer}
 within-the-context cytosines are considered completely unmethylated (thus
 belonging to the reference epiallele). This option has no effect when read
-thresholding is disabled}
+thresholding is disabled.}
 
 \item{min.context.beta}{real number in the range [0;1] (default: 0.5). Reads
 with average beta value for within-the-context cytosines \strong{below} this
 threshold are considered completely unmethylated (thus belonging to the
 reference epiallele). This option has no effect when read thresholding is
-disabled}
+disabled.}
 
 \item{max.outofcontext.beta}{real number in the range [0;1] (default: 0.1).
 Reads with average beta value for out-of-context cytosines \strong{above}
 this threshold are considered completely unmethylated (thus belonging to the
 reference epiallele). This option has no effect when read thresholding is
-disabled}
+disabled.}
 
 \item{min.mapq}{non-negative integer threshold for minimum read mapping
 quality (default: 0). Option has no effect if preprocessed BAM data was
-supplied as an input}
+supplied as an input.}
 
 \item{skip.duplicates}{boolean defining if duplicate aligned reads should be
 skipped (default: FALSE). Option has no effect if preprocessed BAM data was
-supplied as an input OR duplicate reads were not marked by alignment software}
+supplied as an input OR duplicate reads were not marked by alignment
+software.}
 
-\item{gzip}{boolean to compress the report (default: FALSE)}
+\item{gzip}{boolean to compress the report (default: FALSE).}
 
-\item{verbose}{boolean to report progress and timings (default: TRUE)}
+\item{verbose}{boolean to report progress and timings (default: TRUE).}
 
 \item{match.min.overlap}{integer for the smallest overlap between read's and
 BED \code{\link[GenomicRanges]{GRanges}} start or end positions during
 matching of capture-based NGS reads (default: 1). If read matches two or more
 BED genomic regions, only the first match is taken (input
-\code{\link[GenomicRanges]{GRanges}} are \strong{not} sorted internally)}
+\code{\link[GenomicRanges]{GRanges}} are \strong{not} sorted internally) .}
 
 \item{bed.type}{character string for the type of assay that was used to
-produce sequence reads
+produce sequence reads:
 \itemize{
   \item "amplicon" (the default) -- used for amplicon-based next-generation
   sequencing when exact coordinates of sequenced fragments are known.
@@ -186,26 +187,26 @@ matched to genomic locations by exact coordinates (`generateAmpliconReport`
 or `generateBedReport` with an option bed.type="amplicon") or minimum overlap
 (`generateCaptureReport` or `generateBedReport` with an option
 bed.type="capture") - the former to be used for amplicon-based NGS data,
-while the latter - for the capture-based NGS data. Here's a simple example to
-clarify the logic:
+while the latter - for the capture-based NGS data. The function's logic is
+explained below.
 
-Let's suppose we have a BAM file with four reads mapped to chromosome 1 
-positions 1-16 and a genomic range supplied as parameter
-`bed = as("chr1:1-100", "GRanges")`. Assuming the default thresholding
-parameters (threshold.reads = TRUE, threshold.context = "CG",
-min.context.sites = 2, min.context.beta = 0.5, max.outofcontext.beta = 0.1),
-the input and results will look as following:
+Let's suppose we have a BAM file with four reads, all mapped to the "+"
+strand of chromosome 1, positions 1-16. The genomic range is supplied as a
+parameter `bed = as("chr1:1-100", "GRanges")`. Assuming the default values
+for the thresholding parameters (threshold.reads = TRUE,
+threshold.context = "CG", min.context.sites = 2, min.context.beta = 0.5,
+max.outofcontext.beta = 0.1), the input and results will look as following:
 
-\tabular{llll}{
-  chr:strand:start of the read \tab methylation string \tab threshold \tab reason \cr
-  chr1:+:1 \tab ...Z..x+.h..x..h. \tab below \tab min.context.sites < 2 (only one zZ base) \cr
-  chr1:+:1 \tab ...Z..z.h..x..h.  \tab above \tab pass all criteria \cr
-  chr1:+:1 \tab ...Z..z.h..X..h.  \tab below \tab max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) \cr
-  chr1:+:1 \tab ...Z..z.h..z-.h.  \tab below \tab min.context.beta < 0.5 (1Z / 3zZ = 0.33)
+\tabular{lll}{
+  methylation string \tab threshold \tab explained \cr
+  ...Z..x+.h..x..h. \tab below \tab min.context.sites < 2 (only one zZ base) \cr
+  ...Z..z.h..x..h.  \tab above \tab pass all criteria \cr
+  ...Z..z.h..X..h.  \tab below \tab max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) \cr
+  ...Z..z.h..z-.h.  \tab below \tab min.context.beta < 0.5 (1Z / 3zZ = 0.33)
 }
 
 Only the second read will satisfy all of the thresholding criteria, leading
-to the following BED report:
+to the following BED report (given that all reads map to chr1:+:1-16):
 
 \tabular{llllllll}{
   seqnames \tab start \tab end \tab width \tab strand \tab nreads+ \tab nreads- \tab VEF \cr
@@ -234,4 +235,8 @@ to the following BED report:
 of individual cytosines, \code{\link{generateVcfReport}} for evaluating
 epiallele-SNV associations, and `epialleleR` vignettes for the description of
 usage and sample data.
+
+\code{\link[GenomicRanges]{GRanges}} class for working with genomic ranges,
+\code{\link[GenomeInfoDb]{seqlevelsStyle}} function for getting or setting
+the seqlevels style.
 }
