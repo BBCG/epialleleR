@@ -6,9 +6,9 @@
 #'
 #' @description
 #' `generateBedReport`, `generateAmpliconReport`, `generateCaptureReport` --
-#' These functions match BAM reads to the set of genomic locations and return
+#' these functions match BAM reads to the set of genomic locations and return
 #' the fraction of reads with an average methylation level passing an arbitrary
-#' threshold
+#' threshold.
 #'
 #' @details
 #' Functions report hypermethylated variant epiallele frequencies (VEF) per
@@ -27,17 +27,21 @@
 #' min.context.sites = 2, min.context.beta = 0.5, max.outofcontext.beta = 0.1),
 #' the input and results will look as following:
 #' 
-#' | read chr:strand:start | methylation string | threshold | reason |
-#' | chr1:+:1 | ...Z..x+.h..x..h. | below | min.context.sites < 2 (only one zZ base) |
-#' | chr1:+:1 | ...Z..z.h..x..h.  | above | pass all criteria |
-#' | chr1:+:1 | ...Z..z.h..X..h.  | below | max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) |
-#' | chr1:+:1 | ...Z..z.h..z-.h.  | below | min.context.beta < 0.5 (1Z / 3zZ = 0.33) |
+#' \tabular{llll}{
+#'   chr:strand:start of the read \tab methylation string \tab threshold \tab reason \cr
+#'   chr1:+:1 \tab ...Z..x+.h..x..h. \tab below \tab min.context.sites < 2 (only one zZ base) \cr
+#'   chr1:+:1 \tab ...Z..z.h..x..h.  \tab above \tab pass all criteria \cr
+#'   chr1:+:1 \tab ...Z..z.h..X..h.  \tab below \tab max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) \cr
+#'   chr1:+:1 \tab ...Z..z.h..z-.h.  \tab below \tab min.context.beta < 0.5 (1Z / 3zZ = 0.33)
+#' }
 #' 
 #' Only the second read will satisfy all of the thresholding criteria, leading
 #' to the following BED report:
 #' 
-#' | seqnames | start | end | width | strand | nreads+ | nreads- | VEF |
-#' | chr1 | 1 | 100 | 100 | * | 4 | 0 | 0.25 |
+#' \tabular{llllllll}{
+#'   seqnames \tab start \tab end \tab width \tab strand \tab nreads+ \tab nreads- \tab VEF \cr
+#'   chr1 \tab 1 \tab 100 \tab 100 \tab * \tab 4 \tab 0 \tab 0.25
+#' }
 #'
 #' @param bam BAM file location string OR preprocessed output of
 #' \code{\link{preprocessBam}} function
@@ -64,7 +68,7 @@
 #'   to match the genomic range when their overlap is more or equal to
 #'   `match.min.overlap`. If read matches two or more BED genomic regions, only
 #'   the first match is taken (input \code{\link[GenomicRanges]{GRanges}} are
-#'   *not* sorted internally)
+#'   \strong{not} sorted internally)
 #' }
 #' @param match.tolerance integer for the largest difference between read's and
 #' BED \code{\link[GenomicRanges]{GRanges}} start or end positions during
@@ -73,7 +77,7 @@
 #' BED \code{\link[GenomicRanges]{GRanges}} start or end positions during
 #' matching of capture-based NGS reads (default: 1). If read matches two or more
 #' BED genomic regions, only the first match is taken (input
-#' \code{\link[GenomicRanges]{GRanges}} are *not* sorted internally) 
+#' \code{\link[GenomicRanges]{GRanges}} are \strong{not} sorted internally) 
 #' @param threshold.reads boolean defining if sequence reads should be
 #' thresholded before counting reads belonging to variant epialleles (default:
 #' TRUE). Disabling thresholding is possible but makes no sense in this context,
@@ -94,18 +98,18 @@
 #' }
 #' This option has no effect when read thresholding is disabled
 #' @param min.context.sites non-negative integer for minimum number of cytosines
-#' within the `threshold.context` (default: 2). Reads containing *fewer*
+#' within the `threshold.context` (default: 2). Reads containing \strong{fewer}
 #' within-the-context cytosines are considered completely unmethylated (thus
 #' belonging to the reference epiallele). This option has no effect when read
 #' thresholding is disabled
 #' @param min.context.beta real number in the range [0;1] (default: 0.5). Reads
-#' with average beta value for within-the-context cytosines *below* this
+#' with average beta value for within-the-context cytosines \strong{below} this
 #' threshold are considered completely unmethylated (thus belonging to the
 #' reference epiallele). This option has no effect when read thresholding is
 #' disabled
 #' @param max.outofcontext.beta real number in the range [0;1] (default: 0.1).
-#' Reads with average beta value for out-of-context cytosines *above* this
-#' threshold are considered completely unmethylated (thus belonging to the
+#' Reads with average beta value for out-of-context cytosines \strong{above}
+#' this threshold are considered completely unmethylated (thus belonging to the
 #' reference epiallele). This option has no effect when read thresholding is
 #' disabled
 #' @param min.mapq non-negative integer threshold for minimum read mapping
@@ -138,14 +142,20 @@
 #' \code{\link{generateCytosineReport}} for methylation statistics at the level
 #' of individual cytosines, \code{\link{generateVcfReport}} for evaluating
 #' epiallele-SNV associations, and `epialleleR` vignettes for the description of
-#' usage and sample data
+#' usage and sample data.
 #' @examples
-#'   amplicon.bam <- system.file("extdata", "amplicon010meth.bam", package="epialleleR")
-#'   amplicon.bed <- system.file("extdata", "amplicon.bed", package="epialleleR")
+#'   # amplicon data
+#'   amplicon.bam    <- system.file("extdata", "amplicon010meth.bam", package="epialleleR")
+#'   amplicon.bed    <- system.file("extdata", "amplicon.bed", package="epialleleR")
 #'   amplicon.report <- generateAmpliconReport(bam=amplicon.bam, bed=amplicon.bed)
-#'   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
-#'   capture.bed <- system.file("extdata", "capture.bed", package="epialleleR")
+#'   
+#'   # capture NGS
+#'   capture.bam    <- system.file("extdata", "capture.bam", package="epialleleR")
+#'   capture.bed    <- system.file("extdata", "capture.bed", package="epialleleR")
 #'   capture.report <- generateCaptureReport(bam=capture.bam, bed=capture.bed)
+#'   
+#'   # generateAmpliconReport and generateCaptureReport are just aliases
+#'   # of the generateBedReport
 #'   bed.report <- generateBedReport(bam=capture.bam, bed=capture.bed, bed.type="capture")
 #'   identical(capture.report, bed.report)
 #' @rdname generateBedReport

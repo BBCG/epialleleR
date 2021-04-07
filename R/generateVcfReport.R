@@ -21,7 +21,7 @@
 #'   \code{\link[GenomeInfoDb]{seqlevelsStyle}} function
 #' }
 #' @param bed Browser Extensible Data (BED) file location string OR object of
-#' class \code{\link[GenomicRanges]{GRanges}} holding genomic coordinates for
+#' class \code{\linkS4class{GRanges}} holding genomic coordinates for
 #' regions of interest. It is used to include only the specific genomic ranges
 #' when the VCF file is loaded. This option has no effect when VCF object is
 #' supplied as a `vcf` param. The seqlevels of BED file/object must match the
@@ -51,18 +51,18 @@
 #' }
 #' This option has no effect when read thresholding is disabled
 #' @param min.context.sites non-negative integer for minimum number of cytosines
-#' within the `threshold.context` (default: 2). Reads containing *fewer*
+#' within the `threshold.context` (default: 2). Reads containing \strong{fewer}
 #' within-the-context cytosines are considered completely unmethylated (thus
 #' belonging to the reference epiallele). This option has no effect when read
 #' thresholding is disabled
 #' @param min.context.beta real number in the range [0;1] (default: 0.5). Reads
-#' with average beta value for within-the-context cytosines *below* this
+#' with average beta value for within-the-context cytosines \strong{below} this
 #' threshold are considered completely unmethylated (thus belonging to the
 #' reference epiallele). This option has no effect when read thresholding is
 #' disabled
 #' @param max.outofcontext.beta real number in the range [0;1] (default: 0.1).
-#' Reads with average beta value for out-of-context cytosines *above* this
-#' threshold are considered completely unmethylated (thus belonging to the
+#' Reads with average beta value for out-of-context cytosines \strong{above}
+#' this threshold are considered completely unmethylated (thus belonging to the
 #' reference epiallele). This option has no effect when read thresholding is
 #' disabled
 #' @param min.mapq non-negative integer threshold for minimum read mapping
@@ -81,25 +81,29 @@
 #'   \item range -- genomic coordinates of the variation
 #'   \item REF -- base at the reference allele
 #'   \item ALT -- base at the alternative allele
-#'   \item [M|U][+|-][Ref|Alt] -- number of *Ref*erence or *Alt*ernative bases
-#'   that were found at this particular position within *M*ethylated or
-#'   *U*nmethylated reads that were mapped to "*+*" (forward) or "*-*" (reverse)
-#'   DNA strand
-#'   \item SumRef -- sum of all *Ref*erence base counts
-#'   \item SumAlt -- sum of all *Alt*ernative base counts
+#'   \item [M|U][+|-][Ref|Alt] -- number of \strong{Ref}erence or
+#'   \strong{Alt}ernative bases that were found at this particular position
+#'   within \strong{M}ethylated or \strong{U}nmethylated reads that were mapped
+#'   to "\strong{+}" (forward) or "\strong{-}" (reverse) DNA strand
+#'   \item SumRef -- sum of all \strong{Ref}erence base counts
+#'   \item SumAlt -- sum of all \strong{Alt}ernative base counts
 #'   \item FEp+ -- Fisher's Exact test p-value for association of a variation
-#'   with methylation status of the reads that map to the "*+*" (forward) DNA
-#'   strand. Calculated using following contingency table:
+#'   with methylation status of the reads that map to the "\strong{+}" (forward)
+#'   DNA strand. Calculated using following contingency table:
 #'   
-#'   | `M+Ref` | `M+Alt` |
-#'   | `U+Ref` | `U+Alt` |
+#'   \tabular{ll}{
+#'     M+Ref \tab M+Alt \cr
+#'     U+Ref \tab U+Alt 
+#'   }
 #'   
 #'   \item FEp- -- Fisher's Exact test p-value for association of a variation
-#'   with methylation status of the reads that map to the "*-*" (reverse) DNA
-#'   strand. Calculated using following contingency table:
+#'   with methylation status of the reads that map to the "\strong{-}" (reverse)
+#'   DNA strand. Calculated using following contingency table:
 #'   
-#'   | `M-Ref` | `M-Alt` |
-#'   | `U-Ref` | `U-Alt` |
+#'   \tabular{ll}{
+#'     M-Ref \tab M-Alt \cr
+#'     U-Ref \tab U-Alt 
+#'   }
 #' }
 #' @seealso \code{\link{preprocessBam}} for preloading BAM data,
 #' \code{\link{generateCytosineReport}} for methylation statistics at the level
@@ -110,6 +114,8 @@
 #'   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
 #'   capture.bed <- system.file("extdata", "capture.bed", package="epialleleR")
 #'   capture.vcf <- system.file("extdata", "capture.vcf.gz", package="epialleleR")
+#'   
+#'   # VCF report
 #'   vcf.report <- generateVcfReport(bam=capture.bam, bed=capture.bed, vcf=capture.vcf)
 #' @export
 generateVcfReport <- function (bam,
@@ -122,7 +128,7 @@ generateVcfReport <- function (bam,
                                threshold.context=c("CG", "CHG", "CHH", "CxG", "CX"),
                                min.context.sites=2,
                                min.context.beta=0.5,
-                               max.outofcontext.beta=0.1, # double 0 to 1
+                               max.outofcontext.beta=0.1,
                                min.mapq=0,
                                skip.duplicates=FALSE,
                                gzip=FALSE,

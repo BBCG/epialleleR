@@ -21,7 +21,7 @@ generateCytosineReport(
 }
 \arguments{
 \item{bam}{BAM file location string OR preprocessed output of
-\code{\link{preprocessBam}} function}
+\code{\link[epialleleR]{preprocessBam}} function}
 
 \item{report.file}{file location string to write the cytosine report. If NULL
 (the default) then report is returned as a
@@ -94,9 +94,8 @@ columns are:
 }
 }
 \description{
-`generateCytosineReport` This function counts methylated and unmethylated
-DNA bases taking into the account average methylation level of the entire
-sequence read
+This function counts methylated and unmethylated DNA bases taking into the
+account average methylation level of the entire sequence read.
 }
 \details{
 The function reports cytosine methylation information using BAM file as an
@@ -109,35 +108,41 @@ Let's suppose we have a BAM file with four reads mapped to chromosome 1
 positions 1-16. Assuming the default thresholding parameters (threshold.reads
 = TRUE, threshold.context = "CG", min.context.sites = 2, min.context.beta =
 0.5, max.outofcontext.beta = 0.1), the input and results will look as
-following:
+following
 
-| read chr:strand:start | methylation string | threshold | reason | methylation reported |
-| chr1:+:1 | ...Z..x+.h..x..h. | below | min.context.sites < 2 (only one zZ base) | C at position 4: unmethylated |
-| chr1:+:1 | ...Z..z.h..x..h.  | above | pass all criteria | C4: methylated, C7: unmethylated |
-| chr1:+:1 | ...Z..z.h..X..h.  | below | max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) | C4 and C7: unmethylated |
-| chr1:+:1 | ...Z..z.h..z-.h.  | below | min.context.beta < 0.5 (1Z / 3zZ = 0.33) | C4 and C7: unmethylated |
+\tabular{lllll}{
+  chr:strand:start of the read \tab methylation string \tab threshold \tab reason \tab methylation reported \cr
+  chr1:+:1 \tab ...Z..x+.h..x..h. \tab below \tab min.context.sites < 2 (only one zZ base) \tab C at position 4: unmethylated \cr
+  chr1:+:1 \tab ...Z..z.h..x..h.  \tab above \tab pass all criteria \tab C4: methylated, C7: unmethylated \cr
+  chr1:+:1 \tab ...Z..z.h..X..h.  \tab below \tab max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) \tab C4 and C7: unmethylated \cr
+  chr1:+:1 \tab ...Z..z.h..z-.h.  \tab below \tab min.context.beta < 0.5 (1Z / 3zZ = 0.33) \tab C4 and C7: unmethylated
+}
 
 Only the second read will satisfy all of the thresholding criteria, leading
 to the following CX report:
 
-| rname | strand | pos | context | meth | unmeth | triad |
-| chr1 | + | 4 | CG | 1 | 3 | NNN |
-| chr1 | + | 7 | CG | 0 | 3 | NNN |
-| chr1 | + | 9 | CHH | 0 | 4 | NNN |
-| chr1 | + | 12 | CHG | 0 | 3 | NNN |
-| chr1 | + | 15 | CHH | 0 | 4 | NNN |
+\tabular{lllllll}{
+  rname \tab strand \tab pos \tab context \tab meth \tab unmeth \tab triad \cr
+  chr1 \tab + \tab 4 \tab CG \tab 1 \tab 3 \tab NNN \cr
+  chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \tab NNN \cr
+  chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \tab NNN \cr
+  chr1 \tab + \tab 12 \tab CHG \tab 0 \tab 3 \tab NNN \cr
+  chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 \tab NNN 
+}
 
 With the thresholding disabled (threshold.reads = FALSE) all methylated bases
 will retain their status, so the CX report will be similar to the reports
 produced by other methylation callers (such as Bismark or Illumina DRAGEN Bio
 IT Platform):
 
-| rname | strand | pos | context | meth | unmeth | triad |
-| chr1 | + | 4 | CG | 4 | 0 | NNN |
-| chr1 | + | 7 | CG | 0 | 3 | NNN |
-| chr1 | + | 9 | CHH | 0 | 4 | NNN |
-| chr1 | + | 12 | CHG | 1 | 2 | NNN |
-| chr1 | + | 15 | CHH | 0 | 4 | NNN |
+\tabular{lllllll}{
+  rname \tab strand \tab pos \tab context \tab meth \tab unmeth \tab triad \cr
+  chr1 \tab + \tab 4 \tab CG \tab 4 \tab 0 \tab NNN \cr
+  chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \tab NNN \cr
+  chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \tab NNN \cr
+  chr1 \tab + \tab 12 \tab CHG \tab 1 \tab 2 \tab NNN \cr
+  chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 \tab NNN 
+}
 
 Other notes:
 
@@ -158,9 +163,13 @@ such information will be considered as worth adding.
 }
 \examples{
   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
-  cg.report   <- generateCytosineReport(capture.bam)
-  cx.report   <- generateCytosineReport(capture.bam, threshold.reads=FALSE,
-                 report.context="CX")
+  
+  # CpG report with thresholding
+  cg.report <- generateCytosineReport(capture.bam)
+  
+  # CX report without thresholding
+  cx.report <- generateCytosineReport(capture.bam, threshold.reads=FALSE,
+               report.context="CX")
 }
 \seealso{
 \code{\link{preprocessBam}} for preloading BAM data,
