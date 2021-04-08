@@ -135,7 +135,7 @@ software.}
 BED \code{\link[GenomicRanges]{GRanges}} start or end positions during
 matching of capture-based NGS reads (default: 1). If read matches two or more
 BED genomic regions, only the first match is taken (input
-\code{\link[GenomicRanges]{GRanges}} are \strong{not} sorted internally) .}
+\code{\link[GenomicRanges]{GRanges}} are \strong{not} sorted internally).}
 
 \item{bed.type}{character string for the type of assay that was used to
 produce sequencing reads:
@@ -158,7 +158,7 @@ produce sequencing reads:
 \code{\link[data.table]{data.table}} object containing VEF report for
 BED \code{\link[GenomicRanges]{GRanges}} or NULL if report.file was
 specified. If BAM file contains reads that would not match to any of BED
-\code{\link[GenomicRanges]{GRanges}}, the first row in the report will
+\code{\link[GenomicRanges]{GRanges}}, the last row in the report will
 contain information on such reads (with seqnames, start and end equal to NA).
 The report columns are:
 \itemize{
@@ -233,8 +233,9 @@ to the following BED report (given that all reads map to chr1:+:1-16):
 \code{\link{preprocessBam}} for preloading BAM data,
 \code{\link{generateCytosineReport}} for methylation statistics at the level
 of individual cytosines, \code{\link{generateVcfReport}} for evaluating
-epiallele-SNV associations, and `epialleleR` vignettes for the description of
-usage and sample data.
+epiallele-SNV associations, \code{\link{generateBedEcdf}} for analysing the
+distribution of per-read beta values, and `epialleleR` vignettes for the
+description of usage and sample data.
 
 \code{\link[GenomicRanges]{GRanges}} class for working with genomic ranges,
 \code{\link[GenomeInfoDb]{seqlevelsStyle}} function for getting or setting

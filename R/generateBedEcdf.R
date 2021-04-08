@@ -30,23 +30,76 @@
 #'   \strong{not} sorted internally)
 #' }
 #' @param bed.rows integer vector specifying what `bed` regions should be
-#' included in the output. If `c(1)` (the default), then function returns eCDF
+#' included in the output. If `c(1)` (the default), then function returns eCDFs
 #' for the first region of `bed`, if NULL - eCDF functions for all `bed`
 #' genomic regions as well as for the reads that didn't match any of the regions
 #' (last element of the return value; only if there are such reads).
-#' @param zero.based.bed param desc
-#' @param match.tolerance param desc
-#' @param match.min.overlap param desc
-#' @param ecdf.context param desc
-#' @param min.mapq param desc
-#' @param skip.duplicates param desc
-#' @param verbose param desc
-#' @return return desc
-#' @seealso whatelse
-#' @examples
-#' \dontrun{
-#'   sessionInfo()
+#' @param zero.based.bed boolean defining if BED coordinates are zero based
+#' (default: FALSE).
+#' @param match.tolerance integer for the largest difference between read's and
+#' BED \code{\link[GenomicRanges]{GRanges}} start or end positions during
+#' matching of amplicon-based NGS reads (default: 1).
+#' @param match.min.overlap integer for the smallest overlap between read's and
+#' BED \code{\link[GenomicRanges]{GRanges}} start or end positions during
+#' matching of capture-based NGS reads (default: 1). If read matches two or more
+#' BED genomic regions, only the first match is taken (input
+#' \code{\link[GenomicRanges]{GRanges}} are \strong{not} sorted internally).
+#' @param ecdf.context string defining cytosine methylation context used
+#' for computing within-the-context and out-of-context eCDFs:
+#' \itemize{
+#'   \item "CG" (the default) -- within-the-context: CpG cytosines (called as
+#'   zZ), out-of-context: all the other cytosines (hHxX)
+#'   \item "CHG" -- within-the-context: CHG cytosines (xX), out-of-context: hHzZ
+#'   \item "CHH" -- within-the-context: CHH cytosines (hH), out-of-context: xXzZ
+#'   \item "CxG" -- within-the-context: CG and CHG cytosines (zZxX),
+#'   out-of-context: CHH cytosines (hH)
+#'   \item "CX" -- all cytosines are considered within-the-context
 #' }
+#' @param min.mapq non-negative integer threshold for minimum read mapping
+#' quality (default: 0). Option has no effect if preprocessed BAM data was
+#' supplied as an input.
+#' @param skip.duplicates boolean defining if duplicate aligned reads should be
+#' skipped (default: FALSE). Option has no effect if preprocessed BAM data was
+#' supplied as an input OR duplicate reads were not marked by alignment
+#' software.
+#' @param verbose boolean to report progress and timings (default: TRUE).
+#' @return list with a number of elements equal to the length of `bed.rows` (if
+#' not NULL), or to the number of genomic regions within `bed` (if 
+#' `bed.rows==NULL`) plus one item for all reads not matching `bed` genomic
+#' regions (if any). Every list item is a list on it's own, consisting of two
+#' eCDF functions for within- and out-of-context per-read beta values.
+#' @seealso \code{\link{preprocessBam}} for preloading BAM data,
+#' \code{\link{generateCytosineReport}} for methylation statistics at the level
+#' of individual cytosines, \code{\link{generateBedReport}} for genomic
+#' region-based statistics, \code{\link{generateVcfReport}} for evaluating
+#' epiallele-SNV associations, and `epialleleR` vignettes for the description of
+#' usage and sample data.
+#' @examples
+#'   # amplicon data
+#'   amplicon.bam   <- system.file("extdata", "amplicon010meth.bam", package="epialleleR")
+#'   amplicon.bed   <- system.file("extdata", "amplicon.bed", package="epialleleR")
+#'   
+#'   # let's compute eCDF
+#'   amplicon.ecdfs <- generateBedEcdf(bam=amplicon.bam, bed=amplicon.bed, bed.rows=NULL)
+#'   
+#'   # there are 5 items in amplicon.ecdfs, let's plot all of them
+#'   par(mfrow=c(1,length(amplicon.ecdfs)))
+#'   
+#'   # cycle through items
+#'   sapply(1:length(amplicon.ecdfs), function (x) {
+#'     # four of them have names corresponding to genomic regions of amplicon.bed
+#'     # fifth - NA for all the reads that don't match to any of those regions
+#'     main <- if (is.na(names(amplicon.ecdfs[x]))) "unmatched"
+#'             else names(amplicon.ecdfs[x])
+#'     
+#'     # plotting eCDF for within-the-context per-read beta values (in red)
+#'     plot(amplicon.ecdfs[[x]]$context, col="red", verticals=TRUE, do.points=FALSE,
+#'          xlim=c(0,1), xlab="per-read beta value", ylab="cumulative density", main=main)
+#'     
+#'     # adding eCDF for out-of-context per-read beta values (in blue)
+#'     plot(amplicon.ecdfs[[x]]$out.of.context, add=TRUE, col="blue",
+#'          verticals=TRUE, do.points=FALSE)
+#'   })
 #' @export
 generateBedEcdf <- function (bam,
                              bed,

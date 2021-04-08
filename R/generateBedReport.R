@@ -77,7 +77,7 @@
 #' BED \code{\link[GenomicRanges]{GRanges}} start or end positions during
 #' matching of capture-based NGS reads (default: 1). If read matches two or more
 #' BED genomic regions, only the first match is taken (input
-#' \code{\link[GenomicRanges]{GRanges}} are \strong{not} sorted internally) .
+#' \code{\link[GenomicRanges]{GRanges}} are \strong{not} sorted internally).
 #' @param threshold.reads boolean defining if sequence reads should be
 #' thresholded before counting reads belonging to variant epialleles (default:
 #' TRUE). Disabling thresholding is possible but makes no sense in this context,
@@ -142,8 +142,9 @@
 #' @seealso \code{\link{preprocessBam}} for preloading BAM data,
 #' \code{\link{generateCytosineReport}} for methylation statistics at the level
 #' of individual cytosines, \code{\link{generateVcfReport}} for evaluating
-#' epiallele-SNV associations, and `epialleleR` vignettes for the description of
-#' usage and sample data.
+#' epiallele-SNV associations, \code{\link{generateBedEcdf}} for analysing the
+#' distribution of per-read beta values, and `epialleleR` vignettes for the
+#' description of usage and sample data.
 #' 
 #' \code{\link[GenomicRanges]{GRanges}} class for working with genomic ranges,
 #' \code{\link[GenomeInfoDb]{seqlevelsStyle}} function for getting or setting

@@ -132,8 +132,9 @@
 #' @seealso \code{\link{preprocessBam}} for preloading BAM data,
 #' \code{\link{generateCytosineReport}} for methylation statistics at the level
 #' of individual cytosines, \code{\link{generateBedReport}} for genomic
-#' region-based statistics, and `epialleleR` vignettes for the description of
-#' usage and sample data.
+#' region-based statistics, \code{\link{generateBedEcdf}} for analysing the
+#' distribution of per-read beta values, and `epialleleR` vignettes for the
+#' description of usage and sample data.
 #' 
 #' \code{\link[GenomicRanges]{GRanges}} class for working with genomic ranges,
 #' \code{\link[VariantAnnotation]{readVcf}} function for loading VCF data,
