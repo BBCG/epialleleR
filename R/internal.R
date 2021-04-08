@@ -361,7 +361,7 @@ utils::globalVariables(
   bed.dt <- data.table::as.data.table(bed)
   bed.cl <- colnames(bed.dt)
   bed.dt[, bedmatch:=.I]
-  bed.report <- data.table::merge.data.table(bed.dt, bam.dt, by="bedmatch", all=TRUE)
+  bed.report <- data.table::merge.data.table(bed.dt, bam.dt, by="bedmatch", all=TRUE)[order(bedmatch)]
   
   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(bed.report[,setdiff(names(bed.report),
@@ -389,7 +389,7 @@ utils::globalVariables(
   ctx.beta=rcpp_get_xm_beta(bam.processed$XM, ctx.meth, ctx.unmeth)
   ooctx.beta=rcpp_get_xm_beta(bam.processed$XM, ooctx.meth, ooctx.unmeth)
 
-  all.bed.rows <- sort(unique(bed.match), na.last=FALSE)
+  all.bed.rows <- sort(unique(bed.match), na.last=TRUE)
   if (is.null(bed.rows))
     bed.rows <- all.bed.rows
   else

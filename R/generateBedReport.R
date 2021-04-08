@@ -55,7 +55,7 @@
 #' @param zero.based.bed boolean defining if BED coordinates are zero based
 #' (default: FALSE).
 #' @param bed.type character string for the type of assay that was used to
-#' produce sequence reads:
+#' produce sequencing reads:
 #' \itemize{
 #'   \item "amplicon" (the default) -- used for amplicon-based next-generation
 #'   sequencing when exact coordinates of sequenced fragments are known.
@@ -124,7 +124,7 @@
 #' @return \code{\link[data.table]{data.table}} object containing VEF report for
 #' BED \code{\link[GenomicRanges]{GRanges}} or NULL if report.file was
 #' specified. If BAM file contains reads that would not match to any of BED
-#' \code{\link[GenomicRanges]{GRanges}}, the first row in the report will
+#' \code{\link[GenomicRanges]{GRanges}}, the last row in the report will
 #' contain information on such reads (with seqnames, start and end equal to NA).
 #' The report columns are:
 #' \itemize{

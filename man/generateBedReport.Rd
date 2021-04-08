@@ -138,7 +138,7 @@ BED genomic regions, only the first match is taken (input
 \code{\link[GenomicRanges]{GRanges}} are \strong{not} sorted internally) .}
 
 \item{bed.type}{character string for the type of assay that was used to
-produce sequence reads:
+produce sequencing reads:
 \itemize{
   \item "amplicon" (the default) -- used for amplicon-based next-generation
   sequencing when exact coordinates of sequenced fragments are known.

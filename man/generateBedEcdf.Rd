@@ -19,13 +19,35 @@ generateBedEcdf(
 )
 }
 \arguments{
-\item{bam}{param desc}
+\item{bam}{BAM file location string OR preprocessed output of
+\code{\link{preprocessBam}} function.}
 
-\item{bed}{param desc}
+\item{bed}{Browser Extensible Data (BED) file location string OR object of
+class \code{\linkS4class{GRanges}} holding genomic coordinates for
+regions of interest. It is used to match sequencing reads to the genomic
+regions prior to eCDF computation. The seqlevels of BED file/object must
+match the seqlevels of the BAM file/object used.}
 
-\item{bed.type}{param desc}
+\item{bed.type}{character string for the type of assay that was used to
+produce sequencing reads:
+\itemize{
+  \item "amplicon" (the default) -- used for amplicon-based next-generation
+  sequencing when exact coordinates of sequenced fragments are known.
+  Matching of reads to genomic ranges are then performed by the read's start
+  or end positions, either of which should be no further than
+  `match.tolerance` bases away from the start or end position of genomic
+  ranges given in BED file/\code{\link[GenomicRanges]{GRanges}} object
+  \item "capture" -- used for capture-based next-generation sequencing when
+  reads partially overlap with the capture target regions. Read is considered
+  to match the genomic range when their overlap is more or equal to
+  `match.min.overlap`. If read matches two or more BED genomic regions, only
+  the first match is taken (input \code{\link[GenomicRanges]{GRanges}} are
+  \strong{not} sorted internally)
+}}
 
-\item{bed.rows}{param desc}
+\item{bed.rows}{integer vector specifying what `bed` regions should be
+included in the output. If `c(1)` (the default), then function returns eCDF
+for either first region of `bed` or for reads that don't match any regions}
 
 \item{zero.based.bed}{param desc}
 
@@ -45,7 +67,7 @@ generateBedEcdf(
 return desc
 }
 \description{
-`generateBedEcdf` desc. Epiallele-aware. GENERIC
+This function
 }
 \details{
 details
