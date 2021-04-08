@@ -1,10 +1,20 @@
 #' generateBedEcdf
 #'
 #' @description
-#' This function
+#' This function computes empirical cumulative distribution functions (eCDF) for
+#' per-read beta values of the sequencing reads.
 #'
 #' @details
-#' details
+#' The function matches reads to the genomic regions provided in a BED
+#' file/\code{\linkS4class{GRanges}} object, computes average per-read beta
+#' values according to the cytosine context parameter `ecdf.context`, and
+#' returns a list of eCDFs for within- and out-of-context average per-read beta
+#' values, which can be used for plotting.
+#' 
+#' The resulting eCDFs and their plots can be used to characterise the
+#' methylation pattern of a particular genomic region, e.g. if reads that match
+#' to that region are methylated in an "all-or-none" manner or if some
+#' intermediate methylation levels are more frequent.
 #'
 #' @param bam BAM file location string OR preprocessed output of
 #' \code{\link{preprocessBam}} function.
