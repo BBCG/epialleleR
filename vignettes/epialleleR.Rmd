@@ -1,0 +1,79 @@
+---
+title: "The epialleleR User's Guide"
+author: "Oleksii Nikolaienko"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+abstract: |
+  A comprehensive guide to using the epialleleR package for calling the
+  hypermethylated epiallele frequencies using next-generation sequencing data
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{epialleleR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  width = 100
+)
+options(width=100)
+# devtools::load_all(".")   # delete later
+```
+
+# Introduction
+
+*`epialleleR`* is an R package for ...
+
+## Current Features
+
+ * a
+ * b
+ * c
+
+# Reading data
+
+*`epialleleR`* methods operate on objects of the class *`GRanges`*...
+
+*`epialleleR`* package includes sample data, which was ...
+
+```{r, fig.width=10, fig.height=4, out.width="100%", out.height="100%"}
+library(epialleleR)
+
+
+```
+
+
+# A
+
+This code shows how to do basic analysis with *`epialleleR`* using provided data files:
+
+```{r, fig.width=10, fig.height=6, out.width="100%", out.height="100%"}
+# A
+```
+
+
+# B
+
+If necessary, B... [^2]
+
+```{r}
+# B
+```
+
+## Citing the *`epialleleR`* package
+[TBA](https://doi.org/TBA)
+
+
+## Session Info
+
+```{r session}
+sessionInfo()
+```
+
+# References
+[^1]: Z
+[^2]: X
+
+

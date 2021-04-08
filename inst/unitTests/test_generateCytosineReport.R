@@ -20,7 +20,17 @@ test_generateCytosineReport <- function () {
   )
 
   RUnit::checkEquals(
+    sum(cg.report$unmeth),
+    15245
+  )
+  
+  RUnit::checkEquals(
     sum(cx.report$meth),
     6051
+  )
+  
+  RUnit::checkEquals(
+    sum(cx.report$unmeth),
+    125903
   )
 }
