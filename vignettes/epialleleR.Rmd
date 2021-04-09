@@ -4,7 +4,7 @@ author: "Oleksii Nikolaienko"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 abstract: |
   A comprehensive guide to using the epialleleR package for calling the
-  hypermethylated epiallele frequencies using next-generation sequencing data
+  hypermethylated epiallele frequencies from next-generation sequencing data
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{epialleleR}
@@ -19,51 +19,319 @@ knitr::opts_chunk$set(
   width = 100
 )
 options(width=100)
-# devtools::load_all(".")   # delete later
+devtools::load_all(".")   # delete later
 ```
+
+*****
 
 # Introduction
 
-*`epialleleR`* is an R package for ...
+The cytosine DNA methylation is an important epigenetic mechanism for regulation
+of gene expression. Abnormal methylation is linked to several diseases, being 
+for example the most common molecular lesion in cancer cell[^1]. Multiple
+studies suggest that alterations in DNA methylation, despite occuring at a low
+mosaic level, may confer increased risk of cancer later in life[^2].
+
+The cytosine methylation levels within relatively small regions of the human
+genome are thought to be often concordant, resulting in a limited number of
+distinct methylation patterns of short sequencing reads[^3]. Due to the
+cell-to-cell variations in methylation, DNA purified from tissue samples
+contains a mix of hyper- and hypomethylated alleles with varying ratios that
+depend on a genomic region and a tissue type.
+
+Unsurprisingly, when the frequencies of hypermethylated epialleles are low
+(e.g. 1e-02 and lower) and cytosine methylation levels are averaged and reported
+using conventional algorythms, the identification of such hypermethylated
+epialleles becomes nearly impossible. In order to increase the sensitivity of
+DNA methylation analysis we have developed *`epialleleR`* &#8212; an R package
+for calling hypermethylated variant epiallele frequences (VEF).
+
+*`epialleleR`* is a fast and scalable solution for analysis of data obtained by
+next-generation sequencing of bisulfite-treated DNA samples. The minimum
+requirement for the input is: Binary Alignment Map (BAM) file containing
+sequencing reads. These reads can be obtained from either deep or ultra-deep
+sequencing, using either narrowly targeted gene panel (amplicon sequencing),
+larger methylation capture panels, or even whole-genome approaches.
 
 ## Current Features
 
- * a
- * b
- * c
+ * in addition to conventional reporting of cytosine DNA methylation levels
+ (beta values), *`epialleleR`* can call variant epiallele frequences (VEF) of
+ hypermethylated alleles at the level of individual cytosines
+ (*`generateCytosineReport`*) or supplied genomic regions
+ (*`generateBedReport`*)
+ * potential bimodality of methylation for genomic regions of interest can be
+ assessed using *`generateBedEcdf`* method
+ * the association of single-nucleotide variations with the epiallelic status
+ can be tested using *`generateVcfReport`*
 
-# Reading data
+*****
 
-*`epialleleR`* methods operate on objects of the class *`GRanges`*...
+# Sample data
 
-*`epialleleR`* package includes sample data, which was ...
+*`epialleleR`* package includes sample data, which was obtained using targeted
+sequencing. The description of assays and files is given below. All the
+genomic coordinates for external data files are according to GRCh38 reference
+assembly.
 
-```{r, fig.width=10, fig.height=4, out.width="100%", out.height="100%"}
-library(epialleleR)
+### Amplicon-based methylation NGS data
 
+The samples of Human HCT116 DKO Non-Methylated (Zymo Research, cat # D5014-1),
+or Human HCT116 DKO Methylated (Zymo Research, cat # D5014-2) DNA[^4], or their
+mix were bisulfite-converted, and BRCA1 gene promoter was amplified using four
+pairs of primers. Amplicons were mixed, indexed and sequenced at Illumina MiSeq
+system. The related files are:
 
-```
+| Name | Type | Description |
+| --- | --- | --- |
+| amplicon000meth.bam | BAM | a subset of reads for non-methylated DNA sample |
+| amplicon010meth.bam | BAM | a subset of reads for a 1:9 mix of methylated and non-methylated DNA samples |
+| amplicon100meth.bam | BAM | a&nbsp;subset&nbsp;of&nbsp;reads&nbsp;for&nbsp;fully&nbsp;methylated&nbsp;DNA&nbsp;sample |
+| amplicon.bed | BED | genomic coordinates of four amplicons covering promoter area of BRCA1 gene |
+| amplicon.vcf.gz | VCF | a relevant subset of sequence variations |
+| amplicon.vcf.gz.tbi | tabix | tabix file for the amplicon.vcf.gz |
 
+### Capture-based methylation NGS data
 
-# A
+The tumour DNA was bisulfite-converted, fragmented and hybridyzed with
+custom-made probes covering promoter regions of 283 tumour supressor genes (as
+described in [^5]). Libraries were sequenced using Illumina MiSeq system. The
+related files are:
 
-This code shows how to do basic analysis with *`epialleleR`* using provided data files:
+| Name | Type | Description |
+| --- | --- | --- |
+| capture.bam | BAM | a subset of reads |
+| capture.bed | BED | genomic&nbsp;coordinates&nbsp;of&nbsp;capture&nbsp;target&nbsp;regions |
+| capture.vcf.gz | VCF | a relevant subset of sequence variations |
+| capture.vcf.gz.tbi | tabix | tabix file for the amplicon.vcf.gz |
 
-```{r, fig.width=10, fig.height=6, out.width="100%", out.height="100%"}
-# A
-```
+*****
 
+# Typical workflow
 
-# B
+As mentioned earlier, *`epialleleR`* uses data stored in Binary Alignment Map
+(BAM) files as its input. It is absolutely necessary that records in a BAM file
+contain XM tag with the methylation call string &#8212; such files are produced
+by virtually any software tool for mapping and alignment of bisulfite
+sequencing reads (such as Bismark, BSMAP or Illumina DRAGEN Bio-IT Platform).
 
-If necessary, B... [^2]
+Please use function help files for full description of available parameters, as
+well as explanation of function's logic and output values.
+
+## Reading the data
+
+All of the *`epialleleR`* methods can load BAM data using the file path.
+However if a file is very large and several reports need to be prepared, it is
+advised to use *`preprocessBam`* convenience function as shown below. This
+function is also used internally when BAM file location string is supplied as
+an input for other *`epialleleR`* methods.
+
+*`preprocessBam`* automatically determines if BAM is derived from single-end or
+paired-end sequencing. When the latter is the case, paired reads are merged
+so that the overlapping fragments of second read are clipped (because quality
+of the second read is usually lower than of the first). These **merged reads**
+are then processed as a **single entity** in all *`epialleleR`* methods.
 
 ```{r}
-# B
+library(epialleleR)
+
+capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
+bam.data    <- preprocessBam(capture.bam)
 ```
 
+## Making cytosine reports
+
+*`epialleleR`* can generate conventional cytosine reports in a format, which is
+similar to the genome-wide cytosine report produced by coverage2cytosine
+Bismark module[^6].
+
+Please note that *`generateCytosineReport`* produces thresholded (VEF) report
+by default: **methylated** cytosines from reads that do **not** pass the
+threshold (**hypo**methylated reads) are counted as being **un**methylated. In
+order to make conventional cytosine report, use *`threshold.reads=FALSE`*.
+
+```{r}
+# data.table::data.table object for
+# CpG VEF report
+cg.vef.report <- generateCytosineReport(bam.data)
+head(cg.vef.report[order(meth+unmeth, decreasing=TRUE)])
+
+# CpG cytosine report
+cg.report <- generateCytosineReport(bam.data, threshold.reads=FALSE)
+head(cg.report[order(meth+unmeth, decreasing=TRUE)])
+
+# CX cytosine report
+cx.report <- generateCytosineReport(bam.data, threshold.reads=FALSE,
+                                    report.context="CX")
+head(cx.report[order(meth+unmeth, decreasing=TRUE)])
+```
+
+## Making VEF reports for the set of genomic regions
+
+*`epialleleR`* allows to make reports not only for individual cytosine bases,
+but also for a set of genomic regions. It is especially useful when the targeted
+methylation sequencing was used to produce reads (such as amplicon sequencing or
+by capture using, e.g., Agilent SureSelect Target Enrichment Probes).
+
+The amplicon sequencing principally differs from capture-based assays in that
+the coordinates of reads are known. Therefore reads can be assigned to amplicons
+by their exact positions, while to the capture targets &#8212; by the overlap.
+For this, *`epialleleR`* provides generic *`generateBedReport`* function as well
+as two of its aliases, *`generateAmpliconReport`* (for amplicon-based NGS) and
+*`generateCaptureReport`* (for capture-based NGS).
+
+```{r}
+# report for amplicon-based data
+# matching is done by exact start or end positions plus/minus tolerance
+amplicon.report <- generateAmpliconReport(
+  bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
+  bed=system.file("extdata", "amplicon.bed", package="epialleleR")
+)
+amplicon.report
+
+# report for capture-based data
+# matching is done by overlap
+capture.report <- generateCaptureReport(
+  bam=system.file("extdata", "capture.bam", package="epialleleR"),
+  bed=system.file("extdata", "capture.bed", package="epialleleR")
+)
+head(capture.report)
+
+# generateBedReport is a generic function for BED-guided reports
+bed.report <- generateBedReport(
+  bam=system.file("extdata", "capture.bam", package="epialleleR"),
+  bed=system.file("extdata", "capture.bed", package="epialleleR"),
+  bed.type="capture"
+)
+identical(capture.report, bed.report)
+```
+
+## Plotting the distribution of per-read beta values
+
+As stated in the introduction, human genomic DNA regions often show bimodal
+methylation patterns. *`epialleleR`* allows to visualize this information by
+plotting empirical cumulative distribution functions (eCDFs) for within- and
+out-of-context beta values.
+
+The code below produces plots for the sequencing reads of control DNA
+samples. Note that within-the-context eCDF(0.5) values are very close to the
+expected 1-VEF values for the corresponding control DNA samples: 
+
+ * non-methylated DNA &#8212; expected VEF = 0, observed 1-eCDF(0.5) &#8776; 0
+ * 1:9 mix of methylated and non-methylated DNA &#8212; expected VEF = 0.1, observed 1-eCDF(0.5) &#8776; 0.1
+ * and fully methylated DNA &#8212; expected VEF = 1, observed 1-eCDF(0.5) &#8776; 1
+
+```{r, fig.width=10, fig.height=6, out.width="100%", out.height="100%"}
+# First, let's visualise eCDFs for within- and out-of-context beta values
+# for all four amplicons and unmatched reads. Note that within-the-context eCDF
+# of 0.5 is very close to the expected 1-VEF value (0.1) for all amplicons
+# produced from this 1:9 mix of methylated and non-methylated control DNA
+
+# let's compute eCDF
+amplicon.ecdfs <- generateBedEcdf(
+  bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
+  bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
+  bed.rows=NULL
+)
+
+# there are 5 items in amplicon.ecdfs, let's plot all of them
+par(mfrow=c(1,length(amplicon.ecdfs)))
+
+# cycle through items
+for (x in 1:length(amplicon.ecdfs)) {
+  # four of them have names corresponding to genomic regions of amplicon.bed
+  # fifth - NA for all the reads that don't match to any of those regions
+  main <- if (is.na(names(amplicon.ecdfs[x]))) "unmatched"
+          else names(amplicon.ecdfs[x])
+  
+  # plotting eCDF for within-the-context per-read beta values (in red)
+  plot(amplicon.ecdfs[[x]]$context, col="red", verticals=TRUE, do.points=FALSE,
+       xlim=c(0,1), xlab="per-read beta value", ylab="cumulative density", main=main)
+  
+  # adding eCDF for out-of-context per-read beta values (in blue)
+  plot(amplicon.ecdfs[[x]]$out.of.context, add=TRUE, col="blue",
+       verticals=TRUE, do.points=FALSE)
+}
+
+
+# Second, let's compare eCDFs for within-the-context beta values for only one
+# amplicon but all three sequenced samples: pure non-methylated DNA, 1:9 mix of
+# methylated and non-methylated DNA, and fully methylated DNA
+
+# our files
+bam.files <- c("amplicon000meth.bam", "amplicon010meth.bam", "amplicon100meth.bam")
+
+# let's plot all of them
+par(mfrow=c(1,length(bam.files)))
+
+# cycle through items
+for (f in bam.files) {
+  # let's compute eCDF
+  amplicon.ecdfs <- generateBedEcdf(
+    bam=system.file("extdata", f, package="epialleleR"),
+    bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
+    # only the second amplicon
+    bed.rows=2, verbose=FALSE
+  )
+  
+  # plotting eCDF for within-the-context per-read beta values (in red)
+  plot(amplicon.ecdfs[[1]]$context, col="red", verticals=TRUE, do.points=FALSE,
+       xlim=c(0,1), xlab="per-read beta value", ylab="cumulative density", main=f)
+  
+   # adding eCDF for out-of-context per-read beta values (in blue)
+  plot(amplicon.ecdfs[[1]]$out.of.context, add=TRUE, col="blue",
+       verticals=TRUE, do.points=FALSE)
+}
+```
+
+## Exploring sequence variants in epialleles
+
+It is known that sequence variants can affect methylation status of a DNA[^7].
+*`generateVcfReport`* function calculates frequencies of single nucleotide
+variants (SNVs) within epialleles and tests for the association between SNV and
+epiallelic status using Fisher's exact test. Base counts and the test's p-values
+are included in the returned value.
+
+In addition to BAM file location string or preprocessed BAM object, function
+requires a location string for the Variant Call Format (VCF) file or the VCF
+object that was obtained using *`VariantAnnotation::readVcf`* function. As VCF
+files can be extremely large, it is strongly advised to prefilter the VCF object
+by the relevant set of genomic regions, or specify such relevant set of regions
+as a *`bed`* parameter when *`vcf`* points to a VCF file location.
+
+Please note, that the output report is currently limited to SNVs only.
+
+```{r}
+# VCF report
+vcf.report <- generateVcfReport(
+  bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
+  bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
+  vcf=system.file("extdata", "amplicon.vcf.gz", package="epialleleR"),
+  # when VCF seqlevels are different from BED and BAM it is possible
+  # to convert them internally
+  vcf.style="NCBI"
+)
+
+# NA values are shown for the C->T variants on the "+" and G->A on the "-"
+# strands, because bisulfite conversion makes their counting impossible
+head(vcf.report)
+
+# let's sort the report by increasing Fisher's exact test's p-values.
+# the p-values are given separately for reads that map to the "+"
+head(vcf.report[order(`FEp-`, na.last=TRUE)])
+
+# and to the "-" strand
+head(vcf.report[order(`FEp+`, na.last=TRUE)])
+```
+
+*****
+
+# Other information
+
 ## Citing the *`epialleleR`* package
-[TBA](https://doi.org/TBA)
+
+The experimental data analysed using the package has not been published yet.
+The citation information will be updated in the nearest future.
 
 
 ## Session Info
@@ -72,8 +340,15 @@ If necessary, B... [^2]
 sessionInfo()
 ```
 
-# References
-[^1]: Z
-[^2]: X
+*****
 
+# References
+
+[^1]: https://doi.org/10.1146/annurev.pharmtox.45.120403.095832
+[^2]: https://doi.org/10.1101/2020.12.01.403501
+[^3]: https://doi.org/10.1093/bib/bbx077
+[^4]: https://www.zymoresearch.com/products/human-methylated-non-methylated-dna-set-dna-w-primers
+[^5]: https://dx.doi.org/10.1186%2Fs13148-020-00920-7
+[^6]: https://www.bioinformatics.babraham.ac.uk/projects/bismark/
+[^7]: https://doi.org/10.1038/modpathol.2009.130
 

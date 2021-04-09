@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Oleksii Nikolaienko" />
+
+
+<title>The epialleleR User's Guide</title>
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+<style type="text/css">
+  p.abstract{
+    text-align: center;
+    font-weight: bold;
+  }
+  div.abstract{
+    margin: auto;
+    width: 90%;
+  }
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">The epialleleR User's Guide</h1>
+<h4 class="author">Oleksii Nikolaienko</h4>
+<h4 class="date">09 April, 2021</h4>
+<div class="abstract">
+<p class="abstract">Abstract</p>
+<p>A comprehensive guide to using the epialleleR package for calling the hypermethylated epiallele frequencies from next-generation sequencing data</p>
+</div>
+
+
+
+<hr />
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>The cytosine DNA methylation is an important epigenetic mechanism for regulation of gene expression. Abnormal methylation is linked to several diseases, being for example the most common molecular lesion in cancer cell<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. Multiple studies suggest that alterations in DNA methylation, despite occuring at a low mosaic level, may confer increased risk of cancer later in life<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>.</p>
+<p>The cytosine methylation levels within relatively small regions of the human genome are thought to be often concordant, resulting in a limited number of distinct methylation patterns of short sequencing reads<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>. Due to the cell-to-cell variations in methylation, DNA purified from tissue samples contains a mix of hyper- and hypomethylated alleles with varying ratios that depend on a genomic region and a tissue type.</p>
+<p>Unsurprisingly, when the frequencies of hypermethylated epialleles are low (e.g. 1e-02 and lower) and cytosine methylation levels are averaged and reported using conventional algorythms, the identification of such hypermethylated epialleles becomes nearly impossible. In order to increase the sensitivity of DNA methylation analysis we have developed <em><code>epialleleR</code></em> — an R package for calling hypermethylated variant epiallele frequences (VEF).</p>
+<p><em><code>epialleleR</code></em> is a fast and scalable solution for analysis of data obtained by next-generation sequencing of bisulfite-treated DNA samples. The minimum requirement for the input is: Binary Alignment Map (BAM) file containing sequencing reads. These reads can be obtained from either deep or ultra-deep sequencing, using either narrowly targeted gene panel (amplicon sequencing), larger methylation capture panels, or even whole-genome approaches.</p>
+<div id="current-features" class="section level2">
+<h2>Current Features</h2>
+<ul>
+<li>in addition to conventional reporting of cytosine DNA methylation levels (beta values), <em><code>epialleleR</code></em> can call variant epiallele frequences (VEF) of hypermethylated alleles at the level of individual cytosines (<em><code>generateCytosineReport</code></em>) or supplied genomic regions (<em><code>generateBedReport</code></em>)</li>
+<li>potential bimodality of methylation for genomic regions of interest can be assessed using <em><code>generateBedEcdf</code></em> method</li>
+<li>the association of single-nucleotide variations with the epiallelic status can be tested using <em><code>generateVcfReport</code></em></li>
+</ul>
+<hr />
+</div>
+</div>
+<div id="sample-data" class="section level1">
+<h1>Sample data</h1>
+<p><em><code>epialleleR</code></em> package includes sample data, which was obtained using targeted sequencing. The description of assays and files is given below. All the genomic coordinates for external data files are according to GRCh38 reference assembly.</p>
+<div id="amplicon-based-methylation-ngs-data" class="section level3">
+<h3>Amplicon-based methylation NGS data</h3>
+<p>The samples of Human HCT116 DKO Non-Methylated (Zymo Research, cat # D5014-1), or Human HCT116 DKO Methylated (Zymo Research, cat # D5014-2) DNA<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>, or their mix were bisulfite-converted, and BRCA1 gene promoter was amplified using four pairs of primers. Amplicons were mixed, indexed and sequenced at Illumina MiSeq system. The related files are:</p>
+<table style="width:17%;">
+<colgroup>
+<col width="5%"></col>
+<col width="5%"></col>
+<col width="5%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>amplicon000meth.bam</td>
+<td>BAM</td>
+<td>a subset of reads for non-methylated DNA sample</td>
+</tr>
+<tr class="even">
+<td>amplicon010meth.bam</td>
+<td>BAM</td>
+<td>a subset of reads for a 1:9 mix of methylated and non-methylated DNA samples</td>
+</tr>
+<tr class="odd">
+<td>amplicon100meth.bam</td>
+<td>BAM</td>
+<td>a subset of reads for fully methylated DNA sample</td>
+</tr>
+<tr class="even">
+<td>amplicon.bed</td>
+<td>BED</td>
+<td>genomic coordinates of four amplicons covering promoter area of BRCA1 gene</td>
+</tr>
+<tr class="odd">
+<td>amplicon.vcf.gz</td>
+<td>VCF</td>
+<td>a relevant subset of sequence variations</td>
+</tr>
+<tr class="even">
+<td>amplicon.vcf.gz.tbi</td>
+<td>tabix</td>
+<td>tabix file for the amplicon.vcf.gz</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="capture-based-methylation-ngs-data" class="section level3">
+<h3>Capture-based methylation NGS data</h3>
+<p>The tumour DNA was bisulfite-converted, fragmented and hybridyzed with custom-made probes covering promoter regions of 283 tumour supressor genes (as described in <a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a>). Libraries were sequenced using Illumina MiSeq system. The related files are:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>capture.bam</td>
+<td>BAM</td>
+<td>a subset of reads</td>
+</tr>
+<tr class="even">
+<td>capture.bed</td>
+<td>BED</td>
+<td>genomic coordinates of capture target regions</td>
+</tr>
+<tr class="odd">
+<td>capture.vcf.gz</td>
+<td>VCF</td>
+<td>a relevant subset of sequence variations</td>
+</tr>
+<tr class="even">
+<td>capture.vcf.gz.tbi</td>
+<td>tabix</td>
+<td>tabix file for the amplicon.vcf.gz</td>
+</tr>
+</tbody>
+</table>
+<hr />
+</div>
+</div>
+<div id="typical-workflow" class="section level1">
+<h1>Typical workflow</h1>
+<p>As mentioned earlier, <em><code>epialleleR</code></em> uses data stored in Binary Alignment Map (BAM) files as its input. It is absolutely necessary that records in a BAM file contain XM tag with the methylation call string — such files are produced by virtually any software tool for mapping and alignment of bisulfite sequencing reads (such as Bismark, BSMAP or Illumina DRAGEN Bio-IT Platform).</p>
+<p>Please use function help files for full description of available parameters, as well as explanation of function's logic and output values.</p>
+<div id="reading-the-data" class="section level2">
+<h2>Reading the data</h2>
+<p>All of the <em><code>epialleleR</code></em> methods can load BAM data using the file path. However if a file is very large and several reports need to be prepared, it is advised to use <em><code>preprocessBam</code></em> convenience function as shown below. This function is also used internally when BAM file location string is supplied as an input for other <em><code>epialleleR</code></em> methods.</p>
+<p><em><code>preprocessBam</code></em> automatically determines if BAM is derived from single-end or paired-end sequencing. When the latter is the case, paired reads are merged so that the overlapping fragments of second read are clipped (because quality of the second read is usually lower than of the first). These <strong>merged reads</strong> are then processed as a <strong>single entity</strong> in all <em><code>epialleleR</code></em> methods.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(epialleleR)
+
+capture.bam &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;capture.bam&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>)
+bam.data    &lt;-<span class="st"> </span><span class="kw">preprocessBam</span>(capture.bam)
+<span class="co">#&gt; Reading BAM file [0.529s]</span>
+<span class="co">#&gt; Preprocessing BAM data:</span>
+<span class="co">#&gt;   Transforming sequences [0.017s]</span>
+<span class="co">#&gt;   Merging pairs [0.019s]</span></code></pre></div>
+</div>
+<div id="making-cytosine-reports" class="section level2">
+<h2>Making cytosine reports</h2>
+<p><em><code>epialleleR</code></em> can generate conventional cytosine reports in a format, which is similar to the genome-wide cytosine report produced by coverage2cytosine Bismark module<a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a>.</p>
+<p>Please note that <em><code>generateCytosineReport</code></em> produces thresholded (VEF) report by default: <strong>methylated</strong> cytosines from reads that do <strong>not</strong> pass the threshold (<strong>hypo</strong>methylated reads) are counted as being <strong>un</strong>methylated. In order to make conventional cytosine report, use <em><code>threshold.reads=FALSE</code></em>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># data.table::data.table object for</span>
+<span class="co"># CpG VEF report</span>
+cg.vef.report &lt;-<span class="st"> </span><span class="kw">generateCytosineReport</span>(bam.data)
+<span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq' and 'skip.duplicates' will have no effect.</span>
+<span class="co">#&gt; Thresholding reads [0.002s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.119s]</span>
+<span class="kw">head</span>(cg.vef.report[<span class="kw">order</span>(meth<span class="op">+</span>unmeth, <span class="dt">decreasing=</span><span class="ot">TRUE</span>)])
+<span class="co">#&gt;    rname strand      pos context meth unmeth triad</span>
+<span class="co">#&gt; 1: chr17      + 61864475      CG    7      9   NNN</span>
+<span class="co">#&gt; 2: chr17      + 61864486      CG   10      6   NNN</span>
+<span class="co">#&gt; 3: chr17      + 61864504      CG    9      7   NNN</span>
+<span class="co">#&gt; 4: chr20      - 57267455      CG   13      1   NNN</span>
+<span class="co">#&gt; 5: chr17      - 61863826      CG    0     13   NNN</span>
+<span class="co">#&gt; 6: chr17      - 61863830      CG    0     13   NNN</span>
+
+<span class="co"># CpG cytosine report</span>
+cg.report &lt;-<span class="st"> </span><span class="kw">generateCytosineReport</span>(bam.data, <span class="dt">threshold.reads=</span><span class="ot">FALSE</span>)
+<span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq' and 'skip.duplicates' will have no effect.</span>
+<span class="co">#&gt; Preparing cytosine report [0.120s]</span>
+<span class="kw">head</span>(cg.report[<span class="kw">order</span>(meth<span class="op">+</span>unmeth, <span class="dt">decreasing=</span><span class="ot">TRUE</span>)])
+<span class="co">#&gt;    rname strand      pos context meth unmeth triad</span>
+<span class="co">#&gt; 1: chr17      + 61864475      CG    8      8   NNN</span>
+<span class="co">#&gt; 2: chr17      + 61864486      CG   10      6   NNN</span>
+<span class="co">#&gt; 3: chr17      + 61864504      CG   10      6   NNN</span>
+<span class="co">#&gt; 4: chr20      - 57267455      CG   13      1   NNN</span>
+<span class="co">#&gt; 5: chr17      - 61863826      CG    0     13   NNN</span>
+<span class="co">#&gt; 6: chr17      - 61863830      CG    0     13   NNN</span>
+
+<span class="co"># CX cytosine report</span>
+cx.report &lt;-<span class="st"> </span><span class="kw">generateCytosineReport</span>(bam.data, <span class="dt">threshold.reads=</span><span class="ot">FALSE</span>,
+                                    <span class="dt">report.context=</span><span class="st">&quot;CX&quot;</span>)
+<span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq' and 'skip.duplicates' will have no effect.</span>
+<span class="co">#&gt; Preparing cytosine report [0.141s]</span>
+<span class="kw">head</span>(cx.report[<span class="kw">order</span>(meth<span class="op">+</span>unmeth, <span class="dt">decreasing=</span><span class="ot">TRUE</span>)])
+<span class="co">#&gt;    rname strand      pos context meth unmeth triad</span>
+<span class="co">#&gt; 1: chr17      + 61864338     CHG    1     25   NNN</span>
+<span class="co">#&gt; 2: chr17      + 61864348     CHH    0     24   NNN</span>
+<span class="co">#&gt; 3: chr17      + 61864364     CHH    0     24   NNN</span>
+<span class="co">#&gt; 4: chr17      + 61864365     CHH    0     24   NNN</span>
+<span class="co">#&gt; 5: chr17      + 61864373     CHH    0     24   NNN</span>
+<span class="co">#&gt; 6: chr17      + 61864324     CHG    0     23   NNN</span></code></pre></div>
+</div>
+<div id="making-vef-reports-for-the-set-of-genomic-regions" class="section level2">
+<h2>Making VEF reports for the set of genomic regions</h2>
+<p><em><code>epialleleR</code></em> allows to make reports not only for individual cytosine bases, but also for a set of genomic regions. It is especially useful when the targeted methylation sequencing was used to produce reads (such as amplicon sequencing or by capture using, e.g., Agilent SureSelect Target Enrichment Probes).</p>
+<p>The amplicon sequencing principally differs from capture-based assays in that the coordinates of reads are known. Therefore reads can be assigned to amplicons by their exact positions, while to the capture targets — by the overlap. For this, <em><code>epialleleR</code></em> provides generic <em><code>generateBedReport</code></em> function as well as two of its aliases, <em><code>generateAmpliconReport</code></em> (for amplicon-based NGS) and <em><code>generateCaptureReport</code></em> (for capture-based NGS).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># report for amplicon-based data</span>
+<span class="co"># matching is done by exact start or end positions plus/minus tolerance</span>
+amplicon.report &lt;-<span class="st"> </span><span class="kw">generateAmpliconReport</span>(
+  <span class="dt">bam=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;amplicon010meth.bam&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>),
+  <span class="dt">bed=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;amplicon.bed&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>)
+)
+<span class="co">#&gt; Reading BED file [0.025s]</span>
+<span class="co">#&gt; Reading BAM file [0.475s]</span>
+<span class="co">#&gt; Preprocessing BAM data:</span>
+<span class="co">#&gt;   Transforming sequences [0.004s]</span>
+<span class="co">#&gt;   Merging pairs [0.004s]</span>
+<span class="co">#&gt; Thresholding reads [0.000s]</span>
+<span class="co">#&gt; Preparing amplicon report [0.014s]</span>
+amplicon.report
+<span class="co">#&gt;    seqnames    start      end width strand amplicon nreads+ nreads-        VEF</span>
+<span class="co">#&gt; 1:    chr17 43125624 43126026   403      * CpG00-13       0     156 0.08333333</span>
+<span class="co">#&gt; 2:    chr17 43125270 43125640   371      * CpG14-31       0      61 0.11475410</span>
+<span class="co">#&gt; 3:    chr17 43125171 43125550   380      * CpG17-34       0      93 0.05376344</span>
+<span class="co">#&gt; 4:    chr17 43124861 43125249   389      * CpG33-49       0      84 0.10714286</span>
+<span class="co">#&gt; 5:     &lt;NA&gt;       NA       NA    NA   &lt;NA&gt;     &lt;NA&gt;      60      46 0.13207547</span>
+
+<span class="co"># report for capture-based data</span>
+<span class="co"># matching is done by overlap</span>
+capture.report &lt;-<span class="st"> </span><span class="kw">generateCaptureReport</span>(
+  <span class="dt">bam=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;capture.bam&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>),
+  <span class="dt">bed=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;capture.bed&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>)
+)
+<span class="co">#&gt; Reading BED file [0.021s]</span>
+<span class="co">#&gt; Reading BAM file [0.119s]</span>
+<span class="co">#&gt; Preprocessing BAM data:</span>
+<span class="co">#&gt;   Transforming sequences [0.010s]</span>
+<span class="co">#&gt;   Merging pairs [0.009s]</span>
+<span class="co">#&gt; Thresholding reads [0.001s]</span>
+<span class="co">#&gt; Preparing capture report [0.022s]</span>
+<span class="kw">head</span>(capture.report)
+<span class="co">#&gt;    seqnames    start      end width strand     V4 nreads+ nreads-       VEF</span>
+<span class="co">#&gt; 1:     chr1  3067647  3069703  2057      * PRDM16       2       1 1.0000000</span>
+<span class="co">#&gt; 2:     chr1  3651039  3653096  2058      *   TP73       0       2 0.5000000</span>
+<span class="co">#&gt; 3:     chr1  3689153  3691202  2050      *   TP73       0       2 1.0000000</span>
+<span class="co">#&gt; 4:     chr1  3696519  3698570  2052      *   TP73       1       2 1.0000000</span>
+<span class="co">#&gt; 5:     chr1  6179609  6181670  2062      *   CHD5       0       3 0.6666667</span>
+<span class="co">#&gt; 6:     chr1 13698869 13699064   196      *  PRDM2      NA      NA        NA</span>
+
+<span class="co"># generateBedReport is a generic function for BED-guided reports</span>
+bed.report &lt;-<span class="st"> </span><span class="kw">generateBedReport</span>(
+  <span class="dt">bam=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;capture.bam&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>),
+  <span class="dt">bed=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;capture.bed&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>),
+  <span class="dt">bed.type=</span><span class="st">&quot;capture&quot;</span>
+)
+<span class="co">#&gt; Reading BED file [0.008s]</span>
+<span class="co">#&gt; Reading BAM file [0.132s]</span>
+<span class="co">#&gt; Preprocessing BAM data:</span>
+<span class="co">#&gt;   Transforming sequences [0.011s]</span>
+<span class="co">#&gt;   Merging pairs [0.009s]</span>
+<span class="co">#&gt; Thresholding reads [0.001s]</span>
+<span class="co">#&gt; Preparing capture report [0.010s]</span>
+<span class="kw">identical</span>(capture.report, bed.report)
+<span class="co">#&gt; [1] TRUE</span></code></pre></div>
+</div>
+<div id="plotting-the-distribution-of-per-read-beta-values" class="section level2">
+<h2>Plotting the distribution of per-read beta values</h2>
+<p>As stated in the introduction, human genomic DNA regions often show bimodal methylation patterns. <em><code>epialleleR</code></em> allows to visualize this information by plotting empirical cumulative distribution functions (eCDFs) for within- and out-of-context beta values.</p>
+<p>The code below produces plots for the sequencing reads of control DNA samples. Note that within-the-context eCDF(0.5) values are very close to the expected 1-VEF values for the corresponding control DNA samples:</p>
+<ul>
+<li>non-methylated DNA — expected VEF = 0, observed 1-eCDF(0.5) ≈ 0</li>
+<li>1:9 mix of methylated and non-methylated DNA — expected VEF = 0.1, observed 1-eCDF(0.5) ≈ 0.1</li>
+<li>and fully methylated DNA — expected VEF = 1, observed 1-eCDF(0.5) ≈ 1</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># First, let's visualise eCDFs for within- and out-of-context beta values</span>
+<span class="co"># for all four amplicons and unmatched reads. Note that within-the-context eCDF</span>
+<span class="co"># of 0.5 is very close to the expected 1-VEF value (0.1) for all amplicons</span>
+<span class="co"># produced from this 1:9 mix of methylated and non-methylated control DNA</span>
+
+<span class="co"># let's compute eCDF</span>
+amplicon.ecdfs &lt;-<span class="st"> </span><span class="kw">generateBedEcdf</span>(
+  <span class="dt">bam=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;amplicon010meth.bam&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>),
+  <span class="dt">bed=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;amplicon.bed&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>),
+  <span class="dt">bed.rows=</span><span class="ot">NULL</span>
+)
+<span class="co">#&gt; Reading BED file [0.007s]</span>
+<span class="co">#&gt; Reading BAM file [0.096s]</span>
+<span class="co">#&gt; Preprocessing BAM data:</span>
+<span class="co">#&gt;   Transforming sequences [0.004s]</span>
+<span class="co">#&gt;   Merging pairs [0.003s]</span>
+<span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.008s]</span>
+
+<span class="co"># there are 5 items in amplicon.ecdfs, let's plot all of them</span>
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="kw">length</span>(amplicon.ecdfs)))
+
+<span class="co"># cycle through items</span>
+<span class="cf">for</span> (x <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(amplicon.ecdfs)) {
+  <span class="co"># four of them have names corresponding to genomic regions of amplicon.bed</span>
+  <span class="co"># fifth - NA for all the reads that don't match to any of those regions</span>
+  main &lt;-<span class="st"> </span><span class="cf">if</span> (<span class="kw">is.na</span>(<span class="kw">names</span>(amplicon.ecdfs[x]))) <span class="st">&quot;unmatched&quot;</span>
+          <span class="cf">else</span> <span class="kw">names</span>(amplicon.ecdfs[x])
+  
+  <span class="co"># plotting eCDF for within-the-context per-read beta values (in red)</span>
+  <span class="kw">plot</span>(amplicon.ecdfs[[x]]<span class="op">$</span>context, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>, <span class="dt">verticals=</span><span class="ot">TRUE</span>, <span class="dt">do.points=</span><span class="ot">FALSE</span>,
+       <span class="dt">xlim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="dt">xlab=</span><span class="st">&quot;per-read beta value&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;cumulative density&quot;</span>, <span class="dt">main=</span>main)
+  
+  <span class="co"># adding eCDF for out-of-context per-read beta values (in blue)</span>
+  <span class="kw">plot</span>(amplicon.ecdfs[[x]]<span class="op">$</span>out.of.context, <span class="dt">add=</span><span class="ot">TRUE</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>,
+       <span class="dt">verticals=</span><span class="ot">TRUE</span>, <span class="dt">do.points=</span><span class="ot">FALSE</span>)
+}</code></pre></div>
+<p><img src="data:image/png;base64,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" width="100%" height="100%" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+
+<span class="co"># Second, let's compare eCDFs for within-the-context beta values for only one</span>
+<span class="co"># amplicon but all three sequenced samples: pure non-methylated DNA, 1:9 mix of</span>
+<span class="co"># methylated and non-methylated DNA, and fully methylated DNA</span>
+
+<span class="co"># our files</span>
+bam.files &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;amplicon000meth.bam&quot;</span>, <span class="st">&quot;amplicon010meth.bam&quot;</span>, <span class="st">&quot;amplicon100meth.bam&quot;</span>)
+
+<span class="co"># let's plot all of them</span>
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="kw">length</span>(bam.files)))
+
+<span class="co"># cycle through items</span>
+<span class="cf">for</span> (f <span class="cf">in</span> bam.files) {
+  <span class="co"># let's compute eCDF</span>
+  amplicon.ecdfs &lt;-<span class="st"> </span><span class="kw">generateBedEcdf</span>(
+    <span class="dt">bam=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, f, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>),
+    <span class="dt">bed=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;amplicon.bed&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>),
+    <span class="co"># only the second amplicon</span>
+    <span class="dt">bed.rows=</span><span class="dv">2</span>, <span class="dt">verbose=</span><span class="ot">FALSE</span>
+  )
+  
+  <span class="co"># plotting eCDF for within-the-context per-read beta values (in red)</span>
+  <span class="kw">plot</span>(amplicon.ecdfs[[<span class="dv">1</span>]]<span class="op">$</span>context, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>, <span class="dt">verticals=</span><span class="ot">TRUE</span>, <span class="dt">do.points=</span><span class="ot">FALSE</span>,
+       <span class="dt">xlim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="dt">xlab=</span><span class="st">&quot;per-read beta value&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;cumulative density&quot;</span>, <span class="dt">main=</span>f)
+  
+   <span class="co"># adding eCDF for out-of-context per-read beta values (in blue)</span>
+  <span class="kw">plot</span>(amplicon.ecdfs[[<span class="dv">1</span>]]<span class="op">$</span>out.of.context, <span class="dt">add=</span><span class="ot">TRUE</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>,
+       <span class="dt">verticals=</span><span class="ot">TRUE</span>, <span class="dt">do.points=</span><span class="ot">FALSE</span>)
+}</code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA8AAAAJACAIAAADNc5igAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAgAElEQVR4nO3deVyVZf7/8c9hkcUFUVlNUHDBpSSVSHFhRJ0W2yQT09BsGSMT/TXaNE3m1/o2j2+b1dSUNpPZplNTNmWamZSpY0xulHvliiwpGgkI6OH+/XEapCMo1/Hc5z4XvJ6P+eNwnZv7/nDwPb25uc+NzTAMAQAAANA4PlYPAAAAAOiEAg0AAAAooEADAAAACijQAAAAgAIKNAAAAKCAAg0AAAAooEADAAAACijQAAAAgAIKNAAAAKCAAg0AAAAooEADAAAACijQAAAAgAIKNAAAAKCAAg0AAAAooEADAAAACijQAAAAgAIKNAAAAKCAAg0AAAAooEADAAAACijQAAAAgAIKtFfYs2ePzWa76667ROSHH36w2Wy33Xab1UO5Td2vriFr1qyx2WwPP/ywx6YC3IX8kl/oi/ySX9dQoL1OQEDAlVdeGR8f78Z9rlq1auDAgW3btk1NTf3Pf/6juuia1q1bX3755Rc7OqAVj+XX4c477xw4cGBjtlRFftEMmZFfh8ZElfzqhQLtdS655JKNGzfOnTvXXTs8fPjwjTfeeOLEifvvv//777+/6qqrTp482fhFd40BNAeeyW91dfW6detmzJjx97///fxbumsMoDlwe34bH1Xyqx0KtOueeOKJzp07BwYGdu/e/dVXXxWR3NzcLl26ZGdnDxs2LDQ09LbbbluzZk2fPn3atGkzadIku92+YcOGLl26zJkzZ+TIkW3btr3uuusKCwudduv0C5f169cPGjSodevWtUcRka1btw4fPjwkJCQ2Nva+++5zxOzbb7/t0qXLrFmz0tPTQ0JCLr/88ry8PBFZtmxZZWXlgw8++PDDDz/wwAMnTpz49NNPG794wS/KcYi+ffu2bt164MCBX331lYhceumlZWVl27ZtS0pKcsxcUVExfvz4kJCQpKSkvXv31vuS5ufnDx06NDQ0dMyYMSUlJS6/zu78NqOJ0jq/hw8fHjp06HPPPVf30OQXzYcu+W18VMmvfgy45NNPPxWRK6+88n/+53/i4uJ8fHwKCgq++OILEWnRosXEiRO7d+8uIoGBgZmZmXFxcSLy4YcffvbZZyLi4+Mzfvz48ePHi8iwYcMMw9i9e7eI3HnnnU6Pjxw50rJly+jo6Icffrhv374i8sUXX/z444+hoaGtW7f+4x//OHbsWBGZOHGiYRibNm0SEV9f3+uuu+6qq64SkbS0NMMw7rvvPhFZu3atYRgrVqwQkccff7zxixf8ojZv3myz2fr37/9///d/cXFxLVu2LCoq2r17d1BQUI8ePfbs2eP4inx8fK699tq0tDQRSU9Pd3o9Ha+MiGRkZGRkZIjIVVdd5fLr7MF/CNCS7vmt/UIcX4XjMflFM6FRfmtdMKrkVzsUaBft2LHjzTff3LdvX15e3qhRo0Tkq6++cvzDysjIMAzj3Xffrc3hokWLROSFF15w/DNNTk527KR///4icujQoYYC/Pzzz4vIX//6V8Mwdu7cmZGRsWTJkpdffrl20TCMK664wmazlZeXOwJ89dVXG4Zx5syZ0NDQjh07GoYxefJkEdm9e7dhGDk5OSLy4IMPNn7xgl/UtGnTROTNN9/cvn37Y489JiJPPfWUYRitWrVKTEys/YqGDBliGMbJkydbtGjRu3dvp9fT8coMGDDA8aHj5+bDhw+79jqb9V1HU6F7fmu/kLr/VSa/aCY0ym+tC0aV/GqHSzhc1K5du88//7xXr15Dhw7dtWtX3ac6d+4sIkFBQU6PayUnJzseXHHFFSJy+PDhho5y6NAhEUlISBCRnj17LlmyJCMj4+DBgyJy2WWXOba59NJLDcNwLIpIjx49RMTX17d9+/aOX6a0atVKRBy/qyooKBCRsLCwxi9e8ItyHHrixIl9+vT505/+JCLffffduV+LY7BWrVq1adOmod/yOF4QEbnyyitFZP/+/RfzOgMN0T2/9R6O/KKZ0Ci/9eK/v00DBdpFTzzxxN///ve//vWvJ06cqP1n10hff/2144HjZ9aYmJiGtoyKihIRx6VUBQUFTz/99JdffunYfvv27Y5tHA8uueSShnbSrVs3Efnhhx9EZP/+/SLSuXPnxi9e8MuJjIx0fC21P5Y5fkYXEcMwLvjpdTleEBFxvAG5Y8eOF/M6Aw3RPb8XuWVd5Bfa0Si/9eK/v00DBdpFjp/hPvnkk6ysrI8++khEampqGvm5GzdunDx5cmZm5tdffz1ixIjzZO+mm24KDAx88sknH3vssRtuuOH3v//96dOnx4wZ07Zt2wceeGDu3Lnjx4/Pzc3NyMho3br1eXYSFBT06KOPzpw587nnnouIiLj66qsbv3jBL+fWW28Vkezs7AULFowePdpmsy1fvlxE/P398/PzN2zY0NAn7tixo2fPnvfcc0/tyn/+8x/HK5Obmzt48OC4uLiLeZ2Bhuie34vcsi7yC+1olN+G9sx/f5sACrSLZs6cmZSUtGLFivz8/Hnz5l1yySWOd782xu2337579+5//etf119//VtvvXWeLbt06fLRRx9FRUX9+c9//vnnnxctWpSWlhYeHv7ZZ59dfvnl8+fPX79+/b333rtw4cLz7KRTp07Lli2LjIz829/+Fhsb++GHHwYGBjZ+8YJfTmpq6uLFi0tKSmbMmLF///7XXntt9OjRIjJt2jQfH59Zs2Y19ImVlZW7d+/Oz88XkYCAgEsuuWTKlCk7d+7817/+de211y5dulQu7nUGGqJ7fi9yy7rIL7SjUX7rxX9/mwab6kl+XIw1a9aMGDFi7ty5jzzyiNWzAFBDfgF9kV+4F2egAQAAAAUUaAAAAEABl3AAAAAACjgDDQAAACigQAMAAAAKKNAAAACAAgo0AAAAoIACDQAAACigQAMAAAAKKNAAAACAAgo0AAAAoIACDQAAACigQAMAAAAKKNAAAACAAgo0AAAAoIACDQAAACigQAMAAAAKKNAAAACAAgo0AAAAoMDP6gEatGHDho8++sjqKQB3iomJycrKsnoKTyC/aHrIL6Avt+fXZhiGG3fnRrNnz96xY8fQoUOtHgRwj9LS0jfeeOPw4cNWD+IJ5BdNDPkF9GVGfr33DLSIpKamzpo1y+opAPfIz89/4403rJ7Cc8gvmhLyC+jLjPxyDTQAAACggAINAAAAKKBAAwAAAAoo0AAAAIACCjQAAACggAINAAAAKKBAAwAAAApMvA90TU1NXl5eYWGh3W6Pjo5OTEz09fU173AA3Ij8Avoiv4DZzCrQOTk5U6ZMCQoKSkhIMAxj7969p06dWrRoUWpqqklHBOAu5BfQF/kFPMCsAp2dnZ2TkxMXF1e7kp+fn56enpuba9IRAbgL+QX0RX4BDzDrGmi73R4ZGVl3JTw83KRjAXAv8gvoi/wCHmDWGehp06YlJiampKQkJCTYbLY9e/Zs3Lhx+vTpJh0OgBuRX0Bf5BfwALPOQGdlZa1evTo5ObmioqKioiIpKWnlypVTp0416XAA3Ij8Avoiv4AHmHgXjtjYWKfE2u123ggMaIH8Avoiv4DZTCzQToqLiyMjIw3DqPfZBQsW7N+/v+7KsWPHevXqtX79eseH8fHxUVFRInLo0KFDubly6pT4+YlIfEFB1LFjInIoKupQWJhj4+ozvosW9epYeVxEArv4hPSwi0h81Il2rU7Vu31D+2GddTeu72/X7v7bbxc9uTO/hw7VbvbKK72jokLHjZP27X+13tD2rLNu7vqBA4fWrJGgoF/Wya+IKL6ex4/7LlvWIyKinYiMGpXfosWB82/POuua5tdzBTosLKyoqKihZ9u0aRMaGlp3Zc+ePWVlZS1atHB8WPujs6+vb4vjx0VE2rYVEd/AQAkNFRHfFi1a/HebsvLArflRfbodFxFbQI2fzSYiAT4+LXx9692+of2wzrob1/1ttoqyMtGTO/P730URycnxv/deCQhwXm9oe9ZZN3f99OkWhYXSrdsvH5JfEVF8PUtLA/bu9UtIEBEJCPDx9/em7y/rTXvds/m1NfQjqeWSk5PDwsKWL19ez3O/+5307y93393Q537/vVx9tXz3nYnjAary8/MHDhx4+PBhqwfxhPPltw4fH7HbxWbzzFDAhfz8s3TqJKWl5z5Dfhtp5Ur5y19kxQq3DwVciGfzy5/yBgAAABSYdQnH+PHj611fsmSJSUcE4C7kF9AX+QU8wKwC/fvf/37s2LGTJ09OSUkx6RAATEJ+AX2RX8ADzCrQ/fv3nzRp0oABA9LS0kw6BACTkF9AX+QX8AAT78LxyCOPmLdzAKbyQH5nzhRvfQ8zoDf++wuYzXO3sTPDFVdIZaXUuZnJL6qr5ehRKwYC0Ghr18pNN3ELDgCAfvQu0IYhM2fKZZfV89Tp0x6fBoCKdu3k3nutHgLARaipkRYtxG7/1WLPnhZNA3iQ3gW6RQvp0UP697d6DgAAmp+aGrHZuBYLzRH3gQYAAAAUUKABAAAABRRoAAAAQIHe10AD0NfOnXLkiNVDoPl47TVZtkwiI8+3TXW1VFV5aiAAGqNAA7CGj49ERFg9BJqPHTvk9OkLv+s8Otoj0wDQGwUagDXCwyU83Ooh0Hy0ayeJiXL33VbPAaApoEADAAA1f/yjlJdLQIDU1Fg9CmAF3kQIAADUrFwpFRXSvr1Mnmz1KIAVOAMNAADUtG8vGRmSlmb1HIBFOAMNAAAAKOAMNADAW61bJ3PnSteubtjVtm3u2Q8AUKABAN7r0CE5fvzC955rjM6dZcAAN+wHACjQAADv1bKldO7MvecAeBuugQYAAAAUUKABAAAABRRoAAAAQAEFGgAAAFDAmwgBeNQf/iBbtkjbtnLwoPz8s9XTwGvNny8ffiinT8upU1aPAgDOKNAAPGr/funSRUaMkH793HN3MjRNhw5JWJiMHi3BwVaPAgDOKNAAPKptW+nfX8aOtXoOeLmQEGnbVjIzrZ4DAOqh9zXQe/dKQYHVQwAAAKA50btABwRI+/ZWDwEAAIDmRO8CHR4ubdtaPQQAAACaE66BBgAAgBf7179kzRrp2PF821RVyenTnhqIAg0AsMS4cVJe3uBNNnbskKQkzw4EwFt9/rl8/fWF78lzyy0emUaEAg0AsMahQzJihFx2Wf3PDh/ObQ4B/CIiQn7zG3n8cavnOIsCDQCwQuvWMnSojBxp9RwAoEzvNxECAAAAHqblGegbPs36emm3oP+TggI5edLqaQAAANCcaFmgOwSUTxu+I+PppIoK6dPH6mkAAADQnGhZoP187B1a2ePirJ4DAAAAzY+WBRoA4L2OHJGrr5aEhAts9u23cvSoRwYCADejQAMA3OrkSSkpkbFjL7DZsGFyzTUeGQiAztavl4cekhtvtHqOX6FAAwDcysdHWrW6cIEGgMYIDJT+/eX9962e41e4jR0AAACggAINAAAAKKBAAwAAAAoo0AAAAIAC3kQIwFvdcYds3y5t2lg9BxRVVEhJidVDAICJKNAAvFVpqaSmysiRVs8BRYYh5eVWDwEAJqJAA/BWLVtK794yYoTVcwAA8CtcAw0AAAAooEADAAAACijQAAAAgAIKNAAAAKCANxEC8Kwvv5RV6+Xdzy+85c6d0q2b+QMBAKCGAg3As86cka5d5YErLrzl0aOSlmb+QAAAqKFAA/Asf3+JipIRQ6yeAwAAF3ENNAAAAKCAAg0AANRs3Cjffmv1EIB1KNAAAEBNYqJc0Yg3MgBNFQUaAAAAUECBBgAAABRQoAEAAAAFFGgAAABAAQUaAAAAUECBBgAAABRQoAEAAAAFFGgAAABAAQUaAAAAUECBBgAAABRQoAEAAAAFFGgAAABAAQUaAAAAUECBBgAAABRQoAEAAAAFFGgAAABAAQUaAAAAUGBigS4vL6+oqBCRI0eOLF26dMuWLeYdC4B7kV9AX+QXMJtZBfr111+Pjo6OiYn5y1/+MnTo0OXLl48ZM+bZZ5816XAA3Ij8Avoiv4AH+Jm037lz5+7ZsycgICAmJmbVqlWDBg0qKSkZMGDAjBkzTDoiAHchv4C+yC/gAWYV6Jqamnbt2vn5+bVs2bJ9+/Yi0qpVK5vNZtLhALgR+QX0RX4BDzCrQN9yyy3Jycn+/v4jRoyYPHnyhAkTVq1aNWrUKJMOB8CNyC+gL/ILeIBZBfqJJ55Yu3atn59fSkrKZ599tnLlytGjR99xxx0mHQ6AG5FfQF/kF/AAswq0iAwbNszxYMSIESNGjBARu93e0Mb/+Mc/Dhw4UHelsLAwODjYvPEAnAf5BfRFfgGzmVignRQXF0dGRhqGUe+zx48fP3HiRN2VM2fOnCfwADyJ/AL6Ir+A23muQIeFhRUVFTX07D333OO08vnnn7dp08bkoQA0CvkF9EV+AbczsUDX1NTk5eUVFhba7fbo6OjExMSIiAjzDgfAjcgvoC/yC5jNrAKdk5MzZcqUoKCghIQEwzD27t176tSpRYsWpaammnREAO5CfgF9kV/AA8wq0NnZ2Tk5OXFxcbUr+fn56enpubm5Jh0RgLuQX0Bf5BfwALP+lLfdbo+MjKy7Eh4ebtKxALgX+QX0RX4BDzDrDPS0adMSExNTUlISEhJsNtuePXs2btw4ffp0kw4HwI3IL6Av8gt4gFlnoLOyslavXp2cnFxRUVFRUZGUlLRy5cqpU6eadDgAbkR+AX2RX8ADTLwLR2xsLIkFNEV+AX2RX8BsZp2BBgAAAJokCjQAAACggAINAAAAKKBAAwAAAAoo0AAAAIACCjQAAACggAINAAAAKKBAAwAAAAoo0AAAAIACCjQAAACggAINAAAAKKBAAwAAAAoo0AAAAIACCjQAAACggAINAAAAKKBAAwAAAAr8rB4AAAAAqI/dLoMHS0iI1XM44ww0AAAAvJLdLoYh331n9RzOKNAAAADwYm3aWD2BMwo0AAAAoIACDQAAACigQAMAAAAKKNAAAACAAgo0AAAAoIACDQAA1Bw5IqWlVg+B5uDhh6Wmxuoh6kGBBgAAasrKpLra6iHQHDz7rKSmWj1EPSjQAABATUyMxMRYPQSaA39/+eADq4eoBwUaAAAAUECBBgAAABRQoAEAAAAFFGgAAABAAQUaAAAAUECBBgAAABT4WT0AAAAAmqvwcDl9Wmy2+p+tqhJfX88O1CgUaAAAAFikRQv5/HOJjq7/WbtdAgM9O1CjUKABAABgEZtNQkIkNNTqOdRwDTQAAACggAINAAAAKKBAAwAAAAoo0AAAAIACCjQAAACggAINAADU/PijlJdbPQRgHQo0AABQc/KkVFdbPQRgHQo0AABQEx3d4B++AJoDCjQAAACggAINAAAAKKBAAwAAAAoo0AAAAIACCjQAAACggAINAAAAKKBAAwCARrnuOomKkvh42b9fKiutnga6e/FFaddOfvxRDMPqUZRRoAEAQKNERMh998nq1bJ7tyQmWj0NdNe2rQwdKt99J506WT2KMj+rBwAAAHrw9ZUOHSQuzuo50DTYbNKypcTEWD2HKzgDDQAAACigQAMAAAAKKNAAAACAAgo0AAAAoIACDQAAACigQAMAAAAKKNAAAACAAgo0AAAAoIACDQAAACigQAMAAAAKKNAAAACAAgo0AAAAoIACDQAAACigQAMAAAAK/KweAAAAAM1MSIgEBckll1g9h4so0AAAAPCskydl0yaJiLB6DheZeAlHUVGR3W4XkU2bNr355ps7duww71gA3Iv8Avoiv9BD167Spo3VQ7jIrAL9/PPP9+vXr6qq6tFHH73llltWr159zTXXvPTSSyYdDoAbkV9AX+QX8ACzLuF46qmndu3aFRwcvGDBgm+++aZdu3ZHjx4dOHDgPffcY9IRAbgL+QX0RX4BDzDrDHSHDh1Onz4tIu3atfP19RWR1q1bBwcHm3Q4AG5EfgF9kV/AA8w6A/3nP/85JSVl9OjR3bt3T01NHTly5IoVK26//XaTDgfAjcgvoC/yC3iAWQX6t7/97ddff718+fIOHTr06NEjPDz8nXfe6dWrl0mHA+BG5BfQF/kFPMDE29i1adPm1ltvrbtit9sdv04616pVqw4ePFh35ejRo61btzZvPADnQX4BfZFfwGzOBbpHjx7jx4+fMGFCt27d3Huk4uLiyMhIwzDqfXbr1q379++vu1JeXn7q1Cn3zgA0beQX0Bf5BTTiXKC//PLLd955Z/LkyTU1NRMmTBg3blxYWJhbjhQWFlZUVNTQs3/4wx+cVrZt2xYaGuqWQwPNBPkF9EV+AY0434UjIiLivvvuW7t27Z133vmnP/0pNjZ29OjRrt2DvaamZuvWrStWrPjoo482b95sGEaEtn9vBtAC+QX0RX4BjTifgV6+fPn777//xRdfDBo06LXXXvvtb3+bm5t7880379q1S2m/OTk5U6ZMCQoKSkhIMAxj7969p06dWrRoUWpqqttmB/Br5BfQF/kFNOJcoN99992bb775pZdeCggIcKykpqb+6U9/Ut1vdnZ2Tk5OXFxc7Up+fn56enpubu7FjAvgPMgvoC/yC2jE+RKO7t27X3fddbXpnTNnjohMmDBBdb92uz0yMrLuSnh4uKtDAmgU8gvoi/wCGjl7BnrIkCEisn379k8++cSxYrfby8rK5s2b58J+p02blpiYmJKSkpCQYLPZ9uzZs3HjxunTp7tlaABOyC+gL/ILaOdsgV66dKmIzJ49+4knnqhd7NChg2v7zcrKuvbaa1euXFlYWGiz2ZKSkubMmRMbG3uR4wKoF/kF9EV+Ae2cLdB33nnnG2+8ERwcPHfu3LpbvPLKK67tOjY2durUqRczHIBGIr+AvsgvoJ2zBTojIyM4ODgjI8PCaQC4hvwC+iK/gHbOvolw0qRJwcHBHTt23LdvX1pa2oYNG+bMmePj4/wuQwBeiPwC+iK/gHac8zlu3LiWLVtu3759+fLlTz755MyZMy0ZC4ALyC+gL/ILaMS5QJeXl996663vvfferbfeOmjQoKqqKkvGAuAC8gvoi/wCGnH+QyoxMTH333//smXL/vOf/zz//PPBwcGWjAXABeQX0Bf5BTTifAb6nXfe6dix49KlSzt06HD8+PG3337bkrEAuID8Avoiv4BGnM9Ad+jQYezYsdXV1T/88MNtt90WFBRkyVgAXEB+AX2RX0AjzgX63nvvXb16de0d1yMiIt58802PTwXAFeQX0Bf5RdP3zDPSqZPVQ7iHc4E+fPjw3r17LRkFwEUiv4C+yC+avlmzZMwYsdlERAYM+OWBnpwLdHx8fHV1dYsWLSyZBsDFIL+Avsgvmj6bTZYuFV9fq+dwA+cCXVpaGh0dnZqaGhoa6lhx+U+JAvAw8gvoi/wCGnEu0BMmTJgwYYIlowC4SOQX0Bf5BTTifBu7tLS0jh07Hj9+fPjw4fHx8WlpaZaMBcAF5BfQF/kFNOJcoBcvXnzTTTfNnj3bMIwRI0YsWLDAkrEAuID8Avoiv4BGnAv0M888s2HDhj59+vj4+OTl5T399NOWjAXABeQX0Bf5BTTiXKDLysoCAwMdj/39/QMCAjw+EgAXkV9AX+QX0IhzgZ4wYcL111+/f//+hQsXjho16pZbbrFkLAAuIL+AvsgvmpolS6RdO4mPP/s/Ea3v/VyX81045s2b9/HHH69fv764uPjRRx8dMmSIJWMBcAH5BfRFftHUBAbKgAHy8stnV06fFh/nU7eaOlugc3NzHQ86dOhw4403Oh7n5eX17dvXgrkAqCC/gL7IL5omm01atpS4OKvnMMXZAv3ss8+KSEFBwfr16y+//HI/P79NmzZNnTr1hRdesG48AI1CfgF9kV9AO2cL9JIlS0Rk5MiRu3fv7tatm4js37//7rvvtmw0AI1GfgF9kV9AO85Xohw6dKhr166Ox507dy4oKPD4SABcRH4BfZFfQCPObyK84oorMjMz77jjDhF59dVXBwwYYMVUAFxBfgF9kV9AI84F+pVXXnn55ZdfeOEFHx+fwYMH8yskQCPkF9AX+QU04lygAwMDZ8yYMWPGDEumAXAxyC+gL/KLpiM3V7ZulX375OefrR7FLM4FGgAAAHDdiy/Kli0SEyP/vay/6aFAAwAAwH3i4iQ+Xh55xOo5TFTP34PZvXv3u+++axjGgQMHPD4PgItCfgF9kV9AF84FevHixTfddNPs2bMNwxgxYsSCBQssGQuAC8gvoC/yC2jEuUA/88wzGzZs6NOnj4+PT15e3tNPP23JWABcQH4BfZFfQCPOBbqsrCwwMNDx2N/fPyAgwOMjAXAR+QX0RX4BjTgX6AkTJlx//fX79+9fuHDhqFGjbrnlFkvGAuAC8gvoi/wCGnG+C8fDDz/86aefrl+/vri4+NFHHx0yZIglYwFwAfkF9EV+AY04F+jY2NgbbrhhwoQJKSkpNpvNkpkAuIb8Avoiv4BGnC/h2LVr1+DBg+fPn9+7d+8HH3xw+/btlowFwAXkF9AX+QU04lygQ0JCJkyY8N577y1ZsmT9+vWXXnqpJWMBcAH5BfRFfgGNOF/C8eWXX3700Ucff/xxu3bt0tPT33rrLUvGAuAC8gvoi/wCGnEu0HPnzk1PT1+zZk1UVJQlAwFwGfkF9EV+AY2cLdBXX331G2+8ER8fv23btm3bttWuv/LKK1YMBkAB+QX0RX4B7Zwt0BkZGcHBwRkZGRZOA8A15BfQF/kFtHO2QE+aNElEvvrqq4ceeqh2cc6cOWlpaRbMBUAF+QX0RX4B7Zwt0I57tm/fvv2TTz5xrNjt9rKysnnz5lkzGoBGI7+AvsgvoJ2zBXrp0qUiMnv27CeeeKJ2sUOHDhYMBUAR+QX0RX4B7Zwt0B07dhSRuvfNMQzj8ccfr/sbJQDeifwC+iK/gHac/5DKs88+Gx0dHRQUFBsbGxwcvG/fPkvGAuAC8gvoi/wCGnEu0K+//vrOnTuzsrKWL1+em5vr4+O8AQCvRVuqPZkAABzuSURBVH4BfZFfQCPO+Tx+/HhISMiQIUPWrl172WWX7dy505KxALiA/AL6Ir+ARpz/EmFqaurEiROffvrpUaNGnTx5Mjg42JKxALiA/AL6Ir+ARpwL9N///vdt27ZFRka+8MILn3322XPPPWfJWABcQH4BfZFfQCNnC/Q999xT+/hvf/ub48Ff/vKXl156ydNDAVBEfgF9kV9AO2cL9OjRoy2cA8DFIL+Avsgvmo6oKImOlqIiSU21ehRznS3Q1157rYiUlJTUfdrX19fTEwFQR34BfZFfNB0nTsj774uI9Ohh9Sjmcr4G+qqrrnI8OHr06MGDBzMzMxcvXuzxqQC4gvwC+iK/aApsNrn8cgkMtHoO0zkX6K+//rr28ZYtW1588UXPzgPAdeQX0Bf5BTRyvvu09+vXb9u2bR4bBYAbkV9AX+QX8HLOZ6BnzpxZ+3jnzp2dOnXy7DwAXEd+AX2RX0AjzgV68ODBtY/T0tKGDRvm2XkAuI78Avoiv4BGnAt0enq6YRg1NTWOD202m8dHAuAi8gvoi/wCGnEu0PPmzVuwYEHtXxDt3Lnz6tWrPT4VAFeQX0Bf5Bca++ADOXVK/Pzkvz8BNnnOBfrf//73gQMH/P39LZkGwMUgv4C+yC80dv/9EhsrHTpIt27SPP4NO9+FIzIysrS01JJRAFwk8gvoi/xCYx07yv/8j7zzjmzfLs3jbwA5n4Hu3bt3dHR0z549fXx+6dZbt271+FQAXEF+AX2RX0AjzgX63Xff3bZtW8eOHS2ZBsDFIL+AvsgvoBHnAt2rV6+ePXvy5l9AR+QX0Bf5BTTiXKDLy8u7deuWkpJS+yukRYsWeXwqAK4gv4C+yC+gEecCPXXqVEvmAHDxyC+gL/ILaMS5QCcmJtb90Ld5vJUSaBrIL6Av8gtoxLlAX3XVVY4HR48ePXjwYGZm5uLFiz0+FQBXkF9AX+QX+ikqkssuk5gY2btXjh2zehqPci7QX3/9de3jLVu2vPjii56dB4DryC+gL/IL/VRXi5+fLFggx49LWprV03iU8x9Sqatfv37btm1zy2EWLlzolv0AaCTyC+iL/EIb/v7Sv7+MHCk+56uUTY/zGeiZM2fWPt65c2enTp1c26/TL57mzZsXEBAgIpMmTXJthwAuiPwC+iK/gEacC/TgwYNrH6elpQ0bNsy1/a5atWrZsmWZmZnBwcEiUllZ6fhhmgAD5iG/gL7IL6AR5wLdrl276dOnb9iwoaqq6sorr1y4cGGaSxe1vP322//85z/nz5//5JNPDho06LPPPps/f747BgbQIPIL6Iv8AhpxLtC/+93v3n777TZt2ojIihUrxowZs2PHDtd2ffPNNw8ZMiQrK+uDDz6oqqq62EkBXAj5BfRFfgGNOF/x7evrO2DAAMfjHj16+FzcJeERERHvvfdenz594uPjL2Y/ABqD/AL6Ir+ARpzPQI8aNWrMmDE33nijv7//+++/n5KScvHHyMzMzMzMFBG73d7QneG3bdt27Nd3ECwtLQ0JCbn4owPNB/kF9EV+oZNPPxW7XU6ckOpqq0exhnOBnj9//ttvv/3FF1+cOXPmt7/97eTJk911pOLi4sjISMMw6n329ddf//bbb+uuFBUVhYaGuuvoQHNAfgF9kV/oZPp0adlSQkIkJsbqUazhXKB9fHwmTpw4ceJEtx8pLCysqKiooWefeeYZp5Xk5OT27du7fQygCSO/gL7IL3QSEyOzZsnIkVbPYRnnAu1GNTU1eXl5hYWFdrs9Ojo6MTExIiLCvMMBcCPyC+iL/AJmM6tA5+TkTJkyJSgoKCEhwTCMvXv3njp1atGiRampqSYdEYC7kF9AX+QX8ACzCnR2dnZOTk5cXFztSn5+fnp6em5urklHBOAu5BfQF/kFPMCsP1xut9sjIyPrroSHh5t0LADuRX4BfZFfwAPMOgM9bdq0xMTElJSUhIQEm822Z8+ejRs3Tp8+3aTDAXAj8gvoi/wCHmDWGeisrKzVq1cnJydXVFRUVFQkJSWtXLly6tSpJh0OgBuRX0Bf5BfwABPvwhEbG0tiAU2RX0Bf5Bcwm1lnoAEAAIAmiQINAAAAKKBAAwAAAAoo0AAAAIACCjQAAACggAINAAAAKKBAAwAAAApMvA80AAAAmo716+WnnyQwUI4flzNnrJ7GShRoAAAANMLvfy8VFRIRIRUVEhxs9TRWokADAACgEeLi5LrrZPx4q+ewHtdAAwAAAAoo0AAAAIACCjQAAACggAINAAAAKKBAAwAAAAoo0AAAAIACCjQAAACggAINAAAAKKBAAwAAAAoo0AAAAIACCjQAAACggAINAAAAKKBAAwAAAAoo0AAAAIACCjQAAACggAINAAAAKKBAAwAAAAoo0AAAAIACCjQAAACggAINAAAAKKBAAwAAAAoo0AAAAIACCjQAAACggAINAAAAKKBAAwAAAAoo0AAAAIACCjQAAACggAINAAAAKKBAAwAAAAoo0AAAAIACCjQAAACgwM/qAQAAAODFPv5YAgJERH78UaqrrZ7GK1CgAQAA0LD0dBk0SHx9JT9fWrSwehqvQIEGAABAwwIDZdkyCQmxeg4vwjXQAAAAgAIKNAAAAKCAAg0AAAAooEADAAAACijQAAAAgAIKNAAAAKCA29gBAADg18aOlcOHpXVrEZGKCjEMqwfyLhRoAAAA/NqpUzJqlAwdKiJyxx3Stq3VA3kXCjQAAAB+LThYLr1URoyweg4vxTXQAAAAgAIKNAAAAKCAAg0AAAAooEADAAAACijQAAAAgALuwgEAAAAREampkWXLJCREfvxRTp+2ehrvRYEGAACAiIh8841MmiQDB0phofjREhvESwMAAAAREQkOlo4dZfVqq+fwdlwDDQAAACigQAMAAAAKKNAAAACAAgo0AAAAoIACDQAAACigQAMAAAAKuI0dAAAARHr3lpAQOXbM6jk0QIEGAACAyJEjMm+e+PtbPYcGTLyEY/PmzR988EFpaWntyvLly807HAA3Ir+AvsgvXOTnJ6mpcv31Vs+hAbMK9JNPPjlmzJh33nmnb9++W7dudSzeddddJh0OgBuRX0Bf5BfwALMu4XjhhRe2bNnSvn37vLy89PT0rVu3tm7d2qRjAXAv8gvoi/wCHmDWGeigoCBHYvv27fu73/1uxowZJh0IgNuRX0Bf5BfwALMK9E033ZSYmPj888+LyP3333/s2LGMjIyKigqTDgfAjcgvoC/yC3iAWZdw/PnPf7722muLi4tFxMfH5/333//HP/4RGhpq0uEAuBH5BfRFfgEPMPE2doMHD6597Ovre+utt44bN66hjfft23fixIm6K+Xl5QQesAr5BfRFfgGzee4+0MXFxZGRkYZh1PvsY489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AFBAgQYAAAAUUKABAAAABRRoAAAAQAEFutkZP358bm5u7YfPPffcc889d/5POXLkyJAhQy7yuB9//PE999xzkTsBmjnyC+iL/DYlFGgNVFdXnzx5svHrALwH+QX0RX7REAq0ZV588cXs7OyMjIzhw4c/9thjjsVHHnmka9euiYmJixcvFpE1a9ZkZmYmJCSsWrWq7uc6rTt9lt1uv/3227t06dK/f3/HT7eVlZWZmZk9evQYOXJkQUGB0ySbN29OSUmJj4+fO3duvWPMnj17+/bt//u//3vunmsNHz583bp1IlJaWhodHV1ZWVnvlu+9997MmTMdj5OSkkpKSs49HOD9yC/5hb7IL/m9eH5WD9Csffrpp99++63NZktNTR05cuSxY8c2bNjwzTffVFZWpqSkJCcni8iaNWu2bNkSERHh9Lm16x9//LHTZ1VUVFRVVe3bt6+0tLRXr17Z2dkvv/xyTU3N7t27v/vuu549ezrtauPGjXl5eXa7vV+/fiNHjvzpp5+cdvjEE08cOnTooYce2rJli9Oea3eSnp7+4YcfDhkyZPny5TfccMPOnTsb2tLJufMnJCS47zUGzEJ+hfxCW+RXyO/FoUBbaeTIkX5+fiJy3XXXrV+//tixY0VFRePGjRORysrKb775pn379qmpqeemV0Rq19evX+/0Wbfccsszzzzz4YcffvnllydOnHBsM23aNJvN1r1798svv9xpV9dcc01wcLCI3HjjjRs3biwpKXHaYUpKimPLfv36Oe251pgxY9LS0p588sn3339/5syZ59nSybnzE2BogfzWOz/5hRbIb73zk9/Go0Bb6cyZM7UP/P39g4ODs7Oz77rrLhGpqamx2Ww5OTmOaInIK6+88vrrr/v6+n7xxRciUrt+7metW7cuKyvr7rvvnjRp0j//+U8R8fHxsdlsju0d/5dRr9DQ0HrHqP2t07l7rhUVFdWuXbu8vLxdu3alpKScZ8taR48erXd+F15JwPPIb73zu/BKAp5Hfuud34VXstniGmgrrVq1qqKiory8fOnSpYMHDx42bNhbb71VXV1dXl7evXv3gwcP1t34rrvuWrdunSO9dZ37WatXr7711lvvu+8+m832448/GoaRkpLy6quvisj+/fs3bdrktIePP/64vLy8rKxs6dKlqamp9Y5ht9tF5Nw9191Penr6tGnTbrjhBpvN1tCWLVq02LVrl4hs3brVsefzf9WA1yK/9c7vvhcYMBH5rXd+973ATR9noK2UmJiYlpZWUlIyadKkpKQkERk+fHi/fv2qqqpmzZrVuXPnH3744YI7GTp0qNNnZWRkTJ8+/aOPPurdu/f48eMff/zx+++//6677urdu3d0dPTUqVMDAwNrPz00NPTmm29OS0srLS296667+vbte+4YVVVVZWVlc+bMOXfPDz30UO2u0tPT/9//+38vvfSSiJy7ZWJiooikpqb+7W9/69+/f2JiYmZmpq+v77nzu/tlBkxBfskv9EV+ye9Fsjn9EAOPefHFFysrK++//36rBwGgjPwC+iK/uHhcwgEAAAAo4Aw0AAAAoIAz0AAAAIACCjQAAACggAINAAAAKKBAAwAAAAoo0AAAAIACCjQAAACggAINAAAAKKBAAwAAAAoo0AAAAIACCjQAAACggAINAAAAKKBAAwAAAAoo0AAAAICC/w/Yej88fmpWogAAAABJRU5ErkJggg==" width="100%" height="100%" /></p>
+</div>
+<div id="exploring-sequence-variants-in-epialleles" class="section level2">
+<h2>Exploring sequence variants in epialleles</h2>
+<p>It is known that sequence variants can affect methylation status of a DNA<a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a>. <em><code>generateVcfReport</code></em> function calculates frequencies of single nucleotide variants (SNVs) within epialleles and tests for the association between SNV and epiallelic status using Fisher's exact test. Base counts and the test's p-values are included in the returned value.</p>
+<p>In addition to BAM file location string or preprocessed BAM object, function requires a location string for the Variant Call Format (VCF) file or the VCF object that was obtained using <em><code>VariantAnnotation::readVcf</code></em> function. As VCF files can be extremely large, it is strongly advised to prefilter the VCF object by the relevant set of genomic regions, or specify such relevant set of regions as a <em><code>bed</code></em> parameter when <em><code>vcf</code></em> points to a VCF file location.</p>
+<p>Please note, that the output report is currently limited to SNVs only.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># VCF report</span>
+vcf.report &lt;-<span class="st"> </span><span class="kw">generateVcfReport</span>(
+  <span class="dt">bam=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;amplicon010meth.bam&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>),
+  <span class="dt">bed=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;amplicon.bed&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>),
+  <span class="dt">vcf=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;amplicon.vcf.gz&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>),
+  <span class="co"># when VCF seqlevels are different from BED and BAM it is possible</span>
+  <span class="co"># to convert them internally</span>
+  <span class="dt">vcf.style=</span><span class="st">&quot;NCBI&quot;</span>
+)
+<span class="co">#&gt; Reading BED file [0.008s]</span>
+<span class="co">#&gt; Reading VCF file [1.953s]</span>
+<span class="co">#&gt; Reading BAM file [0.109s]</span>
+<span class="co">#&gt; Preprocessing BAM data:</span>
+<span class="co">#&gt;   Transforming sequences [0.004s]</span>
+<span class="co">#&gt;   Merging pairs [0.004s]</span>
+<span class="co">#&gt; Thresholding reads [0.000s]</span>
+<span class="co">#&gt; Extracting base frequences [0.055s]</span>
+
+<span class="co"># NA values are shown for the C-&gt;T variants on the &quot;+&quot; and G-&gt;A on the &quot;-&quot;</span>
+<span class="co"># strands, because bisulfite conversion makes their counting impossible</span>
+<span class="kw">head</span>(vcf.report)
+<span class="co">#&gt;           name seqnames    range REF ALT M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt U-Alt SumRef</span>
+<span class="co">#&gt; 1: rs546660277    chr17 43124874   A   C     0     0     9    74     0     0     0     0     83</span>
+<span class="co">#&gt; 2: rs574263814    chr17 43124891   G   A     0     0    NA    NA     0     0    NA    NA      0</span>
+<span class="co">#&gt; 3:   rs8176076    chr17 43124935   G   A     0     0    NA    NA     0     0    NA    NA      0</span>
+<span class="co">#&gt; 4: rs535977743    chr17 43125016   C   T    NA    NA     9    75    NA    NA     0     0     84</span>
+<span class="co">#&gt; 5: rs191784032    chr17 43125050   C   A     0     0     9    74     0     0     0     1     83</span>
+<span class="co">#&gt; 6: rs111956204    chr17 43125083   C   A     0     0     9    75     0     0     0     0     84</span>
+<span class="co">#&gt;    SumAlt FEp+ FEp-</span>
+<span class="co">#&gt; 1:      0    1    1</span>
+<span class="co">#&gt; 2:      0    1   NA</span>
+<span class="co">#&gt; 3:      0    1   NA</span>
+<span class="co">#&gt; 4:      0   NA    1</span>
+<span class="co">#&gt; 5:      1    1    1</span>
+<span class="co">#&gt; 6:      0    1    1</span>
+
+<span class="co"># let's sort the report by increasing Fisher's exact test's p-values.</span>
+<span class="co"># the p-values are given separately for reads that map to the &quot;+&quot;</span>
+<span class="kw">head</span>(vcf.report[<span class="kw">order</span>(<span class="st">`</span><span class="dt">FEp-</span><span class="st">`</span>, <span class="dt">na.last=</span><span class="ot">TRUE</span>)])
+<span class="co">#&gt;           name seqnames    range REF ALT M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt U-Alt SumRef</span>
+<span class="co">#&gt; 1: rs187992882    chr17 43125347   C   A     0     0    11   141     0     0     1     1    152</span>
+<span class="co">#&gt; 2: rs539845430    chr17 43125475   T   G     0     0     6    94     0     0     5    38    100</span>
+<span class="co">#&gt; 3: rs112960339    chr17 43125524   C   T    NA    NA    10   119    NA    NA     0     1    129</span>
+<span class="co">#&gt; 4: rs546660277    chr17 43124874   A   C     0     0     9    74     0     0     0     0     83</span>
+<span class="co">#&gt; 5: rs535977743    chr17 43125016   C   T    NA    NA     9    75    NA    NA     0     0     84</span>
+<span class="co">#&gt; 6: rs191784032    chr17 43125050   C   A     0     0     9    74     0     0     0     1     83</span>
+<span class="co">#&gt;    SumAlt FEp+      FEp-</span>
+<span class="co">#&gt; 1:      2    1 0.1502419</span>
+<span class="co">#&gt; 2:     43    1 0.3063393</span>
+<span class="co">#&gt; 3:      1   NA 1.0000000</span>
+<span class="co">#&gt; 4:      0    1 1.0000000</span>
+<span class="co">#&gt; 5:      0   NA 1.0000000</span>
+<span class="co">#&gt; 6:      1    1 1.0000000</span>
+
+<span class="co"># and to the &quot;-&quot; strand</span>
+<span class="kw">head</span>(vcf.report[<span class="kw">order</span>(<span class="st">`</span><span class="dt">FEp+</span><span class="st">`</span>, <span class="dt">na.last=</span><span class="ot">TRUE</span>)])
+<span class="co">#&gt;           name seqnames    range REF ALT M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt U-Alt SumRef</span>
+<span class="co">#&gt; 1: rs546660277    chr17 43124874   A   C     0     0     9    74     0     0     0     0     83</span>
+<span class="co">#&gt; 2: rs574263814    chr17 43124891   G   A     0     0    NA    NA     0     0    NA    NA      0</span>
+<span class="co">#&gt; 3:   rs8176076    chr17 43124935   G   A     0     0    NA    NA     0     0    NA    NA      0</span>
+<span class="co">#&gt; 4: rs191784032    chr17 43125050   C   A     0     0     9    74     0     0     0     1     83</span>
+<span class="co">#&gt; 5: rs111956204    chr17 43125083   C   A     0     0     9    75     0     0     0     0     84</span>
+<span class="co">#&gt; 6:  rs55680227    chr17 43125086   A   C     0     0     9    74     0     0     0     0     83</span>
+<span class="co">#&gt;    SumAlt FEp+ FEp-</span>
+<span class="co">#&gt; 1:      0    1    1</span>
+<span class="co">#&gt; 2:      0    1   NA</span>
+<span class="co">#&gt; 3:      0    1   NA</span>
+<span class="co">#&gt; 4:      1    1    1</span>
+<span class="co">#&gt; 5:      0    1    1</span>
+<span class="co">#&gt; 6:      0    1    1</span></code></pre></div>
+<hr />
+</div>
+</div>
+<div id="other-information" class="section level1">
+<h1>Other information</h1>
+<div id="citing-the-epialleler-package" class="section level2">
+<h2>Citing the <em><code>epialleleR</code></em> package</h2>
+<p>The experimental data analysed using the package has not been published yet. The citation information will be updated in the nearest future.</p>
+</div>
+<div id="session-info" class="section level2">
+<h2>Session Info</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sessionInfo</span>()
+<span class="co">#&gt; R version 4.0.4 (2021-02-15)</span>
+<span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span>
+<span class="co">#&gt; Running under: Ubuntu 18.04.5 LTS</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Matrix products: default</span>
+<span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.7.1</span>
+<span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.7.1</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; locale:</span>
+<span class="co">#&gt;  [1] LC_CTYPE=en_DK.UTF-8       LC_NUMERIC=C               LC_TIME=en_DK.UTF-8       </span>
+<span class="co">#&gt;  [4] LC_COLLATE=en_DK.UTF-8     LC_MONETARY=en_DK.UTF-8    LC_MESSAGES=en_DK.UTF-8   </span>
+<span class="co">#&gt;  [7] LC_PAPER=en_DK.UTF-8       LC_NAME=C                  LC_ADDRESS=C              </span>
+<span class="co">#&gt; [10] LC_TELEPHONE=C             LC_MEASUREMENT=en_DK.UTF-8 LC_IDENTIFICATION=C       </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; attached base packages:</span>
+<span class="co">#&gt; [1] stats4    parallel  stats     graphics  grDevices utils     datasets  methods   base     </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; other attached packages:</span>
+<span class="co">#&gt; [1] GenomeInfoDb_1.26.2 IRanges_2.24.1      S4Vectors_0.28.1    BiocGenerics_0.36.0</span>
+<span class="co">#&gt; [5] epialleleR_0.4.3   </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; loaded via a namespace (and not attached):</span>
+<span class="co">#&gt;  [1] bitops_1.0-6                matrixStats_0.58.0          fs_1.5.0                   </span>
+<span class="co">#&gt;  [4] usethis_2.0.1               devtools_2.3.2              bit64_4.0.5                </span>
+<span class="co">#&gt;  [7] progress_1.2.2              httr_1.4.2                  rprojroot_2.0.2            </span>
+<span class="co">#&gt; [10] tools_4.0.4                 bslib_0.2.4                 utf8_1.2.1                 </span>
+<span class="co">#&gt; [13] R6_2.5.0                    DBI_1.1.1                   withr_2.4.1                </span>
+<span class="co">#&gt; [16] tidyselect_1.1.0            prettyunits_1.1.1           processx_3.5.1             </span>
+<span class="co">#&gt; [19] curl_4.3                    bit_4.0.4                   compiler_4.0.4             </span>
+<span class="co">#&gt; [22] cli_2.4.0                   Biobase_2.50.0              xml2_1.3.2                 </span>
+<span class="co">#&gt; [25] desc_1.3.0                  DelayedArray_0.16.1         rtracklayer_1.50.0         </span>
+<span class="co">#&gt; [28] sass_0.3.1                  callr_3.6.0                 askpass_1.1                </span>
+<span class="co">#&gt; [31] rappdirs_0.3.3              stringr_1.4.0               digest_0.6.27              </span>
+<span class="co">#&gt; [34] Rsamtools_2.6.0             rmarkdown_2.7               XVector_0.30.0             </span>
+<span class="co">#&gt; [37] pkgconfig_2.0.3             htmltools_0.5.1.1           sessioninfo_1.1.1          </span>
+<span class="co">#&gt; [40] MatrixGenerics_1.2.1        highr_0.8                   BSgenome_1.58.0            </span>
+<span class="co">#&gt; [43] dbplyr_2.1.1                fastmap_1.1.0               rlang_0.4.10               </span>
+<span class="co">#&gt; [46] rstudioapi_0.13             RSQLite_2.2.5               jquerylib_0.1.3            </span>
+<span class="co">#&gt; [49] generics_0.1.0              jsonlite_1.7.2              BiocParallel_1.24.1        </span>
+<span class="co">#&gt; [52] dplyr_1.0.5                 VariantAnnotation_1.36.0    RCurl_1.98-1.3             </span>
+<span class="co">#&gt; [55] magrittr_2.0.1              GenomeInfoDbData_1.2.4      Matrix_1.3-2               </span>
+<span class="co">#&gt; [58] fansi_0.4.2                 Rcpp_1.0.6                  lifecycle_1.0.0            </span>
+<span class="co">#&gt; [61] stringi_1.5.3               yaml_2.2.1                  SummarizedExperiment_1.20.0</span>
+<span class="co">#&gt; [64] zlibbioc_1.36.0             pkgbuild_1.2.0              BiocFileCache_1.14.0       </span>
+<span class="co">#&gt; [67] grid_4.0.4                  blob_1.2.1                  crayon_1.4.1               </span>
+<span class="co">#&gt; [70] lattice_0.20-41             Biostrings_2.58.0           BH_1.75.0-0                </span>
+<span class="co">#&gt; [73] GenomicFeatures_1.42.1      hms_1.0.0                   pillar_1.5.1               </span>
+<span class="co">#&gt; [76] knitr_1.31                  ps_1.6.0                    GenomicRanges_1.42.0       </span>
+<span class="co">#&gt; [79] biomaRt_2.46.3              pkgload_1.2.1               XML_3.99-0.6               </span>
+<span class="co">#&gt; [82] glue_1.4.2                  evaluate_0.14               data.table_1.14.0          </span>
+<span class="co">#&gt; [85] remotes_2.3.0               vctrs_0.3.7                 testthat_3.0.2             </span>
+<span class="co">#&gt; [88] openssl_1.4.3               purrr_0.3.4                 assertthat_0.2.1           </span>
+<span class="co">#&gt; [91] cachem_1.0.4                xfun_0.22                   tibble_3.1.0               </span>
+<span class="co">#&gt; [94] GenomicAlignments_1.26.0    AnnotationDbi_1.52.0        memoise_2.0.0              </span>
+<span class="co">#&gt; [97] ellipsis_0.3.1</span></code></pre></div>
+<hr />
+</div>
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="https://doi.org/10.1146/annurev.pharmtox.45.120403.095832" class="uri">https://doi.org/10.1146/annurev.pharmtox.45.120403.095832</a><a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p><a href="https://doi.org/10.1101/2020.12.01.403501" class="uri">https://doi.org/10.1101/2020.12.01.403501</a><a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p><a href="https://doi.org/10.1093/bib/bbx077" class="uri">https://doi.org/10.1093/bib/bbx077</a><a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p><a href="https://www.zymoresearch.com/products/human-methylated-non-methylated-dna-set-dna-w-primers" class="uri">https://www.zymoresearch.com/products/human-methylated-non-methylated-dna-set-dna-w-primers</a><a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p><a href="https://dx.doi.org/10.1186%2Fs13148-020-00920-7">https://dx.doi.org/10.1186%2Fs13148-020-00920-7</a><a href="#fnref5">↩</a></p></li>
+<li id="fn6"><p><a href="https://www.bioinformatics.babraham.ac.uk/projects/bismark/" class="uri">https://www.bioinformatics.babraham.ac.uk/projects/bismark/</a><a href="#fnref6">↩</a></p></li>
+<li id="fn7"><p><a href="https://doi.org/10.1038/modpathol.2009.130" class="uri">https://doi.org/10.1038/modpathol.2009.130</a><a href="#fnref7">↩</a></p></li>
+</ol>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
