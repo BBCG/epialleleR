@@ -143,6 +143,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>potential bimodality of methylation for genomic regions of interest can be assessed using <em><code>generateBedEcdf</code></em> method</li>
 <li>the association of single-nucleotide variations with the epiallelic status can be tested using <em><code>generateVcfReport</code></em></li>
 </ul>
+</div>
+<div id="processing-speed" class="section level2">
+<h2>Processing speed</h2>
+<p>Currently <em><code>epialleleR</code></em> runs in a single-thread mode only, however most of the processing time is spent on loading the BAM data (using <em><code>Rsamtools</code></em>), which is difficult to improve by parallel processing. All the other operations are performed using optimised C++ functions, and usually take less time. Running time for complete task &quot;BAM on disk -&gt; CX report on disk&quot; depends on a size of a BAM file, and the speed is usually within the range of 4-6 MB/s (or 25-50 thousand reads per second) for a single core of a relatively modern CPU (Intel(R) Core(TM) i7-7700).</p>
+<p>Since BAM loading and preprocessing is a biggest bottleneck at the moment, major improvements are planned for the next upcoming release (v1.1): the dependency on <em><code>Rsamtools</code></em> will be removed, loading and preprocessing will be done within the same C++ function, hopefully aiding in much higher processing speed.</p>
 <hr />
 </div>
 </div>
@@ -248,10 +253,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 capture.bam &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;capture.bam&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>)
 bam.data    &lt;-<span class="st"> </span><span class="kw">preprocessBam</span>(capture.bam)
-<span class="co">#&gt; Reading BAM file [0.529s]</span>
+<span class="co">#&gt; Reading BAM file [0.520s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
 <span class="co">#&gt;   Transforming sequences [0.017s]</span>
-<span class="co">#&gt;   Merging pairs [0.019s]</span></code></pre></div>
+<span class="co">#&gt;   Merging pairs [0.022s]</span></code></pre></div>
 </div>
 <div id="making-cytosine-reports" class="section level2">
 <h2>Making cytosine reports</h2>
@@ -261,8 +266,8 @@ bam.data    &lt;-<span class="st"> </span><span class="kw">preprocessBam</span>(
 <span class="co"># CpG VEF report</span>
 cg.vef.report &lt;-<span class="st"> </span><span class="kw">generateCytosineReport</span>(bam.data)
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq' and 'skip.duplicates' will have no effect.</span>
-<span class="co">#&gt; Thresholding reads [0.002s]</span>
-<span class="co">#&gt; Preparing cytosine report [0.119s]</span>
+<span class="co">#&gt; Thresholding reads [0.001s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.120s]</span>
 <span class="kw">head</span>(cg.vef.report[<span class="kw">order</span>(meth<span class="op">+</span>unmeth, <span class="dt">decreasing=</span><span class="ot">TRUE</span>)])
 <span class="co">#&gt;    rname strand      pos context meth unmeth triad</span>
 <span class="co">#&gt; 1: chr17      + 61864475      CG    7      9   NNN</span>
@@ -275,7 +280,7 @@ cg.vef.report &lt;-<span class="st"> </span><span class="kw">generateCytosineRep
 <span class="co"># CpG cytosine report</span>
 cg.report &lt;-<span class="st"> </span><span class="kw">generateCytosineReport</span>(bam.data, <span class="dt">threshold.reads=</span><span class="ot">FALSE</span>)
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq' and 'skip.duplicates' will have no effect.</span>
-<span class="co">#&gt; Preparing cytosine report [0.120s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.121s]</span>
 <span class="kw">head</span>(cg.report[<span class="kw">order</span>(meth<span class="op">+</span>unmeth, <span class="dt">decreasing=</span><span class="ot">TRUE</span>)])
 <span class="co">#&gt;    rname strand      pos context meth unmeth triad</span>
 <span class="co">#&gt; 1: chr17      + 61864475      CG    8      8   NNN</span>
@@ -289,7 +294,7 @@ cg.report &lt;-<span class="st"> </span><span class="kw">generateCytosineReport<
 cx.report &lt;-<span class="st"> </span><span class="kw">generateCytosineReport</span>(bam.data, <span class="dt">threshold.reads=</span><span class="ot">FALSE</span>,
                                     <span class="dt">report.context=</span><span class="st">&quot;CX&quot;</span>)
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq' and 'skip.duplicates' will have no effect.</span>
-<span class="co">#&gt; Preparing cytosine report [0.141s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.142s]</span>
 <span class="kw">head</span>(cx.report[<span class="kw">order</span>(meth<span class="op">+</span>unmeth, <span class="dt">decreasing=</span><span class="ot">TRUE</span>)])
 <span class="co">#&gt;    rname strand      pos context meth unmeth triad</span>
 <span class="co">#&gt; 1: chr17      + 61864338     CHG    1     25   NNN</span>
@@ -309,11 +314,11 @@ amplicon.report &lt;-<span class="st"> </span><span class="kw">generateAmpliconR
   <span class="dt">bam=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;amplicon010meth.bam&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>),
   <span class="dt">bed=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;amplicon.bed&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>)
 )
-<span class="co">#&gt; Reading BED file [0.025s]</span>
-<span class="co">#&gt; Reading BAM file [0.475s]</span>
+<span class="co">#&gt; Reading BED file [0.027s]</span>
+<span class="co">#&gt; Reading BAM file [0.484s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
-<span class="co">#&gt;   Transforming sequences [0.004s]</span>
-<span class="co">#&gt;   Merging pairs [0.004s]</span>
+<span class="co">#&gt;   Transforming sequences [0.003s]</span>
+<span class="co">#&gt;   Merging pairs [0.003s]</span>
 <span class="co">#&gt; Thresholding reads [0.000s]</span>
 <span class="co">#&gt; Preparing amplicon report [0.014s]</span>
 amplicon.report
@@ -331,12 +336,12 @@ capture.report &lt;-<span class="st"> </span><span class="kw">generateCaptureRep
   <span class="dt">bed=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;capture.bed&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>)
 )
 <span class="co">#&gt; Reading BED file [0.021s]</span>
-<span class="co">#&gt; Reading BAM file [0.119s]</span>
+<span class="co">#&gt; Reading BAM file [0.122s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
-<span class="co">#&gt;   Transforming sequences [0.010s]</span>
-<span class="co">#&gt;   Merging pairs [0.009s]</span>
+<span class="co">#&gt;   Transforming sequences [0.012s]</span>
+<span class="co">#&gt;   Merging pairs [0.011s]</span>
 <span class="co">#&gt; Thresholding reads [0.001s]</span>
-<span class="co">#&gt; Preparing capture report [0.022s]</span>
+<span class="co">#&gt; Preparing capture report [0.024s]</span>
 <span class="kw">head</span>(capture.report)
 <span class="co">#&gt;    seqnames    start      end width strand     V4 nreads+ nreads-       VEF</span>
 <span class="co">#&gt; 1:     chr1  3067647  3069703  2057      * PRDM16       2       1 1.0000000</span>
@@ -352,13 +357,13 @@ bed.report &lt;-<span class="st"> </span><span class="kw">generateBedReport</spa
   <span class="dt">bed=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;capture.bed&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>),
   <span class="dt">bed.type=</span><span class="st">&quot;capture&quot;</span>
 )
-<span class="co">#&gt; Reading BED file [0.008s]</span>
-<span class="co">#&gt; Reading BAM file [0.132s]</span>
+<span class="co">#&gt; Reading BED file [0.011s]</span>
+<span class="co">#&gt; Reading BAM file [0.137s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
-<span class="co">#&gt;   Transforming sequences [0.011s]</span>
+<span class="co">#&gt;   Transforming sequences [0.009s]</span>
 <span class="co">#&gt;   Merging pairs [0.009s]</span>
-<span class="co">#&gt; Thresholding reads [0.001s]</span>
-<span class="co">#&gt; Preparing capture report [0.010s]</span>
+<span class="co">#&gt; Thresholding reads [0.002s]</span>
+<span class="co">#&gt; Preparing capture report [0.009s]</span>
 <span class="kw">identical</span>(capture.report, bed.report)
 <span class="co">#&gt; [1] TRUE</span></code></pre></div>
 </div>
@@ -382,8 +387,8 @@ amplicon.ecdfs &lt;-<span class="st"> </span><span class="kw">generateBedEcdf</s
   <span class="dt">bed=</span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;amplicon.bed&quot;</span>, <span class="dt">package=</span><span class="st">&quot;epialleleR&quot;</span>),
   <span class="dt">bed.rows=</span><span class="ot">NULL</span>
 )
-<span class="co">#&gt; Reading BED file [0.007s]</span>
-<span class="co">#&gt; Reading BAM file [0.096s]</span>
+<span class="co">#&gt; Reading BED file [0.008s]</span>
+<span class="co">#&gt; Reading BAM file [0.101s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
 <span class="co">#&gt;   Transforming sequences [0.004s]</span>
 <span class="co">#&gt;   Merging pairs [0.003s]</span>
@@ -454,14 +459,14 @@ vcf.report &lt;-<span class="st"> </span><span class="kw">generateVcfReport</spa
   <span class="co"># to convert them internally</span>
   <span class="dt">vcf.style=</span><span class="st">&quot;NCBI&quot;</span>
 )
-<span class="co">#&gt; Reading BED file [0.008s]</span>
-<span class="co">#&gt; Reading VCF file [1.953s]</span>
-<span class="co">#&gt; Reading BAM file [0.109s]</span>
+<span class="co">#&gt; Reading BED file [0.007s]</span>
+<span class="co">#&gt; Reading VCF file [1.873s]</span>
+<span class="co">#&gt; Reading BAM file [0.104s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
 <span class="co">#&gt;   Transforming sequences [0.004s]</span>
 <span class="co">#&gt;   Merging pairs [0.004s]</span>
-<span class="co">#&gt; Thresholding reads [0.000s]</span>
-<span class="co">#&gt; Extracting base frequences [0.055s]</span>
+<span class="co">#&gt; Thresholding reads [0.001s]</span>
+<span class="co">#&gt; Extracting base frequences [0.052s]</span>
 
 <span class="co"># NA values are shown for the C-&gt;T variants on the &quot;+&quot; and G-&gt;A on the &quot;-&quot;</span>
 <span class="co"># strands, because bisulfite conversion makes their counting impossible</span>
@@ -546,7 +551,7 @@ vcf.report &lt;-<span class="st"> </span><span class="kw">generateVcfReport</spa
 <span class="co">#&gt; </span>
 <span class="co">#&gt; other attached packages:</span>
 <span class="co">#&gt; [1] GenomeInfoDb_1.26.2 IRanges_2.24.1      S4Vectors_0.28.1    BiocGenerics_0.36.0</span>
-<span class="co">#&gt; [5] epialleleR_0.4.3   </span>
+<span class="co">#&gt; [5] epialleleR_0.99.0  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; loaded via a namespace (and not attached):</span>
 <span class="co">#&gt;  [1] bitops_1.0-6                matrixStats_0.58.0          fs_1.5.0                   </span>
