@@ -1,5 +1,5 @@
 Package: epialleleR
-Title: Fast, epiallele-aware methylation reporter
+Title: Fast, Epiallele-Aware Methylation Reporter
 Version: 0.5.0
 Authors@R: 
   person(given = "Oleksii",
