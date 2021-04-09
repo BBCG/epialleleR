@@ -1,5 +1,9 @@
-![epialleleR](logo.svg) 
-==========
+<img align="right" src="logo.svg">
+
+<br><br><br>
+
+<!-- ![epialleleR](logo.svg) &nbsp;
+========== -->
 
 ## Introduction
 
