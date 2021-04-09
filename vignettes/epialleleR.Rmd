@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
   width = 100
 )
 options(width=100)
-devtools::load_all(".")   # delete later
+# devtools::load_all(".")   # delete later
 ```
 
 *****
