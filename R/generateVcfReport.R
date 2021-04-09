@@ -171,7 +171,8 @@ generateVcfReport <- function (bam,
   if (!any(is(vcf, "CollapsedVCF"), is(vcf, "ExpandedVCF"))) {
     if (!is.null(bed) & !is(bed, "GRanges"))
       bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed, verbose=verbose)
-    vcf <- .readVcf(vcf.file=vcf, vcf.style=vcf.style, bed=bed, verbose=verbose)
+    vcf <- .readVcf(vcf.file=vcf, vcf.style=vcf.style,
+                    bed=GenomicRanges::reduce(bed), verbose=verbose)
   } else {
     if (verbose)
       message("Already preprocessed VCF supplied as an input. Options",
@@ -201,7 +202,6 @@ generateVcfReport <- function (bam,
   vcf.report <- .getBaseFreqReport(bam.processed=bam, vcf=vcf, verbose=verbose)
   
   vcf.report <- vcf.report[,grep("nam|ran|ref|alt|fep",colnames(vcf.report), ignore.case=TRUE), with=FALSE]
-  vcf.report <- unique(vcf.report)
   
   if (is.null(report.file))
     return(vcf.report)

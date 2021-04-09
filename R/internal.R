@@ -13,6 +13,7 @@
 #' @importFrom stringi stri_length
 #' @importFrom GenomicRanges makeGRangesFromDataFrame
 #' @importFrom GenomicRanges seqnames
+#' @importFrom GenomicRanges reduce
 #' @importFrom BiocGenerics start
 #' @importFrom BiocGenerics end
 #' @importFrom VariantAnnotation ScanVcfParam
