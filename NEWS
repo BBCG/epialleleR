@@ -34,7 +34,12 @@ Changes in version 0.4.0 (2021-03-08)
 + added some tests based on sample data
 + README.md
 
-Changes in version 0.4.5 (2021-04-0x)
-+ works on Apple Silicon now
+Changes in version 0.5.0 (2021-04-09)
++ R>=4.0 for submission
++ removed unused dependencies
++ correct work of generateVcfReport (although SNV only)
++ unmatched reads are at the end of generateBed* output now   
++ compiles and works on Apple Silicon (native ARM64 R)
 + fully documented methods
 + fully covered with tests and examples
++ comprehensive vignettes
