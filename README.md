@@ -1,7 +1,7 @@
 epialleleR
 ==========
 
-# Introduction
+## Introduction
 
 DISCLAIMER: This is a work in progress, however the package is already usable,
 and the obtained eperimantal results will soon be published. Main methods
@@ -19,7 +19,7 @@ distribution function for per-read beta values, and testing the significance
 of the association between epiallele methylation status and base frequencies
 at particular genomic positions (SNPs).
 
-## Current Features
+### Current Features
 
  * conventional reporting of cytosine methylation (*`generateCytosineReport`*)
  * calling the hypermethylated variant epiallele frequency (VEF) at the
@@ -54,21 +54,48 @@ install_github("BBCG/epialleleR", build_vignettes=FALSE,
   dependencies=TRUE, type="source")
 ```
 
+-------
+
+## Using the package
+
+Please read *`epialleleR`* vignettes (`vignettes/epialleleR.html`) or consult
+the function's help pages for the extensive information on usage, parameters and
+output values.
+
+Very brief synopsis:
+
+```r
+library(epialleleR)
+
+# external files
+amplicon.bam <- system.file("extdata", "amplicon010meth.bam", package="epialleleR")
+amplicon.bed <- system.file("extdata", "amplicon.bed", package="epialleleR")
+amplicon.vcf <- system.file("extdata", "amplicon.vcf.gz", package="epialleleR")
+
+# preloading the data
+bam.data <- preprocessBam(amplicon.bam)
+
+# CpG VEF report for individual bases
+cg.vef.report <- generateCytosineReport(bam.data)
+
+# BED-guided VEF report for genomic ranges
+bed.report <- generateBedReport(bam=amplicon.bam, bed=amplicon.bed, bed.type="capture")
+
+# VCF report
+vcf.report <- generateVcfReport(bam=amplicon.bam, bed=amplicon.bed,
+                                vcf=amplicon.vcf, vcf.style="NCBI")
+```
 
 -------
 
 ### Citing the *`epialleleR`* package
-[NOT YET AVAILABLE](https://doi.org/NOT.YET.AVAILABLE)
+The experimental data analysed using the package has not been published yet.
+The citation information will be updated in the nearest future.
 
 ### *`epialleleR`* at Bioconductor
-[NOT YET AVAILABLE](https://bioconductor.org/packages/devel/bioc/html/epialleleR.html)
+On its way now.
 
 -------
-
-# How to Use
-
-TBA
-
 
 License
 ---------
