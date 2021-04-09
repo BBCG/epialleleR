@@ -65,6 +65,22 @@ larger methylation capture panels, or even whole-genome approaches.
  * the association of single-nucleotide variations with the epiallelic status
  can be tested using *`generateVcfReport`*
 
+## Processing speed
+
+Currently *`epialleleR`* runs in a single-thread mode only, however most of the
+processing time is spent on loading the BAM data (using *`Rsamtools`*), which is
+difficult to improve by parallel processing. All the other operations are
+performed using optimised C++ functions, and usually take less time. Running
+time for complete task "BAM on disk -> CX report on disk" depends on a size of
+a BAM file, and the speed is usually within the range of 4-6 MB/s (or 25-50
+thousand reads per second) for a single core of a relatively modern CPU
+(Intel(R) Core(TM) i7-7700).
+
+Since BAM loading and preprocessing is a biggest bottleneck at the moment, major
+improvements are planned for the next upcoming release (v1.1): the dependency
+on *`Rsamtools`* will be removed, loading and preprocessing will be done within
+the same C++ function, hopefully aiding in much higher processing speed.
+
 *****
 
 # Sample data
