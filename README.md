@@ -1,6 +1,4 @@
-
-![epialleleR](logo.svg)
-
+![epialleleR](logo.svg) 
 ==========
 
 ## Introduction
