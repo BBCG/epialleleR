@@ -22,7 +22,7 @@ std::vector<std::string> rcpp_merge_ends(std::vector<int> read1_pos,         // 
     // checking for the interrupt
     if ((x & 1048575) == 0) Rcpp::checkUserInterrupt();
     
-    if (read1_seq[x].size()==abs(isize[x])) {
+    if (read1_seq[x].size()==(unsigned int)abs(isize[x])) {
       res[x] = read1_seq[x];
       continue;
     }
