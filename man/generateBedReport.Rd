@@ -182,13 +182,13 @@ threshold.
 }
 \details{
 Functions report hypermethylated variant epiallele frequencies (VEF) per
-genomic region of interest using BAM and BED files as input. Reads are
-matched to genomic locations by exact coordinates (`generateAmpliconReport`
-or `generateBedReport` with an option bed.type="amplicon") or minimum overlap
-(`generateCaptureReport` or `generateBedReport` with an option
-bed.type="capture") - the former to be used for amplicon-based NGS data,
-while the latter - for the capture-based NGS data. The function's logic is
-explained below.
+genomic region of interest using BAM and BED files as input. Reads (or read
+pairs as a single entity) are matched to genomic locations by exact
+coordinates (`generateAmpliconReport` or `generateBedReport` with an option
+bed.type="amplicon") or minimum overlap (`generateCaptureReport` or
+`generateBedReport` with an option bed.type="capture") - the former to be
+used for amplicon-based NGS data, while the latter - for the capture-based
+NGS data. The function's logic is explained below.
 
 Let's suppose we have a BAM file with four reads, all mapped to the "+"
 strand of chromosome 1, positions 1-16. The genomic range is supplied as a

@@ -6,11 +6,11 @@
 #'
 #' @details
 #' Using BAM reads and sequence variation information as an input,
-#' `generateVcfReport` function thresholds the reads according to supplied
-#' parameters and calculates the occurence of \strong{Ref}erence and
-#' \strong{Alt}ernative bases withing reads, taking into the account DNA strand
-#' the read mapped to and average methylation level (epiallele status) of the
-#' read.
+#' `generateVcfReport` function thresholds the reads (or read pairs as a single
+#' entity) according to supplied parameters and calculates the occurence of
+#' \strong{Ref}erence and \strong{Alt}ernative bases withing reads, taking into
+#' the account DNA strand the read mapped to and average methylation level
+#' (epiallele status) of the read.
 #' 
 #' The information on sequence variation can be supplied as a Variant Call
 #' Format (VCF) file location or an object of class VCF, returned by the
@@ -110,7 +110,9 @@
 #'   \strong{Alt}ernative bases that were found at this particular position
 #'   within \strong{M}ethylated (above threshold) or \strong{U}nmethylated
 #'   (below threshold) reads that were mapped to \strong{"+"} (forward) or
-#'   \strong{"-"} (reverse) DNA strand
+#'   \strong{"-"} (reverse) DNA strand. NA values mean that it is not possible
+#'   to determine the number of bases due to the bisulfite conversion-related
+#'   limitations (C->T variants on "+" and G->A on "-" strands)
 #'   \item SumRef -- sum of all \strong{Ref}erence base counts
 #'   \item SumAlt -- sum of all \strong{Alt}ernative base counts
 #'   \item FEp+ -- Fisher's Exact test p-value for association of a variation
@@ -199,6 +201,7 @@ generateVcfReport <- function (bam,
   vcf.report <- .getBaseFreqReport(bam.processed=bam, vcf=vcf, verbose=verbose)
   
   vcf.report <- vcf.report[,grep("nam|ran|ref|alt|fep",colnames(vcf.report), ignore.case=TRUE), with=FALSE]
+  vcf.report <- unique(vcf.report)
   
   if (is.null(report.file))
     return(vcf.report)

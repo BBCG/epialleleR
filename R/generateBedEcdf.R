@@ -5,11 +5,11 @@
 #' per-read beta values of the sequencing reads.
 #'
 #' @details
-#' The function matches reads to the genomic regions provided in a BED
-#' file/\code{\linkS4class{GRanges}} object, computes average per-read beta
-#' values according to the cytosine context parameter `ecdf.context`, and
-#' returns a list of eCDFs for within- and out-of-context average per-read beta
-#' values, which can be used for plotting.
+#' The function matches reads (or read pairs as a single entity) to the genomic
+#' regions provided in a BED file/\code{\linkS4class{GRanges}} object, computes
+#' average per-read beta values according to the cytosine context parameter
+#' `ecdf.context`, and returns a list of eCDFs for within- and out-of-context
+#' average per-read beta values, which can be used for plotting.
 #' 
 #' The resulting eCDFs and their plots can be used to characterise the
 #' methylation pattern of a particular genomic region, e.g. if reads that match
