@@ -1,4 +1,4 @@
-epialleleR
+![epialleleR](logo.svg)
 ==========
 
 ## Introduction
