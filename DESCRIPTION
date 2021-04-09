@@ -1,6 +1,6 @@
 Package: epialleleR
 Title: Fast, epiallele-aware methylation reporter
-Version: 0.4.3
+Version: 0.5.0
 Authors@R: 
   person(given = "Oleksii",
     family = "Nikolaienko",
@@ -19,7 +19,7 @@ Description: Epialleles are specific DNA methylation patterns that are
 CommentSystemRequirements: C++17
 NeedsCompilation: yes
 Depends:
-  R (>= 3.6)
+  R (>= 4.0)
 Imports:
   Rcpp,
   BH,
@@ -27,10 +27,7 @@ Imports:
   methods,
   utils,
   Rsamtools,
-  GenomicAlignments,
-  IRanges,
   GenomicRanges,
-  Biostrings,
   BiocGenerics,
   GenomeInfoDb,
   SummarizedExperiment,
