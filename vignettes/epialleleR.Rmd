@@ -29,7 +29,7 @@ options(width=100)
 The cytosine DNA methylation is an important epigenetic mechanism for regulation
 of gene expression. Abnormal methylation is linked to several diseases, being 
 for example the most common molecular lesion in cancer cell[^1]. Multiple
-studies suggest that alterations in DNA methylation, despite occuring at a low
+studies suggest that alterations in DNA methylation, despite occurring at a low
 mosaic level, may confer increased risk of cancer later in life[^2].
 
 The cytosine methylation levels within relatively small regions of the human
@@ -37,32 +37,32 @@ genome are thought to be often concordant, resulting in a limited number of
 distinct methylation patterns of short sequencing reads[^3]. Due to the
 cell-to-cell variations in methylation, DNA purified from tissue samples
 contains a mix of hyper- and hypomethylated alleles with varying ratios that
-depend on a genomic region and a tissue type.
+depend on the genomic region and tissue type.
 
 Unsurprisingly, when the frequencies of hypermethylated epialleles are low
 (e.g. 1e-02 and lower) and cytosine methylation levels are averaged and reported
-using conventional algorythms, the identification of such hypermethylated
+using conventional algorithms, the identification of such hypermethylated
 epialleles becomes nearly impossible. In order to increase the sensitivity of
 DNA methylation analysis we have developed *`epialleleR`* &#8212; an R package
-for calling hypermethylated variant epiallele frequences (VEF).
+for calling hypermethylated variant epiallele frequencies (VEF).
 
 *`epialleleR`* is a fast and scalable solution for analysis of data obtained by
 next-generation sequencing of bisulfite-treated DNA samples. The minimum
-requirement for the input is: Binary Alignment Map (BAM) file containing
+requirement for the input is a Binary Alignment Map (BAM) file containing
 sequencing reads. These reads can be obtained from either deep or ultra-deep
-sequencing, using either narrowly targeted gene panel (amplicon sequencing),
+sequencing, using either narrowly targeted gene panels (amplicon sequencing),
 larger methylation capture panels, or even whole-genome approaches.
 
 ## Current Features
 
- * in addition to conventional reporting of cytosine DNA methylation levels
- (beta values), *`epialleleR`* can call variant epiallele frequences (VEF) of
+ * In addition to conventional reporting of cytosine DNA methylation levels
+ (beta values), *`epialleleR`* can call variant epiallele frequencies (VEF) of
  hypermethylated alleles at the level of individual cytosines
  (*`generateCytosineReport`*) or supplied genomic regions
  (*`generateBedReport`*)
- * potential bimodality of methylation for genomic regions of interest can be
+ * Potential bimodality of methylation for genomic regions of interest can be
  assessed using *`generateBedEcdf`* method
- * the association of single-nucleotide variations with the epiallelic status
+ * The association of single-nucleotide variations with the epiallelic status
  can be tested using *`generateVcfReport`*
 
 ## Processing speed
@@ -71,22 +71,23 @@ Currently *`epialleleR`* runs in a single-thread mode only, however most of the
 processing time is spent on loading the BAM data (using *`Rsamtools`*), which is
 difficult to improve by parallel processing. All the other operations are
 performed using optimised C++ functions, and usually take less time. Running
-time for complete task "BAM on disk -> CX report on disk" depends on a size of
-a BAM file, and the speed is usually within the range of 4-6 MB/s (or 25-50
+time for complete task "BAM on disk -> CX report on disk" depends on the size of
+the BAM file, and the speed is usually within the range of 4-6 MB/s (or 25-50
 thousand reads per second) for a single core of a relatively modern CPU
 (Intel(R) Core(TM) i7-7700).
 
-Since BAM loading and preprocessing is a biggest bottleneck at the moment, major
-improvements are planned for the next upcoming release (v1.1): the dependency
-on *`Rsamtools`* will be removed, loading and preprocessing will be done within
-the same C++ function, hopefully aiding in much higher processing speed.
+Since BAM loading and preprocessing is the biggest bottleneck at the moment,
+major improvements are planned for the next upcoming release (v1.1): the
+dependency on *`Rsamtools`* will be removed, and loading and preprocessing will
+be done within the same C++ function, hopefully aiding in much higher processing
+speed.
 
 *****
 
 # Sample data
 
-*`epialleleR`* package includes sample data, which was obtained using targeted
-sequencing. The description of assays and files is given below. All the
+The *`epialleleR`* package includes sample data, which was obtained using
+targeted sequencing. The description of assays and files is given below. All the
 genomic coordinates for external data files are according to GRCh38 reference
 assembly.
 
@@ -94,9 +95,9 @@ assembly.
 
 The samples of Human HCT116 DKO Non-Methylated (Zymo Research, cat # D5014-1),
 or Human HCT116 DKO Methylated (Zymo Research, cat # D5014-2) DNA[^4], or their
-mix were bisulfite-converted, and BRCA1 gene promoter was amplified using four
-pairs of primers. Amplicons were mixed, indexed and sequenced at Illumina MiSeq
-system. The related files are:
+mix were bisulfite-converted, and the BRCA1 gene promoter region was amplified
+using four pairs of primers. Amplicons were mixed, indexed and sequenced at
+Illumina MiSeq system. The related files are:
 
 | Name | Type | Description |
 | --- | --- | --- |
@@ -109,8 +110,8 @@ system. The related files are:
 
 ### Capture-based methylation NGS data
 
-The tumour DNA was bisulfite-converted, fragmented and hybridyzed with
-custom-made probes covering promoter regions of 283 tumour supressor genes (as
+The tumour DNA was bisulfite-converted, fragmented and hybridized with
+custom-made probes covering promoter regions of 283 tumour suppressor genes (as
 described in [^5]). Libraries were sequenced using Illumina MiSeq system. The
 related files are:
 
@@ -126,27 +127,28 @@ related files are:
 # Typical workflow
 
 As mentioned earlier, *`epialleleR`* uses data stored in Binary Alignment Map
-(BAM) files as its input. It is absolutely necessary that records in a BAM file
-contain XM tag with the methylation call string &#8212; such files are produced
-by virtually any software tool for mapping and alignment of bisulfite
+(BAM) files as its input. It is a prerequisite that records in a BAM file
+contain an XM tag with the methylation call string &#8212; such files are
+produced by virtually any software tool for mapping and alignment of bisulfite
 sequencing reads (such as Bismark, BSMAP or Illumina DRAGEN Bio-IT Platform).
 
-Please use function help files for full description of available parameters, as
-well as explanation of function's logic and output values.
+Please use the function help files for a full description of available
+parameters, as well as explanation of the function's logic and output values.
 
 ## Reading the data
 
-All of the *`epialleleR`* methods can load BAM data using the file path.
-However if a file is very large and several reports need to be prepared, it is
-advised to use *`preprocessBam`* convenience function as shown below. This
-function is also used internally when BAM file location string is supplied as
+All *`epialleleR`* methods can load BAM data using the file path.
+However, if a file is very large and several reports need to be prepared, it is
+advised to use the *`preprocessBam`* convenience function as shown below. This
+function is also used internally when a BAM file location string is supplied as
 an input for other *`epialleleR`* methods.
 
 *`preprocessBam`* automatically determines if BAM is derived from single-end or
 paired-end sequencing. When the latter is the case, paired reads are merged
-so that the overlapping fragments of second read are clipped (because quality
-of the second read is usually lower than of the first). These **merged reads**
-are then processed as a **single entity** in all *`epialleleR`* methods.
+so that the overlapping fragments of the second read are clipped (because the
+quality of the second read is usually lower than of the first). These
+**merged reads** are then processed as a **single entity** in all *`epialleleR`*
+methods.
 
 ```{r}
 library(epialleleR)
@@ -158,13 +160,13 @@ bam.data    <- preprocessBam(capture.bam)
 ## Making cytosine reports
 
 *`epialleleR`* can generate conventional cytosine reports in a format, which is
-similar to the genome-wide cytosine report produced by coverage2cytosine
+similar to the genome-wide cytosine report produced by the *`coverage2cytosine`*
 Bismark module[^6].
 
 Please note that *`generateCytosineReport`* produces thresholded (VEF) report
 by default: **methylated** cytosines from reads that do **not** pass the
 threshold (**hypo**methylated reads) are counted as being **un**methylated. In
-order to make conventional cytosine report, use *`threshold.reads=FALSE`*.
+order to make a conventional cytosine report, use *`threshold.reads=FALSE`*.
 
 ```{r}
 # data.table::data.table object for
@@ -182,19 +184,19 @@ cx.report <- generateCytosineReport(bam.data, threshold.reads=FALSE,
 head(cx.report[order(meth+unmeth, decreasing=TRUE)])
 ```
 
-## Making VEF reports for the set of genomic regions
+## Making VEF reports for a set of genomic regions
 
 *`epialleleR`* allows to make reports not only for individual cytosine bases,
 but also for a set of genomic regions. It is especially useful when the targeted
 methylation sequencing was used to produce reads (such as amplicon sequencing or
-by capture using, e.g., Agilent SureSelect Target Enrichment Probes).
+hybridization capture using, e.g., Agilent SureSelect Target Enrichment Probes).
 
 The amplicon sequencing principally differs from capture-based assays in that
-the coordinates of reads are known. Therefore reads can be assigned to amplicons
-by their exact positions, while to the capture targets &#8212; by the overlap.
-For this, *`epialleleR`* provides generic *`generateBedReport`* function as well
-as two of its aliases, *`generateAmpliconReport`* (for amplicon-based NGS) and
-*`generateCaptureReport`* (for capture-based NGS).
+the coordinates of reads are known. Therefore, reads can be assigned to
+amplicons by their exact positions, while to the capture targets &#8212; by the
+overlap. For this, *`epialleleR`* provides generic *`generateBedReport`*
+function as well as two of its aliases, *`generateAmpliconReport`* (for
+amplicon-based NGS) and *`generateCaptureReport`* (for capture-based NGS).
 
 ```{r}
 # report for amplicon-based data
@@ -302,13 +304,13 @@ for (f in bam.files) {
 
 ## Exploring sequence variants in epialleles
 
-It is known that sequence variants can affect methylation status of a DNA[^7].
-*`generateVcfReport`* function calculates frequencies of single nucleotide
-variants (SNVs) within epialleles and tests for the association between SNV and
-epiallelic status using Fisher's exact test. Base counts and the test's p-values
-are included in the returned value.
+It is known that sequence variants can affect the methylation status of a
+DNA[^7]. The *`generateVcfReport`* function calculates frequencies of single
+nucleotide variants (SNVs) within epialleles and tests for the association
+between SNV and epiallelic status using Fisher's exact test. Base counts and the
+test's p-values are included in the returned value.
 
-In addition to BAM file location string or preprocessed BAM object, function
+In addition to BAM file location string or preprocessed BAM object, the function
 requires a location string for the Variant Call Format (VCF) file or the VCF
 object that was obtained using *`VariantAnnotation::readVcf`* function. As VCF
 files can be extremely large, it is strongly advised to prefilter the VCF object
