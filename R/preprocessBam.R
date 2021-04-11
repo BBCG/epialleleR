@@ -6,7 +6,7 @@
 #' @details
 #' The function loads and preprocesses BAM file, saving time when multiple
 #' analyses are to be performed on large input files. Currently, Rsamtools
-#' package is used to read the data, but this will change in a future with a
+#' package is used to read the data, but this will change in the future with a
 #' goal of speeding up this step even further.
 #' 
 #' This function is also used internally when BAM file location is supplied as
@@ -40,7 +40,7 @@
 #' vignettes for the description of usage and sample data.
 #' 
 #' Sequence Alignment/Map \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{format specifications},
-#' duplicate alighments marking by \href{http://www.htslib.org/doc/samtools-markdup.html}{Samtools}
+#' duplicate alignments marking by \href{http://www.htslib.org/doc/samtools-markdup.html}{Samtools}
 #' and \href{https://support.illumina.com/content/dam/illumina-support/help/Illumina_DRAGEN_Bio_IT_Platform_v3_7_1000000141465/Content/SW/Informatics/Dragen/DuplicateMarking_fDG.htm}{Illumina DRAGEN Bio IT Platform}.
 #' @examples
 #'   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")

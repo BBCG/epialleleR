@@ -16,7 +16,7 @@ be considered somewhat experimental and may undergo significant changes or be
 substituted with some other method in the future.
 
 *`epialleleR`* is an R package for calling hypermethylated variant epiallele
-(VEF) frequencies at the level of genomic regions or individual cytosines
+frequencies (VEF) at the level of genomic regions or individual cytosines
 in next-generation sequencing data using binary alignment map (BAM) files as
 an input. Other functionality includes computing the empirical cumulative
 distribution function for per-read beta values, and testing the significance

@@ -32,8 +32,8 @@ is supplied, its seqlevels must match the seqlevels of the BAM file/object
 used.}
 
 \item{vcf.style}{string for the seqlevels style of the VCF file, if
-different from BED file/object. Only has effect when `vcf` param points to
-the VCF file location and `bed` is not NULL. Possible values:
+different from BED file/object. Only has effect when `vcf` parameter points
+to the VCF file location and `bed` is not NULL. Possible values:
 \itemize{
   \item NULL (the default) -- seqlevels in BED file/object and VCF file are
   the same
@@ -45,8 +45,8 @@ the VCF file location and `bed` is not NULL. Possible values:
 class \code{\linkS4class{GRanges}} holding genomic coordinates for
 regions of interest. It is used to include only the specific genomic ranges
 when the VCF file is loaded. This option has no effect when VCF object is
-supplied as a `vcf` param. The seqlevels of BED file/object must match the
-seqlevels of the BAM file/object used.}
+supplied as a `vcf` parameter. The seqlevels of BED file/object must match
+the seqlevels of the BAM file/object used.}
 
 \item{report.file}{file location string to write the VCF report. If NULL
 (the default) then report is returned as a
@@ -58,12 +58,12 @@ seqlevels of the BAM file/object used.}
 \item{threshold.reads}{boolean defining if sequence reads should be
 thresholded before counting bases in reference and variant epialleles
 (default: TRUE). Disabling thresholding is possible but makes no sense in
-this context, as all the reads will be assigned to the variant epiallele,
+this context as all the reads will be assigned to the variant epiallele,
 which will result in Fisher's Exact test p-value of 1 (in columns `FEp+` and
 `FEP-`).}
 
 \item{threshold.context}{string defining cytosine methylation context used
-for thresholdning the reads:
+for thresholding the reads:
 \itemize{
   \item "CG" (the default) -- within-the-context: CpG cytosines (called as
   zZ), out-of-context: all the other cytosines (hHxX)
@@ -72,7 +72,7 @@ for thresholdning the reads:
   \item "CxG" -- within-the-context: CG and CHG cytosines (zZxX),
   out-of-context: CHH cytosines (hH)
   \item "CX" -- all cytosines are considered within-the-context, this
-  effectively results in no thresholdning
+  effectively results in no thresholding
 }
 This option has no effect when read thresholding is disabled.}
 
@@ -149,8 +149,8 @@ tests their association with the methylation status of the sequencing reads.
 \details{
 Using BAM reads and sequence variation information as an input,
 `generateVcfReport` function thresholds the reads (or read pairs as a single
-entity) according to supplied parameters and calculates the occurence of
-\strong{Ref}erence and \strong{Alt}ernative bases withing reads, taking into
+entity) according to supplied parameters and calculates the occurrence of
+\strong{Ref}erence and \strong{Alt}ernative bases within reads, taking into
 the account DNA strand the read mapped to and average methylation level
 (epiallele status) of the read.
 
@@ -168,8 +168,8 @@ reads belonging to certain epialleles using Fisher's Exact test
 (\code{\link[stats]{fisher.test}}) and reports separate p-values for reads
 mapped to \strong{"+"} (forward) and \strong{"-"} (reverse) DNA strands.
 
-Please note that currently final report includes only the VCF entries with
-single-base REF and ALT alleles. This will be fixed in the future.
+Please note that the final report currently includes only the VCF entries
+with single-base REF and ALT alleles. This will be fixed in the future.
 }
 \examples{
   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")

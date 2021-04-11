@@ -81,13 +81,13 @@ matching of amplicon-based NGS reads (default: 1).}
 
 \item{threshold.reads}{boolean defining if sequence reads should be
 thresholded before counting reads belonging to variant epialleles (default:
-TRUE). Disabling thresholding is possible but makes no sense in this context,
+TRUE). Disabling thresholding is possible but makes no sense in this context
 as all the reads will be assigned to the variant epiallele, which will result
 in VEF==1 (in such case `NA` VEF values are returned in order to avoid
 confusion).}
 
 \item{threshold.context}{string defining cytosine methylation context used
-for thresholdning the reads:
+for thresholding the reads:
 \itemize{
   \item "CG" (the default) -- within-the-context: CpG cytosines (called as
   zZ), out-of-context: all the other cytosines (hHxX)
@@ -96,7 +96,7 @@ for thresholdning the reads:
   \item "CxG" -- within-the-context: CG and CHG cytosines (zZxX),
   out-of-context: CHH cytosines (hH)
   \item "CX" -- all cytosines are considered within-the-context, this
-  effectively results in no thresholdning
+  effectively results in no thresholding
 }
 This option has no effect when read thresholding is disabled.}
 
@@ -168,7 +168,7 @@ The report columns are:
   \item width -- width of genomic region
   \item strand -- strand
   \item ... -- other columns that were present in BED or metadata columns of
-  \code{\link[GenomicRanges]{GRanges}} abject 
+  \code{\link[GenomicRanges]{GRanges}} object 
   \item nreads+ -- number of reads mapped to the forward ("+") strand
   \item nreads- -- number of reads mapped to the reverse ("-") strand
   \item VEF -- frequency of reads passing the threshold
@@ -186,8 +186,8 @@ genomic region of interest using BAM and BED files as input. Reads (or read
 pairs as a single entity) are matched to genomic locations by exact
 coordinates (`generateAmpliconReport` or `generateBedReport` with an option
 bed.type="amplicon") or minimum overlap (`generateCaptureReport` or
-`generateBedReport` with an option bed.type="capture") - the former to be
-used for amplicon-based NGS data, while the latter - for the capture-based
+`generateBedReport` with an option bed.type="capture") -- the former to be
+used for amplicon-based NGS data, while the latter -- for the capture-based
 NGS data. The function's logic is explained below.
 
 Let's suppose we have a BAM file with four reads, all mapped to the "+"
