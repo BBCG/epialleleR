@@ -21,8 +21,8 @@
 #' @importFrom VariantAnnotation expand
 #' @importFrom GenomeInfoDb seqlevelsStyle
 #' @importFrom SummarizedExperiment rowRanges
-#' @importFrom Rcpp sourceCpp
-#' @importFrom Rcpp evalCpp
+# @importFrom Rcpp sourceCpp
+# @importFrom Rcpp evalCpp
 #' @importFrom stats ecdf
 #' @importFrom stats fisher.test
 #' @importFrom stats setNames
@@ -122,7 +122,7 @@ utils::globalVariables(
   tm <- proc.time()
   
   bed.df <- data.table::fread(file=bed.file, sep="\t", blank.lines.skip=TRUE, data.table=FALSE)
-  colnames(bed.df)[1:3] <- c("chr", "start", "end")
+  colnames(bed.df)[seq_len(3)] <- c("chr", "start", "end")
   bed    <- GenomicRanges::makeGRangesFromDataFrame(bed.df, keep.extra.columns=TRUE, ignore.strand=TRUE,
                                                     starts.in.df.are.0based=zero.based.bed)
   
@@ -211,8 +211,8 @@ utils::globalVariables(
   tm <- proc.time()
   
   if (any(
-    sapply(c(bam[[1]][c("qname","flag","rname","strand","pos","cigar","seq")],
-             bam[[1]][[c("tag")]]), is.null)
+    vapply(c(bam[[1]][c("qname","flag","rname","strand","pos","cigar","seq")],
+             bam[[1]][[c("tag")]]), is.null, logical(1))
   )) stop("BAM list object must contain data for the following BAM fields: ",
           "'qname', 'flag', 'rname', 'strand', 'pos', 'cigar', 'seq' ",
           "and the following tags: 'XM', 'XG'. ",
@@ -422,8 +422,9 @@ utils::globalVariables(
   
   vcf.ranges <- BiocGenerics::sort(SummarizedExperiment::rowRanges(vcf))
   vcf.ranges <- vcf.ranges[BiocGenerics::width(vcf.ranges)==1 &
-                           sapply(as.character(vcf.ranges$ALT),
-                                  stringi::stri_length, USE.NAMES=FALSE)==1]
+                           vapply(as.character(vcf.ranges$ALT),
+                                  stringi::stri_length,
+                                  FUN.VALUE=numeric(1), USE.NAMES=FALSE)==1]
   GenomeInfoDb::seqlevels(vcf.ranges, pruning.mode="coarse") <-
     levels(bam.processed$rname)
   freqs <- rcpp_get_base_freqs(as.integer(bam.processed$rname),
