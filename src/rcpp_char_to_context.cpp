@@ -6,12 +6,9 @@
 
 // fast, vectorised
 // [[Rcpp::export("rcpp_char_to_context")]]
-std::vector<std::string> rcpp_char_to_context(std::vector<unsigned char> ctx)  // char
+std::vector<std::string> rcpp_char_to_context(std::vector<unsigned char> ctx)   // char
 {
-  std::map <unsigned char, std::string> ctx_map = {
-    {'z',"CG"},  {'Z',"CG"},  {'x',"CHG"}, {'X',"CHG"},
-    {'h',"CHH"}, {'H',"CHH"}, {'u',"CN"},  {'U',"CN"}
-  };
+  std::map <unsigned char, std::string> ctx_map = { {'z',"CG"},  {'Z',"CG"},  {'x',"CHG"}, {'X',"CHG"}, {'h',"CHH"}, {'H',"CHH"}, {'u',"CN"},  {'U',"CN"} };
   std::vector<std::string> res (ctx.size());
   for (unsigned int x=0; x<ctx.size(); x++) {
     // checking for the interrupt
