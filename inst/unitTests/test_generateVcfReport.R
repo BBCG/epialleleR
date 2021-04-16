@@ -68,4 +68,10 @@ test_generateVcfReport <- function () {
     sum(nothreshold.report$`FEp-`, na.rm=TRUE),
     41
   )
+  
+  generateVcfReport(
+    bam=system.file("extdata", "capture.bam", package="epialleleR"),
+    bed=system.file("extdata", "capture.bed", package="epialleleR"),
+    vcf=capture.vcf, report.file=tempfile(), verbose=FALSE
+  )
 }

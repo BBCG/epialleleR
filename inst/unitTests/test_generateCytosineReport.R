@@ -33,4 +33,6 @@ test_generateCytosineReport <- function () {
     sum(cx.report$unmeth),
     125903
   )
+  
+  generateCytosineReport(capture.bam, report.file=tempfile())
 }

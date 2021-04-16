@@ -47,4 +47,6 @@ test_generateBedReport <- function () {
   RUnit::checkTrue(
     all(is.na(nothreshold.report$VEF))
   )
+  
+  generateAmpliconReport(bam=amplicon.bam, bed=amplicon.bed, report.file=tempfile())
 }
