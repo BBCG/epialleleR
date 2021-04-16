@@ -47,9 +47,7 @@ utils::globalVariables(
     "U+Ref", "U+T", "U-A", "U-Alt", "U-C", "U-G", "U-Ref", "U-T")
 )
 
-.onUnload <- function (libpath) {
-  library.dynam.unload("epialleleR", libpath)
-}
+.onUnload <- function (libpath) {library.dynam.unload("epialleleR", libpath)}
 
 ################################################################################
 # Constants

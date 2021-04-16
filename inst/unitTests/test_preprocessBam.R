@@ -1,6 +1,6 @@
 test_preprocessBam <- function () {
   RUnit::checkException(
-    epialleleR:::.processBam(list(), FALSE)
+    epialleleR:::.processBam(list("bam"=list()), FALSE)
   )
   
   capture.bam  <- system.file("extdata", "capture.bam", package="epialleleR")
