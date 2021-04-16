@@ -1,4 +1,8 @@
 test_preprocessBam <- function () {
+  RUnit::checkException(
+    epialleleR:::.processBam(list(), FALSE)
+  )
+  
   capture.bam  <- system.file("extdata", "capture.bam", package="epialleleR")
   capture.data <- preprocessBam(capture.bam, verbose=FALSE)
   RUnit::checkEquals(
@@ -12,7 +16,7 @@ test_preprocessBam <- function () {
   )
   
   amplicon.bam  <- system.file("extdata", "amplicon010meth.bam", package="epialleleR")
-  amplicon.data <- preprocessBam(amplicon.bam, verbose=FALSE)
+  amplicon.data <- preprocessBam(amplicon.bam, skip.duplicates=TRUE, verbose=FALSE)
   RUnit::checkEquals(
     dim(amplicon.data),
     c(500,7)
