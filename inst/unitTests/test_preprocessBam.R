@@ -6,6 +6,11 @@ test_preprocessBam <- function () {
     c(2968,7)
   )
   
+  RUnit::checkEquals(
+    preprocessBam(capture.data, verbose=TRUE),
+    capture.data
+  )
+  
   amplicon.bam  <- system.file("extdata", "amplicon010meth.bam", package="epialleleR")
   amplicon.data <- preprocessBam(amplicon.bam, verbose=FALSE)
   RUnit::checkEquals(

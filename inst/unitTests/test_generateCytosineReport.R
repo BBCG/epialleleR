@@ -1,6 +1,6 @@
 test_generateCytosineReport <- function () {
   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
-  cg.report   <- generateCytosineReport(capture.bam, verbose=FALSE)
+  cg.report   <- generateCytosineReport(capture.bam, verbose=TRUE)
   cx.report   <- generateCytosineReport(capture.bam, threshold.reads=FALSE,
                                         report.context="CX", verbose=FALSE)
   

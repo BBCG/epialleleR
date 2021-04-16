@@ -2,7 +2,7 @@ test_generateBedEcdf <- function () {
   amplicon.ecdfs <- generateBedEcdf(
     bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
     bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
-    bed.rows=NULL, verbose=FALSE
+    bed.rows=NULL, verbose=TRUE
   )
   
   RUnit::checkEquals(
