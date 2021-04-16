@@ -122,7 +122,7 @@ intermediate methylation levels are more frequent.
   par(mfrow=c(1,length(amplicon.ecdfs)))
   
   # cycle through items
-  sapply(1:length(amplicon.ecdfs), function (x) {
+  for (x in 1:length(amplicon.ecdfs)) {
     # four of them have names corresponding to genomic regions of amplicon.bed
     # fifth - NA for all the reads that don't match to any of those regions
     main <- if (is.na(names(amplicon.ecdfs[x]))) "unmatched"
@@ -135,7 +135,7 @@ intermediate methylation levels are more frequent.
     # adding eCDF for out-of-context per-read beta values (in blue)
     plot(amplicon.ecdfs[[x]]$out.of.context, add=TRUE, col="blue",
          verticals=TRUE, do.points=FALSE)
-  })
+  }
 }
 \seealso{
 \code{\link{preprocessBam}} for preloading BAM data,
