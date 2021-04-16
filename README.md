@@ -63,8 +63,8 @@ install_github("BBCG/epialleleR", build_vignettes=FALSE,
 ## Using the package
 
 Please read *`epialleleR`* vignettes
-(at [GitHub pages](https://bbcg.github.io/epialleleR/articles/epialleleR.html)
-or within R environment: `vignette("epialleleR", package="epialleleR")`) or
+at [GitHub pages](https://bbcg.github.io/epialleleR/articles/epialleleR.html)
+or within the R environment: `vignette("epialleleR", package="epialleleR")`, or
 consult the function's help pages for the extensive information on usage,
 parameters and output values.
 
