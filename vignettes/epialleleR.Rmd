@@ -1,6 +1,5 @@
 ---
 title: "The epialleleR User's Guide"
-author: "Oleksii Nikolaienko"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 abstract: |
   A comprehensive guide to using the epialleleR package for calling the

@@ -1,6 +1,9 @@
-<img align="right" src="logo.svg">
+# Fast, epiallele-aware methylation reporter  <img align="right" src="logo.svg">
 
-<br><br><br>
+![R-CMD-check-bioc](https://img.shields.io/github/workflow/status/BBCG/epialleleR/R-CMD-check-bioc)
+
+
+<!-- <br><br><br> -->
 
 <!-- ![epialleleR](logo.svg) &nbsp;
 ========== -->
