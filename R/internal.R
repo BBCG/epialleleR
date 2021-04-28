@@ -222,8 +222,8 @@ utils::globalVariables(
   
   if (verbose) message("  Transforming sequences", appendLF=FALSE)
   bam.data[, `:=` (isfirst = bitwAnd(flag,128)==0,
-                   seq     = rcpp_apply_cigar(cigar, seq),
-                   XM      = rcpp_apply_cigar(cigar, XM))]
+                   seq     = rcpp_apply_cigar(cigar, seq, "N"),
+                   XM      = rcpp_apply_cigar(cigar, XM,  "-"))]
  
   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
 

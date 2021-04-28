@@ -6,14 +6,15 @@
 using namespace Rcpp;
 
 // rcpp_apply_cigar
-std::vector<std::string> rcpp_apply_cigar(std::vector<std::string> cigar, std::vector<std::string> query);
-RcppExport SEXP _epialleleR_rcpp_apply_cigar(SEXP cigarSEXP, SEXP querySEXP) {
+std::vector<std::string> rcpp_apply_cigar(std::vector<std::string> cigar, std::vector<std::string> query, char gap);
+RcppExport SEXP _epialleleR_rcpp_apply_cigar(SEXP cigarSEXP, SEXP querySEXP, SEXP gapSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::vector<std::string> >::type cigar(cigarSEXP);
     Rcpp::traits::input_parameter< std::vector<std::string> >::type query(querySEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_apply_cigar(cigar, query));
+    Rcpp::traits::input_parameter< char >::type gap(gapSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_apply_cigar(cigar, query, gap));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -145,7 +146,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_epialleleR_rcpp_apply_cigar", (DL_FUNC) &_epialleleR_rcpp_apply_cigar, 2},
+    {"_epialleleR_rcpp_apply_cigar", (DL_FUNC) &_epialleleR_rcpp_apply_cigar, 3},
     {"_epialleleR_rcpp_char_to_context", (DL_FUNC) &_epialleleR_rcpp_char_to_context, 1},
     {"_epialleleR_rcpp_cx_report", (DL_FUNC) &_epialleleR_rcpp_cx_report, 6},
     {"_epialleleR_rcpp_get_base_freqs", (DL_FUNC) &_epialleleR_rcpp_get_base_freqs, 8},

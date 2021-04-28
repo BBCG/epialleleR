@@ -10,7 +10,8 @@
 // fast vectorised alternative to GenomicAlignments::sequenceLayer
 // [[Rcpp::export("rcpp_apply_cigar")]]
 std::vector<std::string> rcpp_apply_cigar(std::vector<std::string> cigar,       // CIGAR strings
-                                          std::vector<std::string> query)       // query (XM) strings
+                                          std::vector<std::string> query,       // query (XM) strings
+                                          char gap)                             // char to fill gaps with
 {
   std::vector<std::string> res(query.size());
 
@@ -49,7 +50,7 @@ std::vector<std::string> rcpp_apply_cigar(std::vector<std::string> cigar,       
           break;
         case 'D' :
         case 'N' :
-          res[x] += std::string(cigar_oplen,'-');
+          res[x] += std::string(cigar_oplen, gap);
           break;
         case 'S' :
           query_pos += cigar_oplen;
@@ -83,14 +84,16 @@ std::vector<std::string> rcpp_apply_cigar(std::vector<std::string> cigar,       
 rcpp_apply_cigar(c("10M2D4I12M","1M2I223M","226M"),
                  c("abcdefghijklmnopqrstuvwxyz",
                    "....h......x......Z.........x...........xh..x................x.......h.......h.....x.....Z...x.Z......h.....Z..h.....x.......h.......x....................................x........xh.h..hhh.Z...x..x.....Z..x..h.......xhhh.h....",
-                   "..h.....x...........x..x...z.h.h.Z.....x............Zx.hh...x..h.hh..xhhh.....Z..x......x...Z.z.hhh.hhhh..Zx.h.h.hh...hhh........h..........x.Z.hhh.hhhh..Zx.h.h.h....hhhh.....Z..x......x...Z.Z.hhh.hhhh..Zx.h.h.hh...hhh........"))
+                   "..h.....x...........x..x...z.h.h.Z.....x............Zx.hh...x..h.hh..xhhh.....Z..x......x...Z.z.hhh.hhhh..Zx.h.h.hh...hhh........h..........x.Z.hhh.hhhh..Zx.h.h.h....hhhh.....Z..x......x...Z.Z.hhh.hhhh..Zx.h.h.hh...hhh........"),
+                 "?")
 
 cigar <- bam.dt$cigar
 query <- bam.dt$XM
-system.time(xm.my  <- rcpp_apply_cigar(cigar,query))
+gap   <- "-"
+system.time(xm.my  <- rcpp_apply_cigar(cigar,query,gap))
 system.time(xm.ref <- as.character(GenomicAlignments::sequenceLayer(Biostrings::BStringSet(query, use.names=FALSE), cigar), use.names=FALSE))
 identical(xm.my, xm.ref)
-# microbenchmark::microbenchmark(rcpp_apply_cigar(cigar,query), times=10)
+# microbenchmark::microbenchmark(rcpp_apply_cigar(cigar,query,gap), times=10)
 */
 
 // Sourcing:
