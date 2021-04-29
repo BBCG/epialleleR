@@ -1,8 +1,4 @@
 test_preprocessBam <- function () {
-  RUnit::checkException(
-    epialleleR:::.processBam(list("bam"=list()), FALSE)
-  )
-  
   capture.bam  <- system.file("extdata", "capture.bam", package="epialleleR")
   capture.data <- preprocessBam(capture.bam, verbose=FALSE)
   RUnit::checkEquals(
@@ -20,16 +16,5 @@ test_preprocessBam <- function () {
   RUnit::checkEquals(
     dim(amplicon.data),
     c(500,7)
-  )
-  
-  RUnit::checkEquals(
-    epialleleR:::rcpp_apply_cigar("2S4M4=2X1D4I1N6M1H1P", "abcdefghijklmnopqrstuvwxyz", "?"),
-    "cdefghijkl??qrstuvwxyz"
-    # as.character(
-    #   GenomicAlignments::sequenceLayer(
-    #     Biostrings::BStringSet("abcdefghijklmnopqrstuvwxyz"),
-    #     "2S4M4=2X1D4I1N6M1H1P", D.letter="?", N.letter="?"
-    #   )
-    # )
   )
 }
