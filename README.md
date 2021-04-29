@@ -37,7 +37,13 @@ at particular genomic positions (SNPs).
  * testing for the association between epiallele methylation
  status and sequence variations (*`generateVcfReport`*)
 
+### Coming soon
 
+ * even faster and more memory-efficient BAM loading
+ * min-baseq parameter to reduce the effect of low quality bases on SNV calling
+ (at the moment the output of *`generateVcfReport`* is equivalent to the one of
+ `samtools mpileup -Q 0 ...`)
+ 
 -------
 
 ## Installation
