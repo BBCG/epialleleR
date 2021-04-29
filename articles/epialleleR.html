@@ -221,10 +221,10 @@
 
 <span class="va">capture.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="va">bam.data</span>    <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preprocessBam.html">preprocessBam</a></span><span class="op">(</span><span class="va">capture.bam</span><span class="op">)</span>
-<span class="co">#&gt; Reading BAM file [1.129s]</span>
+<span class="co">#&gt; Reading BAM file [1.198s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
-<span class="co">#&gt;   Transforming sequences [0.029s]</span>
-<span class="co">#&gt;   Merging pairs [0.021s]</span></code></pre></div>
+<span class="co">#&gt;   Transforming sequences [0.032s]</span>
+<span class="co">#&gt;   Merging pairs [0.022s]</span></code></pre></div>
 </div>
 <div id="making-cytosine-reports" class="section level2">
 <h2 class="hasAnchor">
@@ -236,8 +236,8 @@
 <span class="co"># CpG VEF report</span>
 <span class="va">cg.vef.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span><span class="op">)</span>
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq' and 'skip.duplicates' will have no effect.</span>
-<span class="co">#&gt; Thresholding reads [0.002s]</span>
-<span class="co">#&gt; Preparing cytosine report [0.022s]</span>
+<span class="co">#&gt; Thresholding reads [0.003s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.024s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cg.vef.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;    rname strand      pos context meth unmeth triad</span>
 <span class="co">#&gt; 1: chr17      + 61864475      CG    7      9   NNN</span>
@@ -264,7 +264,7 @@
 <span class="va">cx.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span>,
                                     report.context<span class="op">=</span><span class="st">"CX"</span><span class="op">)</span>
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq' and 'skip.duplicates' will have no effect.</span>
-<span class="co">#&gt; Preparing cytosine report [0.041s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.045s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cx.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;    rname strand      pos context meth unmeth triad</span>
 <span class="co">#&gt; 1: chr17      + 61864338     CHG    1     25   NNN</span>
@@ -286,13 +286,13 @@
   bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.049s]</span>
-<span class="co">#&gt; Reading BAM file [0.156s]</span>
+<span class="co">#&gt; Reading BED file [0.052s]</span>
+<span class="co">#&gt; Reading BAM file [0.170s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
 <span class="co">#&gt;   Transforming sequences [0.007s]</span>
 <span class="co">#&gt;   Merging pairs [0.007s]</span>
-<span class="co">#&gt; Thresholding reads [0.001s]</span>
-<span class="co">#&gt; Preparing amplicon report [0.026s]</span>
+<span class="co">#&gt; Thresholding reads [0.000s]</span>
+<span class="co">#&gt; Preparing amplicon report [0.028s]</span>
 <span class="va">amplicon.report</span>
 <span class="co">#&gt;    seqnames    start      end width strand amplicon nreads+ nreads-        VEF</span>
 <span class="co">#&gt; 1:    chr17 43125624 43126026   403      * CpG00-13       0     156 0.08333333</span>
@@ -307,13 +307,13 @@
   bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.045s]</span>
-<span class="co">#&gt; Reading BAM file [0.197s]</span>
+<span class="co">#&gt; Reading BED file [0.051s]</span>
+<span class="co">#&gt; Reading BAM file [0.218s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
 <span class="co">#&gt;   Transforming sequences [0.017s]</span>
-<span class="co">#&gt;   Merging pairs [0.013s]</span>
+<span class="co">#&gt;   Merging pairs [0.016s]</span>
 <span class="co">#&gt; Thresholding reads [0.002s]</span>
-<span class="co">#&gt; Preparing capture report [0.896s]</span>
+<span class="co">#&gt; Preparing capture report [0.946s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">capture.report</span><span class="op">)</span>
 <span class="co">#&gt;    seqnames    start      end width strand     V4 nreads+ nreads-       VEF</span>
 <span class="co">#&gt; 1:     chr1  3067647  3069703  2057      * PRDM16       2       1 1.0000000</span>
@@ -329,13 +329,13 @@
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed.type<span class="op">=</span><span class="st">"capture"</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.018s]</span>
-<span class="co">#&gt; Reading BAM file [0.164s]</span>
+<span class="co">#&gt; Reading BED file [0.019s]</span>
+<span class="co">#&gt; Reading BAM file [0.168s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
-<span class="co">#&gt;   Transforming sequences [0.018s]</span>
-<span class="co">#&gt;   Merging pairs [0.014s]</span>
+<span class="co">#&gt;   Transforming sequences [0.020s]</span>
+<span class="co">#&gt;   Merging pairs [0.015s]</span>
 <span class="co">#&gt; Thresholding reads [0.002s]</span>
-<span class="co">#&gt; Preparing capture report [0.020s]</span>
+<span class="co">#&gt; Preparing capture report [0.018s]</span>
 <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">capture.report</span>, <span class="va">bed.report</span><span class="op">)</span>
 <span class="co">#&gt; [1] TRUE</span></code></pre></div>
 </div>
@@ -362,11 +362,11 @@
   bed.rows<span class="op">=</span><span class="cn">NULL</span>
 <span class="op">)</span>
 <span class="co">#&gt; Reading BED file [0.017s]</span>
-<span class="co">#&gt; Reading BAM file [0.137s]</span>
+<span class="co">#&gt; Reading BAM file [0.134s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
-<span class="co">#&gt;   Transforming sequences [0.007s]</span>
-<span class="co">#&gt;   Merging pairs [0.006s]</span>
-<span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.014s]</span>
+<span class="co">#&gt;   Transforming sequences [0.006s]</span>
+<span class="co">#&gt;   Merging pairs [0.009s]</span>
+<span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.015s]</span>
 
 <span class="co"># there are 5 items in amplicon.ecdfs, let's plot all of them</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
@@ -437,13 +437,13 @@
   vcf.style<span class="op">=</span><span class="st">"NCBI"</span>
 <span class="op">)</span>
 <span class="co">#&gt; Reading BED file [0.017s]</span>
-<span class="co">#&gt; Reading VCF file [1.163s]</span>
-<span class="co">#&gt; Reading BAM file [0.134s]</span>
+<span class="co">#&gt; Reading VCF file [1.235s]</span>
+<span class="co">#&gt; Reading BAM file [0.131s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
-<span class="co">#&gt;   Transforming sequences [0.006s]</span>
+<span class="co">#&gt;   Transforming sequences [0.007s]</span>
 <span class="co">#&gt;   Merging pairs [0.007s]</span>
 <span class="co">#&gt; Thresholding reads [0.001s]</span>
-<span class="co">#&gt; Extracting base frequences [0.130s]</span>
+<span class="co">#&gt; Extracting base frequences [0.129s]</span>
 
 <span class="co"># NA values are shown for the C-&gt;T variants on the "+" and G-&gt;A on the "-"</span>
 <span class="co"># strands, because bisulfite conversion makes their counting impossible</span>
