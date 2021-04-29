@@ -92,7 +92,7 @@ tests their association with the methylation status of the sequencing reads." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.99.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.99.3</span>
       </span>
     </div>
 
@@ -324,7 +324,10 @@ reads belonging to certain epialleles using Fisher's Exact test
 (<code><a href='https://rdrr.io/r/stats/fisher.test.html'>fisher.test</a></code>) and reports separate p-values for reads
 mapped to <strong>"+"</strong> (forward) and <strong>"-"</strong> (reverse) DNA strands.</p>
 <p>Please note that the final report currently includes only the VCF entries
-with single-base REF and ALT alleles. This will be fixed in the future.</p>
+with single-base REF and ALT alleles. Also, there is no filtering by the base
+quality at the moment, thus the output of `generateVcfReport` is equivalent
+to the one of `samtools mplieup -Q 0 ...`, and may result in false SNVs
+caused by misalignments. These will be fixed in the future.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='preprocessBam.html'>preprocessBam</a></code> for preloading BAM data,
@@ -345,7 +348,7 @@ the seqlevels style.</p></div>
   
   <span class='co'># VCF report</span>
   <span class='va'>vcf.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateVcfReport</span><span class='op'>(</span>bam<span class='op'>=</span><span class='va'>capture.bam</span>, bed<span class='op'>=</span><span class='va'>capture.bed</span>, vcf<span class='op'>=</span><span class='va'>capture.vcf</span><span class='op'>)</span>
-</div><div class='co'>#&gt; Reading BED file</div><div class='co'>#&gt;  [0.017s]</div><div class='co'>#&gt; Reading VCF file</div><div class='co'>#&gt;  [9.344s]</div><div class='co'>#&gt; Reading BAM file</div><div class='co'>#&gt;  [0.149s]</div><div class='co'>#&gt; Preprocessing BAM data:</div><div class='co'>#&gt;   Transforming sequences</div><div class='co'>#&gt;  [0.021s]</div><div class='co'>#&gt;   Merging pairs</div><div class='co'>#&gt;  [0.018s]</div><div class='co'>#&gt; Thresholding reads</div><div class='co'>#&gt;  [0.002s]</div><div class='co'>#&gt; Extracting base frequences</div><div class='co'>#&gt;  [14.122s]</div></pre>
+</div><div class='co'>#&gt; Reading BED file</div><div class='co'>#&gt;  [0.019s]</div><div class='co'>#&gt; Reading VCF file</div><div class='co'>#&gt;  [10.545s]</div><div class='co'>#&gt; Reading BAM file</div><div class='co'>#&gt;  [0.186s]</div><div class='co'>#&gt; Preprocessing BAM data:</div><div class='co'>#&gt;   Transforming sequences</div><div class='co'>#&gt;  [0.022s]</div><div class='co'>#&gt;   Merging pairs</div><div class='co'>#&gt;  [0.018s]</div><div class='co'>#&gt; Thresholding reads</div><div class='co'>#&gt;  [0.002s]</div><div class='co'>#&gt; Extracting base frequences</div><div class='co'>#&gt;  [14.512s]</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
