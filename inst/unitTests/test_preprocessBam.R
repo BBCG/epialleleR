@@ -21,4 +21,15 @@ test_preprocessBam <- function () {
     dim(amplicon.data),
     c(500,7)
   )
+  
+  # as.character(
+  #   GenomicAlignments::sequenceLayer(
+  #     Biostrings::BStringSet("abcdefghijklmnopqrstuvwxyz"),
+  #     "2S4M4=2X1D4I1N6M1H1P", D.letter="?", N.letter="?"
+  #   )
+  # )
+  RUnit::checkEquals(
+    rcpp_apply_cigar("2S4M4=2X1D4I1N6M1H1P", "abcdefghijklmnopqrstuvwxyz", "?"),
+    "cdefghijkl??qrstuvwxyz"
+  )
 }
