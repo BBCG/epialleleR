@@ -27,7 +27,10 @@
 #' mapped to \strong{"+"} (forward) and \strong{"-"} (reverse) DNA strands.
 #' 
 #' Please note that the final report currently includes only the VCF entries
-#' with single-base REF and ALT alleles. This will be fixed in the future.
+#' with single-base REF and ALT alleles. Also, there is no filtering by the base
+#' quality at the moment, thus the output of `generateVcfReport` is equivalent
+#' to the one of `samtools mplieup -Q 0 ...`, and may result in false SNVs
+#' caused by misalignments. These will be fixed in the future.
 #'
 #' @param bam BAM file location string OR preprocessed output of
 #' \code{\link{preprocessBam}} function.
