@@ -59,7 +59,7 @@ std::vector<std::string> rcpp_apply_cigar(std::vector<std::string> cigar,       
         case 'P' :
           break;
         default :
-          Rcpp::stop("Unknown CIGAR operation at BAM line ", x);
+          Rcpp::stop("Unknown CIGAR operation at BAM line %i", x);
       }
 
       // next op
