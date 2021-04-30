@@ -8,13 +8,6 @@
 
 <title>generateBedReport — generateBedReport • epialleleR</title>
 
-<!-- favicons -->
-<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
@@ -51,7 +44,6 @@
 these functions match BAM reads to the set of genomic locations and return
 the fraction of reads with an average methylation level passing an arbitrary
 threshold." />
-<meta property="og:image" content="/logo.svg" />
 
 
 
@@ -387,19 +379,25 @@ the seqlevels style.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>  <span class='co'># amplicon data</span>
-  <span class='va'>amplicon.bam</span>    <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"amplicon010meth.bam"</span>, package<span class='op'>=</span><span class='st'>"epialleleR"</span><span class='op'>)</span>
-  <span class='va'>amplicon.bed</span>    <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"amplicon.bed"</span>, package<span class='op'>=</span><span class='st'>"epialleleR"</span><span class='op'>)</span>
-  <span class='va'>amplicon.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateAmpliconReport</span><span class='op'>(</span>bam<span class='op'>=</span><span class='va'>amplicon.bam</span>, bed<span class='op'>=</span><span class='va'>amplicon.bed</span><span class='op'>)</span>
-</div><div class='co'>#&gt; Reading BED file</div><div class='co'>#&gt;  [0.017s]</div><div class='co'>#&gt; Reading BAM file</div><div class='co'>#&gt;  [0.153s]</div><div class='co'>#&gt; Preprocessing BAM data:</div><div class='co'>#&gt;   Transforming sequences</div><div class='co'>#&gt;  [0.007s]</div><div class='co'>#&gt;   Merging pairs</div><div class='co'>#&gt;  [0.006s]</div><div class='co'>#&gt; Thresholding reads</div><div class='co'>#&gt;  [0.000s]</div><div class='co'>#&gt; Preparing amplicon report</div><div class='co'>#&gt;  [0.026s]</div><div class='input'>  
+  <span class='va'>amplicon.bam</span>    <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"amplicon010meth.bam"</span>,
+                                 package<span class='op'>=</span><span class='st'>"epialleleR"</span><span class='op'>)</span>
+  <span class='va'>amplicon.bed</span>    <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"amplicon.bed"</span>,
+                                 package<span class='op'>=</span><span class='st'>"epialleleR"</span><span class='op'>)</span>
+  <span class='va'>amplicon.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateAmpliconReport</span><span class='op'>(</span>bam<span class='op'>=</span><span class='va'>amplicon.bam</span>,
+                                            bed<span class='op'>=</span><span class='va'>amplicon.bed</span><span class='op'>)</span>
+</div><div class='co'>#&gt; Reading BED file</div><div class='co'>#&gt;  [0.019s]</div><div class='co'>#&gt; Reading BAM file</div><div class='co'>#&gt;  [0.151s]</div><div class='co'>#&gt; Preprocessing BAM data:</div><div class='co'>#&gt;   Transforming sequences</div><div class='co'>#&gt;  [0.006s]</div><div class='co'>#&gt;   Merging pairs</div><div class='co'>#&gt;  [0.006s]</div><div class='co'>#&gt; Thresholding reads</div><div class='co'>#&gt;  [0.000s]</div><div class='co'>#&gt; Preparing amplicon report</div><div class='co'>#&gt;  [0.024s]</div><div class='input'>  
   <span class='co'># capture NGS</span>
-  <span class='va'>capture.bam</span>    <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"capture.bam"</span>, package<span class='op'>=</span><span class='st'>"epialleleR"</span><span class='op'>)</span>
-  <span class='va'>capture.bed</span>    <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"capture.bed"</span>, package<span class='op'>=</span><span class='st'>"epialleleR"</span><span class='op'>)</span>
+  <span class='va'>capture.bam</span>    <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"capture.bam"</span>,
+                                package<span class='op'>=</span><span class='st'>"epialleleR"</span><span class='op'>)</span>
+  <span class='va'>capture.bed</span>    <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"capture.bed"</span>,
+                                package<span class='op'>=</span><span class='st'>"epialleleR"</span><span class='op'>)</span>
   <span class='va'>capture.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateCaptureReport</span><span class='op'>(</span>bam<span class='op'>=</span><span class='va'>capture.bam</span>, bed<span class='op'>=</span><span class='va'>capture.bed</span><span class='op'>)</span>
-</div><div class='co'>#&gt; Reading BED file</div><div class='co'>#&gt;  [0.018s]</div><div class='co'>#&gt; Reading BAM file</div><div class='co'>#&gt;  [1.070s]</div><div class='co'>#&gt; Preprocessing BAM data:</div><div class='co'>#&gt;   Transforming sequences</div><div class='co'>#&gt;  [0.020s]</div><div class='co'>#&gt;   Merging pairs</div><div class='co'>#&gt;  [0.019s]</div><div class='co'>#&gt; Thresholding reads</div><div class='co'>#&gt;  [0.002s]</div><div class='co'>#&gt; Preparing capture report</div><div class='co'>#&gt;  [0.045s]</div><div class='input'>  
+</div><div class='co'>#&gt; Reading BED file</div><div class='co'>#&gt;  [0.016s]</div><div class='co'>#&gt; Reading BAM file</div><div class='co'>#&gt;  [0.180s]</div><div class='co'>#&gt; Preprocessing BAM data:</div><div class='co'>#&gt;   Transforming sequences</div><div class='co'>#&gt;  [0.017s]</div><div class='co'>#&gt;   Merging pairs</div><div class='co'>#&gt;  [0.014s]</div><div class='co'>#&gt; Thresholding reads</div><div class='co'>#&gt;  [0.002s]</div><div class='co'>#&gt; Preparing capture report</div><div class='co'>#&gt;  [0.041s]</div><div class='input'>  
   <span class='co'># generateAmpliconReport and generateCaptureReport are just aliases</span>
   <span class='co'># of the generateBedReport</span>
-  <span class='va'>bed.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateBedReport</span><span class='op'>(</span>bam<span class='op'>=</span><span class='va'>capture.bam</span>, bed<span class='op'>=</span><span class='va'>capture.bed</span>, bed.type<span class='op'>=</span><span class='st'>"capture"</span><span class='op'>)</span>
-</div><div class='co'>#&gt; Reading BED file</div><div class='co'>#&gt;  [0.024s]</div><div class='co'>#&gt; Reading BAM file</div><div class='co'>#&gt;  [0.183s]</div><div class='co'>#&gt; Preprocessing BAM data:</div><div class='co'>#&gt;   Transforming sequences</div><div class='co'>#&gt;  [0.018s]</div><div class='co'>#&gt;   Merging pairs</div><div class='co'>#&gt;  [0.015s]</div><div class='co'>#&gt; Thresholding reads</div><div class='co'>#&gt;  [0.002s]</div><div class='co'>#&gt; Preparing capture report</div><div class='co'>#&gt;  [0.017s]</div><div class='input'>  <span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span><span class='op'>(</span><span class='va'>capture.report</span>, <span class='va'>bed.report</span><span class='op'>)</span>
+  <span class='va'>bed.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateBedReport</span><span class='op'>(</span>bam<span class='op'>=</span><span class='va'>capture.bam</span>, bed<span class='op'>=</span><span class='va'>capture.bed</span>,
+                                  bed.type<span class='op'>=</span><span class='st'>"capture"</span><span class='op'>)</span>
+</div><div class='co'>#&gt; Reading BED file</div><div class='co'>#&gt;  [0.016s]</div><div class='co'>#&gt; Reading BAM file</div><div class='co'>#&gt;  [0.998s]</div><div class='co'>#&gt; Preprocessing BAM data:</div><div class='co'>#&gt;   Transforming sequences</div><div class='co'>#&gt;  [0.017s]</div><div class='co'>#&gt;   Merging pairs</div><div class='co'>#&gt;  [0.014s]</div><div class='co'>#&gt; Thresholding reads</div><div class='co'>#&gt;  [0.002s]</div><div class='co'>#&gt; Preparing capture report</div><div class='co'>#&gt;  [0.016s]</div><div class='input'>  <span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span><span class='op'>(</span><span class='va'>capture.report</span>, <span class='va'>bed.report</span><span class='op'>)</span>
 </div><div class='co'>#&gt; [1] TRUE</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
