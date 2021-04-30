@@ -112,25 +112,29 @@ intermediate methylation levels are more frequent.
 }
 \examples{
   # amplicon data
-  amplicon.bam   <- system.file("extdata", "amplicon010meth.bam", package="epialleleR")
-  amplicon.bed   <- system.file("extdata", "amplicon.bed", package="epialleleR")
+  amplicon.bam <- system.file("extdata", "amplicon010meth.bam",
+                              package="epialleleR")
+  amplicon.bed <- system.file("extdata", "amplicon.bed",
+                              package="epialleleR")
   
   # let's compute eCDF
-  amplicon.ecdfs <- generateBedEcdf(bam=amplicon.bam, bed=amplicon.bed, bed.rows=NULL)
+  amplicon.ecdfs <- generateBedEcdf(bam=amplicon.bam, bed=amplicon.bed,
+                                    bed.rows=NULL)
   
   # there are 5 items in amplicon.ecdfs, let's plot all of them
   par(mfrow=c(1,length(amplicon.ecdfs)))
   
   # cycle through items
   for (x in 1:length(amplicon.ecdfs)) {
-    # four of them have names corresponding to genomic regions of amplicon.bed
+    # four of them have names corresponding to amplicon.bed genomic regions, 
     # fifth - NA for all the reads that don't match to any of those regions
     main <- if (is.na(names(amplicon.ecdfs[x]))) "unmatched"
             else names(amplicon.ecdfs[x])
     
     # plotting eCDF for within-the-context per-read beta values (in red)
-    plot(amplicon.ecdfs[[x]]$context, col="red", verticals=TRUE, do.points=FALSE,
-         xlim=c(0,1), xlab="per-read beta value", ylab="cumulative density", main=main)
+    plot(amplicon.ecdfs[[x]]$context, col="red", verticals=TRUE,
+         do.points=FALSE, xlim=c(0,1), xlab="per-read beta value",
+         ylab="cumulative density", main=main)
     
     # adding eCDF for out-of-context per-read beta values (in blue)
     plot(amplicon.ecdfs[[x]]$out.of.context, add=TRUE, col="blue",

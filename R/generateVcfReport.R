@@ -148,10 +148,12 @@
 #' @examples
 #'   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
 #'   capture.bed <- system.file("extdata", "capture.bed", package="epialleleR")
-#'   capture.vcf <- system.file("extdata", "capture.vcf.gz", package="epialleleR")
+#'   capture.vcf <- system.file("extdata", "capture.vcf.gz",
+#'                              package="epialleleR")
 #'   
 #'   # VCF report
-#'   vcf.report <- generateVcfReport(bam=capture.bam, bed=capture.bed, vcf=capture.vcf)
+#'   vcf.report <- generateVcfReport(bam=capture.bam, bed=capture.bed,
+#'                                   vcf=capture.vcf)
 #' @export
 generateVcfReport <- function (bam,
                                vcf,
@@ -173,7 +175,8 @@ generateVcfReport <- function (bam,
   
   if (!any(is(vcf, "CollapsedVCF"), is(vcf, "ExpandedVCF"))) {
     if (!is.null(bed) & !is(bed, "GRanges"))
-      bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed, verbose=verbose)
+      bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed,
+                      verbose=verbose)
     vcf <- .readVcf(vcf.file=vcf, vcf.style=vcf.style,
                     bed=GenomicRanges::reduce(bed), verbose=verbose)
   } else {
@@ -204,7 +207,8 @@ generateVcfReport <- function (bam,
   
   vcf.report <- .getBaseFreqReport(bam.processed=bam, vcf=vcf, verbose=verbose)
   
-  vcf.report <- vcf.report[,grep("nam|ran|ref|alt|fep",colnames(vcf.report), ignore.case=TRUE), with=FALSE]
+  vcf.report <- vcf.report[, grep("nam|ran|ref|alt|fep", colnames(vcf.report),
+                                  ignore.case=TRUE), with=FALSE]
   
   if (is.null(report.file))
     return(vcf.report)
@@ -212,9 +216,3 @@ generateVcfReport <- function (bam,
     .writeReport(report=vcf.report, report.file=report.file, gzip=gzip,
                  verbose=verbose)
 }
-
-
-#|[c]{}^
-
-# ##############################################################################
-

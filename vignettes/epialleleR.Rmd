@@ -205,7 +205,7 @@ related files are:
 | capture.bam | BAM | a subset of reads |
 | capture.bed | BED | genomic&nbsp;coordinates&nbsp;of&nbsp;capture&nbsp;target&nbsp;regions |
 | capture.vcf.gz | VCF | a relevant subset of sequence variations |
-| capture.vcf.gz.tbi | tabix | tabix file for the amplicon.vcf.gz |
+| capture.vcf.gz.tbi | tabix | tabix file for the capture.vcf.gz |
 
 *****
 
@@ -321,8 +321,10 @@ samples. Note that within-the-context eCDF(0.5) values are very close to the
 expected 1-VEF values for the corresponding control DNA samples: 
 
  * non-methylated DNA &#8212; expected VEF = 0, observed 1-eCDF(0.5) &#8776; 0
- * 1:9 mix of methylated and non-methylated DNA &#8212; expected VEF = 0.1, observed 1-eCDF(0.5) &#8776; 0.1
- * and fully methylated DNA &#8212; expected VEF = 1, observed 1-eCDF(0.5) &#8776; 1
+ * 1:9 mix of methylated and non-methylated DNA &#8212; expected VEF = 0.1,
+ observed 1-eCDF(0.5) &#8776; 0.1
+ * and fully methylated DNA &#8212; expected VEF = 1,
+ observed 1-eCDF(0.5) &#8776; 1
 
 ```{r, fig.width=10, fig.height=6, out.width="100%", out.height="100%"}
 # First, let's visualise eCDFs for within- and out-of-context beta values
@@ -349,7 +351,8 @@ for (x in 1:length(amplicon.ecdfs)) {
   
   # plotting eCDF for within-the-context per-read beta values (in red)
   plot(amplicon.ecdfs[[x]]$context, col="red", verticals=TRUE, do.points=FALSE,
-       xlim=c(0,1), xlab="per-read beta value", ylab="cumulative density", main=main)
+       xlim=c(0,1), xlab="per-read beta value", ylab="cumulative density",
+       main=main)
   
   # adding eCDF for out-of-context per-read beta values (in blue)
   plot(amplicon.ecdfs[[x]]$out.of.context, add=TRUE, col="blue",
@@ -362,7 +365,8 @@ for (x in 1:length(amplicon.ecdfs)) {
 # methylated and non-methylated DNA, and fully methylated DNA
 
 # our files
-bam.files <- c("amplicon000meth.bam", "amplicon010meth.bam", "amplicon100meth.bam")
+bam.files <- c("amplicon000meth.bam", "amplicon010meth.bam",
+               "amplicon100meth.bam")
 
 # let's plot all of them
 par(mfrow=c(1,length(bam.files)))
@@ -379,7 +383,8 @@ for (f in bam.files) {
   
   # plotting eCDF for within-the-context per-read beta values (in red)
   plot(amplicon.ecdfs[[1]]$context, col="red", verticals=TRUE, do.points=FALSE,
-       xlim=c(0,1), xlab="per-read beta value", ylab="cumulative density", main=f)
+       xlim=c(0,1), xlab="per-read beta value", ylab="cumulative density",
+       main=f)
   
    # adding eCDF for out-of-context per-read beta values (in blue)
   plot(amplicon.ecdfs[[1]]$out.of.context, add=TRUE, col="blue",

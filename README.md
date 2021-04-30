@@ -1,12 +1,8 @@
-# Fast, epiallele-aware methylation reporter  <img align="right" src="logo.svg">
+# Fast, epiallele-aware methylation reporter  <img align="right" src="inst/epialleleR_logo.svg">
 
 [![](https://github.com/BBCG/epialleleR/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/BBCG/epialleleR/actions)
 [![](https://codecov.io/gh/BBCG/epialleleR/branch/master/graph/badge.svg)](https://codecov.io/gh/BBCG/epialleleR)
 
-<!-- <br><br><br> -->
-
-<!-- ![epialleleR](logo.svg) &nbsp;
-========== -->
 
 ## Introduction
 
@@ -83,7 +79,8 @@ Very brief synopsis:
 library(epialleleR)
 
 # external files
-amplicon.bam <- system.file("extdata", "amplicon010meth.bam", package="epialleleR")
+amplicon.bam <- system.file("extdata", "amplicon010meth.bam",
+                            package="epialleleR")
 amplicon.bed <- system.file("extdata", "amplicon.bed", package="epialleleR")
 amplicon.vcf <- system.file("extdata", "amplicon.vcf.gz", package="epialleleR")
 
@@ -94,7 +91,8 @@ bam.data <- preprocessBam(amplicon.bam)
 cg.vef.report <- generateCytosineReport(bam.data)
 
 # BED-guided VEF report for genomic ranges
-bed.report <- generateBedReport(bam=amplicon.bam, bed=amplicon.bed, bed.type="capture")
+bed.report <- generateBedReport(bam=amplicon.bam, bed=amplicon.bed,
+                                bed.type="capture")
 
 # VCF report
 vcf.report <- generateVcfReport(bam=amplicon.bam, bed=amplicon.bed,

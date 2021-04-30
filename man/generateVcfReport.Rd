@@ -177,10 +177,12 @@ caused by misalignments. These will be fixed in the future.
 \examples{
   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
   capture.bed <- system.file("extdata", "capture.bed", package="epialleleR")
-  capture.vcf <- system.file("extdata", "capture.vcf.gz", package="epialleleR")
+  capture.vcf <- system.file("extdata", "capture.vcf.gz",
+                             package="epialleleR")
   
   # VCF report
-  vcf.report <- generateVcfReport(bam=capture.bam, bed=capture.bed, vcf=capture.vcf)
+  vcf.report <- generateVcfReport(bam=capture.bam, bed=capture.bed,
+                                  vcf=capture.vcf)
 }
 \seealso{
 \code{\link{preprocessBam}} for preloading BAM data,

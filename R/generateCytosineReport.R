@@ -193,8 +193,3 @@ generateCytosineReport <- function (bam,
     .writeReport(report=cx.report, report.file=report.file, gzip=gzip,
                  verbose=verbose)
 }
-
-
-#|[c]{}^
-
-# ##############################################################################

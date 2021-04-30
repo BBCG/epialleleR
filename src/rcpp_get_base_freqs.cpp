@@ -99,39 +99,3 @@ microbenchmark::microbenchmark(rcpp_get_base_freqs(read_rname, read_strand, read
 // Rcpp::sourceCpp("rcpp_get_base_freqs.cpp")
 
 // #############################################################################
-// Previous code with the bug when short read is present between the long ones
-// Rcpp::NumericMatrix rcpp_get_base_freqs(std::vector<int> read_rname,          // factor for read chr
-//                                         std::vector<int> read_strand,         // factor for read strand
-//                                         std::vector<int> read_start,          // start pos of reads
-//                                         std::vector<int> read_end,            // end pos of reads
-//                                         std::vector<std::string> read_seq,    // seq of reads
-//                                         std::vector<bool> pass,               // read passes the threshold?
-//                                         std::vector<int> vcf_chr,             // factor for VCF entries chr
-//                                         std::vector<int> vcf_pos)             // pos of VCF entries
-// {
-//   Rcpp::NumericMatrix res(vcf_pos.size(),32);
-//   
-//   int cur_read=0;
-//   for (unsigned int i=0; i<vcf_pos.size(); i++) {
-//     for (unsigned int x=cur_read; x<read_start.size(); x++) {
-//       // checking for the interrupt
-//       if ((x & 1048575) == 0) Rcpp::checkUserInterrupt();
-//       
-//       if (read_rname[x]<vcf_chr[i] || read_end[x]<vcf_pos[i]) {         // skip reads if VCF is ahead
-//         cur_read=x;
-//         continue;
-//       }
-//       if (read_rname[x]>vcf_chr[i] || read_start[x]>vcf_pos[i])         // start over from cur_read for new VCF
-//         break;
-//       if (read_rname[x]==vcf_chr[i] && read_start[x]<=vcf_pos[i] &&
-//           read_end[x]>=vcf_pos[i]) {                                    // match found
-//         int idx = read_seq[x][vcf_pos[i]-read_start[x]] & 7;
-//         if (read_strand[x]==2) idx |= 8;
-//         if (pass[x]) idx |= 16;
-//         res(i,idx)++;
-//       }
-//     }
-//   }
-//   
-//   return res;
-// }

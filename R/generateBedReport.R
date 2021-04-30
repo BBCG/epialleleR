@@ -151,18 +151,24 @@
 #' the seqlevels style.
 #' @examples
 #'   # amplicon data
-#'   amplicon.bam    <- system.file("extdata", "amplicon010meth.bam", package="epialleleR")
-#'   amplicon.bed    <- system.file("extdata", "amplicon.bed", package="epialleleR")
-#'   amplicon.report <- generateAmpliconReport(bam=amplicon.bam, bed=amplicon.bed)
+#'   amplicon.bam    <- system.file("extdata", "amplicon010meth.bam",
+#'                                  package="epialleleR")
+#'   amplicon.bed    <- system.file("extdata", "amplicon.bed",
+#'                                  package="epialleleR")
+#'   amplicon.report <- generateAmpliconReport(bam=amplicon.bam,
+#'                                             bed=amplicon.bed)
 #'   
 #'   # capture NGS
-#'   capture.bam    <- system.file("extdata", "capture.bam", package="epialleleR")
-#'   capture.bed    <- system.file("extdata", "capture.bed", package="epialleleR")
+#'   capture.bam    <- system.file("extdata", "capture.bam",
+#'                                 package="epialleleR")
+#'   capture.bed    <- system.file("extdata", "capture.bed",
+#'                                 package="epialleleR")
 #'   capture.report <- generateCaptureReport(bam=capture.bam, bed=capture.bed)
 #'   
 #'   # generateAmpliconReport and generateCaptureReport are just aliases
 #'   # of the generateBedReport
-#'   bed.report <- generateBedReport(bam=capture.bam, bed=capture.bed, bed.type="capture")
+#'   bed.report <- generateBedReport(bam=capture.bam, bed=capture.bed,
+#'                                   bed.type="capture")
 #'   identical(capture.report, bed.report)
 #' @rdname generateBedReport
 #' @export
@@ -257,8 +263,3 @@ generateBedReport <- function (bam,
     .writeReport(report=bed.report, report.file=report.file, gzip=gzip,
                  verbose=verbose)
 }
-
-
-#|[c]{}^
-
-# ##############################################################################
