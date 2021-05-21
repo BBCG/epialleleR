@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.99.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -63,12 +63,12 @@
 
       
 
-      </header><script src="epialleleR_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><script src="epialleleR_files/header-attrs-2.8/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>The epialleleR User’s Guide</h1>
             
-            <h4 data-toc-skip class="date">30 April, 2021</h4>
+            <h4 data-toc-skip class="date">21 May, 2021</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BBCG/epialleleR/blob/master/vignettes/epialleleR.Rmd" class="external-link"><code>vignettes/epialleleR.Rmd</code></a></small>
       <div class="hidden name"><code>epialleleR.Rmd</code></div>
@@ -214,10 +214,10 @@
 
 <span class="va">capture.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="va">bam.data</span>    <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preprocessBam.html">preprocessBam</a></span><span class="op">(</span><span class="va">capture.bam</span><span class="op">)</span>
-<span class="co">#&gt; Reading BAM file [1.051s]</span>
+<span class="co">#&gt; Reading BAM file [1.065s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
-<span class="co">#&gt;   Transforming sequences [0.032s]</span>
-<span class="co">#&gt;   Merging pairs [0.026s]</span></code></pre></div>
+<span class="co">#&gt;   Transforming sequences [0.026s]</span>
+<span class="co">#&gt;   Merging pairs [0.021s]</span></code></pre></div>
 </div>
 <div id="making-cytosine-reports" class="section level2">
 <h2 class="hasAnchor">
@@ -230,7 +230,7 @@
 <span class="va">cg.vef.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span><span class="op">)</span>
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq' and 'skip.duplicates' will have no effect.</span>
 <span class="co">#&gt; Thresholding reads [0.003s]</span>
-<span class="co">#&gt; Preparing cytosine report [0.024s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.021s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cg.vef.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;    rname strand      pos context meth unmeth triad</span>
 <span class="co">#&gt; 1: chr17      + 61864475      CG    7      9   NNN</span>
@@ -243,7 +243,7 @@
 <span class="co"># CpG cytosine report</span>
 <span class="va">cg.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq' and 'skip.duplicates' will have no effect.</span>
-<span class="co">#&gt; Preparing cytosine report [0.024s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.022s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cg.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;    rname strand      pos context meth unmeth triad</span>
 <span class="co">#&gt; 1: chr17      + 61864475      CG    8      8   NNN</span>
@@ -279,13 +279,13 @@
   bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.047s]</span>
-<span class="co">#&gt; Reading BAM file [0.979s]</span>
+<span class="co">#&gt; Reading BED file [0.048s]</span>
+<span class="co">#&gt; Reading BAM file [0.965s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
-<span class="co">#&gt;   Transforming sequences [0.007s]</span>
+<span class="co">#&gt;   Transforming sequences [0.006s]</span>
 <span class="co">#&gt;   Merging pairs [0.007s]</span>
 <span class="co">#&gt; Thresholding reads [0.000s]</span>
-<span class="co">#&gt; Preparing amplicon report [0.026s]</span>
+<span class="co">#&gt; Preparing amplicon report [0.027s]</span>
 <span class="va">amplicon.report</span>
 <span class="co">#&gt;    seqnames    start      end width strand amplicon nreads+ nreads-        VEF</span>
 <span class="co">#&gt; 1:    chr17 43125624 43126026   403      * CpG00-13       0     156 0.08333333</span>
@@ -300,11 +300,11 @@
   bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.051s]</span>
-<span class="co">#&gt; Reading BAM file [0.202s]</span>
+<span class="co">#&gt; Reading BED file [0.044s]</span>
+<span class="co">#&gt; Reading BAM file [0.178s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
-<span class="co">#&gt;   Transforming sequences [0.019s]</span>
-<span class="co">#&gt;   Merging pairs [0.013s]</span>
+<span class="co">#&gt;   Transforming sequences [0.015s]</span>
+<span class="co">#&gt;   Merging pairs [0.012s]</span>
 <span class="co">#&gt; Thresholding reads [0.002s]</span>
 <span class="co">#&gt; Preparing capture report [0.040s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">capture.report</span><span class="op">)</span>
@@ -323,12 +323,12 @@
   bed.type<span class="op">=</span><span class="st">"capture"</span>
 <span class="op">)</span>
 <span class="co">#&gt; Reading BED file [0.016s]</span>
-<span class="co">#&gt; Reading BAM file [0.197s]</span>
+<span class="co">#&gt; Reading BAM file [0.205s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
 <span class="co">#&gt;   Transforming sequences [0.017s]</span>
-<span class="co">#&gt;   Merging pairs [0.022s]</span>
+<span class="co">#&gt;   Merging pairs [0.018s]</span>
 <span class="co">#&gt; Thresholding reads [0.002s]</span>
-<span class="co">#&gt; Preparing capture report [0.019s]</span>
+<span class="co">#&gt; Preparing capture report [0.017s]</span>
 <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">capture.report</span>, <span class="va">bed.report</span><span class="op">)</span>
 <span class="co">#&gt; [1] TRUE</span></code></pre></div>
 </div>
@@ -354,12 +354,12 @@
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed.rows<span class="op">=</span><span class="cn">NULL</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.017s]</span>
-<span class="co">#&gt; Reading BAM file [0.152s]</span>
+<span class="co">#&gt; Reading BED file [0.015s]</span>
+<span class="co">#&gt; Reading BAM file [0.149s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
-<span class="co">#&gt;   Transforming sequences [0.006s]</span>
-<span class="co">#&gt;   Merging pairs [0.006s]</span>
-<span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.014s]</span>
+<span class="co">#&gt;   Transforming sequences [0.005s]</span>
+<span class="co">#&gt;   Merging pairs [0.005s]</span>
+<span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.013s]</span>
 
 <span class="co"># there are 5 items in amplicon.ecdfs, let's plot all of them</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
@@ -432,14 +432,14 @@
   <span class="co"># to convert them internally</span>
   vcf.style<span class="op">=</span><span class="st">"NCBI"</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.019s]</span>
-<span class="co">#&gt; Reading VCF file [1.203s]</span>
-<span class="co">#&gt; Reading BAM file [0.182s]</span>
+<span class="co">#&gt; Reading BED file [0.016s]</span>
+<span class="co">#&gt; Reading VCF file [1.132s]</span>
+<span class="co">#&gt; Reading BAM file [0.166s]</span>
 <span class="co">#&gt; Preprocessing BAM data:</span>
-<span class="co">#&gt;   Transforming sequences [0.007s]</span>
-<span class="co">#&gt;   Merging pairs [0.009s]</span>
+<span class="co">#&gt;   Transforming sequences [0.010s]</span>
+<span class="co">#&gt;   Merging pairs [0.006s]</span>
 <span class="co">#&gt; Thresholding reads [0.001s]</span>
-<span class="co">#&gt; Extracting base frequences [0.108s]</span>
+<span class="co">#&gt; Extracting base frequences [0.095s]</span>
 
 <span class="co"># NA values are shown for the C-&gt;T variants on the "+" and G-&gt;A on the "-"</span>
 <span class="co"># strands, because bisulfite conversion makes their counting impossible</span>
@@ -526,40 +526,40 @@
 <span class="co">#&gt; [1] stats4    parallel  stats     graphics  grDevices utils     datasets  methods   base     </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; other attached packages:</span>
-<span class="co">#&gt; [1] GenomeInfoDb_1.27.11 IRanges_2.25.10      S4Vectors_0.29.17    BiocGenerics_0.37.4 </span>
-<span class="co">#&gt; [5] epialleleR_0.99.3   </span>
+<span class="co">#&gt; [1] GenomeInfoDb_1.28.0 IRanges_2.26.0      S4Vectors_0.30.0    BiocGenerics_0.38.0</span>
+<span class="co">#&gt; [5] epialleleR_1.1.0   </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; loaded via a namespace (and not attached):</span>
 <span class="co">#&gt;  [1] bitops_1.0-7                matrixStats_0.58.0          fs_1.5.0                   </span>
 <span class="co">#&gt;  [4] bit64_4.0.5                 filelock_1.0.2              progress_1.2.2             </span>
 <span class="co">#&gt;  [7] httr_1.4.2                  rprojroot_2.0.2             tools_4.1.0                </span>
-<span class="co">#&gt; [10] bslib_0.2.4                 utf8_1.2.1                  R6_2.5.0                   </span>
+<span class="co">#&gt; [10] bslib_0.2.5.1               utf8_1.2.1                  R6_2.5.0                   </span>
 <span class="co">#&gt; [13] DBI_1.1.1                   tidyselect_1.1.1            prettyunits_1.1.1          </span>
-<span class="co">#&gt; [16] bit_4.0.4                   curl_4.3                    compiler_4.1.0             </span>
-<span class="co">#&gt; [19] textshaping_0.3.3           Biobase_2.51.0              desc_1.3.0                 </span>
-<span class="co">#&gt; [22] DelayedArray_0.17.11        rtracklayer_1.51.5          sass_0.3.1                 </span>
-<span class="co">#&gt; [25] rappdirs_0.3.3              pkgdown_1.6.1.9001          systemfonts_1.0.1          </span>
-<span class="co">#&gt; [28] stringr_1.4.0               digest_0.6.27               Rsamtools_2.7.2            </span>
-<span class="co">#&gt; [31] rmarkdown_2.7               XVector_0.31.1              pkgconfig_2.0.3            </span>
-<span class="co">#&gt; [34] htmltools_0.5.1.1           MatrixGenerics_1.3.1        highr_0.9                  </span>
-<span class="co">#&gt; [37] dbplyr_2.1.1                fastmap_1.1.0               BSgenome_1.59.4            </span>
-<span class="co">#&gt; [40] rlang_0.4.10                RSQLite_2.2.7               jquerylib_0.1.4            </span>
-<span class="co">#&gt; [43] BiocIO_1.1.2                generics_0.1.0              jsonlite_1.7.2             </span>
-<span class="co">#&gt; [46] BiocParallel_1.25.5         dplyr_1.0.5                 VariantAnnotation_1.37.1   </span>
-<span class="co">#&gt; [49] RCurl_1.98-1.3              magrittr_2.0.1              GenomeInfoDbData_1.2.4     </span>
-<span class="co">#&gt; [52] Matrix_1.3-2                Rcpp_1.0.6                  fansi_0.4.2                </span>
-<span class="co">#&gt; [55] lifecycle_1.0.0             stringi_1.5.3               yaml_2.2.1                 </span>
-<span class="co">#&gt; [58] SummarizedExperiment_1.21.3 zlibbioc_1.37.0             BiocFileCache_1.99.6       </span>
+<span class="co">#&gt; [16] bit_4.0.4                   curl_4.3.1                  compiler_4.1.0             </span>
+<span class="co">#&gt; [19] textshaping_0.3.4           Biobase_2.52.0              desc_1.3.0                 </span>
+<span class="co">#&gt; [22] DelayedArray_0.18.0         rtracklayer_1.52.0          sass_0.4.0                 </span>
+<span class="co">#&gt; [25] rappdirs_0.3.3              pkgdown_1.6.1.9001          systemfonts_1.0.2          </span>
+<span class="co">#&gt; [28] stringr_1.4.0               digest_0.6.27               Rsamtools_2.8.0            </span>
+<span class="co">#&gt; [31] rmarkdown_2.8               XVector_0.32.0              pkgconfig_2.0.3            </span>
+<span class="co">#&gt; [34] htmltools_0.5.1.1           MatrixGenerics_1.4.0        dbplyr_2.1.1               </span>
+<span class="co">#&gt; [37] fastmap_1.1.0               BSgenome_1.60.0             highr_0.9                  </span>
+<span class="co">#&gt; [40] rlang_0.4.11                RSQLite_2.2.7               jquerylib_0.1.4            </span>
+<span class="co">#&gt; [43] BiocIO_1.2.0                generics_0.1.0              jsonlite_1.7.2             </span>
+<span class="co">#&gt; [46] BiocParallel_1.26.0         dplyr_1.0.6                 VariantAnnotation_1.38.0   </span>
+<span class="co">#&gt; [49] RCurl_1.98-1.3              magrittr_2.0.1              GenomeInfoDbData_1.2.6     </span>
+<span class="co">#&gt; [52] Matrix_1.3-3                Rcpp_1.0.6                  fansi_0.4.2                </span>
+<span class="co">#&gt; [55] lifecycle_1.0.0             stringi_1.6.2               yaml_2.2.1                 </span>
+<span class="co">#&gt; [58] SummarizedExperiment_1.22.0 zlibbioc_1.38.0             BiocFileCache_2.0.0        </span>
 <span class="co">#&gt; [61] grid_4.1.0                  blob_1.2.1                  crayon_1.4.1               </span>
-<span class="co">#&gt; [64] lattice_0.20-41             Biostrings_2.59.2           GenomicFeatures_1.43.8     </span>
-<span class="co">#&gt; [67] hms_1.0.0                   KEGGREST_1.31.1             knitr_1.33                 </span>
-<span class="co">#&gt; [70] pillar_1.6.0                GenomicRanges_1.43.4        rjson_0.2.20               </span>
-<span class="co">#&gt; [73] biomaRt_2.47.8              XML_3.99-0.6                glue_1.4.2                 </span>
+<span class="co">#&gt; [64] lattice_0.20-44             Biostrings_2.60.0           GenomicFeatures_1.44.0     </span>
+<span class="co">#&gt; [67] hms_1.1.0                   KEGGREST_1.32.0             knitr_1.33                 </span>
+<span class="co">#&gt; [70] pillar_1.6.1                GenomicRanges_1.44.0        rjson_0.2.20               </span>
+<span class="co">#&gt; [73] biomaRt_2.48.0              XML_3.99-0.6                glue_1.4.2                 </span>
 <span class="co">#&gt; [76] evaluate_0.14               data.table_1.14.0           png_0.1-7                  </span>
 <span class="co">#&gt; [79] vctrs_0.3.8                 purrr_0.3.4                 assertthat_0.2.1           </span>
-<span class="co">#&gt; [82] cachem_1.0.4                xfun_0.22                   restfulr_0.0.13            </span>
-<span class="co">#&gt; [85] ragg_1.1.2                  tibble_3.1.1                GenomicAlignments_1.27.2   </span>
-<span class="co">#&gt; [88] AnnotationDbi_1.53.1        memoise_2.0.0               ellipsis_0.3.2</span></code></pre></div>
+<span class="co">#&gt; [82] cachem_1.0.5                xfun_0.23                   restfulr_0.0.13            </span>
+<span class="co">#&gt; [85] ragg_1.1.2                  tibble_3.1.2                GenomicAlignments_1.28.0   </span>
+<span class="co">#&gt; [88] AnnotationDbi_1.54.0        memoise_2.0.0               ellipsis_0.3.2</span></code></pre></div>
 <hr>
 </div>
 </div>
