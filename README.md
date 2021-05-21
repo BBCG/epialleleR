@@ -2,7 +2,7 @@
 
 [![](https://github.com/BBCG/epialleleR/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/BBCG/epialleleR/actions)
 [![](https://codecov.io/gh/BBCG/epialleleR/branch/master/graph/badge.svg)](https://codecov.io/gh/BBCG/epialleleR)
-
+[![](https://bioconductor.org/shields/years-in-bioc/epialleleR.svg)](https://bioconductor.org/packages/release/bioc/html/epialleleR.html)
 
 ## Introduction
 
@@ -44,13 +44,10 @@ at particular genomic positions (SNPs).
 
 ## Installation
 
-### install via Bioconductor (NOT YET AVAILABLE)
+### install via Bioconductor
 ```r
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-
-# The following initializes usage of Bioc devel
-BiocManager::install(version='devel')
 
 BiocManager::install("epialleleR")
 ```
@@ -106,7 +103,8 @@ The experimental data analysed using the package has not been published yet.
 The citation information will be updated in the nearest future.
 
 ### *`epialleleR`* at Bioconductor
-On its way now.
+[Bioconductor - epialleleR (release)](https://bioconductor.org/packages/release/bioc/html/epialleleR.html)
+[Bioconductor - epialleleR (development version)](https://bioconductor.org/packages/devel/bioc/html/epialleleR.html)
 
 -------
 

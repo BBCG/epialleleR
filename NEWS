@@ -43,3 +43,6 @@ Changes in version 0.99.0 (2021-04-09)
 + fully documented methods
 + fully covered with tests and examples
 + comprehensive vignettes
+
+Changes in version 1.1.0 (2021-05-21)
++ released at bioconductor
