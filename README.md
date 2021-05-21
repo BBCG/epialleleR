@@ -103,8 +103,8 @@ The experimental data analysed using the package has not been published yet.
 The citation information will be updated in the nearest future.
 
 ### *`epialleleR`* at Bioconductor
-[Bioconductor - epialleleR (release)](https://bioconductor.org/packages/release/bioc/html/epialleleR.html)
-[Bioconductor - epialleleR (development version)](https://bioconductor.org/packages/devel/bioc/html/epialleleR.html)
+[release](https://bioconductor.org/packages/release/bioc/html/epialleleR.html), 
+[development version](https://bioconductor.org/packages/devel/bioc/html/epialleleR.html)
 
 -------
 
