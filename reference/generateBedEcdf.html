@@ -270,16 +270,16 @@ usage and sample data.</p></div>
 <span class='r-in'>  <span class='va'>amplicon.ecdfs</span> <span class='op'>&lt;-</span> <span class='fu'>generateBedEcdf</span><span class='op'>(</span>bam<span class='op'>=</span><span class='va'>amplicon.bam</span>, bed<span class='op'>=</span><span class='va'>amplicon.bed</span>,</span>
 <span class='r-in'>                                    bed.rows<span class='op'>=</span><span class='cn'>NULL</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BED file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.072s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.080s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BAM file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [1.124s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [1.178s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Preprocessing BAM data:</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>   Transforming sequences</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.020s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>   Merging pairs</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.012s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.013s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Computing ECDFs for within- and out-of-context per-read beta values</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.046s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.044s]</span>
 <span class='r-in'>  </span>
 <span class='r-in'>  <span class='co'># there are 5 items in amplicon.ecdfs, let's plot all of them</span></span>
 <span class='r-in'>  <span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span>mfrow<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>amplicon.ecdfs</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span></span>
