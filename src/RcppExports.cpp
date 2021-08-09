@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // rcpp_apply_cigar
 std::vector<std::string> rcpp_apply_cigar(std::vector<std::string> cigar, std::vector<std::string> query, char gap);
 RcppExport SEXP _epialleleR_rcpp_apply_cigar(SEXP cigarSEXP, SEXP querySEXP, SEXP gapSEXP) {
@@ -126,6 +131,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_read_bam
+int rcpp_read_bam(std::string fn);
+RcppExport SEXP _epialleleR_rcpp_read_bam(SEXP fnSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type fn(fnSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_read_bam(fn));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_threshold_reads
 std::vector<bool> rcpp_threshold_reads(std::vector<std::string> xm, std::string ctx_meth, std::string ctx_unmeth, std::string ooctx_meth, std::string ooctx_unmeth, unsigned int min_n_ctx, double min_ctx_meth_frac, double max_ooctx_meth_frac);
 RcppExport SEXP _epialleleR_rcpp_threshold_reads(SEXP xmSEXP, SEXP ctx_methSEXP, SEXP ctx_unmethSEXP, SEXP ooctx_methSEXP, SEXP ooctx_unmethSEXP, SEXP min_n_ctxSEXP, SEXP min_ctx_meth_fracSEXP, SEXP max_ooctx_meth_fracSEXP) {
@@ -154,6 +170,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_epialleleR_rcpp_match_amplicon", (DL_FUNC) &_epialleleR_rcpp_match_amplicon, 7},
     {"_epialleleR_rcpp_match_capture", (DL_FUNC) &_epialleleR_rcpp_match_capture, 7},
     {"_epialleleR_rcpp_merge_ends", (DL_FUNC) &_epialleleR_rcpp_merge_ends, 6},
+    {"_epialleleR_rcpp_read_bam", (DL_FUNC) &_epialleleR_rcpp_read_bam, 1},
     {"_epialleleR_rcpp_threshold_reads", (DL_FUNC) &_epialleleR_rcpp_threshold_reads, 8},
     {NULL, NULL, 0}
 };
