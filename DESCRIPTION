@@ -17,6 +17,7 @@ Description: Epialleles are specific DNA methylation patterns that are
   of the association between epiallele methylation status and base frequencies
   at particular genomic positions (SNPs).
 CommentSystemRequirements: C++17
+SystemRequirements: GNU make
 NeedsCompilation: yes
 Depends:
   R (>= 4.1)
