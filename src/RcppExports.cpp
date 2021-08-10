@@ -132,13 +132,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_read_bam
-int rcpp_read_bam(std::string fn);
-RcppExport SEXP _epialleleR_rcpp_read_bam(SEXP fnSEXP) {
+Rcpp::List rcpp_read_bam(std::string fn, int min_mapq, int min_baseq, bool skip_duplicates);
+RcppExport SEXP _epialleleR_rcpp_read_bam(SEXP fnSEXP, SEXP min_mapqSEXP, SEXP min_baseqSEXP, SEXP skip_duplicatesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type fn(fnSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_read_bam(fn));
+    Rcpp::traits::input_parameter< int >::type min_mapq(min_mapqSEXP);
+    Rcpp::traits::input_parameter< int >::type min_baseq(min_baseqSEXP);
+    Rcpp::traits::input_parameter< bool >::type skip_duplicates(skip_duplicatesSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_read_bam(fn, min_mapq, min_baseq, skip_duplicates));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -170,7 +173,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_epialleleR_rcpp_match_amplicon", (DL_FUNC) &_epialleleR_rcpp_match_amplicon, 7},
     {"_epialleleR_rcpp_match_capture", (DL_FUNC) &_epialleleR_rcpp_match_capture, 7},
     {"_epialleleR_rcpp_merge_ends", (DL_FUNC) &_epialleleR_rcpp_merge_ends, 6},
-    {"_epialleleR_rcpp_read_bam", (DL_FUNC) &_epialleleR_rcpp_read_bam, 1},
+    {"_epialleleR_rcpp_read_bam", (DL_FUNC) &_epialleleR_rcpp_read_bam, 4},
     {"_epialleleR_rcpp_threshold_reads", (DL_FUNC) &_epialleleR_rcpp_threshold_reads, 8},
     {NULL, NULL, 0}
 };
