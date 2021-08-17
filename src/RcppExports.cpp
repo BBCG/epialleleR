@@ -132,25 +132,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_parse_xm
-std::vector<int> rcpp_parse_xm(std::vector<std::string> qname, std::vector<std::string> xm);
-RcppExport SEXP _epialleleR_rcpp_parse_xm(SEXP qnameSEXP, SEXP xmSEXP) {
+std::vector<int> rcpp_parse_xm(Rcpp::DataFrame& df);
+RcppExport SEXP _epialleleR_rcpp_parse_xm(SEXP dfSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::vector<std::string> >::type qname(qnameSEXP);
-    Rcpp::traits::input_parameter< std::vector<std::string> >::type xm(xmSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_parse_xm(qname, xm));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpp_posttrim_xm
-void rcpp_posttrim_xm(Rcpp::DataFrame& df);
-RcppExport SEXP _epialleleR_rcpp_posttrim_xm(SEXP dfSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
-    rcpp_posttrim_xm(df);
-    return R_NilValue;
+    rcpp_result_gen = Rcpp::wrap(rcpp_parse_xm(df));
+    return rcpp_result_gen;
 END_RCPP
 }
 // rcpp_read_bam
@@ -165,6 +154,16 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< bool >::type skip_duplicates(skip_duplicatesSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_read_bam(fn, min_mapq, min_baseq, skip_duplicates));
     return rcpp_result_gen;
+END_RCPP
+}
+// rcpp_posttrim_read2
+void rcpp_posttrim_read2(Rcpp::DataFrame& df);
+RcppExport SEXP _epialleleR_rcpp_posttrim_read2(SEXP dfSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
+    rcpp_posttrim_read2(df);
+    return R_NilValue;
 END_RCPP
 }
 // rcpp_threshold_reads
@@ -195,9 +194,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_epialleleR_rcpp_match_amplicon", (DL_FUNC) &_epialleleR_rcpp_match_amplicon, 7},
     {"_epialleleR_rcpp_match_capture", (DL_FUNC) &_epialleleR_rcpp_match_capture, 7},
     {"_epialleleR_rcpp_merge_ends", (DL_FUNC) &_epialleleR_rcpp_merge_ends, 6},
-    {"_epialleleR_rcpp_parse_xm", (DL_FUNC) &_epialleleR_rcpp_parse_xm, 2},
-    {"_epialleleR_rcpp_posttrim_xm", (DL_FUNC) &_epialleleR_rcpp_posttrim_xm, 1},
+    {"_epialleleR_rcpp_parse_xm", (DL_FUNC) &_epialleleR_rcpp_parse_xm, 1},
     {"_epialleleR_rcpp_read_bam", (DL_FUNC) &_epialleleR_rcpp_read_bam, 4},
+    {"_epialleleR_rcpp_posttrim_read2", (DL_FUNC) &_epialleleR_rcpp_posttrim_read2, 1},
     {"_epialleleR_rcpp_threshold_reads", (DL_FUNC) &_epialleleR_rcpp_threshold_reads, 8},
     {NULL, NULL, 0}
 };

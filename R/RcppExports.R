@@ -33,16 +33,16 @@ rcpp_merge_ends <- function(read1_pos, read1_seq, read2_pos, read2_seq, isize, g
     .Call(`_epialleleR_rcpp_merge_ends`, read1_pos, read1_seq, read2_pos, read2_seq, isize, gap)
 }
 
-rcpp_parse_xm <- function(qname, xm) {
-    .Call(`_epialleleR_rcpp_parse_xm`, qname, xm)
-}
-
-rcpp_posttrim_xm <- function(df) {
-    invisible(.Call(`_epialleleR_rcpp_posttrim_xm`, df))
+rcpp_parse_xm <- function(df) {
+    .Call(`_epialleleR_rcpp_parse_xm`, df)
 }
 
 rcpp_read_bam <- function(fn, min_mapq, min_baseq, skip_duplicates) {
     .Call(`_epialleleR_rcpp_read_bam`, fn, min_mapq, min_baseq, skip_duplicates)
+}
+
+rcpp_posttrim_read2 <- function(df) {
+    invisible(.Call(`_epialleleR_rcpp_posttrim_read2`, df))
 }
 
 rcpp_threshold_reads <- function(xm, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac) {

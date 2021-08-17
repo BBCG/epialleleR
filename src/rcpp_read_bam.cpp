@@ -176,21 +176,22 @@ void rcpp_posttrim_read2(Rcpp::DataFrame &df) {
   Rcpp::CharacterVector qname = df["qname"];
   Rcpp::CharacterVector seq = df["seq"];
   Rcpp::CharacterVector xm = df["XM"];
+  int dpos, ndel;
   
   // row by row
   for (size_t x=1; x<flag.size(); x++) {
     if ((x & 1048575) == 0) Rcpp::checkUserInterrupt();                         // checking for the interrupt
     
     // trim rightmost READ2
-    if ((qname[x]==qname[x-1]) &&                                    // if this is a rightmost read (df is presorted on QNAME, POS)
-        (flag[x] & BAM_FPROPER_PAIR) &&                              // and this read is a proper pair
-        (flag[x] & BAM_FREAD2)) {                                    // and it's a READ2
-      int dpos = start[x] - start[x-1];                    // get distance between start positions of mates
-      int ndel = xm[x-1].size() - dpos;                    // number of chars to delete from the left side of READ2
-      if ((dpos > 0) && (ndel > 0)) {              // ??? if it's a rightmost read && distance between mates is less than refspaced read length
-        seq[x] = Rcpp::as<std::string>(seq[x]).erase(0, ndel);                                             // trim leftmost Read2 until rightmost Read1
+    if ((qname[x]==qname[x-1]) &&                                               // if this is a same template (df is presorted on QNAME, POS)
+        (flag[x] & BAM_FPROPER_PAIR) &&                                         // and this read is a proper pair
+        (flag[x] & BAM_FREAD2)) {                                               // and it's a READ2
+      dpos = start[x] - start[x-1];                                             // get distance between start positions of mates
+      ndel = xm[x-1].size() - dpos;                                             // number of chars to delete from the left side of READ2
+      if ((dpos > 0) && (ndel > 0)) {                                           // if it's a rightmost read && distance between mates is less than refspaced read length
+        seq[x] = Rcpp::as<std::string>(seq[x]).erase(0, ndel);                  // trim rightmost READ2 until the end of leftmost Read1
         xm[x] = Rcpp::as<std::string>(xm[x]).erase(0, ndel);
-        start[x] = start[x-1] + xm[x-1].size();
+        start[x] = start[x-1] + xm[x-1].size();                                 // adjust new POS
       }
     }
   }
