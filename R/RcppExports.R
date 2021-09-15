@@ -37,6 +37,10 @@ rcpp_parse_xm <- function(df) {
     .Call(`_epialleleR_rcpp_parse_xm`, df)
 }
 
+rcpp_read_bam_pairs <- function(fn, min_mapq, min_baseq, skip_duplicates) {
+    .Call(`_epialleleR_rcpp_read_bam_pairs`, fn, min_mapq, min_baseq, skip_duplicates)
+}
+
 rcpp_read_bam <- function(fn, min_mapq, min_baseq, skip_duplicates) {
     .Call(`_epialleleR_rcpp_read_bam`, fn, min_mapq, min_baseq, skip_duplicates)
 }

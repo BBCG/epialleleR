@@ -9,11 +9,180 @@
 // optimization strategies:
 // [ ] OpenMP SIMD?
 // [ ] HTSlib threads?
-// [-] POS==MPOS && second read && proper pair - skip most of ops <- no use in reality
-// [ ] rec_seq_rs and rec_xm_rs as char*
-// [ ] don't do CIGAR if single M op?
-// [+] reverse QNAME
+// [+] rec_seq_rs and rec_xm_rs as char*
+// [?] reverse QNAME
 // [ ] optimize cx report as well - use 8 byes per cpg and do & instead of if
+
+
+// [[Rcpp::export]]
+Rcpp::List rcpp_read_bam_pairs (std::string fn,                                       // file name
+                          int min_mapq,                                         // min read mapping quality
+                          int min_baseq,                                        // min base quality
+                          bool skip_duplicates)                                 // skip marked duplicates
+{
+  // constants
+  size_t max_qname_width = 256;                                                 // max QNAME length, not expanded, error prone?
+  size_t max_templ_width = 1024;                                                // max insert size, expanded if necessary
+  
+  // file IO
+  htsFile *bam_fp = hts_open(fn.c_str(), "r");                                  // try open file
+  if (bam_fp==NULL) Rcpp::stop("Unable to open BAM file for reading");          // fall back if error
+  bam_hdr_t *bam_hdr = sam_hdr_read(bam_fp);                                    // try read file header
+  if (bam_hdr==NULL) Rcpp::stop("Unable to read BAM header");                   // fall back if error  
+  bam1_t *bam_rec = bam_init1();                                                // create BAM alignment structure
+  
+  // main containers
+  std::vector<std::string> qname, seq, xm;                                      // QNAME, SEQ, XM
+  std::vector<int> flag, rname, strand, start, width;                           // FLAG, id for RNAME + 1, id for CT==1/GA==2, POS + 1
+  int nrecs = 0, ntempls = 0;                                                   // counters: BAM records, templates (read pairs)
+  
+  // template holders
+  char *templ_qname = (char*) malloc(max_qname_width * sizeof(char));           // template QNAME
+  char *rec_qname   = (char*) malloc(max_qname_width * sizeof(char));           // current read QNAME
+  uint8_t *templ_qual_rs = (uint8_t*) malloc(max_templ_width * sizeof(uint8_t));// template QUAL array
+  uint8_t *templ_seq_rs  = (uint8_t*) malloc(max_templ_width * sizeof(uint8_t));// template SEQ array
+  uint8_t *templ_xm_rs   = (uint8_t*) malloc(max_templ_width * sizeof(uint8_t));// template XM array
+  int templ_rname = 0, templ_start = 0, templ_strand = 0, templ_width = 0;      // template RNAME, POS, STRAND, ISIZE
+  
+  
+  #define push_template {               /* pushing template data to vectors */ \
+    flag.push_back(bam_rec->core.flag);                             /* FLAG */ \
+    qname.push_back(std::string(templ_qname));                     /* QNAME */ \
+    rname.push_back(templ_rname + 1);                            /* RNAME+1 */ \
+    strand.push_back(templ_strand);                               /* STRAND */ \
+    start.push_back(templ_start + 1);                              /* POS+1 */ \
+    width.push_back(templ_width);                                  /* ISIZE */ \
+    seq.push_back(std::string((char *) templ_seq_rs, templ_width));  /* SEQ */ \
+    xm.push_back( std::string((char *) templ_xm_rs,  templ_width));   /* XM */ \
+    ntempls++;                                                        /* +1 */ \
+  }
+  
+  // process alignments
+  while( sam_read1(bam_fp, bam_hdr, bam_rec) > 0 ) {                            // rec by rec
+    nrecs++;                                                                    // BAM alignment records ++
+    if ((nrecs & 1048575) == 0) Rcpp::checkUserInterrupt();                     // checking for the interrupt
+    if ((bam_rec->core.qual < min_mapq) ||                                      // skip if mapping quality < min.mapq
+        (skip_duplicates && (bam_rec->core.flag & BAM_FDUP))) continue;         // or if record is an optical/PCR duplicate
+    
+    // save qname
+    strcpy(rec_qname, bam_get_qname(bam_rec));
+    // std::reverse(rec_qname, rec_qname + bam_rec->core.l_qname                // reversing it to make strcmp faster:
+    //                - bam_rec->core.l_extranul - 1);                          // doesn't make any sense now, because compare once
+    
+    if (!(bam_rec->core.flag & BAM_FPROPER_PAIR))
+      Rcpp::Rcout<<"unpaired@"<<nrecs<<"\n";
+    
+    // check if not the same template (QNAME)
+    if ((strcmp(templ_qname, rec_qname) != 0)) {                
+      // store previous template if not first record
+      if (nrecs!=1) push_template;
+      
+      // initialize new template
+      strcpy(templ_qname, rec_qname);                                           // store template QNAME
+      templ_rname = bam_rec->core.tid;                                          // store template RNAME
+      templ_start = bam_rec->core.pos < bam_rec->core.mpos ?                    // smallest of POS,MPOS is a start
+        bam_rec->core.pos : bam_rec->core.mpos;
+      templ_strand = ( bam_aux_get(bam_rec, "XG")[1] == 'C' ) ? 1 : 2 ;         // STRAND is 1 if "ZCT"/"+", 2 if "ZGA"/"-"
+      templ_width = abs(bam_rec->core.isize);                                   // template ISIZE
+      // resize containers if necessary
+      if (templ_width > max_templ_width) {
+        max_templ_width = templ_width;                                          // expand template holders
+        templ_qual_rs = (uint8_t *) realloc(templ_qual_rs, max_templ_width);
+        templ_seq_rs  = (uint8_t *) realloc(templ_seq_rs,  max_templ_width);
+        templ_xm_rs   = (uint8_t *) realloc(templ_xm_rs,   max_templ_width);
+        if (templ_qual_rs==NULL || templ_seq_rs==NULL || templ_xm_rs==NULL)     // check memory allocation
+          Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs);
+      }
+      std::fill_n(templ_qual_rs, templ_width, (uint8_t) min_baseq);             // clean template holders
+      std::fill_n(templ_seq_rs,  templ_width, 'N');
+      std::fill_n(templ_xm_rs,   templ_width, '-');
+     }
+    
+    // add another read to the template
+    // source containers
+    uint8_t *rec_qual = bam_get_qual(bam_rec);                                  // quality string (Phred scale with no +33 offset)
+    char *rec_xm = (char*) bam_aux_get(bam_rec, "XM") + 1;                      // methylation string without leading 'Z'
+    if (rec_xm==NULL) Rcpp::stop("Methylation string is absent/incomplete");    // fall back if absent 
+    uint8_t *rec_pseq = bam_get_seq(bam_rec);                                   // packed sequence string (4 bit per base)
+    
+    // apply CIGAR
+    uint32_t n_cigar = bam_rec->core.n_cigar;                                   // number of CIGAR operations
+    uint32_t *rec_cigar = bam_get_cigar(bam_rec);                               // CIGAR array
+    uint32_t query_pos = 0;                                                     // starting position in query array
+    uint32_t dest_pos = bam_rec->core.pos - templ_start;                        // starting position in destination array
+    for (int i=0; i<n_cigar; i++) {                                             // op by op
+      uint32_t cigar_op = bam_cigar_op(rec_cigar[i]);                           // CIGAR operation
+      uint32_t cigar_oplen = bam_cigar_oplen(rec_cigar[i]);                     // CIGAR operation length
+      switch(cigar_op) {
+        case BAM_CMATCH :                                                       // 'M', 0
+        case BAM_CEQUAL :                                                       // '=', 7
+        case BAM_CDIFF :                                                        // 'X', 8
+          for (int j=0; j<cigar_oplen; j++) {
+            if (rec_qual[query_pos+j] > templ_qual_rs[dest_pos+j]) {
+              templ_qual_rs[dest_pos+j] = rec_qual[query_pos+j];
+              templ_seq_rs[dest_pos+j] = seq_nt16_str[bam_seqi(rec_pseq,query_pos+j)];
+              templ_xm_rs[dest_pos+j] = rec_xm[query_pos+j];
+            }
+          }
+          query_pos += cigar_oplen;
+          dest_pos += cigar_oplen;
+          break;
+        case BAM_CINS :                                                         // 'I', 1
+        case BAM_CSOFT_CLIP :                                                   // 'S', 4
+          query_pos += cigar_oplen;
+          break;
+        case BAM_CDEL :                                                         // 'D', 2
+        case BAM_CREF_SKIP :                                                    // 'N', 3
+          dest_pos += cigar_oplen;
+          break;
+        case BAM_CHARD_CLIP :                                                   // 'H', 5
+        case BAM_CPAD :                                                         // 'P', 6
+        case BAM_CBACK :
+          break;
+        default :
+          Rcpp::stop("Unknown CIGAR operation for BAM entry %s",                // unknown CIGAR operation
+                     bam_get_qname(bam_rec));
+      }
+    }
+  }
+  
+  // push last, yet unsaved template
+  push_template;
+  
+  // cleaning
+  bam_destroy1(bam_rec);                                                        // clean BAM alignment structure 
+  hts_close(bam_fp);                                                            // close BAM file
+  free(templ_qname);                                                            // and free manually allocated memory
+  free(rec_qname);
+  free(templ_qual_rs);
+  free(templ_seq_rs);
+  free(templ_xm_rs);
+  
+  // wrap and return the results
+  std::vector<std::string> chromosomes (                                        // vector of reference names
+      bam_hdr->target_name, bam_hdr->target_name + bam_hdr->n_targets);
+  std::vector<std::string> strands = {"+", "-"};                                // vector of DNA strands
+  std::vector<int> stats = {nrecs, ntempls};                                    // statistics
+  
+  Rcpp::List res = Rcpp::List::create(                                          // final list
+    Rcpp::Named("stats") = stats,                                               // BAM loading statistics
+    Rcpp::Named("chromosomes") = chromosomes,                                   // lookup table of reference names
+    Rcpp::Named("strands") = strands,                                           // lookup table of DNA strands
+    Rcpp::Named("flag") = flag,                                                 // flag
+    Rcpp::Named("qname") = qname,                                               // query names
+    Rcpp::Named("rname") = rname,                                               // numeric ids for reference names
+    Rcpp::Named("strand") = strand,                                             // numeric ids for reference strands
+    Rcpp::Named("start") = start,                                               // start positions of reads
+    Rcpp::Named("width") = width,                                               // lengths of reads
+    Rcpp::Named("seq") = seq,                                                   // sequences
+    Rcpp::Named("XM") = xm                                                      // methylation strings
+  );
+  return(res);
+  
+}
+
+
+
 
 // [[Rcpp::export("rcpp_read_bam")]]
 Rcpp::List rcpp_read_bam (std::string fn,                                       // file name
