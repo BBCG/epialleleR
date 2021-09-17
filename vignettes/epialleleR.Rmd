@@ -152,20 +152,17 @@ larger methylation capture panels, or even whole-genome approaches.
 
 ## Processing speed
 
-Currently *`epialleleR`* runs in a single-thread mode only, however most of the
-processing time is spent on loading the BAM data (using *`Rsamtools`*), which is
-difficult to improve by parallel processing. All the other operations are
-performed using optimised C++ functions, and usually take less time. Running
-time for complete task "BAM on disk -> CX report on disk" depends on the size of
-the BAM file, and the speed is usually within the range of 4-6 MB/s (or 25-50
-thousand reads per second) for a single core of a relatively modern CPU
-(Intel(R) Core(TM) i7-7700).
+Currently *`epialleleR`* runs in a single-thread mode only. Loading the BAM
+data is currently done by means of *`HTSlib`*, therefore it is possible to speed
+it up using >1 threads (`nthreads` option in *`preprocessBam`*). All operations
+are performed using optimised C++ functions, and usually take reasonable time.
+Running time for complete task "BAM on disk -> CX report on disk" depends on the
+size of the BAM file, and the speed is usually within the range of 20-30 MB/s
+(or 150-200 thousand reads per second) for a single core of a relatively
+modern CPU (Intel(R) Core(TM) i7-7700).
 
-Since BAM loading and preprocessing is the biggest bottleneck at the moment,
-major improvements are planned for the next upcoming release (v1.1): the
-dependency on *`Rsamtools`* will be removed, and loading and preprocessing will
-be done within the same C++ function, hopefully aiding in much higher processing
-speed.
+Major bottlenecks (in BAM loading and preprocessing) were removed in the release
+v1.2, full multithreading and minor improvements are expected in the future.
 
 *****
 

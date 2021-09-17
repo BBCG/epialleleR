@@ -173,7 +173,7 @@ generateCytosineReport <- function (bam,
                        verbose=verbose)
   
   if (threshold.reads) {
-    bam$pass <- .thresholdReads(
+    pass <- .thresholdReads(
       bam.processed=bam,
       ctx.meth=.context.to.bases[[threshold.context]][["ctx.meth"]],
       ctx.unmeth=.context.to.bases[[threshold.context]][["ctx.unmeth"]],
@@ -185,11 +185,11 @@ generateCytosineReport <- function (bam,
       verbose=verbose
     )
   } else {
-    bam$pass <- TRUE
+    pass <- rep(TRUE, nrow(bam))
   }
   
   cx.report <- .getCytosineReport(
-    bam.processed=bam,
+    bam.processed=bam, pass=pass,
     ctx=paste0(.context.to.bases[[report.context]][["ctx.unmeth"]],
                .context.to.bases[[report.context]][["ctx.meth"]]),
     verbose=verbose

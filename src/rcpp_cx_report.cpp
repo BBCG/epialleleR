@@ -43,6 +43,7 @@
 // 
 // [[Rcpp::export("rcpp_cx_report")]]
 std::vector<int> rcpp_cx_report(Rcpp::DataFrame &df,                            // data frame with BAM data
+                                Rcpp::LogicalVector &pass,                      // does it pass the threshold
                                 std::string ctx)                                // context string for bases to report
 {
   // walking trough bunch of reads <- filling the map
@@ -54,7 +55,6 @@ std::vector<int> rcpp_cx_report(Rcpp::DataFrame &df,                            
   Rcpp::IntegerVector strand = df["strand"];                                    // template strand
   Rcpp::IntegerVector start  = df["start"];                                     // template start
   Rcpp::CharacterVector xm   = df["XM"];                                        // merged refspaced template XMs
-  Rcpp::LogicalVector pass   = df["pass"];                                      // boolean: if read has passed filtering
   
   // main typedefs
   typedef uint64_t T_key;                                                       // {62bit:pos, 2bit:strand}

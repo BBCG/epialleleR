@@ -101,8 +101,6 @@ columns are:
   \item context -- methylation context
   \item meth -- number of methylated cytosines
   \item unmeth -- number of unmethylated cytosines
-  \item triad -- sequence spanning region [<pos>:<pos+2>]. Always equals to
-  "NNN" due to the reference genome-independent reporting
 }
 }
 \description{
@@ -135,12 +133,12 @@ Only the second read will satisfy all of the thresholding criteria, leading
 to the following CX report (given that all reads map to chr1:+:1-16):
 
 \tabular{lllllll}{
-  rname \tab strand \tab pos \tab context \tab meth \tab unmeth \tab triad \cr
-  chr1 \tab + \tab 4 \tab CG \tab 1 \tab 3 \tab NNN \cr
-  chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \tab NNN \cr
-  chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \tab NNN \cr
-  chr1 \tab + \tab 12 \tab CHG \tab 0 \tab 3 \tab NNN \cr
-  chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 \tab NNN 
+  rname \tab strand \tab pos \tab context \tab meth \tab unmeth \cr
+  chr1 \tab + \tab 4 \tab CG \tab 1 \tab 3 \cr
+  chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \cr
+  chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \cr
+  chr1 \tab + \tab 12 \tab CHG \tab 0 \tab 3 \cr
+  chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 
 }
 
 With the thresholding disabled (threshold.reads = FALSE) all methylated bases
@@ -149,12 +147,12 @@ produced by other methylation callers (such as Bismark or Illumina DRAGEN Bio
 IT Platform):
 
 \tabular{lllllll}{
-  rname \tab strand \tab pos \tab context \tab meth \tab unmeth \tab triad \cr
-  chr1 \tab + \tab 4 \tab CG \tab 4 \tab 0 \tab NNN \cr
-  chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \tab NNN \cr
-  chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \tab NNN \cr
-  chr1 \tab + \tab 12 \tab CHG \tab 1 \tab 2 \tab NNN \cr
-  chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 \tab NNN 
+  rname \tab strand \tab pos \tab context \tab meth \tab unmeth \cr
+  chr1 \tab + \tab 4 \tab CG \tab 4 \tab 0 \cr
+  chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \cr
+  chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \cr
+  chr1 \tab + \tab 12 \tab CHG \tab 1 \tab 2 \cr
+  chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 
 }
 
 Other notes:

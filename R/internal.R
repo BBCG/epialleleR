@@ -213,20 +213,13 @@ utils::globalVariables(
                           match.tolerance, match.min.overlap)
 {
   # fast, vectorised
+  bed.dt <- data.table::as.data.table(bed)
+  bed.dt[, seqnames := factor(seqnames, levels=levels(bam.processed$rname))]
+  
   if (bed.type=="amplicon") {
-    bed.match <- rcpp_match_amplicon(
-      as.character(bam.processed$rname), bam.processed$start,
-      bam.processed$start+bam.processed$width-1,
-      as.character(GenomicRanges::seqnames(bed)),
-      BiocGenerics::start(bed), BiocGenerics::end(bed),
-      match.tolerance)
+    bed.match <- rcpp_match_amplicon(bam.processed, bed.dt, match.tolerance)
   } else if (bed.type=="capture") {
-    bed.match <- rcpp_match_capture(
-      as.character(bam.processed$rname), bam.processed$start,
-      bam.processed$start+bam.processed$width-1,
-      as.character(GenomicRanges::seqnames(bed)),
-      BiocGenerics::start(bed), BiocGenerics::end(bed),
-      match.min.overlap)
+    bed.match <- rcpp_match_capture(bam.processed, bed.dt, match.min.overlap)
   }
   
   return(bed.match)
@@ -240,6 +233,7 @@ utils::globalVariables(
 # value: data.table with Bismark-formatted cytosine report
 
 .getCytosineReport <- function (bam.processed,
+                                pass,
                                 ctx,
                                 verbose)
 {
@@ -250,7 +244,7 @@ utils::globalVariables(
   # reporting, vectorised
   cx.report <- as.data.frame(
     matrix(
-      rcpp_cx_report(bam.processed, ctx), ncol=6, byrow=TRUE,
+      rcpp_cx_report(bam.processed, pass, ctx), ncol=6, byrow=TRUE,
       dimnames=list(NULL, c("rname","strand","pos","context","meth","unmeth"))
     )
   )
@@ -270,29 +264,30 @@ utils::globalVariables(
 
 # descr: BED-assisted (amplicon/capture) report
 
-.getBedReport <- function (bam.processed, bed, bed.type,
+.getBedReport <- function (bam.processed, pass, bed, bed.type,
                            match.tolerance, match.min.overlap,
                            verbose)
 {
   if (verbose) message("Preparing ", bed.type, " report", appendLF=FALSE)
   tm <- proc.time()
   
-  bam.processed[, `:=` (
+  bam.subset <- data.table::data.table(
+    strand=bam.processed$strand,
     bedmatch=.matchTarget(bam.processed=bam.processed, bed=bed,
                           bed.type=bed.type, match.tolerance=match.tolerance,
                           match.min.overlap=match.min.overlap),
     pass=factor(pass, levels=c(TRUE,FALSE))
-  )]
-  data.table::setkey(bam.processed, bedmatch)
+  )
+  data.table::setkey(bam.subset, bedmatch)
   bam.dt <- data.table::dcast(
-    bam.processed[, list(nreads=.N), by=list(bedmatch,strand,pass), nomatch=0],
+    bam.subset[, list(nreads=.N), by=list(bedmatch,strand,pass), nomatch=0],
     bedmatch~pass+strand, value.var=c("nreads"), sep="", drop=FALSE, fill=0
   )
   bam.dt[,`:=` (`nreads+`=`FALSE+`+`TRUE+`,
                 `nreads-`=`FALSE-`+`TRUE-`,
                 VEF=(`TRUE+`+`TRUE-`)/(`FALSE+`+`TRUE+`+`FALSE-`+`TRUE-`) )]
   bed.dt <- data.table::as.data.table(bed)
-  bed.cl <- colnames(bed.dt)
+  # bed.cl <- colnames(bed.dt)
   bed.dt[, bedmatch:=.I]
   bed.report <- data.table::merge.data.table(bed.dt, bam.dt, by="bedmatch",
                                              all=TRUE)[order(bedmatch)]
@@ -302,6 +297,40 @@ utils::globalVariables(
                              c("bedmatch","FALSE+","FALSE-","TRUE+","TRUE-")),
                     with=FALSE])
 }
+# 
+# 
+# .getBedReport <- function (bam.processed, pass, bed, bed.type,
+#                            match.tolerance, match.min.overlap,
+#                            verbose)
+# {
+#   if (verbose) message("Preparing ", bed.type, " report", appendLF=FALSE)
+#   tm <- proc.time()
+#   
+#   bam.processed[, `:=` (
+#     bedmatch=.matchTarget(bam.processed=bam.processed, bed=bed,
+#                           bed.type=bed.type, match.tolerance=match.tolerance,
+#                           match.min.overlap=match.min.overlap),
+#     pass=factor(pass, levels=c(TRUE,FALSE))
+#   )]
+#   data.table::setkey(bam.processed, bedmatch)
+#   bam.dt <- data.table::dcast(
+#     bam.processed[, list(nreads=.N), by=list(bedmatch,strand,pass), nomatch=0],
+#     bedmatch~pass+strand, value.var=c("nreads"), sep="", drop=FALSE, fill=0
+#   )
+#   bam.dt[,`:=` (`nreads+`=`FALSE+`+`TRUE+`,
+#                 `nreads-`=`FALSE-`+`TRUE-`,
+#                 VEF=(`TRUE+`+`TRUE-`)/(`FALSE+`+`TRUE+`+`FALSE-`+`TRUE-`) )]
+#   bed.dt <- data.table::as.data.table(bed)
+#   # bed.cl <- colnames(bed.dt)
+#   bed.dt[, bedmatch:=.I]
+#   bed.report <- data.table::merge.data.table(bed.dt, bam.dt, by="bedmatch",
+#                                              all=TRUE)[order(bedmatch)]
+#   
+#   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+#   return(bed.report[,setdiff(names(bed.report),
+#                              c("bedmatch","FALSE+","FALSE-","TRUE+","TRUE-")),
+#                     with=FALSE])
+# }
 
 ################################################################################
 

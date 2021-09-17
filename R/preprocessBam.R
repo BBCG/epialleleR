@@ -68,7 +68,7 @@ preprocessBam <- function (bam.file,
   } else {
     if (verbose) 
       message("Already preprocessed BAM supplied as an input. Options",
-              " 'min.mapq', 'min.baseq', 'skip.duplicates' and nthreads ",
+              " 'min.mapq', 'min.baseq', 'skip.duplicates' and 'nthreads' ",
               "will have no effect.")
     return(bam.file)
   }

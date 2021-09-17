@@ -10,19 +10,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// rcpp_apply_cigar
-std::vector<std::string> rcpp_apply_cigar(std::vector<std::string> cigar, std::vector<std::string> query, char gap);
-RcppExport SEXP _epialleleR_rcpp_apply_cigar(SEXP cigarSEXP, SEXP querySEXP, SEXP gapSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::vector<std::string> >::type cigar(cigarSEXP);
-    Rcpp::traits::input_parameter< std::vector<std::string> >::type query(querySEXP);
-    Rcpp::traits::input_parameter< char >::type gap(gapSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_apply_cigar(cigar, query, gap));
-    return rcpp_result_gen;
-END_RCPP
-}
 // rcpp_char_to_context
 std::vector<std::string> rcpp_char_to_context(std::vector<unsigned char> ctx);
 RcppExport SEXP _epialleleR_rcpp_char_to_context(SEXP ctxSEXP) {
@@ -35,14 +22,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_cx_report
-std::vector<int> rcpp_cx_report(Rcpp::DataFrame& df, std::string ctx);
-RcppExport SEXP _epialleleR_rcpp_cx_report(SEXP dfSEXP, SEXP ctxSEXP) {
+std::vector<int> rcpp_cx_report(Rcpp::DataFrame& df, Rcpp::LogicalVector& pass, std::string ctx);
+RcppExport SEXP _epialleleR_rcpp_cx_report(SEXP dfSEXP, SEXP passSEXP, SEXP ctxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector& >::type pass(passSEXP);
     Rcpp::traits::input_parameter< std::string >::type ctx(ctxSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_cx_report(df, ctx));
+    rcpp_result_gen = Rcpp::wrap(rcpp_cx_report(df, pass, ctx));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -78,52 +66,28 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_match_amplicon
-std::vector<int> rcpp_match_amplicon(std::vector<std::string> read_chr, std::vector<int> read_start, std::vector<int> read_end, std::vector<std::string> ampl_chr, std::vector<int> ampl_start, std::vector<int> ampl_end, int tolerance);
-RcppExport SEXP _epialleleR_rcpp_match_amplicon(SEXP read_chrSEXP, SEXP read_startSEXP, SEXP read_endSEXP, SEXP ampl_chrSEXP, SEXP ampl_startSEXP, SEXP ampl_endSEXP, SEXP toleranceSEXP) {
+std::vector<int> rcpp_match_amplicon(Rcpp::DataFrame& bam, Rcpp::DataFrame& bed, int tolerance);
+RcppExport SEXP _epialleleR_rcpp_match_amplicon(SEXP bamSEXP, SEXP bedSEXP, SEXP toleranceSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::vector<std::string> >::type read_chr(read_chrSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type read_start(read_startSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type read_end(read_endSEXP);
-    Rcpp::traits::input_parameter< std::vector<std::string> >::type ampl_chr(ampl_chrSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type ampl_start(ampl_startSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type ampl_end(ampl_endSEXP);
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type bam(bamSEXP);
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type bed(bedSEXP);
     Rcpp::traits::input_parameter< int >::type tolerance(toleranceSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_match_amplicon(read_chr, read_start, read_end, ampl_chr, ampl_start, ampl_end, tolerance));
+    rcpp_result_gen = Rcpp::wrap(rcpp_match_amplicon(bam, bed, tolerance));
     return rcpp_result_gen;
 END_RCPP
 }
 // rcpp_match_capture
-std::vector<int> rcpp_match_capture(std::vector<std::string> read_chr, std::vector<int> read_start, std::vector<int> read_end, std::vector<std::string> capt_chr, std::vector<int> capt_start, std::vector<int> capt_end, signed int min_overlap);
-RcppExport SEXP _epialleleR_rcpp_match_capture(SEXP read_chrSEXP, SEXP read_startSEXP, SEXP read_endSEXP, SEXP capt_chrSEXP, SEXP capt_startSEXP, SEXP capt_endSEXP, SEXP min_overlapSEXP) {
+std::vector<int> rcpp_match_capture(Rcpp::DataFrame& bam, Rcpp::DataFrame& bed, signed int min_overlap);
+RcppExport SEXP _epialleleR_rcpp_match_capture(SEXP bamSEXP, SEXP bedSEXP, SEXP min_overlapSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::vector<std::string> >::type read_chr(read_chrSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type read_start(read_startSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type read_end(read_endSEXP);
-    Rcpp::traits::input_parameter< std::vector<std::string> >::type capt_chr(capt_chrSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type capt_start(capt_startSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type capt_end(capt_endSEXP);
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type bam(bamSEXP);
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type bed(bedSEXP);
     Rcpp::traits::input_parameter< signed int >::type min_overlap(min_overlapSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_match_capture(read_chr, read_start, read_end, capt_chr, capt_start, capt_end, min_overlap));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcpp_merge_ends
-std::vector<std::string> rcpp_merge_ends(std::vector<int> read1_pos, std::vector<std::string> read1_seq, std::vector<int> read2_pos, std::vector<std::string> read2_seq, std::vector<int> isize, char gap);
-RcppExport SEXP _epialleleR_rcpp_merge_ends(SEXP read1_posSEXP, SEXP read1_seqSEXP, SEXP read2_posSEXP, SEXP read2_seqSEXP, SEXP isizeSEXP, SEXP gapSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::vector<int> >::type read1_pos(read1_posSEXP);
-    Rcpp::traits::input_parameter< std::vector<std::string> >::type read1_seq(read1_seqSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type read2_pos(read2_posSEXP);
-    Rcpp::traits::input_parameter< std::vector<std::string> >::type read2_seq(read2_seqSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type isize(isizeSEXP);
-    Rcpp::traits::input_parameter< char >::type gap(gapSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_merge_ends(read1_pos, read1_seq, read2_pos, read2_seq, isize, gap));
+    rcpp_result_gen = Rcpp::wrap(rcpp_match_capture(bam, bed, min_overlap));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -173,14 +137,12 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_epialleleR_rcpp_apply_cigar", (DL_FUNC) &_epialleleR_rcpp_apply_cigar, 3},
     {"_epialleleR_rcpp_char_to_context", (DL_FUNC) &_epialleleR_rcpp_char_to_context, 1},
-    {"_epialleleR_rcpp_cx_report", (DL_FUNC) &_epialleleR_rcpp_cx_report, 2},
+    {"_epialleleR_rcpp_cx_report", (DL_FUNC) &_epialleleR_rcpp_cx_report, 3},
     {"_epialleleR_rcpp_get_base_freqs", (DL_FUNC) &_epialleleR_rcpp_get_base_freqs, 8},
     {"_epialleleR_rcpp_get_xm_beta", (DL_FUNC) &_epialleleR_rcpp_get_xm_beta, 3},
-    {"_epialleleR_rcpp_match_amplicon", (DL_FUNC) &_epialleleR_rcpp_match_amplicon, 7},
-    {"_epialleleR_rcpp_match_capture", (DL_FUNC) &_epialleleR_rcpp_match_capture, 7},
-    {"_epialleleR_rcpp_merge_ends", (DL_FUNC) &_epialleleR_rcpp_merge_ends, 6},
+    {"_epialleleR_rcpp_match_amplicon", (DL_FUNC) &_epialleleR_rcpp_match_amplicon, 3},
+    {"_epialleleR_rcpp_match_capture", (DL_FUNC) &_epialleleR_rcpp_match_capture, 3},
     {"_epialleleR_rcpp_parse_xm", (DL_FUNC) &_epialleleR_rcpp_parse_xm, 1},
     {"_epialleleR_rcpp_read_bam_paired", (DL_FUNC) &_epialleleR_rcpp_read_bam_paired, 5},
     {"_epialleleR_rcpp_threshold_reads", (DL_FUNC) &_epialleleR_rcpp_threshold_reads, 8},
