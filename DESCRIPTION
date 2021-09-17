@@ -1,6 +1,6 @@
 Package: epialleleR
 Title: Fast, Epiallele-Aware Methylation Reporter
-Version: 1.1.0
+Version: 1.1.9
 Authors@R: 
   person(given = "Oleksii",
     family = "Nikolaienko",
@@ -16,8 +16,7 @@ Description: Epialleles are specific DNA methylation patterns that are
   distribution function for per-read beta values, and testing the significance
   of the association between epiallele methylation status and base frequencies
   at particular genomic positions (SNPs).
-CommentSystemRequirements: C++17
-SystemRequirements: GNU make
+SystemRequirements: C++17, GNU make
 NeedsCompilation: yes
 Depends:
   R (>= 4.1)
@@ -25,7 +24,6 @@ Imports:
   stats,
   methods,
   utils,
-  Rsamtools,
   GenomicRanges,
   BiocGenerics,
   GenomeInfoDb,

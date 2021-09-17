@@ -1,39 +1,43 @@
 #include <Rcpp.h>
 #include <htslib/hts.h>
 #include <htslib/sam.h>
+#include <htslib/thread_pool.h>
 
 // [[Rcpp::depends(Rhtslib)]]
 
-// An optimised attempt to read and preprocess BAM in place
-//
-// optimization strategies:
+// An optimised attempt to read and preprocess BAM in place. To do:
 // [ ] OpenMP SIMD?
-// [ ] HTSlib threads?
+// [+] HTSlib threads
 // [+] rec_seq_rs and rec_xm_rs as char*
 // [?] reverse QNAME
-// [ ] optimize cx report as well - use 8 bytes per cpg and do & instead of if?
-
+// [ ] free resources on interrupt
 
 // [[Rcpp::export]]
 Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           // file name
                                       int min_mapq,                             // min read mapping quality
                                       int min_baseq,                            // min base quality
-                                      bool skip_duplicates)                     // skip marked duplicates
+                                      bool skip_duplicates,                     // skip marked duplicates
+                                      int nthreads)                             // HTSlib threads, >1 for multiple
 {
   // constants
-  size_t max_qname_width = 256;                                                 // max QNAME length, not expanded yet, error prone?
+  size_t max_qname_width = 256;                                                 // max QNAME length, not expanded yet, ever error-prone?
   size_t max_templ_width = 1024;                                                // max insert size, expanded if necessary
   
   // file IO
   htsFile *bam_fp = hts_open(fn.c_str(), "r");                                  // try open file
   if (bam_fp==NULL) Rcpp::stop("Unable to open BAM file for reading");          // fall back if error
+  htsThreadPool thread_pool = {NULL, 0};                                        // thread pool cuts time by 30%
+  if (nthreads>1) {
+    thread_pool.pool = hts_tpool_init(nthreads);                                // when initiated for 2 threads
+    hts_set_opt(bam_fp, HTS_OPT_THREAD_POOL, &thread_pool);                     // and bound to the file pointer
+  }
   bam_hdr_t *bam_hdr = sam_hdr_read(bam_fp);                                    // try read file header
   if (bam_hdr==NULL) Rcpp::stop("Unable to read BAM header");                   // fall back if error  
   bam1_t *bam_rec = bam_init1();                                                // create BAM alignment structure
   
   // main containers
-  std::vector<std::string> /*qname,*/ seq, xm;                                      // QNAME, SEQ, XM
-  std::vector<int> /*flag,*/ rname, strand, start/*, width*/;                           // FLAG, id for RNAME + 1, id for CT==1/GA==2, POS + 1
+  std::vector<std::string> seq, xm;                                             // SEQ, XM
+  std::vector<int> rname, strand, start;                                        // id for RNAME, id for CT==1/GA==2, POS
   int nrecs = 0, ntempls = 0;                                                   // counters: BAM records, templates (read pairs)
   
   // reserve some memory
@@ -50,12 +54,9 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   
   #define unsorted (ntempls==0) || (nrecs/(ntempls>>1) < 3)                     /* TRUE if no templates OR fraction of two-read templates is <67% */
   #define push_template {               /* pushing template data to vectors */ \
-    /* flag.push_back(bam_rec->core.flag);                             FLAG */ \
-    /* qname.push_back(std::string(templ_qname));                     QNAME */ \
     rname.push_back(templ_rname + 1);                            /* RNAME+1 */ \
     strand.push_back(templ_strand);                               /* STRAND */ \
     start.push_back(templ_start + 1);                              /* POS+1 */ \
-    /* width.push_back(templ_width);                                  ISIZE */ \
     seq.push_back(std::string((char *) templ_seq_rs, templ_width));  /* SEQ */ \
     xm.push_back( std::string((char *) templ_xm_rs,  templ_width));   /* XM */ \
     ntempls++;                                                        /* +1 */ \
@@ -167,8 +168,9 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   // cleaning
   bam_destroy1(bam_rec);                                                        // clean BAM alignment structure 
   hts_close(bam_fp);                                                            // close BAM file
+  if (thread_pool.pool) hts_tpool_destroy(thread_pool.pool);                    // free thread pool
   free(templ_qname);                                                            // and free manually allocated memory
-  free(rec_qname);
+  free(rec_qname); 
   free(templ_qual_rs);
   free(templ_seq_rs);
   free(templ_xm_rs);
@@ -176,14 +178,15 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   // wrap and return the results
   std::vector<std::string> chromosomes (                                        // vector of reference names
       bam_hdr->target_name, bam_hdr->target_name + bam_hdr->n_targets);
-  
+  std::vector<std::string> strands = {"+", "-"};
+  // make rname a factor
   Rcpp::IntegerVector w_rname = Rcpp::wrap(rname);
   w_rname.attr("class") = "factor";
   w_rname.attr("levels") = chromosomes;
-  
+  // make strand a factor
   Rcpp::IntegerVector w_strand = Rcpp::wrap(strand);
   w_strand.attr("class") = "factor";
-  w_strand.attr("levels") = {"+", "-"};
+  w_strand.attr("levels") = strands;
   
   Rcpp::DataFrame res = Rcpp::DataFrame::create(                                // final DF
     Rcpp::Named("rname") = w_rname,                                             // numeric ids (factor) for reference names
@@ -196,8 +199,9 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   return(res);
 }
 
-
 // 
+// Reads single records, trims some, requires post-trimming.
+// Not efficient at all
 // 
 // // [[Rcpp::export("rcpp_read_bam")]]
 // Rcpp::List rcpp_read_bam (std::string fn,                                       // file name
@@ -347,39 +351,39 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
 //   );
 //   return(res);
 // }
-
-
-
-// In place post-trimming of rightmost READ2
-//
-
-// [[Rcpp::export]]
-void rcpp_posttrim_read2(Rcpp::DataFrame &df) {
-  Rcpp::IntegerVector flag = df["flag"];
-  Rcpp::IntegerVector start = df["start"];
-  Rcpp::CharacterVector qname = df["qname"];
-  Rcpp::CharacterVector seq = df["seq"];
-  Rcpp::CharacterVector xm = df["XM"];
-  int dpos, ndel;
-  
-  // row by row
-  for (size_t x=1; x<flag.size(); x++) {
-    if ((x & 1048575) == 0) Rcpp::checkUserInterrupt();                         // checking for the interrupt
-    
-    // trim rightmost READ2
-    if ((qname[x]==qname[x-1]) &&                                               // if this is a same template (df is presorted on QNAME, POS)
-        (flag[x] & BAM_FPROPER_PAIR) &&                                         // and this read is a proper pair
-        (flag[x] & BAM_FREAD2)) {                                               // and it's a READ2
-      dpos = start[x] - start[x-1];                                             // get distance between start positions of mates
-      ndel = xm[x-1].size() - dpos;                                             // number of chars to delete from the left side of READ2
-      if ((dpos > 0) && (ndel > 0)) {                                           // if it's a rightmost read && distance between mates is less than refspaced read length
-        seq[x] = Rcpp::as<std::string>(seq[x]).erase(0, ndel);                  // trim rightmost READ2 until the end of leftmost Read1
-        xm[x] = Rcpp::as<std::string>(xm[x]).erase(0, ndel);
-        start[x] = start[x-1] + xm[x-1].size();                                 // adjust new POS
-      }
-    }
-  }
-}
+// 
+// 
+// 
+// // In place post-trimming of rightmost READ2
+// //
+// 
+// // [[Rcpp::export]]
+// void rcpp_posttrim_read2(Rcpp::DataFrame &df) {
+//   Rcpp::IntegerVector flag = df["flag"];
+//   Rcpp::IntegerVector start = df["start"];
+//   Rcpp::CharacterVector qname = df["qname"];
+//   Rcpp::CharacterVector seq = df["seq"];
+//   Rcpp::CharacterVector xm = df["XM"];
+//   int dpos, ndel;
+//   
+//   // row by row
+//   for (size_t x=1; x<flag.size(); x++) {
+//     if ((x & 1048575) == 0) Rcpp::checkUserInterrupt();                         // checking for the interrupt
+//     
+//     // trim rightmost READ2
+//     if ((qname[x]==qname[x-1]) &&                                               // if this is a same template (df is presorted on QNAME, POS)
+//         (flag[x] & BAM_FPROPER_PAIR) &&                                         // and this read is a proper pair
+//         (flag[x] & BAM_FREAD2)) {                                               // and it's a READ2
+//       dpos = start[x] - start[x-1];                                             // get distance between start positions of mates
+//       ndel = xm[x-1].size() - dpos;                                             // number of chars to delete from the left side of READ2
+//       if ((dpos > 0) && (ndel > 0)) {                                           // if it's a rightmost read && distance between mates is less than refspaced read length
+//         seq[x] = Rcpp::as<std::string>(seq[x]).erase(0, ndel);                  // trim rightmost READ2 until the end of leftmost Read1
+//         xm[x] = Rcpp::as<std::string>(xm[x]).erase(0, ndel);
+//         start[x] = start[x-1] + xm[x-1].size();                                 // adjust new POS
+//       }
+//     }
+//   }
+// }
 
 
 // #############################################################################

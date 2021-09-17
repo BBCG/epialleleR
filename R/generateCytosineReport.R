@@ -30,12 +30,12 @@
 #' to the following CX report (given that all reads map to chr1:+:1-16):
 #' 
 #' \tabular{lllllll}{
-#'   rname \tab strand \tab pos \tab context \tab meth \tab unmeth \tab triad \cr
-#'   chr1 \tab + \tab 4 \tab CG \tab 1 \tab 3 \tab NNN \cr
-#'   chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \tab NNN \cr
-#'   chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \tab NNN \cr
-#'   chr1 \tab + \tab 12 \tab CHG \tab 0 \tab 3 \tab NNN \cr
-#'   chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 \tab NNN 
+#'   rname \tab strand \tab pos \tab context \tab meth \tab unmeth \cr
+#'   chr1 \tab + \tab 4 \tab CG \tab 1 \tab 3 \cr
+#'   chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \cr
+#'   chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \cr
+#'   chr1 \tab + \tab 12 \tab CHG \tab 0 \tab 3 \cr
+#'   chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 
 #' }
 #' 
 #' With the thresholding disabled (threshold.reads = FALSE) all methylated bases
@@ -44,12 +44,12 @@
 #' IT Platform):
 #' 
 #' \tabular{lllllll}{
-#'   rname \tab strand \tab pos \tab context \tab meth \tab unmeth \tab triad \cr
-#'   chr1 \tab + \tab 4 \tab CG \tab 4 \tab 0 \tab NNN \cr
-#'   chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \tab NNN \cr
-#'   chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \tab NNN \cr
-#'   chr1 \tab + \tab 12 \tab CHG \tab 1 \tab 2 \tab NNN \cr
-#'   chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 \tab NNN 
+#'   rname \tab strand \tab pos \tab context \tab meth \tab unmeth \cr
+#'   chr1 \tab + \tab 4 \tab CG \tab 4 \tab 0 \cr
+#'   chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \cr
+#'   chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \cr
+#'   chr1 \tab + \tab 12 \tab CHG \tab 1 \tab 2 \cr
+#'   chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 
 #' }
 #' 
 #' Other notes:
@@ -110,10 +110,17 @@
 #' @param min.mapq non-negative integer threshold for minimum read mapping
 #' quality (default: 0). Option has no effect if preprocessed BAM data was
 #' supplied as an input.
+#' @param min.baseq non-negative integer threshold for minimum nucleotide base
+#' quality (default: 0). Option has no effect if preprocessed BAM data was
+#' supplied as an input.
 #' @param skip.duplicates boolean defining if duplicate aligned reads should be
 #' skipped (default: FALSE). Option has no effect if preprocessed BAM data was
 #' supplied as an input OR duplicate reads were not marked by alignment
 #' software.
+#' @param nthreads non-negative integer for the number of HTSlib threads to be
+#' used during BAM file decompression (default: 1). 2 threads make sense for the
+#' files larger than 100 MB. Option has no effect if preprocessed BAM data was
+#' supplied as an input.
 #' @param gzip boolean to compress the report (default: FALSE).
 #' @param verbose boolean to report progress and timings (default: TRUE).
 #' @return \code{\link[data.table]{data.table}} object containing cytosine
@@ -126,8 +133,6 @@
 #'   \item context -- methylation context
 #'   \item meth -- number of methylated cytosines
 #'   \item unmeth -- number of unmethylated cytosines
-#'   \item triad -- sequence spanning region [<pos>:<pos+2>]. Always equals to
-#'   "NNN" due to the reference genome-independent reporting
 #' }
 #' @seealso \code{\link{preprocessBam}} for preloading BAM data,
 #' \code{\link{generateBedReport}} for genomic region-based statistics,
@@ -154,15 +159,18 @@ generateCytosineReport <- function (bam,
                                     max.outofcontext.beta=0.1,
                                     report.context=threshold.context,
                                     min.mapq=0,
+                                    min.baseq=0,
                                     skip.duplicates=FALSE,
+                                    nthreads=1,
                                     gzip=FALSE,
                                     verbose=TRUE)
 {
   threshold.context <- match.arg(threshold.context, threshold.context)
   report.context    <- match.arg(report.context, report.context)
   
-  bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq,
-                       skip.duplicates=skip.duplicates, verbose=verbose)
+  bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq, min.baseq=min.baseq,
+                       skip.duplicates=skip.duplicates, nthreads=nthreads,
+                       verbose=verbose)
   
   if (threshold.reads) {
     bam$pass <- .thresholdReads(
@@ -182,8 +190,8 @@ generateCytosineReport <- function (bam,
   
   cx.report <- .getCytosineReport(
     bam.processed=bam,
-    ctx=paste0(.context.to.bases[[report.context]][["ctx.meth"]],
-               .context.to.bases[[report.context]][["ctx.unmeth"]]),
+    ctx=paste0(.context.to.bases[[report.context]][["ctx.unmeth"]],
+               .context.to.bases[[report.context]][["ctx.meth"]]),
     verbose=verbose
   )
   

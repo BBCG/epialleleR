@@ -9,8 +9,8 @@ rcpp_char_to_context <- function(ctx) {
     .Call(`_epialleleR_rcpp_char_to_context`, ctx)
 }
 
-rcpp_cx_report <- function(rname, strand, start, xm, pass, ctx) {
-    .Call(`_epialleleR_rcpp_cx_report`, rname, strand, start, xm, pass, ctx)
+rcpp_cx_report <- function(df, ctx) {
+    .Call(`_epialleleR_rcpp_cx_report`, df, ctx)
 }
 
 rcpp_get_base_freqs <- function(read_rname, read_strand, read_start, read_end, read_seq, pass, vcf_chr, vcf_pos) {
@@ -37,19 +37,11 @@ rcpp_parse_xm <- function(df) {
     .Call(`_epialleleR_rcpp_parse_xm`, df)
 }
 
-rcpp_read_bam_paired <- function(fn, min_mapq, min_baseq, skip_duplicates) {
-    .Call(`_epialleleR_rcpp_read_bam_paired`, fn, min_mapq, min_baseq, skip_duplicates)
+rcpp_read_bam_paired <- function(fn, min_mapq, min_baseq, skip_duplicates, nthreads) {
+    .Call(`_epialleleR_rcpp_read_bam_paired`, fn, min_mapq, min_baseq, skip_duplicates, nthreads)
 }
 
-rcpp_read_bam <- function(fn, min_mapq, min_baseq, skip_duplicates) {
-    .Call(`_epialleleR_rcpp_read_bam`, fn, min_mapq, min_baseq, skip_duplicates)
-}
-
-rcpp_posttrim_read2 <- function(df) {
-    invisible(.Call(`_epialleleR_rcpp_posttrim_read2`, df))
-}
-
-rcpp_threshold_reads <- function(xm, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac) {
-    .Call(`_epialleleR_rcpp_threshold_reads`, xm, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac)
+rcpp_threshold_reads <- function(df, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac) {
+    .Call(`_epialleleR_rcpp_threshold_reads`, df, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac)
 }
 
