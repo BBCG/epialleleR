@@ -16,7 +16,7 @@
 #' paired-end sequencing (create an issue if you need to process single-end BAM
 #' files). During preprocessing, paired reads are merged according to their base 
 #' quality: nucleotide base with the highest value in the QUAL string is taken,
-#' unless its quality is less than min.baseq, which results in no information
+#' unless its quality is less than `min.baseq`, which results in no information
 #' for that particular position ("-"/"N"). These merged reads are then
 #' processed as a single entity in all `epialleleR` methods.
 #' 

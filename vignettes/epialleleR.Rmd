@@ -153,7 +153,7 @@ larger methylation capture panels, or even whole-genome approaches.
 ## Processing speed
 
 Currently *`epialleleR`* runs in a single-thread mode only. Loading the BAM
-data is currently done by means of *`HTSlib`*, therefore it is possible to speed
+data is now done by means of *`HTSlib`*, therefore it is possible to speed
 it up using >1 threads (`nthreads` option in *`preprocessBam`*). All operations
 are performed using optimised C++ functions, and usually take reasonable time.
 Running time for complete task "BAM on disk -> CX report on disk" depends on the
@@ -225,12 +225,13 @@ advised to use the *`preprocessBam`* convenience function as shown below. This
 function is also used internally when a BAM file location string is supplied as
 an input for other *`epialleleR`* methods.
 
-*`preprocessBam`* automatically determines if BAM is derived from single-end or
-paired-end sequencing. When the latter is the case, paired reads are merged
-so that the overlapping fragments of the second read are clipped (because the
-quality of the second read is usually lower than of the first). These
-**merged reads** are then processed as a **single entity** in all *`epialleleR`*
-methods.
+`preprocessBam` currently accepts only BAM files that are derived from
+paired-end sequencing (create an issue if you need to process single-end BAM
+files). During preprocessing, paired reads are merged according to their base 
+quality: nucleotide base with the highest value in the QUAL string is taken,
+unless its quality is less than *`min.baseq`*, which results in no information
+for that particular position ("-"/"N"). These **merged reads** are then
+processed as a **single entity** in all *`epialleleR`* methods.
 
 ```{r}
 library(epialleleR)
