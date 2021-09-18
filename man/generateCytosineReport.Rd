@@ -23,7 +23,11 @@ generateCytosineReport(
 }
 \arguments{
 \item{bam}{BAM file location string OR preprocessed output of
-\code{\link[epialleleR]{preprocessBam}} function.}
+\code{\link[epialleleR]{preprocessBam}} function. BAM file alignment records
+must derive from paired-end sequencing, be sorted
+by QNAME (instead of genomic position), contain XG tag (strand information
+for the reference genome) and methylation call strings. Read more about
+these requirements and BAM preprocessing at \code{\link{preprocessBam}}.}
 
 \item{report.file}{file location string to write the cytosine report. If NULL
 (the default) then report is returned as a
@@ -108,10 +112,10 @@ This function counts methylated and unmethylated DNA bases taking into the
 account average methylation level of the entire sequence read.
 }
 \details{
-The function reports cytosine methylation information using BAM file as an
-input. In contrast to the other currently available software, reads (or read
-pairs as a single entity) can be thresholded by their average methylation
-level before counting methylated bases, effectively resulting in
+The function reports cytosine methylation information using BAM file or data
+as an input. In contrast to the other currently available software, reads
+(or read pairs as a single entity) can be thresholded by their average
+methylation level before counting methylated bases, effectively resulting in
 hypermethylated variant epiallele frequency (VEF) being reported instead of
 beta value. The function's logic is explained below.
 
@@ -161,15 +165,16 @@ Methylation string bases in unknown context ("uU") are simply ignored, which,
 to the best of our knowledge, is consistent with the behaviour of other
 tools.
 
-In order to mitigate sequencing errors (leading to rare variations in the
-methylation context, as in reads 1 and 4 above), the context present in more
-than 50\% of the reads is assumed to be correct, while all bases at the same
-position but having other methylation context are simply ignored. This allows
-reports to be prepared without using the reference genome sequence.
+In order to mitigate the effect of sequencing errors (leading to rare
+variations in the methylation context, as in reads 1 and 4 above), the
+context present in more than 50\% of the reads is assumed to be correct,
+while all bases at the same position but having other methylation context
+are simply ignored. This allows reports to be prepared without using the
+reference genome sequence.
 
 The downside of not using the reference genome sequence is the inability to
 determine the actual sequence of triplet for every base in the cytosine 
-report. For now the sequence is reported as "NNN" and this will stay until
+report. Therefore this sequence is not reported, and this will stay until
 such information will be considered as worth adding.
 }
 \examples{

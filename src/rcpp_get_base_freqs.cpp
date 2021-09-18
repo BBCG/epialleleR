@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 // using namespace Rcpp;
 
-// Matches reads with given 1-base positions (VCF) and returns base frequences.
+// Matches reads with given 1-base positions (VCF) and returns base frequencies.
 // FUNCTION ASSUMES THAT BOTH READS AND VCF ENTRIES ARE SORTED!
 // Return value: std::array<int,32> for each position in VCF
 // Array indices are calculated as (char&7 | pass?15:0 | strand?31:0),

@@ -27,13 +27,18 @@
 #' mapped to \strong{"+"} (forward) and \strong{"-"} (reverse) DNA strands.
 #' 
 #' Please note that the final report currently includes only the VCF entries
-#' with single-base REF and ALT alleles. Also, there is no filtering by the base
-#' quality at the moment, thus the output of `generateVcfReport` is equivalent
-#' to the one of `samtools mplieup -Q 0 ...`, and may result in false SNVs
-#' caused by misalignments. These will be fixed in the future.
+#' with single-base REF and ALT alleles. Also, the default (`min.baseq=0`)
+#' output of `generateVcfReport` is equivalent to the one of
+#' `samtools mplieup -Q 0 ...`, and therefore may result in false SNVs caused
+#' by misalignments. Remember to increase `min.baseq` (`samtools mplieup -Q`
+#' default value is 13) to obtain higher-quality results.
 #'
 #' @param bam BAM file location string OR preprocessed output of
-#' \code{\link{preprocessBam}} function.
+#' \code{\link{preprocessBam}} function. BAM file alignment records
+#' must derive from paired-end sequencing, be sorted
+#' by QNAME (instead of genomic position), contain XG tag (strand information
+#' for the reference genome) and methylation call strings. Read more about
+#' these requirements and BAM preprocessing at \code{\link{preprocessBam}}.
 #' @param vcf Variant Call Format (VCF) file location string OR a VCF object
 #' returned by \code{\link[VariantAnnotation]{readVcf}} function. If VCF object
 #' is supplied, its seqlevels must match the seqlevels of the BAM file/object
@@ -95,10 +100,17 @@
 #' @param min.mapq non-negative integer threshold for minimum read mapping
 #' quality (default: 0). Option has no effect if preprocessed BAM data was
 #' supplied as an input.
+#' @param min.baseq non-negative integer threshold for minimum nucleotide base
+#' quality (default: 0). Option has no effect if preprocessed BAM data was
+#' supplied as an input.
 #' @param skip.duplicates boolean defining if duplicate aligned reads should be
 #' skipped (default: FALSE). Option has no effect if preprocessed BAM data was
 #' supplied as an input OR duplicate reads were not marked by alignment
 #' software.
+#' @param nthreads non-negative integer for the number of HTSlib threads to be
+#' used during BAM file decompression (default: 1). 2 threads make sense for the
+#' files larger than 100 MB. Option has no effect if preprocessed BAM data was
+#' supplied as an input.
 #' @param gzip boolean to compress the report (default: FALSE).
 #' @param verbose boolean to report progress and timings (default: TRUE).
 #' @return \code{\link[data.table]{data.table}} object containing VCF report or
@@ -167,7 +179,9 @@ generateVcfReport <- function (bam,
                                min.context.beta=0.5,
                                max.outofcontext.beta=0.1,
                                min.mapq=0,
+                               min.baseq=0,
                                skip.duplicates=FALSE,
+                               nthreads=1,
                                gzip=FALSE,
                                verbose=TRUE)
 {
@@ -187,10 +201,11 @@ generateVcfReport <- function (bam,
   if (is(vcf, "CollapsedVCF"))
     vcf <- VariantAnnotation::expand(vcf, row.names=TRUE)
   
-  bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq,
-                       skip.duplicates=skip.duplicates, verbose=verbose)
+  bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq, min.baseq=min.baseq,
+                       skip.duplicates=skip.duplicates, nthreads=nthreads,
+                       verbose=verbose)
   if (threshold.reads) {
-    bam$pass <- .thresholdReads(
+    pass <- .thresholdReads(
       bam.processed=bam,
       ctx.meth=.context.to.bases[[threshold.context]][["ctx.meth"]],
       ctx.unmeth=.context.to.bases[[threshold.context]][["ctx.unmeth"]],
@@ -202,10 +217,11 @@ generateVcfReport <- function (bam,
       verbose=verbose
     )
   } else {
-    bam$pass <- TRUE
+    rep(TRUE, nrow(bam))
   }
   
-  vcf.report <- .getBaseFreqReport(bam.processed=bam, vcf=vcf, verbose=verbose)
+  vcf.report <- .getBaseFreqReport(bam.processed=bam, pass=pass,
+                                   vcf=vcf, verbose=verbose)
   
   vcf.report <- vcf.report[, grep("nam|ran|ref|alt|fep", colnames(vcf.report),
                                   ignore.case=TRUE), with=FALSE]

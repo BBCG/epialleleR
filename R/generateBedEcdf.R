@@ -13,11 +13,15 @@
 #' 
 #' The resulting eCDFs and their plots can be used to characterise the
 #' methylation pattern of a particular genomic region, e.g. if reads that match
-#' to that region are methylated in an "all-or-none" manner or if some
+#' to that region are methylated in an "all-CpGs-or-none" manner or if some
 #' intermediate methylation levels are more frequent.
 #'
 #' @param bam BAM file location string OR preprocessed output of
-#' \code{\link{preprocessBam}} function.
+#' \code{\link{preprocessBam}} function. BAM file alignment records
+#' must derive from paired-end sequencing, be sorted
+#' by QNAME (instead of genomic position), contain XG tag (strand information
+#' for the reference genome) and methylation call strings. Read more about
+#' these requirements and BAM preprocessing at \code{\link{preprocessBam}}.
 #' @param bed Browser Extensible Data (BED) file location string OR object of
 #' class \code{\linkS4class{GRanges}} holding genomic coordinates for
 #' regions of interest. It is used to match sequencing reads to the genomic
@@ -68,10 +72,17 @@
 #' @param min.mapq non-negative integer threshold for minimum read mapping
 #' quality (default: 0). Option has no effect if preprocessed BAM data was
 #' supplied as an input.
+#' @param min.baseq non-negative integer threshold for minimum nucleotide base
+#' quality (default: 0). Option has no effect if preprocessed BAM data was
+#' supplied as an input.
 #' @param skip.duplicates boolean defining if duplicate aligned reads should be
 #' skipped (default: FALSE). Option has no effect if preprocessed BAM data was
 #' supplied as an input OR duplicate reads were not marked by alignment
 #' software.
+#' @param nthreads non-negative integer for the number of HTSlib threads to be
+#' used during BAM file decompression (default: 1). 2 threads make sense for the
+#' files larger than 100 MB. Option has no effect if preprocessed BAM data was
+#' supplied as an input.
 #' @param verbose boolean to report progress and timings (default: TRUE).
 #' @return list with a number of elements equal to the length of `bed.rows` (if
 #' not NULL), or to the number of genomic regions within `bed` (if 
@@ -95,7 +106,7 @@
 #'   amplicon.ecdfs <- generateBedEcdf(bam=amplicon.bam, bed=amplicon.bed,
 #'                                     bed.rows=NULL)
 #'   
-#'   # there are 5 items in amplicon.ecdfs, let's plot all of them
+#'   # there are 5 items in amplicon.ecdfs, let's plot them all
 #'   par(mfrow=c(1,length(amplicon.ecdfs)))
 #'   
 #'   # cycle through items
@@ -114,6 +125,10 @@
 #'     plot(amplicon.ecdfs[[x]]$out.of.context, add=TRUE, col="blue",
 #'          verticals=TRUE, do.points=FALSE)
 #'   }
+#'   
+#'   # recover default plotting parameters
+#'   par(mfrow=c(1,1))
+#'   
 #' @export
 generateBedEcdf <- function (bam,
                              bed,
@@ -124,7 +139,9 @@ generateBedEcdf <- function (bam,
                              match.min.overlap=1,
                              ecdf.context=c("CG", "CHG", "CHH", "CxG", "CX"),
                              min.mapq=0,
+                             min.baseq=0,
                              skip.duplicates=FALSE,
+                             nthreads=1,
                              verbose=TRUE)
 {
   bed.type     <- match.arg(bed.type, bed.type)
@@ -134,8 +151,9 @@ generateBedEcdf <- function (bam,
     bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed,
                     verbose=verbose)
 
-  bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq,
-                       skip.duplicates=skip.duplicates, verbose=verbose)
+  bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq, min.baseq=min.baseq,
+                       skip.duplicates=skip.duplicates, nthreads=nthreads,
+                       verbose=verbose)
   
   ecdf.list <- .getBedEcdf(
     bam.processed=bam, bed=bed, bed.type=bed.type, bed.rows=bed.rows,

@@ -42,9 +42,13 @@
 #'   seqnames \tab start \tab end \tab width \tab strand \tab nreads+ \tab nreads- \tab VEF \cr
 #'   chr1 \tab 1 \tab 100 \tab 100 \tab * \tab 4 \tab 0 \tab 0.25
 #' }
-#'
+#' 
 #' @param bam BAM file location string OR preprocessed output of
-#' \code{\link{preprocessBam}} function.
+#' \code{\link{preprocessBam}} function. BAM file alignment records
+#' must derive from paired-end sequencing, be sorted
+#' by QNAME (instead of genomic position), contain XG tag (strand information
+#' for the reference genome) and methylation call strings. Read more about
+#' these requirements and BAM preprocessing at \code{\link{preprocessBam}}.
 #' @param bed Browser Extensible Data (BED) file location string OR object of
 #' class \code{\link[GenomicRanges]{GRanges}} holding genomic coordinates for
 #' regions of interest. The seqlevels of BED file/object must be the same as

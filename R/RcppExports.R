@@ -13,8 +13,8 @@ rcpp_get_base_freqs <- function(read_rname, read_strand, read_start, read_end, r
     .Call(`_epialleleR_rcpp_get_base_freqs`, read_rname, read_strand, read_start, read_end, read_seq, pass, vcf_chr, vcf_pos)
 }
 
-rcpp_get_xm_beta <- function(xm, ctx_meth, ctx_unmeth) {
-    .Call(`_epialleleR_rcpp_get_xm_beta`, xm, ctx_meth, ctx_unmeth)
+rcpp_get_xm_beta <- function(bam, ctx_meth, ctx_unmeth) {
+    .Call(`_epialleleR_rcpp_get_xm_beta`, bam, ctx_meth, ctx_unmeth)
 }
 
 rcpp_match_amplicon <- function(bam, bed, tolerance) {

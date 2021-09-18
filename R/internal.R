@@ -351,8 +351,8 @@ utils::globalVariables(
                             match.min.overlap=match.min.overlap)
   
   # Rcpp::sourceCpp("rcpp_get_xm_beta.cpp")
-  ctx.beta=rcpp_get_xm_beta(bam.processed$XM, ctx.meth, ctx.unmeth)
-  ooctx.beta=rcpp_get_xm_beta(bam.processed$XM, ooctx.meth, ooctx.unmeth)
+  ctx.beta=rcpp_get_xm_beta(bam.processed, ctx.meth, ctx.unmeth)
+  ooctx.beta=rcpp_get_xm_beta(bam.processed, ooctx.meth, ooctx.unmeth)
 
   all.bed.rows <- sort(unique(bed.match), na.last=TRUE)
   if (is.null(bed.rows))
@@ -380,7 +380,7 @@ utils::globalVariables(
 # descr: calculates base frequences at particular positions
 # value: data.table with base freqs
 
-.getBaseFreqReport <- function (bam.processed, vcf,
+.getBaseFreqReport <- function (bam.processed, pass, vcf,
                                 verbose)
 {
   if (verbose) message("Extracting base frequences", appendLF=FALSE)
@@ -396,7 +396,7 @@ utils::globalVariables(
   freqs <- rcpp_get_base_freqs(
     as.integer(bam.processed$rname), as.integer(bam.processed$strand),
     bam.processed$start, bam.processed$start+bam.processed$width-1,
-    bam.processed$seq, bam.processed$pass,
+    bam.processed$seq, pass,
     as.integer(GenomicRanges::seqnames(vcf.ranges)),
     BiocGenerics::start(vcf.ranges)
   )

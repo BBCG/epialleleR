@@ -20,6 +20,11 @@
 #' for that particular position ("-"/"N"). These merged reads are then
 #' processed as a single entity in all `epialleleR` methods.
 #' 
+#' It is also a requirement currently that BAM file is sorted by QNAME instead
+#' of genomic location (i.e., "unsorted") to perform merging of paired-end
+#' reads. Error message is shown if it is sorted by genomic location, in this
+#' case please sort it by QNAME using 'samtools sort -n -o out.bam in.bam'.
+#' 
 #' Please also note that for all its methods, `epialleleR` requires methylation
 #' call string to be present in a BAM file - i.e., methylation calling must be
 #' performed after read mapping/alignment by your software of choice.

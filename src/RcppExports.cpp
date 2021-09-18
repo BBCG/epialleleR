@@ -53,15 +53,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_get_xm_beta
-std::vector<double> rcpp_get_xm_beta(std::vector<std::string> xm, std::string ctx_meth, std::string ctx_unmeth);
-RcppExport SEXP _epialleleR_rcpp_get_xm_beta(SEXP xmSEXP, SEXP ctx_methSEXP, SEXP ctx_unmethSEXP) {
+std::vector<double> rcpp_get_xm_beta(Rcpp::DataFrame& bam, std::string ctx_meth, std::string ctx_unmeth);
+RcppExport SEXP _epialleleR_rcpp_get_xm_beta(SEXP bamSEXP, SEXP ctx_methSEXP, SEXP ctx_unmethSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::vector<std::string> >::type xm(xmSEXP);
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type bam(bamSEXP);
     Rcpp::traits::input_parameter< std::string >::type ctx_meth(ctx_methSEXP);
     Rcpp::traits::input_parameter< std::string >::type ctx_unmeth(ctx_unmethSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_get_xm_beta(xm, ctx_meth, ctx_unmeth));
+    rcpp_result_gen = Rcpp::wrap(rcpp_get_xm_beta(bam, ctx_meth, ctx_unmeth));
     return rcpp_result_gen;
 END_RCPP
 }
