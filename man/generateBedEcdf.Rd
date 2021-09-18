@@ -136,7 +136,7 @@ intermediate methylation levels are more frequent.
   amplicon.ecdfs <- generateBedEcdf(bam=amplicon.bam, bed=amplicon.bed,
                                     bed.rows=NULL)
   
-  # there are 5 items in amplicon.ecdfs, let's plot all of them
+  # there are 5 items in amplicon.ecdfs, let's plot them all
   par(mfrow=c(1,length(amplicon.ecdfs)))
   
   # cycle through items
@@ -155,6 +155,10 @@ intermediate methylation levels are more frequent.
     plot(amplicon.ecdfs[[x]]$out.of.context, add=TRUE, col="blue",
          verticals=TRUE, do.points=FALSE)
   }
+  
+  # recover default plotting parameters
+  par(mfrow=c(1,1))
+  
 }
 \seealso{
 \code{\link{preprocessBam}} for preloading BAM data,

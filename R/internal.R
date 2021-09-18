@@ -230,7 +230,7 @@ utils::globalVariables(
 ################################################################################
 
 # descr: prepare cytosine report for processed reads according to filter
-# value: data.table with Bismark-formatted cytosine report
+# value: data.table with Bismark-like cytosine report
 
 .getCytosineReport <- function (bam.processed,
                                 pass,
@@ -297,40 +297,6 @@ utils::globalVariables(
                              c("bedmatch","FALSE+","FALSE-","TRUE+","TRUE-")),
                     with=FALSE])
 }
-# 
-# 
-# .getBedReport <- function (bam.processed, pass, bed, bed.type,
-#                            match.tolerance, match.min.overlap,
-#                            verbose)
-# {
-#   if (verbose) message("Preparing ", bed.type, " report", appendLF=FALSE)
-#   tm <- proc.time()
-#   
-#   bam.processed[, `:=` (
-#     bedmatch=.matchTarget(bam.processed=bam.processed, bed=bed,
-#                           bed.type=bed.type, match.tolerance=match.tolerance,
-#                           match.min.overlap=match.min.overlap),
-#     pass=factor(pass, levels=c(TRUE,FALSE))
-#   )]
-#   data.table::setkey(bam.processed, bedmatch)
-#   bam.dt <- data.table::dcast(
-#     bam.processed[, list(nreads=.N), by=list(bedmatch,strand,pass), nomatch=0],
-#     bedmatch~pass+strand, value.var=c("nreads"), sep="", drop=FALSE, fill=0
-#   )
-#   bam.dt[,`:=` (`nreads+`=`FALSE+`+`TRUE+`,
-#                 `nreads-`=`FALSE-`+`TRUE-`,
-#                 VEF=(`TRUE+`+`TRUE-`)/(`FALSE+`+`TRUE+`+`FALSE-`+`TRUE-`) )]
-#   bed.dt <- data.table::as.data.table(bed)
-#   # bed.cl <- colnames(bed.dt)
-#   bed.dt[, bedmatch:=.I]
-#   bed.report <- data.table::merge.data.table(bed.dt, bam.dt, by="bedmatch",
-#                                              all=TRUE)[order(bedmatch)]
-#   
-#   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
-#   return(bed.report[,setdiff(names(bed.report),
-#                              c("bedmatch","FALSE+","FALSE-","TRUE+","TRUE-")),
-#                     with=FALSE])
-# }
 
 ################################################################################
 
@@ -391,15 +357,12 @@ utils::globalVariables(
                            vapply(as.character(vcf.ranges$ALT),
                                   stringi::stri_length,
                                   FUN.VALUE=numeric(1), USE.NAMES=FALSE)==1]
-  GenomeInfoDb::seqlevels(vcf.ranges, pruning.mode="coarse") <-
-    levels(bam.processed$rname)
-  freqs <- rcpp_get_base_freqs(
-    as.integer(bam.processed$rname), as.integer(bam.processed$strand),
-    bam.processed$start, bam.processed$start+bam.processed$width-1,
-    bam.processed$seq, pass,
-    as.integer(GenomicRanges::seqnames(vcf.ranges)),
-    BiocGenerics::start(vcf.ranges)
-  )
+  # GenomeInfoDb::seqlevels(vcf.ranges, pruning.mode="coarse") <-
+  #   levels(bam.processed$rname)
+  vcf.dt <- data.table::as.data.table(vcf.ranges)
+  vcf.dt[, seqnames := factor(seqnames, levels=levels(bam.processed$rname))]
+  
+  freqs <- rcpp_get_base_freqs(bam.processed, pass, vcf.dt)
   colnames(freqs) <- c("","U+A","","U+C","U+T","","U+N","U+G",
                        "","U-A","","U-C","U-T","","U-N","U-G",
                        "","M+A","","M+C","M+T","","M+N","M+G",
@@ -407,10 +370,7 @@ utils::globalVariables(
   
   bf.report <- data.table::data.table(
     name=names(vcf.ranges),
-    seqnames=as.character(GenomicRanges::seqnames(vcf.ranges)),
-    range=BiocGenerics::start(vcf.ranges),
-    REF=as.character(vcf.ranges$REF),
-    ALT=as.character(vcf.ranges$ALT),
+    vcf.dt[,.(seqnames, range=start, REF, ALT)],
     freqs[,grep("[ACTG]$",colnames(freqs))]
   )
   

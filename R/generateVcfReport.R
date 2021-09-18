@@ -217,7 +217,7 @@ generateVcfReport <- function (bam,
       verbose=verbose
     )
   } else {
-    rep(TRUE, nrow(bam))
+    pass <- rep(TRUE, nrow(bam))
   }
   
   vcf.report <- .getBaseFreqReport(bam.processed=bam, pass=pass,

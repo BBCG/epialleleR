@@ -35,20 +35,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_get_base_freqs
-Rcpp::NumericMatrix rcpp_get_base_freqs(std::vector<int> read_rname, std::vector<int> read_strand, std::vector<int> read_start, std::vector<int> read_end, std::vector<std::string> read_seq, std::vector<bool> pass, std::vector<int> vcf_chr, std::vector<int> vcf_pos);
-RcppExport SEXP _epialleleR_rcpp_get_base_freqs(SEXP read_rnameSEXP, SEXP read_strandSEXP, SEXP read_startSEXP, SEXP read_endSEXP, SEXP read_seqSEXP, SEXP passSEXP, SEXP vcf_chrSEXP, SEXP vcf_posSEXP) {
+Rcpp::NumericMatrix rcpp_get_base_freqs(Rcpp::DataFrame& bam, std::vector<bool> pass, Rcpp::DataFrame& vcf);
+RcppExport SEXP _epialleleR_rcpp_get_base_freqs(SEXP bamSEXP, SEXP passSEXP, SEXP vcfSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::vector<int> >::type read_rname(read_rnameSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type read_strand(read_strandSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type read_start(read_startSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type read_end(read_endSEXP);
-    Rcpp::traits::input_parameter< std::vector<std::string> >::type read_seq(read_seqSEXP);
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type bam(bamSEXP);
     Rcpp::traits::input_parameter< std::vector<bool> >::type pass(passSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type vcf_chr(vcf_chrSEXP);
-    Rcpp::traits::input_parameter< std::vector<int> >::type vcf_pos(vcf_posSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_get_base_freqs(read_rname, read_strand, read_start, read_end, read_seq, pass, vcf_chr, vcf_pos));
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type vcf(vcfSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_get_base_freqs(bam, pass, vcf));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -139,7 +134,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_epialleleR_rcpp_char_to_context", (DL_FUNC) &_epialleleR_rcpp_char_to_context, 1},
     {"_epialleleR_rcpp_cx_report", (DL_FUNC) &_epialleleR_rcpp_cx_report, 3},
-    {"_epialleleR_rcpp_get_base_freqs", (DL_FUNC) &_epialleleR_rcpp_get_base_freqs, 8},
+    {"_epialleleR_rcpp_get_base_freqs", (DL_FUNC) &_epialleleR_rcpp_get_base_freqs, 3},
     {"_epialleleR_rcpp_get_xm_beta", (DL_FUNC) &_epialleleR_rcpp_get_xm_beta, 3},
     {"_epialleleR_rcpp_match_amplicon", (DL_FUNC) &_epialleleR_rcpp_match_amplicon, 3},
     {"_epialleleR_rcpp_match_capture", (DL_FUNC) &_epialleleR_rcpp_match_capture, 3},

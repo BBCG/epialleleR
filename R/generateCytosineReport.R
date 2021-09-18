@@ -129,8 +129,8 @@
 #' @param gzip boolean to compress the report (default: FALSE).
 #' @param verbose boolean to report progress and timings (default: TRUE).
 #' @return \code{\link[data.table]{data.table}} object containing cytosine
-#' report in Bismark format or NULL if report.file was specified. The report
-#' columns are:
+#' report in Bismark-like format or NULL if report.file was specified. The
+#' report columns are:
 #' \itemize{
 #'   \item rname -- reference sequence name (as in BAM)
 #'   \item strand -- strand

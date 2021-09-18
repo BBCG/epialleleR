@@ -9,8 +9,8 @@ rcpp_cx_report <- function(df, pass, ctx) {
     .Call(`_epialleleR_rcpp_cx_report`, df, pass, ctx)
 }
 
-rcpp_get_base_freqs <- function(read_rname, read_strand, read_start, read_end, read_seq, pass, vcf_chr, vcf_pos) {
-    .Call(`_epialleleR_rcpp_get_base_freqs`, read_rname, read_strand, read_start, read_end, read_seq, pass, vcf_chr, vcf_pos)
+rcpp_get_base_freqs <- function(bam, pass, vcf) {
+    .Call(`_epialleleR_rcpp_get_base_freqs`, bam, pass, vcf)
 }
 
 rcpp_get_xm_beta <- function(bam, ctx_meth, ctx_unmeth) {
