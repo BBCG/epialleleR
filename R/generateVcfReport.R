@@ -23,7 +23,7 @@
 #' 
 #' After counting, function checks if certain bases occur more often within
 #' reads belonging to certain epialleles using Fisher's Exact test
-#' (\code{\link[stats]{fisher.test}}) and reports separate p-values for reads
+#' (HTSlib's own implementation) and reports separate p-values for reads
 #' mapped to \strong{"+"} (forward) and \strong{"-"} (reverse) DNA strands.
 #' 
 #' Please note that the final report currently includes only the VCF entries
@@ -187,8 +187,8 @@ generateVcfReport <- function (bam,
 {
   threshold.context <- match.arg(threshold.context, threshold.context)
   
-  if (!any(is(vcf, "CollapsedVCF"), is(vcf, "ExpandedVCF"))) {
-    if (!is.null(bed) & !is(bed, "GRanges"))
+  if (!any(methods::is(vcf, "CollapsedVCF"), methods::is(vcf, "ExpandedVCF"))) {
+    if (!is.null(bed) & !methods::is(bed, "GRanges"))
       bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed,
                       verbose=verbose)
     vcf <- .readVcf(vcf.file=vcf, vcf.style=vcf.style,

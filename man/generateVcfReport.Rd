@@ -180,7 +180,7 @@ files must use the same seqlevels (i.e. chromosome names).
 
 After counting, function checks if certain bases occur more often within
 reads belonging to certain epialleles using Fisher's Exact test
-(\code{\link[stats]{fisher.test}}) and reports separate p-values for reads
+(HTSlib's own implementation) and reports separate p-values for reads
 mapped to \strong{"+"} (forward) and \strong{"-"} (reverse) DNA strands.
 
 Please note that the final report currently includes only the VCF entries

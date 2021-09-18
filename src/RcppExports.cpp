@@ -34,6 +34,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_fep
+std::vector<double> rcpp_fep(Rcpp::DataFrame& df, std::vector<std::string> colnames);
+RcppExport SEXP _epialleleR_rcpp_fep(SEXP dfSEXP, SEXP colnamesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
+    Rcpp::traits::input_parameter< std::vector<std::string> >::type colnames(colnamesSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_fep(df, colnames));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_get_base_freqs
 Rcpp::NumericMatrix rcpp_get_base_freqs(Rcpp::DataFrame& bam, std::vector<bool> pass, Rcpp::DataFrame& vcf);
 RcppExport SEXP _epialleleR_rcpp_get_base_freqs(SEXP bamSEXP, SEXP passSEXP, SEXP vcfSEXP) {
@@ -86,17 +98,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpp_parse_xm
-std::vector<int> rcpp_parse_xm(Rcpp::DataFrame& df);
-RcppExport SEXP _epialleleR_rcpp_parse_xm(SEXP dfSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_parse_xm(df));
-    return rcpp_result_gen;
-END_RCPP
-}
 // rcpp_read_bam_paired
 Rcpp::DataFrame rcpp_read_bam_paired(std::string fn, int min_mapq, int min_baseq, bool skip_duplicates, int nthreads);
 RcppExport SEXP _epialleleR_rcpp_read_bam_paired(SEXP fnSEXP, SEXP min_mapqSEXP, SEXP min_baseqSEXP, SEXP skip_duplicatesSEXP, SEXP nthreadsSEXP) {
@@ -134,11 +135,11 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_epialleleR_rcpp_char_to_context", (DL_FUNC) &_epialleleR_rcpp_char_to_context, 1},
     {"_epialleleR_rcpp_cx_report", (DL_FUNC) &_epialleleR_rcpp_cx_report, 3},
+    {"_epialleleR_rcpp_fep", (DL_FUNC) &_epialleleR_rcpp_fep, 2},
     {"_epialleleR_rcpp_get_base_freqs", (DL_FUNC) &_epialleleR_rcpp_get_base_freqs, 3},
     {"_epialleleR_rcpp_get_xm_beta", (DL_FUNC) &_epialleleR_rcpp_get_xm_beta, 3},
     {"_epialleleR_rcpp_match_amplicon", (DL_FUNC) &_epialleleR_rcpp_match_amplicon, 3},
     {"_epialleleR_rcpp_match_capture", (DL_FUNC) &_epialleleR_rcpp_match_capture, 3},
-    {"_epialleleR_rcpp_parse_xm", (DL_FUNC) &_epialleleR_rcpp_parse_xm, 1},
     {"_epialleleR_rcpp_read_bam_paired", (DL_FUNC) &_epialleleR_rcpp_read_bam_paired, 5},
     {"_epialleleR_rcpp_threshold_reads", (DL_FUNC) &_epialleleR_rcpp_threshold_reads, 8},
     {NULL, NULL, 0}

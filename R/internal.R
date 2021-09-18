@@ -6,19 +6,19 @@
 #' @importFrom data.table setorder
 #' @importFrom data.table setkey
 #' @importFrom data.table setDT
+#' @importFrom data.table setattr
 #' @importFrom stringi stri_length
 #' @importFrom GenomicRanges makeGRangesFromDataFrame
 #' @importFrom GenomicRanges seqnames
 #' @importFrom GenomicRanges reduce
-#' @importFrom BiocGenerics start
-#' @importFrom BiocGenerics end
+#' @importFrom BiocGenerics sort
+#' @importFrom BiocGenerics width
 #' @importFrom VariantAnnotation ScanVcfParam
 #' @importFrom VariantAnnotation readVcf
 #' @importFrom VariantAnnotation expand
 #' @importFrom GenomeInfoDb seqlevelsStyle
 #' @importFrom SummarizedExperiment rowRanges
 #' @importFrom stats ecdf
-#' @importFrom stats fisher.test
 #' @importFrom stats setNames
 #' @importFrom methods is
 #' @importFrom utils globalVariables
@@ -249,10 +249,10 @@ utils::globalVariables(
     )
   )
   data.table::setDT(cx.report)
-  cx.report[, setattr(rname,  "class", "factor")]
-  cx.report[, setattr(rname,  "levels", levels(bam.processed$rname))]
-  cx.report[, setattr(strand, "class", "factor")]
-  cx.report[, setattr(strand, "levels", levels(bam.processed$strand))]
+  cx.report[, data.table::setattr(rname,  "class", "factor")]
+  cx.report[, data.table::setattr(rname,  "levels", levels(bam.processed$rname))]
+  cx.report[, data.table::setattr(strand, "class", "factor")]
+  cx.report[, data.table::setattr(strand, "levels", levels(bam.processed$strand))]
   cx.report[, `:=` (context = rcpp_char_to_context(context))]
 
   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
@@ -400,9 +400,11 @@ utils::globalVariables(
                                        `M+Alt`=`M+T`,       `U+Alt`=`U+T`,       `M-Alt`=`M-T`,       `U-Alt`=`U-T`      )]
   bf.report[, `:=` (SumRef=rowSums(bf.report[,.(`M+Ref`,`U+Ref`,`M-Ref`,`U-Ref`)], na.rm=TRUE),
                     SumAlt=rowSums(bf.report[,.(`M+Alt`,`U+Alt`,`M-Alt`,`U-Alt`)], na.rm=TRUE))]
-  FEp <- function (x) { if (any(is.na(x))) NA else stats::fisher.test(matrix(x, nrow=2))$p.value }
-  bf.report[, `:=` (`FEp+`=apply(bf.report[,.(`M+Ref`,`U+Ref`,`M+Alt`,`U+Alt`)], 1, FEp),
-                    `FEp-`=apply(bf.report[,.(`M-Ref`,`U-Ref`,`M-Alt`,`U-Alt`)], 1, FEp))]
+  # FEp <- function (x) { if (any(is.na(x))) NA else stats::fisher.test(matrix(x, nrow=2))$p.value }
+  # bf.report[, `:=` (`FEp+`=apply(bf.report[,.(`M+Ref`,`U+Ref`,`M+Alt`,`U+Alt`)], 1, FEp),
+  #                   `FEp-`=apply(bf.report[,.(`M-Ref`,`U-Ref`,`M-Alt`,`U-Alt`)], 1, FEp))]
+  bf.report[, `:=` (`FEp+`=rcpp_fep(bf.report, c("M+Ref","U+Ref","M+Alt","U+Alt")),
+                    `FEp-`=rcpp_fep(bf.report, c("M-Ref","U-Ref","M-Alt","U-Alt")))]
   
   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(bf.report)

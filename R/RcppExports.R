@@ -9,6 +9,10 @@ rcpp_cx_report <- function(df, pass, ctx) {
     .Call(`_epialleleR_rcpp_cx_report`, df, pass, ctx)
 }
 
+rcpp_fep <- function(df, colnames) {
+    .Call(`_epialleleR_rcpp_fep`, df, colnames)
+}
+
 rcpp_get_base_freqs <- function(bam, pass, vcf) {
     .Call(`_epialleleR_rcpp_get_base_freqs`, bam, pass, vcf)
 }
@@ -23,10 +27,6 @@ rcpp_match_amplicon <- function(bam, bed, tolerance) {
 
 rcpp_match_capture <- function(bam, bed, min_overlap) {
     .Call(`_epialleleR_rcpp_match_capture`, bam, bed, min_overlap)
-}
-
-rcpp_parse_xm <- function(df) {
-    .Call(`_epialleleR_rcpp_parse_xm`, df)
 }
 
 rcpp_read_bam_paired <- function(fn, min_mapq, min_baseq, skip_duplicates, nthreads) {

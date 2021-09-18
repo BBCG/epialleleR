@@ -147,7 +147,7 @@ generateBedEcdf <- function (bam,
   bed.type     <- match.arg(bed.type, bed.type)
   ecdf.context <- match.arg(ecdf.context, ecdf.context)
   
-  if (!is(bed, "GRanges"))
+  if (!methods::is(bed, "GRanges"))
     bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed,
                     verbose=verbose)
 
