@@ -81,7 +81,7 @@ tests their association with the methylation status of the sequencing reads." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.9</span>
       </span>
     </div>
 
@@ -137,7 +137,9 @@ tests their association with the methylation status of the sequencing reads.</p>
   min.context.beta <span class='op'>=</span> <span class='fl'>0.5</span>,
   max.outofcontext.beta <span class='op'>=</span> <span class='fl'>0.1</span>,
   min.mapq <span class='op'>=</span> <span class='fl'>0</span>,
+  min.baseq <span class='op'>=</span> <span class='fl'>0</span>,
   skip.duplicates <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  nthreads <span class='op'>=</span> <span class='fl'>1</span>,
   gzip <span class='op'>=</span> <span class='cn'>FALSE</span>,
   verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span></code></pre></div>
@@ -148,7 +150,11 @@ tests their association with the methylation status of the sequencing reads.</p>
     <tr>
       <th>bam</th>
       <td><p>BAM file location string OR preprocessed output of
-<code><a href='preprocessBam.html'>preprocessBam</a></code> function.</p></td>
+<code><a href='preprocessBam.html'>preprocessBam</a></code> function. BAM file alignment records
+must derive from paired-end sequencing, be sorted
+by QNAME (instead of genomic position), contain XG tag (strand information
+for the reference genome) and methylation call strings. Read more about
+these requirements and BAM preprocessing at <code><a href='preprocessBam.html'>preprocessBam</a></code>.</p></td>
     </tr>
     <tr>
       <th>vcf</th>
@@ -242,11 +248,24 @@ quality (default: 0). Option has no effect if preprocessed BAM data was
 supplied as an input.</p></td>
     </tr>
     <tr>
+      <th>min.baseq</th>
+      <td><p>non-negative integer threshold for minimum nucleotide base
+quality (default: 0). Option has no effect if preprocessed BAM data was
+supplied as an input.</p></td>
+    </tr>
+    <tr>
       <th>skip.duplicates</th>
       <td><p>boolean defining if duplicate aligned reads should be
 skipped (default: FALSE). Option has no effect if preprocessed BAM data was
 supplied as an input OR duplicate reads were not marked by alignment
 software.</p></td>
+    </tr>
+    <tr>
+      <th>nthreads</th>
+      <td><p>non-negative integer for the number of HTSlib threads to be
+used during BAM file decompression (default: 1). 2 threads make sense for the
+files larger than 100 MB. Option has no effect if preprocessed BAM data was
+supplied as an input.</p></td>
     </tr>
     <tr>
       <th>gzip</th>
@@ -310,13 +329,14 @@ location of such large VCF file. Please note that all the BAM, BED and VCF
 files must use the same seqlevels (i.e. chromosome names).</p>
 <p>After counting, function checks if certain bases occur more often within
 reads belonging to certain epialleles using Fisher's Exact test
-(<code><a href='https://rdrr.io/r/stats/fisher.test.html'>fisher.test</a></code>) and reports separate p-values for reads
+(HTSlib's own implementation) and reports separate p-values for reads
 mapped to <strong>"+"</strong> (forward) and <strong>"-"</strong> (reverse) DNA strands.</p>
 <p>Please note that the final report currently includes only the VCF entries
-with single-base REF and ALT alleles. Also, there is no filtering by the base
-quality at the moment, thus the output of `generateVcfReport` is equivalent
-to the one of `samtools mplieup -Q 0 ...`, and may result in false SNVs
-caused by misalignments. These will be fixed in the future.</p>
+with single-base REF and ALT alleles. Also, the default (`min.baseq=0`)
+output of `generateVcfReport` is equivalent to the one of
+`samtools mplieup -Q 0 ...`, and therefore may result in false SNVs caused
+by misalignments. Remember to increase `min.baseq` (`samtools mplieup -Q`
+default value is 13) to obtain higher-quality results.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='preprocessBam.html'>preprocessBam</a></code> for preloading BAM data,
@@ -342,18 +362,13 @@ the seqlevels style.</p></div>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BED file</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.017s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading VCF file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [8.892s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [9.697s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BAM file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.139s]</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> Preprocessing BAM data:</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>   Transforming sequences</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.037s]</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>   Merging pairs</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.014s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.030s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Thresholding reads</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.002s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.001s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Extracting base frequences</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [12.175s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.961s]</span>
 </code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

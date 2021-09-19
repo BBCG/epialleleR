@@ -81,7 +81,7 @@ account average methylation level of the entire sequence read." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.9</span>
       </span>
     </div>
 
@@ -134,7 +134,9 @@ account average methylation level of the entire sequence read.</p>
   max.outofcontext.beta <span class='op'>=</span> <span class='fl'>0.1</span>,
   report.context <span class='op'>=</span> <span class='va'>threshold.context</span>,
   min.mapq <span class='op'>=</span> <span class='fl'>0</span>,
+  min.baseq <span class='op'>=</span> <span class='fl'>0</span>,
   skip.duplicates <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  nthreads <span class='op'>=</span> <span class='fl'>1</span>,
   gzip <span class='op'>=</span> <span class='cn'>FALSE</span>,
   verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span></code></pre></div>
@@ -145,7 +147,11 @@ account average methylation level of the entire sequence read.</p>
     <tr>
       <th>bam</th>
       <td><p>BAM file location string OR preprocessed output of
-<code><a href='preprocessBam.html'>preprocessBam</a></code> function.</p></td>
+<code><a href='preprocessBam.html'>preprocessBam</a></code> function. BAM file alignment records
+must derive from paired-end sequencing, be sorted
+by QNAME (instead of genomic position), contain XG tag (strand information
+for the reference genome) and methylation call strings. Read more about
+these requirements and BAM preprocessing at <code><a href='preprocessBam.html'>preprocessBam</a></code>.</p></td>
     </tr>
     <tr>
       <th>report.file</th>
@@ -209,11 +215,24 @@ quality (default: 0). Option has no effect if preprocessed BAM data was
 supplied as an input.</p></td>
     </tr>
     <tr>
+      <th>min.baseq</th>
+      <td><p>non-negative integer threshold for minimum nucleotide base
+quality (default: 0). Option has no effect if preprocessed BAM data was
+supplied as an input.</p></td>
+    </tr>
+    <tr>
       <th>skip.duplicates</th>
       <td><p>boolean defining if duplicate aligned reads should be
 skipped (default: FALSE). Option has no effect if preprocessed BAM data was
 supplied as an input OR duplicate reads were not marked by alignment
 software.</p></td>
+    </tr>
+    <tr>
+      <th>nthreads</th>
+      <td><p>non-negative integer for the number of HTSlib threads to be
+used during BAM file decompression (default: 1). 2 threads make sense for the
+files larger than 100 MB. Option has no effect if preprocessed BAM data was
+supplied as an input.</p></td>
     </tr>
     <tr>
       <th>gzip</th>
@@ -228,24 +247,22 @@ software.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code><a href='https://Rdatatable.gitlab.io/data.table/reference/data.table.html'>data.table</a></code> object containing cytosine
-report in Bismark format or NULL if report.file was specified. The report
-columns are:</p><ul>
+report in Bismark-like format or NULL if report.file was specified. The
+report columns are:</p><ul>
 <li><p>rname -- reference sequence name (as in BAM)</p></li>
 <li><p>strand -- strand</p></li>
 <li><p>pos -- cytosine position</p></li>
 <li><p>context -- methylation context</p></li>
 <li><p>meth -- number of methylated cytosines</p></li>
 <li><p>unmeth -- number of unmethylated cytosines</p></li>
-<li><p>triad -- sequence spanning region [&lt;pos&gt;:&lt;pos+2&gt;]. Always equals to
-  "NNN" due to the reference genome-independent reporting</p></li>
 </ul>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The function reports cytosine methylation information using BAM file as an
-input. In contrast to the other currently available software, reads (or read
-pairs as a single entity) can be thresholded by their average methylation
-level before counting methylated bases, effectively resulting in
+    <p>The function reports cytosine methylation information using BAM file or data
+as an input. In contrast to the other currently available software, reads
+(or read pairs as a single entity) can be thresholded by their average
+methylation level before counting methylated bases, effectively resulting in
 hypermethylated variant epiallele frequency (VEF) being reported instead of
 beta value. The function's logic is explained below.</p>
 <p>Let's suppose we have a BAM file with four reads, all mapped to the "+"
@@ -265,12 +282,11 @@ max.outofcontext.beta = 0.1), the input and results will look as following:</p>
 <p>Only the second read will satisfy all of the thresholding criteria, leading
 to the following CX report (given that all reads map to chr1:+:1-16):</p>
 <table class='table'>
-<tr><td>rname</td><td>strand</td><td>pos</td><td>context</td><td>meth</td><td>unmeth</td><td>triad</td></tr>
-<tr><td>chr1</td><td>+</td><td>4</td><td>CG</td><td>1</td><td>3</td><td>NNN</td></tr>
-<tr><td>chr1</td><td>+</td><td>7</td><td>CG</td><td>0</td><td>3</td><td>NNN</td></tr>
-<tr><td>chr1</td><td>+</td><td>9</td><td>CHH</td><td>0</td><td>4</td><td>NNN</td></tr>
-<tr><td>chr1</td><td>+</td><td>12</td><td>CHG</td><td>0</td><td>3</td><td>NNN</td></tr>
-<tr><td>chr1</td><td>+</td><td>15</td><td>CHH</td><td>0</td><td>4</td><td>NNN</td></tr>
+<tr><td>rname</td><td>strand</td><td>pos</td><td>context</td><td>meth</td><td>unmeth</td><td>chr1</td></tr>
+<tr><td>+</td><td>4</td><td>CG</td><td>1</td><td>3</td><td>chr1</td><td>+</td></tr>
+<tr><td>7</td><td>CG</td><td>0</td><td>3</td><td>chr1</td><td>+</td><td>9</td></tr>
+<tr><td>CHH</td><td>0</td><td>4</td><td>chr1</td><td>+</td><td>12</td><td>CHG</td></tr>
+<tr><td>0</td><td>3</td><td>chr1</td><td>+</td><td>15</td><td>CHH</td><td>0</td></tr>
 </table>
 
 
@@ -279,12 +295,11 @@ will retain their status, so the CX report will be similar to the reports
 produced by other methylation callers (such as Bismark or Illumina DRAGEN Bio
 IT Platform):</p>
 <table class='table'>
-<tr><td>rname</td><td>strand</td><td>pos</td><td>context</td><td>meth</td><td>unmeth</td><td>triad</td></tr>
-<tr><td>chr1</td><td>+</td><td>4</td><td>CG</td><td>4</td><td>0</td><td>NNN</td></tr>
-<tr><td>chr1</td><td>+</td><td>7</td><td>CG</td><td>0</td><td>3</td><td>NNN</td></tr>
-<tr><td>chr1</td><td>+</td><td>9</td><td>CHH</td><td>0</td><td>4</td><td>NNN</td></tr>
-<tr><td>chr1</td><td>+</td><td>12</td><td>CHG</td><td>1</td><td>2</td><td>NNN</td></tr>
-<tr><td>chr1</td><td>+</td><td>15</td><td>CHH</td><td>0</td><td>4</td><td>NNN</td></tr>
+<tr><td>rname</td><td>strand</td><td>pos</td><td>context</td><td>meth</td><td>unmeth</td><td>chr1</td></tr>
+<tr><td>+</td><td>4</td><td>CG</td><td>4</td><td>0</td><td>chr1</td><td>+</td></tr>
+<tr><td>7</td><td>CG</td><td>0</td><td>3</td><td>chr1</td><td>+</td><td>9</td></tr>
+<tr><td>CHH</td><td>0</td><td>4</td><td>chr1</td><td>+</td><td>12</td><td>CHG</td></tr>
+<tr><td>1</td><td>2</td><td>chr1</td><td>+</td><td>15</td><td>CHH</td><td>0</td></tr>
 </table>
 
 
@@ -292,14 +307,15 @@ IT Platform):</p>
 <p>Methylation string bases in unknown context ("uU") are simply ignored, which,
 to the best of our knowledge, is consistent with the behaviour of other
 tools.</p>
-<p>In order to mitigate sequencing errors (leading to rare variations in the
-methylation context, as in reads 1 and 4 above), the context present in more
-than 50% of the reads is assumed to be correct, while all bases at the same
-position but having other methylation context are simply ignored. This allows
-reports to be prepared without using the reference genome sequence.</p>
+<p>In order to mitigate the effect of sequencing errors (leading to rare
+variations in the methylation context, as in reads 1 and 4 above), the
+context present in more than 50% of the reads is assumed to be correct,
+while all bases at the same position but having other methylation context
+are simply ignored. This allows reports to be prepared without using the
+reference genome sequence.</p>
 <p>The downside of not using the reference genome sequence is the inability to
 determine the actual sequence of triplet for every base in the cytosine 
-report. For now the sequence is reported as "NNN" and this will stay until
+report. Therefore this sequence is not reported, and this will stay until
 such information will be considered as worth adding.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
@@ -316,29 +332,19 @@ sample data.</p></div>
 <span class='r-in'>  <span class='co'># CpG report with thresholding</span></span>
 <span class='r-in'>  <span class='va'>cg.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateCytosineReport</span><span class='op'>(</span><span class='va'>capture.bam</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BAM file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.941s]</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> Preprocessing BAM data:</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>   Transforming sequences</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.014s]</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>   Merging pairs</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.014s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.025s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Thresholding reads</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.001s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.002s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Preparing cytosine report</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.019s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.032s]</span>
 <span class='r-in'>  </span>
 <span class='r-in'>  <span class='co'># CX report without thresholding</span></span>
 <span class='r-in'>  <span class='va'>cx.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateCytosineReport</span><span class='op'>(</span><span class='va'>capture.bam</span>, threshold.reads<span class='op'>=</span><span class='cn'>FALSE</span>,</span>
 <span class='r-in'>               report.context<span class='op'>=</span><span class='st'>"CX"</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BAM file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.143s]</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span> Preprocessing BAM data:</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>   Transforming sequences</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.014s]</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>   Merging pairs</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.012s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.025s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Preparing cytosine report</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.032s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.045s]</span>
 </code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

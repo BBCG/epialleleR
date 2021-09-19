@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.9</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
 <div id="introduction" class="section level2">
 <h2 class="hasAnchor">
 <a href="#introduction" class="anchor" aria-hidden="true"></a>Introduction</h2>
-<p>DISCLAIMER: This is a work in progress, however the package is already usable, and the obtained experimental results will soon be published. Main methods (<em><code>preprocessBam</code></em>, <em><code>generateCytosineReport</code></em>, <em><code>generateBedReport</code></em>) won’t change. The <em><code>generateVcfReport</code></em> method will at some point be improved to include variable-length sequence variations, while <em><code>generateBedEcdf</code></em> should be considered somewhat experimental and may undergo significant changes or be substituted with some other method in the future.</p>
+<p>DISCLAIMER: This is a work in progress, however the package is already usable, and the obtained experimental results will soon be published. Main methods (<em><code>preprocessBam</code></em>, <em><code>generateCytosineReport</code></em>, <em><code>generateBedReport</code></em>) won’t change. The <em><code>generateVcfReport</code></em> method might at some point be improved to include variable-length sequence variations, while <em><code>generateBedEcdf</code></em> should be considered somewhat experimental and may undergo significant changes or be substituted with some other method in the future.</p>
 <p><em><code>epialleleR</code></em> is an R package for calling hypermethylated variant epiallele frequencies (VEF) at the level of genomic regions or individual cytosines in next-generation sequencing data using binary alignment map (BAM) files as an input. Other functionality includes computing the empirical cumulative distribution function for per-read beta values, and testing the significance of the association between epiallele methylation status and base frequencies at particular genomic positions (SNPs).</p>
 <div id="current-features" class="section level3">
 <h3 class="hasAnchor">
@@ -92,12 +92,12 @@
 <li>testing for the association between epiallele methylation status and sequence variations (<em><code>generateVcfReport</code></em>)</li>
 </ul>
 </div>
-<div id="coming-soon" class="section level3">
+<div id="recent-improvements-v12" class="section level3">
 <h3 class="hasAnchor">
-<a href="#coming-soon" class="anchor" aria-hidden="true"></a>Coming soon</h3>
+<a href="#recent-improvements-v12" class="anchor" aria-hidden="true"></a>Recent improvements (v1.2)</h3>
 <ul>
-<li>even faster and more memory-efficient BAM loading</li>
-<li>min-baseq parameter to reduce the effect of low quality bases on SNV calling (at the moment the output of <em><code>generateVcfReport</code></em> is equivalent to the one of <code>samtools mpileup -Q 0 ...</code>)</li>
+<li>even faster and more memory-efficient BAM loading (by means of HTSlib)</li>
+<li>min.baseq parameter to reduce the effect of low quality bases on methylation or SNV calling (in v1.0 the output of <em><code>generateVcfReport</code></em> was equivalent to the one of <code>samtools mpileup -Q 0 ...</code>)</li>
 </ul>
 <hr>
 </div>
