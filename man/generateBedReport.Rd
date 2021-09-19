@@ -18,7 +18,9 @@ generateAmpliconReport(
   min.context.beta = 0.5,
   max.outofcontext.beta = 0.1,
   min.mapq = 0,
+  min.baseq = 0,
   skip.duplicates = FALSE,
+  nthreads = 0,
   gzip = FALSE,
   verbose = TRUE
 )
@@ -35,7 +37,9 @@ generateCaptureReport(
   min.context.beta = 0.5,
   max.outofcontext.beta = 0.1,
   min.mapq = 0,
+  min.baseq = 0,
   skip.duplicates = FALSE,
+  nthreads = 0,
   gzip = FALSE,
   verbose = TRUE
 )
@@ -54,14 +58,20 @@ generateBedReport(
   min.context.beta = 0.5,
   max.outofcontext.beta = 0.1,
   min.mapq = 0,
+  min.baseq = 0,
   skip.duplicates = FALSE,
+  nthreads = 1,
   gzip = FALSE,
   verbose = TRUE
 )
 }
 \arguments{
 \item{bam}{BAM file location string OR preprocessed output of
-\code{\link{preprocessBam}} function.}
+\code{\link{preprocessBam}} function. BAM file alignment records
+must derive from paired-end sequencing, be sorted
+by QNAME (instead of genomic position), contain XG tag (strand information
+for the reference genome) and methylation call strings. Read more about
+these requirements and BAM preprocessing at \code{\link{preprocessBam}}.}
 
 \item{bed}{Browser Extensible Data (BED) file location string OR object of
 class \code{\link[GenomicRanges]{GRanges}} holding genomic coordinates for
@@ -122,10 +132,19 @@ disabled.}
 quality (default: 0). Option has no effect if preprocessed BAM data was
 supplied as an input.}
 
+\item{min.baseq}{non-negative integer threshold for minimum nucleotide base
+quality (default: 0). Option has no effect if preprocessed BAM data was
+supplied as an input.}
+
 \item{skip.duplicates}{boolean defining if duplicate aligned reads should be
 skipped (default: FALSE). Option has no effect if preprocessed BAM data was
 supplied as an input OR duplicate reads were not marked by alignment
 software.}
+
+\item{nthreads}{non-negative integer for the number of HTSlib threads to be
+used during BAM file decompression (default: 1). 2 threads make sense for the
+files larger than 100 MB. Option has no effect if preprocessed BAM data was
+supplied as an input.}
 
 \item{gzip}{boolean to compress the report (default: FALSE).}
 

@@ -9,7 +9,7 @@
 DISCLAIMER: This is a work in progress, however the package is already usable,
 and the obtained experimental results will soon be published. Main methods
 (*`preprocessBam`*, *`generateCytosineReport`*, *`generateBedReport`*) won't
-change. The *`generateVcfReport`* method will at some point be improved to
+change. The *`generateVcfReport`* method might at some point be improved to
 include variable-length sequence variations, while *`generateBedEcdf`* should
 be considered somewhat experimental and may undergo significant changes or be
 substituted with some other method in the future.
@@ -33,12 +33,12 @@ at particular genomic positions (SNPs).
  * testing for the association between epiallele methylation
  status and sequence variations (*`generateVcfReport`*)
 
-### Coming soon
+### Recent improvements (v1.2)
 
- * even faster and more memory-efficient BAM loading
- * min-baseq parameter to reduce the effect of low quality bases on SNV calling
- (at the moment the output of *`generateVcfReport`* is equivalent to the one of
- `samtools mpileup -Q 0 ...`)
+ * even faster and more memory-efficient BAM loading (by means of HTSlib)
+ * min.baseq parameter to reduce the effect of low quality bases on 
+ methylation or SNV calling (in v1.0 the output of *`generateVcfReport`* was
+ equivalent to the one of `samtools mpileup -Q 0 ...`)
  
 -------
 

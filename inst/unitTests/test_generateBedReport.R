@@ -49,4 +49,26 @@ test_generateBedReport <- function () {
   )
   
   generateAmpliconReport(bam=amplicon.bam, bed=amplicon.bed, report.file=tempfile())
+  
+  
+  quality.report <- generateAmpliconReport(bam=amplicon.bam, bed=amplicon.bed,
+                                           min.mapq=30, min.baseq=20, verbose=TRUE)
+  
+  RUnit::checkEquals(
+    sum(quality.report$`nreads-`),
+    434
+  )
+  
+  RUnit::checkEquals(
+    sum(quality.report[,.(`nreads+`,`nreads-`)]),
+    485
+  )
+  
+  RUnit::checkTrue(
+    sum(amplicon.report[1:4]$VEF) == sum(quality.report[1:4]$VEF)
+  )
+  
+  RUnit::checkTrue(
+    amplicon.report[5]$VEF != quality.report[5]$VEF
+  )
 }

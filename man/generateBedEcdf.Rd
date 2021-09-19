@@ -14,13 +14,19 @@ generateBedEcdf(
   match.min.overlap = 1,
   ecdf.context = c("CG", "CHG", "CHH", "CxG", "CX"),
   min.mapq = 0,
+  min.baseq = 0,
   skip.duplicates = FALSE,
+  nthreads = 1,
   verbose = TRUE
 )
 }
 \arguments{
 \item{bam}{BAM file location string OR preprocessed output of
-\code{\link{preprocessBam}} function.}
+\code{\link{preprocessBam}} function. BAM file alignment records
+must derive from paired-end sequencing, be sorted
+by QNAME (instead of genomic position), contain XG tag (strand information
+for the reference genome) and methylation call strings. Read more about
+these requirements and BAM preprocessing at \code{\link{preprocessBam}}.}
 
 \item{bed}{Browser Extensible Data (BED) file location string OR object of
 class \code{\linkS4class{GRanges}} holding genomic coordinates for
@@ -80,10 +86,19 @@ for computing within-the-context and out-of-context eCDFs:
 quality (default: 0). Option has no effect if preprocessed BAM data was
 supplied as an input.}
 
+\item{min.baseq}{non-negative integer threshold for minimum nucleotide base
+quality (default: 0). Option has no effect if preprocessed BAM data was
+supplied as an input.}
+
 \item{skip.duplicates}{boolean defining if duplicate aligned reads should be
 skipped (default: FALSE). Option has no effect if preprocessed BAM data was
 supplied as an input OR duplicate reads were not marked by alignment
 software.}
+
+\item{nthreads}{non-negative integer for the number of HTSlib threads to be
+used during BAM file decompression (default: 1). 2 threads make sense for the
+files larger than 100 MB. Option has no effect if preprocessed BAM data was
+supplied as an input.}
 
 \item{verbose}{boolean to report progress and timings (default: TRUE).}
 }
@@ -107,7 +122,7 @@ average per-read beta values, which can be used for plotting.
 
 The resulting eCDFs and their plots can be used to characterise the
 methylation pattern of a particular genomic region, e.g. if reads that match
-to that region are methylated in an "all-or-none" manner or if some
+to that region are methylated in an "all-CpGs-or-none" manner or if some
 intermediate methylation levels are more frequent.
 }
 \examples{
@@ -121,7 +136,7 @@ intermediate methylation levels are more frequent.
   amplicon.ecdfs <- generateBedEcdf(bam=amplicon.bam, bed=amplicon.bed,
                                     bed.rows=NULL)
   
-  # there are 5 items in amplicon.ecdfs, let's plot all of them
+  # there are 5 items in amplicon.ecdfs, let's plot them all
   par(mfrow=c(1,length(amplicon.ecdfs)))
   
   # cycle through items
@@ -140,6 +155,10 @@ intermediate methylation levels are more frequent.
     plot(amplicon.ecdfs[[x]]$out.of.context, add=TRUE, col="blue",
          verticals=TRUE, do.points=FALSE)
   }
+  
+  # recover default plotting parameters
+  par(mfrow=c(1,1))
+  
 }
 \seealso{
 \code{\link{preprocessBam}} for preloading BAM data,

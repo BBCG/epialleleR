@@ -5,10 +5,10 @@
 #' account average methylation level of the entire sequence read.
 #'
 #' @details
-#' The function reports cytosine methylation information using BAM file as an
-#' input. In contrast to the other currently available software, reads (or read
-#' pairs as a single entity) can be thresholded by their average methylation
-#' level before counting methylated bases, effectively resulting in
+#' The function reports cytosine methylation information using BAM file or data
+#' as an input. In contrast to the other currently available software, reads
+#' (or read pairs as a single entity) can be thresholded by their average
+#' methylation level before counting methylated bases, effectively resulting in
 #' hypermethylated variant epiallele frequency (VEF) being reported instead of
 #' beta value. The function's logic is explained below.
 #' 
@@ -30,12 +30,12 @@
 #' to the following CX report (given that all reads map to chr1:+:1-16):
 #' 
 #' \tabular{lllllll}{
-#'   rname \tab strand \tab pos \tab context \tab meth \tab unmeth \tab triad \cr
-#'   chr1 \tab + \tab 4 \tab CG \tab 1 \tab 3 \tab NNN \cr
-#'   chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \tab NNN \cr
-#'   chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \tab NNN \cr
-#'   chr1 \tab + \tab 12 \tab CHG \tab 0 \tab 3 \tab NNN \cr
-#'   chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 \tab NNN 
+#'   rname \tab strand \tab pos \tab context \tab meth \tab unmeth \cr
+#'   chr1 \tab + \tab 4 \tab CG \tab 1 \tab 3 \cr
+#'   chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \cr
+#'   chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \cr
+#'   chr1 \tab + \tab 12 \tab CHG \tab 0 \tab 3 \cr
+#'   chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 
 #' }
 #' 
 #' With the thresholding disabled (threshold.reads = FALSE) all methylated bases
@@ -44,12 +44,12 @@
 #' IT Platform):
 #' 
 #' \tabular{lllllll}{
-#'   rname \tab strand \tab pos \tab context \tab meth \tab unmeth \tab triad \cr
-#'   chr1 \tab + \tab 4 \tab CG \tab 4 \tab 0 \tab NNN \cr
-#'   chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \tab NNN \cr
-#'   chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \tab NNN \cr
-#'   chr1 \tab + \tab 12 \tab CHG \tab 1 \tab 2 \tab NNN \cr
-#'   chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 \tab NNN 
+#'   rname \tab strand \tab pos \tab context \tab meth \tab unmeth \cr
+#'   chr1 \tab + \tab 4 \tab CG \tab 4 \tab 0 \cr
+#'   chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \cr
+#'   chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \cr
+#'   chr1 \tab + \tab 12 \tab CHG \tab 1 \tab 2 \cr
+#'   chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 
 #' }
 #' 
 #' Other notes:
@@ -58,19 +58,24 @@
 #' to the best of our knowledge, is consistent with the behaviour of other
 #' tools.
 #' 
-#' In order to mitigate sequencing errors (leading to rare variations in the
-#' methylation context, as in reads 1 and 4 above), the context present in more
-#' than 50\% of the reads is assumed to be correct, while all bases at the same
-#' position but having other methylation context are simply ignored. This allows
-#' reports to be prepared without using the reference genome sequence.
+#' In order to mitigate the effect of sequencing errors (leading to rare
+#' variations in the methylation context, as in reads 1 and 4 above), the
+#' context present in more than 50\% of the reads is assumed to be correct,
+#' while all bases at the same position but having other methylation context
+#' are simply ignored. This allows reports to be prepared without using the
+#' reference genome sequence.
 #' 
 #' The downside of not using the reference genome sequence is the inability to
 #' determine the actual sequence of triplet for every base in the cytosine 
-#' report. For now the sequence is reported as "NNN" and this will stay until
+#' report. Therefore this sequence is not reported, and this will stay until
 #' such information will be considered as worth adding.
 #'
 #' @param bam BAM file location string OR preprocessed output of
-#' \code{\link[epialleleR]{preprocessBam}} function.
+#' \code{\link[epialleleR]{preprocessBam}} function. BAM file alignment records
+#' must derive from paired-end sequencing, be sorted
+#' by QNAME (instead of genomic position), contain XG tag (strand information
+#' for the reference genome) and methylation call strings. Read more about
+#' these requirements and BAM preprocessing at \code{\link{preprocessBam}}.
 #' @param report.file file location string to write the cytosine report. If NULL
 #' (the default) then report is returned as a
 #' \code{\link[data.table]{data.table}} object.
@@ -110,15 +115,22 @@
 #' @param min.mapq non-negative integer threshold for minimum read mapping
 #' quality (default: 0). Option has no effect if preprocessed BAM data was
 #' supplied as an input.
+#' @param min.baseq non-negative integer threshold for minimum nucleotide base
+#' quality (default: 0). Option has no effect if preprocessed BAM data was
+#' supplied as an input.
 #' @param skip.duplicates boolean defining if duplicate aligned reads should be
 #' skipped (default: FALSE). Option has no effect if preprocessed BAM data was
 #' supplied as an input OR duplicate reads were not marked by alignment
 #' software.
+#' @param nthreads non-negative integer for the number of HTSlib threads to be
+#' used during BAM file decompression (default: 1). 2 threads make sense for the
+#' files larger than 100 MB. Option has no effect if preprocessed BAM data was
+#' supplied as an input.
 #' @param gzip boolean to compress the report (default: FALSE).
 #' @param verbose boolean to report progress and timings (default: TRUE).
 #' @return \code{\link[data.table]{data.table}} object containing cytosine
-#' report in Bismark format or NULL if report.file was specified. The report
-#' columns are:
+#' report in Bismark-like format or NULL if report.file was specified. The
+#' report columns are:
 #' \itemize{
 #'   \item rname -- reference sequence name (as in BAM)
 #'   \item strand -- strand
@@ -126,8 +138,6 @@
 #'   \item context -- methylation context
 #'   \item meth -- number of methylated cytosines
 #'   \item unmeth -- number of unmethylated cytosines
-#'   \item triad -- sequence spanning region [<pos>:<pos+2>]. Always equals to
-#'   "NNN" due to the reference genome-independent reporting
 #' }
 #' @seealso \code{\link{preprocessBam}} for preloading BAM data,
 #' \code{\link{generateBedReport}} for genomic region-based statistics,
@@ -154,18 +164,21 @@ generateCytosineReport <- function (bam,
                                     max.outofcontext.beta=0.1,
                                     report.context=threshold.context,
                                     min.mapq=0,
+                                    min.baseq=0,
                                     skip.duplicates=FALSE,
+                                    nthreads=1,
                                     gzip=FALSE,
                                     verbose=TRUE)
 {
   threshold.context <- match.arg(threshold.context, threshold.context)
   report.context    <- match.arg(report.context, report.context)
   
-  bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq,
-                       skip.duplicates=skip.duplicates, verbose=verbose)
+  bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq, min.baseq=min.baseq,
+                       skip.duplicates=skip.duplicates, nthreads=nthreads,
+                       verbose=verbose)
   
   if (threshold.reads) {
-    bam$pass <- .thresholdReads(
+    pass <- .thresholdReads(
       bam.processed=bam,
       ctx.meth=.context.to.bases[[threshold.context]][["ctx.meth"]],
       ctx.unmeth=.context.to.bases[[threshold.context]][["ctx.unmeth"]],
@@ -177,13 +190,13 @@ generateCytosineReport <- function (bam,
       verbose=verbose
     )
   } else {
-    bam$pass <- TRUE
+    pass <- rep(TRUE, nrow(bam))
   }
   
   cx.report <- .getCytosineReport(
-    bam.processed=bam,
-    ctx=paste0(.context.to.bases[[report.context]][["ctx.meth"]],
-               .context.to.bases[[report.context]][["ctx.unmeth"]]),
+    bam.processed=bam, pass=pass,
+    ctx=paste0(.context.to.bases[[report.context]][["ctx.unmeth"]],
+               .context.to.bases[[report.context]][["ctx.meth"]]),
     verbose=verbose
   )
   

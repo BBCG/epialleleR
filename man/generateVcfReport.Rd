@@ -17,14 +17,20 @@ generateVcfReport(
   min.context.beta = 0.5,
   max.outofcontext.beta = 0.1,
   min.mapq = 0,
+  min.baseq = 0,
   skip.duplicates = FALSE,
+  nthreads = 1,
   gzip = FALSE,
   verbose = TRUE
 )
 }
 \arguments{
 \item{bam}{BAM file location string OR preprocessed output of
-\code{\link{preprocessBam}} function.}
+\code{\link{preprocessBam}} function. BAM file alignment records
+must derive from paired-end sequencing, be sorted
+by QNAME (instead of genomic position), contain XG tag (strand information
+for the reference genome) and methylation call strings. Read more about
+these requirements and BAM preprocessing at \code{\link{preprocessBam}}.}
 
 \item{vcf}{Variant Call Format (VCF) file location string OR a VCF object
 returned by \code{\link[VariantAnnotation]{readVcf}} function. If VCF object
@@ -98,10 +104,19 @@ disabled.}
 quality (default: 0). Option has no effect if preprocessed BAM data was
 supplied as an input.}
 
+\item{min.baseq}{non-negative integer threshold for minimum nucleotide base
+quality (default: 0). Option has no effect if preprocessed BAM data was
+supplied as an input.}
+
 \item{skip.duplicates}{boolean defining if duplicate aligned reads should be
 skipped (default: FALSE). Option has no effect if preprocessed BAM data was
 supplied as an input OR duplicate reads were not marked by alignment
 software.}
+
+\item{nthreads}{non-negative integer for the number of HTSlib threads to be
+used during BAM file decompression (default: 1). 2 threads make sense for the
+files larger than 100 MB. Option has no effect if preprocessed BAM data was
+supplied as an input.}
 
 \item{gzip}{boolean to compress the report (default: FALSE).}
 
@@ -165,14 +180,15 @@ files must use the same seqlevels (i.e. chromosome names).
 
 After counting, function checks if certain bases occur more often within
 reads belonging to certain epialleles using Fisher's Exact test
-(\code{\link[stats]{fisher.test}}) and reports separate p-values for reads
+(HTSlib's own implementation) and reports separate p-values for reads
 mapped to \strong{"+"} (forward) and \strong{"-"} (reverse) DNA strands.
 
 Please note that the final report currently includes only the VCF entries
-with single-base REF and ALT alleles. Also, there is no filtering by the base
-quality at the moment, thus the output of `generateVcfReport` is equivalent
-to the one of `samtools mplieup -Q 0 ...`, and may result in false SNVs
-caused by misalignments. These will be fixed in the future.
+with single-base REF and ALT alleles. Also, the default (`min.baseq=0`)
+output of `generateVcfReport` is equivalent to the one of
+`samtools mplieup -Q 0 ...`, and therefore may result in false SNVs caused
+by misalignments. Remember to increase `min.baseq` (`samtools mplieup -Q`
+default value is 13) to obtain higher-quality results.
 }
 \examples{
   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")

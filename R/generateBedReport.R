@@ -42,9 +42,13 @@
 #'   seqnames \tab start \tab end \tab width \tab strand \tab nreads+ \tab nreads- \tab VEF \cr
 #'   chr1 \tab 1 \tab 100 \tab 100 \tab * \tab 4 \tab 0 \tab 0.25
 #' }
-#'
+#' 
 #' @param bam BAM file location string OR preprocessed output of
-#' \code{\link{preprocessBam}} function.
+#' \code{\link{preprocessBam}} function. BAM file alignment records
+#' must derive from paired-end sequencing, be sorted
+#' by QNAME (instead of genomic position), contain XG tag (strand information
+#' for the reference genome) and methylation call strings. Read more about
+#' these requirements and BAM preprocessing at \code{\link{preprocessBam}}.
 #' @param bed Browser Extensible Data (BED) file location string OR object of
 #' class \code{\link[GenomicRanges]{GRanges}} holding genomic coordinates for
 #' regions of interest. The seqlevels of BED file/object must be the same as
@@ -115,10 +119,17 @@
 #' @param min.mapq non-negative integer threshold for minimum read mapping
 #' quality (default: 0). Option has no effect if preprocessed BAM data was
 #' supplied as an input.
+#' @param min.baseq non-negative integer threshold for minimum nucleotide base
+#' quality (default: 0). Option has no effect if preprocessed BAM data was
+#' supplied as an input.
 #' @param skip.duplicates boolean defining if duplicate aligned reads should be
 #' skipped (default: FALSE). Option has no effect if preprocessed BAM data was
 #' supplied as an input OR duplicate reads were not marked by alignment
 #' software.
+#' @param nthreads non-negative integer for the number of HTSlib threads to be
+#' used during BAM file decompression (default: 1). 2 threads make sense for the
+#' files larger than 100 MB. Option has no effect if preprocessed BAM data was
+#' supplied as an input.
 #' @param gzip boolean to compress the report (default: FALSE).
 #' @param verbose boolean to report progress and timings (default: TRUE).
 #' @return \code{\link[data.table]{data.table}} object containing VEF report for
@@ -176,7 +187,8 @@ generateAmpliconReport <- function (
   bam, bed, report.file=NULL, zero.based.bed=FALSE, match.tolerance=1,
   threshold.reads=TRUE, threshold.context=c("CG", "CHG", "CHH", "CxG", "CX"),
   min.context.sites=2, min.context.beta=0.5, max.outofcontext.beta=0.1,
-  min.mapq=0, skip.duplicates=FALSE, gzip=FALSE, verbose=TRUE)
+  min.mapq=0, min.baseq=0, skip.duplicates=FALSE, nthreads=0,
+  gzip=FALSE, verbose=TRUE)
 {
   generateBedReport(
     bam=bam, bed=bed, report.file=report.file, zero.based.bed=zero.based.bed,
@@ -184,7 +196,8 @@ generateAmpliconReport <- function (
     threshold.reads=threshold.reads, threshold.context=threshold.context,
     min.context.sites=min.context.sites, min.context.beta=min.context.beta,
     max.outofcontext.beta=max.outofcontext.beta, min.mapq=min.mapq,
-    skip.duplicates=skip.duplicates, gzip=gzip, verbose=verbose
+    min.baseq=min.baseq, skip.duplicates=skip.duplicates, nthreads=nthreads,
+    gzip=gzip, verbose=verbose
   )
 }
 #' @rdname generateBedReport
@@ -193,7 +206,8 @@ generateCaptureReport <- function (
   bam, bed, report.file=NULL, zero.based.bed=FALSE, match.min.overlap=1,
   threshold.reads=TRUE, threshold.context=c("CG", "CHG", "CHH", "CxG", "CX"),
   min.context.sites=2, min.context.beta=0.5, max.outofcontext.beta=0.1,
-  min.mapq=0, skip.duplicates=FALSE, gzip=FALSE, verbose=TRUE)
+  min.mapq=0, min.baseq=0, skip.duplicates=FALSE, nthreads=0,
+  gzip=FALSE, verbose=TRUE)
 {
   generateBedReport(
     bam=bam, bed=bed, report.file=report.file, zero.based.bed=zero.based.bed,
@@ -201,7 +215,8 @@ generateCaptureReport <- function (
     threshold.reads=threshold.reads, threshold.context=threshold.context,
     min.context.sites=min.context.sites, min.context.beta=min.context.beta,
     max.outofcontext.beta=max.outofcontext.beta, min.mapq=min.mapq,
-    skip.duplicates=skip.duplicates, gzip=gzip, verbose=verbose
+    min.baseq=min.baseq, skip.duplicates=skip.duplicates, nthreads=nthreads,
+    gzip=gzip, verbose=verbose
   )
 }
 #' @rdname generateBedReport
@@ -219,7 +234,9 @@ generateBedReport <- function (bam,
                                min.context.beta=0.5,
                                max.outofcontext.beta=0.1,
                                min.mapq=0,
+                               min.baseq=0,
                                skip.duplicates=FALSE,
+                               nthreads=1,
                                gzip=FALSE,
                                verbose=TRUE)
 {
@@ -230,11 +247,12 @@ generateBedReport <- function (bam,
     bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed,
                     verbose=verbose)
   
-  bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq,
-                       skip.duplicates=skip.duplicates, verbose=verbose)
+  bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq, min.baseq=min.baseq,
+                       skip.duplicates=skip.duplicates, nthreads=nthreads,
+                       verbose=verbose)
   
   if (threshold.reads) {
-    bam$pass <- .thresholdReads(
+    pass <- .thresholdReads(
       bam.processed=bam,
       ctx.meth=.context.to.bases[[threshold.context]][["ctx.meth"]],
       ctx.unmeth=.context.to.bases[[threshold.context]][["ctx.unmeth"]],
@@ -246,11 +264,11 @@ generateBedReport <- function (bam,
       verbose=verbose
     )
   } else {
-    bam$pass <- TRUE
+    pass <- rep(TRUE, nrow(bam))
   }
   
   bed.report <- .getBedReport(
-    bam.processed=bam, bed=bed, bed.type=bed.type,
+    bam.processed=bam, pass=pass, bed=bed, bed.type=bed.type,
     match.tolerance=match.tolerance, match.min.overlap=match.min.overlap,
     verbose=verbose
   )

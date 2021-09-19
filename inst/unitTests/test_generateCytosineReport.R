@@ -6,12 +6,12 @@ test_generateCytosineReport <- function () {
   
   RUnit::checkEquals(
     dim(cg.report),
-    c(15413,7)
+    c(15413,6)
   )
   
   RUnit::checkEquals(
     dim(cx.report),
-    c(97237,7)
+    c(97237,6)
   )
   
   RUnit::checkEquals(
@@ -35,4 +35,42 @@ test_generateCytosineReport <- function () {
   )
   
   generateCytosineReport(capture.bam, report.file=tempfile())
+  
+  
+  cg.quality  <- generateCytosineReport(capture.bam, verbose=TRUE,
+                                        min.mapq=30, min.baseq=20)
+  cx.quality  <- generateCytosineReport(capture.bam, threshold.reads=FALSE,
+                                        min.mapq=30, min.baseq=20,
+                                        report.context="CX", verbose=FALSE)
+  
+  RUnit::checkEquals(
+    dim(cg.quality),
+    c(15187,6)
+  )
+  
+  RUnit::checkEquals(
+    dim(cx.quality),
+    c(96040,6)
+  )
+  
+  RUnit::checkEquals(
+    sum(cg.quality$meth),
+    4829
+  )
+  
+  RUnit::checkEquals(
+    sum(cg.quality$unmeth),
+    15040
+  )
+  
+  RUnit::checkEquals(
+    sum(cx.quality$meth),
+    5866
+  )
+  
+  RUnit::checkEquals(
+    sum(cx.quality$unmeth),
+    124057
+  )
+  
 }

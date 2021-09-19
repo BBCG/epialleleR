@@ -3,7 +3,7 @@ test_preprocessBam <- function () {
   capture.data <- preprocessBam(capture.bam, verbose=FALSE)
   RUnit::checkEquals(
     dim(capture.data),
-    c(2968,7)
+    c(2968,5)
   )
   
   RUnit::checkEquals(
@@ -15,6 +15,32 @@ test_preprocessBam <- function () {
   amplicon.data <- preprocessBam(amplicon.bam, skip.duplicates=TRUE, verbose=FALSE)
   RUnit::checkEquals(
     dim(amplicon.data),
-    c(500,7)
+    c(500,5)
   )
+  
+  quality.data <- preprocessBam(capture.bam, verbose=FALSE,
+                                min.mapq=30, min.baseq=20)
+  RUnit::checkEquals(
+    dim(quality.data),
+    c(2968,5)
+  )
+  
+  RUnit::checkTrue(
+    !identical(capture.data, quality.data)
+  )
+  
+  RUnit::checkTrue(
+    identical(capture.data[,1:3], quality.data[,1:3])
+  )
+  
+  if (require(Rsamtools, quietly=TRUE)) {
+    RUnit::checkException(
+      preprocessBam(file.path(system.file("extdata", package="Rsamtools"), "ex1.bam"), verbose=FALSE)
+    )
+    
+    RUnit::checkException(
+      preprocessBam(file.path(system.file("extdata", package="Rsamtools"), "tiny.bam"), verbose=FALSE)
+    )
+  }
+  
 }

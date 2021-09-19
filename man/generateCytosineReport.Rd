@@ -14,14 +14,20 @@ generateCytosineReport(
   max.outofcontext.beta = 0.1,
   report.context = threshold.context,
   min.mapq = 0,
+  min.baseq = 0,
   skip.duplicates = FALSE,
+  nthreads = 1,
   gzip = FALSE,
   verbose = TRUE
 )
 }
 \arguments{
 \item{bam}{BAM file location string OR preprocessed output of
-\code{\link[epialleleR]{preprocessBam}} function.}
+\code{\link[epialleleR]{preprocessBam}} function. BAM file alignment records
+must derive from paired-end sequencing, be sorted
+by QNAME (instead of genomic position), contain XG tag (strand information
+for the reference genome) and methylation call strings. Read more about
+these requirements and BAM preprocessing at \code{\link{preprocessBam}}.}
 
 \item{report.file}{file location string to write the cytosine report. If NULL
 (the default) then report is returned as a
@@ -70,10 +76,19 @@ T). This option has no effect when read thresholding is disabled.}
 quality (default: 0). Option has no effect if preprocessed BAM data was
 supplied as an input.}
 
+\item{min.baseq}{non-negative integer threshold for minimum nucleotide base
+quality (default: 0). Option has no effect if preprocessed BAM data was
+supplied as an input.}
+
 \item{skip.duplicates}{boolean defining if duplicate aligned reads should be
 skipped (default: FALSE). Option has no effect if preprocessed BAM data was
 supplied as an input OR duplicate reads were not marked by alignment
 software.}
+
+\item{nthreads}{non-negative integer for the number of HTSlib threads to be
+used during BAM file decompression (default: 1). 2 threads make sense for the
+files larger than 100 MB. Option has no effect if preprocessed BAM data was
+supplied as an input.}
 
 \item{gzip}{boolean to compress the report (default: FALSE).}
 
@@ -81,8 +96,8 @@ software.}
 }
 \value{
 \code{\link[data.table]{data.table}} object containing cytosine
-report in Bismark format or NULL if report.file was specified. The report
-columns are:
+report in Bismark-like format or NULL if report.file was specified. The
+report columns are:
 \itemize{
   \item rname -- reference sequence name (as in BAM)
   \item strand -- strand
@@ -90,8 +105,6 @@ columns are:
   \item context -- methylation context
   \item meth -- number of methylated cytosines
   \item unmeth -- number of unmethylated cytosines
-  \item triad -- sequence spanning region [<pos>:<pos+2>]. Always equals to
-  "NNN" due to the reference genome-independent reporting
 }
 }
 \description{
@@ -99,10 +112,10 @@ This function counts methylated and unmethylated DNA bases taking into the
 account average methylation level of the entire sequence read.
 }
 \details{
-The function reports cytosine methylation information using BAM file as an
-input. In contrast to the other currently available software, reads (or read
-pairs as a single entity) can be thresholded by their average methylation
-level before counting methylated bases, effectively resulting in
+The function reports cytosine methylation information using BAM file or data
+as an input. In contrast to the other currently available software, reads
+(or read pairs as a single entity) can be thresholded by their average
+methylation level before counting methylated bases, effectively resulting in
 hypermethylated variant epiallele frequency (VEF) being reported instead of
 beta value. The function's logic is explained below.
 
@@ -124,12 +137,12 @@ Only the second read will satisfy all of the thresholding criteria, leading
 to the following CX report (given that all reads map to chr1:+:1-16):
 
 \tabular{lllllll}{
-  rname \tab strand \tab pos \tab context \tab meth \tab unmeth \tab triad \cr
-  chr1 \tab + \tab 4 \tab CG \tab 1 \tab 3 \tab NNN \cr
-  chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \tab NNN \cr
-  chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \tab NNN \cr
-  chr1 \tab + \tab 12 \tab CHG \tab 0 \tab 3 \tab NNN \cr
-  chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 \tab NNN 
+  rname \tab strand \tab pos \tab context \tab meth \tab unmeth \cr
+  chr1 \tab + \tab 4 \tab CG \tab 1 \tab 3 \cr
+  chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \cr
+  chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \cr
+  chr1 \tab + \tab 12 \tab CHG \tab 0 \tab 3 \cr
+  chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 
 }
 
 With the thresholding disabled (threshold.reads = FALSE) all methylated bases
@@ -138,12 +151,12 @@ produced by other methylation callers (such as Bismark or Illumina DRAGEN Bio
 IT Platform):
 
 \tabular{lllllll}{
-  rname \tab strand \tab pos \tab context \tab meth \tab unmeth \tab triad \cr
-  chr1 \tab + \tab 4 \tab CG \tab 4 \tab 0 \tab NNN \cr
-  chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \tab NNN \cr
-  chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \tab NNN \cr
-  chr1 \tab + \tab 12 \tab CHG \tab 1 \tab 2 \tab NNN \cr
-  chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 \tab NNN 
+  rname \tab strand \tab pos \tab context \tab meth \tab unmeth \cr
+  chr1 \tab + \tab 4 \tab CG \tab 4 \tab 0 \cr
+  chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \cr
+  chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \cr
+  chr1 \tab + \tab 12 \tab CHG \tab 1 \tab 2 \cr
+  chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 
 }
 
 Other notes:
@@ -152,15 +165,16 @@ Methylation string bases in unknown context ("uU") are simply ignored, which,
 to the best of our knowledge, is consistent with the behaviour of other
 tools.
 
-In order to mitigate sequencing errors (leading to rare variations in the
-methylation context, as in reads 1 and 4 above), the context present in more
-than 50\% of the reads is assumed to be correct, while all bases at the same
-position but having other methylation context are simply ignored. This allows
-reports to be prepared without using the reference genome sequence.
+In order to mitigate the effect of sequencing errors (leading to rare
+variations in the methylation context, as in reads 1 and 4 above), the
+context present in more than 50\% of the reads is assumed to be correct,
+while all bases at the same position but having other methylation context
+are simply ignored. This allows reports to be prepared without using the
+reference genome sequence.
 
 The downside of not using the reference genome sequence is the inability to
 determine the actual sequence of triplet for every base in the cytosine 
-report. For now the sequence is reported as "NNN" and this will stay until
+report. Therefore this sequence is not reported, and this will stay until
 such information will be considered as worth adding.
 }
 \examples{

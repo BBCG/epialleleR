@@ -5,30 +5,41 @@
 #'
 #' @details
 #' The function loads and preprocesses BAM file, saving time when multiple
-#' analyses are to be performed on large input files. Currently, Rsamtools
-#' package is used to read the data, but this will change in the future with a
-#' goal of speeding up this step even further.
+#' analyses are to be performed on large input files. Currently, HTSlib
+#' is used to read the data, therefore it is possible to speed up the loading
+#' by means of HTSlib threads.
 #' 
-#' This function is also used internally when BAM file location is supplied as
+#' This function is also called internally when BAM file location is supplied as
 #' an input for other `epialleleR` methods.
 #' 
-#' `preprocessBam` automatically determines whether BAM is derived from
-#' single-end or paired-end sequencing. When the latter is the case, paired
-#' reads are merged so that the overlapping fragments of second read are clipped
-#' (because quality of the second read is usually lower than of the first).
-#' These merged reads are then processed as a single entity in all `epialleleR`
-#' methods.
+#' `preprocessBam` currently accepts only BAM files that are derived from
+#' paired-end sequencing (create an issue if you need to process single-end BAM
+#' files). During preprocessing, paired reads are merged according to their base 
+#' quality: nucleotide base with the highest value in the QUAL string is taken,
+#' unless its quality is less than `min.baseq`, which results in no information
+#' for that particular position ("-"/"N"). These merged reads are then
+#' processed as a single entity in all `epialleleR` methods.
+#' 
+#' It is also a requirement currently that BAM file is sorted by QNAME instead
+#' of genomic location (i.e., "unsorted") to perform merging of paired-end
+#' reads. Error message is shown if it is sorted by genomic location, in this
+#' case please sort it by QNAME using 'samtools sort -n -o out.bam in.bam'.
 #' 
 #' Please also note that for all its methods, `epialleleR` requires methylation
-#' call string to be present in a BAM file - i.e. methylation calling must be
+#' call string to be present in a BAM file - i.e., methylation calling must be
 #' performed after read mapping/alignment by your software of choice.
 #'
 #' @param bam.file BAM file location string.
 #' @param min.mapq non-negative integer threshold for minimum read mapping
 #' quality (default: 0).
+#' @param min.baseq non-negative integer threshold for minimum nucleotide base
+#' quality (default: 0).
 #' @param skip.duplicates boolean defining if duplicate aligned reads should be
 #' skipped (default: FALSE). Option has no effect if duplicate reads were not
 #' marked by alignment software.
+#' @param nthreads non-negative integer for the number of HTSlib threads to be
+#' used during BAM file decompression (default: 1). 2 threads make sense for the
+#' files larger than 100 MB.
 #' @param verbose boolean to report progress and timings (default: TRUE).
 #' @return \code{\link[data.table]{data.table}} object containing preprocessed
 #' BAM data.
@@ -48,18 +59,22 @@
 #' @export
 preprocessBam <- function (bam.file,
                            min.mapq=0,
+                           min.baseq=0,
                            skip.duplicates=FALSE,
+                           nthreads=1,
                            verbose=TRUE)
 {
   if (is.character(bam.file)) {
-    bam <- .readBam(bam.file=bam.file, min.mapq=min.mapq,
-                    skip.duplicates=skip.duplicates, verbose=verbose)
-    bam.processed <- .processBam(bam=bam, verbose=verbose)
+    bam.processed <- .readBam(
+      bam.file=bam.file, min.mapq=min.mapq, min.baseq=min.baseq,
+      skip.duplicates=skip.duplicates, nthreads=nthreads, verbose=verbose
+    )
     return(bam.processed)
   } else {
     if (verbose) 
       message("Already preprocessed BAM supplied as an input. Options",
-              " 'min.mapq' and 'skip.duplicates' will have no effect.")
+              " 'min.mapq', 'min.baseq', 'skip.duplicates' and 'nthreads' ",
+              "will have no effect.")
     return(bam.file)
   }
 }
