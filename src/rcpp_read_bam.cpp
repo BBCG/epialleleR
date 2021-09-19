@@ -20,8 +20,8 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
                                       int nthreads)                             // HTSlib threads, >1 for multiple
 {
   // constants
-  size_t max_qname_width = 256;                                                 // max QNAME length, not expanded yet, ever error-prone?
-  size_t max_templ_width = 1024;                                                // max insert size, expanded if necessary
+  int max_qname_width = 256;                                                    // max QNAME length, not expanded yet, ever error-prone?
+  int max_templ_width = 1024;                                                   // max insert size, expanded if necessary
   
   // file IO
   htsFile *bam_fp = hts_open(fn.c_str(), "r");                                  // try open file
@@ -122,14 +122,14 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
     uint32_t *rec_cigar = bam_get_cigar(bam_rec);                               // CIGAR array
     uint32_t query_pos = 0;                                                     // starting position in query array
     uint32_t dest_pos = bam_rec->core.pos - templ_start;                        // starting position in destination array
-    for (int i=0; i<n_cigar; i++) {                                             // op by op
+    for (size_t i=0; i<n_cigar; i++) {                                          // op by op
       uint32_t cigar_op = bam_cigar_op(rec_cigar[i]);                           // CIGAR operation
       uint32_t cigar_oplen = bam_cigar_oplen(rec_cigar[i]);                     // CIGAR operation length
       switch(cigar_op) {
         case BAM_CMATCH :                                                       // 'M', 0
         case BAM_CEQUAL :                                                       // '=', 7
         case BAM_CDIFF :                                                        // 'X', 8
-          for (int j=0; j<cigar_oplen; j++) {
+          for (size_t j=0; j<cigar_oplen; j++) {
             if (rec_qual[query_pos+j] > templ_qual_rs[dest_pos+j]) {
               templ_qual_rs[dest_pos+j] = rec_qual[query_pos+j];
               templ_seq_rs[dest_pos+j] = seq_nt16_str[bam_seqi(rec_pseq,query_pos+j)];

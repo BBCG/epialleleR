@@ -32,4 +32,15 @@ test_preprocessBam <- function () {
   RUnit::checkTrue(
     identical(capture.data[,1:3], quality.data[,1:3])
   )
+  
+  if (require(Rsamtools, quietly=TRUE)) {
+    RUnit::checkException(
+      preprocessBam(file.path(system.file("extdata", package="Rsamtools"), "ex1.bam"), verbose=FALSE)
+    )
+    
+    RUnit::checkException(
+      preprocessBam(file.path(system.file("extdata", package="Rsamtools"), "tiny.bam"), verbose=FALSE)
+    )
+  }
+  
 }
