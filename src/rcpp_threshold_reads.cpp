@@ -2,8 +2,12 @@
 // using namespace Rcpp;
 
 // Read thresholding
-// Output: bool array with "true" for reads passing/above thresholding criteria
+// Output: bool vector with "true" for reads passing/above thresholding criteria
 //
+// This one would def benefit from:
+// [ ] SIMD
+// [ ] fewer branches
+// [ ] FALSE as a default
 
 // thresholding, vectorised, ascii-based
 // [[Rcpp::export("rcpp_threshold_reads")]]

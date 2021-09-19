@@ -33,12 +33,11 @@
 ################################################################################
 
 utils::globalVariables(
-  c(".", ".I", ".N", ":=", "FALSE+", "FALSE-", "TRUE+", "TRUE-", "XG", "XM",
-    "XM.norm", "bedmatch", "cigar", "context", "flag", "isize", "meth", "mpos",
-    "pass", "pos", "qname", "rname", "strand", "triad", "unmeth", "width",
-    "isfirst", "ALT", "M+A", "M+Alt", "M+C", "M+G", "M+Ref", "M+T", "M-A",
-    "M-Alt", "M-C", "M-G", "M-Ref", "M-T", "REF", "U+A", "U+Alt", "U+C", "U+G",
-    "U+Ref", "U+T", "U-A", "U-Alt", "U-C", "U-G", "U-Ref", "U-T")
+  c(".", ".I", ".N", ":=", "bedmatch", "context", "rname", "start", "strand",
+    "FALSE+", "FALSE-", "TRUE+", "TRUE-", "REF", "ALT",
+    "M+Ref","U+Ref","M+Alt","U+Alt", "M-Ref","U-Ref","M-Alt","U-Alt",
+    "M+A", "M+C", "M+G", "M+T", "M-A", "M-C", "M-G", "M-T",
+    "U+A", "U+C", "U+G", "U+T", "U-A", "U-C", "U-G", "U-T")
 )
 
 .onUnload <- function (libpath) {library.dynam.unload("epialleleR", libpath)}
