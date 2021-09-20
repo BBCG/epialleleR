@@ -261,7 +261,8 @@ report columns are:</p><ul>
 
     <p>The function reports cytosine methylation information using BAM file or data
 as an input. In contrast to the other currently available software, reads
-(or read pairs as a single entity) can be thresholded by their average
+(for paired-end sequencing alignment files - read
+pairs as a single entity) can be thresholded by their average
 methylation level before counting methylated bases, effectively resulting in
 hypermethylated variant epiallele frequency (VEF) being reported instead of
 beta value. The function's logic is explained below.</p>
@@ -273,7 +274,7 @@ max.outofcontext.beta = 0.1), the input and results will look as following:</p>
 <table class='table'>
 <tr><td>methylation string</td><td>threshold</td><td>explained</td><td>methylation reported</td></tr>
 <tr><td>...Z..x+.h..x..h.</td><td>below</td><td>min.context.sites &lt; 2 (only one zZ base)</td><td>all cytosines unmethylated</td></tr>
-<tr><td>...Z..z.h..x..h.</td><td>above</td><td>pass all criteria</td><td>only C4 is methylated</td></tr>
+<tr><td>...Z..z.h..x..h.</td><td>above</td><td>pass all criteria</td><td>only C4 (Z at position 4) is methylated</td></tr>
 <tr><td>...Z..z.h..X..h.</td><td>below</td><td>max.outofcontext.beta &gt; 0.1 (1XH / 3xXhH = 0.33)</td><td>all cytosines unmethylated</td></tr>
 <tr><td>...Z..z.h..z-.h.</td><td>below</td><td>min.context.beta &lt; 0.5 (1Z / 3zZ = 0.33)</td><td>all cytosines unmethylated</td></tr>
 </table>
@@ -332,11 +333,11 @@ sample data.</p></div>
 <span class='r-in'>  <span class='co'># CpG report with thresholding</span></span>
 <span class='r-in'>  <span class='va'>cg.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateCytosineReport</span><span class='op'>(</span><span class='va'>capture.bam</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BAM file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.025s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.024s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Thresholding reads</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.002s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.001s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Preparing cytosine report</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.032s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.034s]</span>
 <span class='r-in'>  </span>
 <span class='r-in'>  <span class='co'># CX report without thresholding</span></span>
 <span class='r-in'>  <span class='va'>cx.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateCytosineReport</span><span class='op'>(</span><span class='va'>capture.bam</span>, threshold.reads<span class='op'>=</span><span class='cn'>FALSE</span>,</span>
@@ -344,7 +345,7 @@ sample data.</p></div>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BAM file</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.025s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Preparing cytosine report</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.045s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.047s]</span>
 </code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

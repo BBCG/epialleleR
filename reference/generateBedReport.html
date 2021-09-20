@@ -347,16 +347,17 @@ The report columns are:</p><ul>
 <li><p>strand -- strand</p></li>
 <li><p>... -- other columns that were present in BED or metadata columns of
   <code><a href='https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html'>GRanges</a></code> object</p></li>
-<li><p>nreads+ -- number of reads mapped to the forward ("+") strand</p></li>
-<li><p>nreads- -- number of reads mapped to the reverse ("-") strand</p></li>
+<li><p>nreads+ -- number of reads (pairs) mapped to the forward ("+") strand</p></li>
+<li><p>nreads- -- number of reads (pairs) mapped to the reverse ("-") strand</p></li>
 <li><p>VEF -- frequency of reads passing the threshold</p></li>
 </ul>
 
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Functions report hypermethylated variant epiallele frequencies (VEF) per
-genomic region of interest using BAM and BED files as input. Reads (or read
-pairs as a single entity) are matched to genomic locations by exact
+genomic region of interest using BAM and BED files as input. Reads (for
+paired-end sequencing alignment files - read pairs as a single
+entity) are matched to genomic locations by exact
 coordinates (`generateAmpliconReport` or `generateBedReport` with an option
 bed.type="amplicon") or minimum overlap (`generateCaptureReport` or
 `generateBedReport` with an option bed.type="capture") -- the former to be
@@ -406,13 +407,13 @@ the seqlevels style.</p></div>
 <span class='r-in'>  <span class='va'>amplicon.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateAmpliconReport</span><span class='op'>(</span>bam<span class='op'>=</span><span class='va'>amplicon.bam</span>,</span>
 <span class='r-in'>                                            bed<span class='op'>=</span><span class='va'>amplicon.bed</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BED file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.018s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.016s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BAM file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.008s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.007s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Thresholding reads</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.000s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.001s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Preparing amplicon report</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.052s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.056s]</span>
 <span class='r-in'>  </span>
 <span class='r-in'>  <span class='co'># capture NGS</span></span>
 <span class='r-in'>  <span class='va'>capture.bam</span>    <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"capture.bam"</span>,</span>
@@ -421,24 +422,24 @@ the seqlevels style.</p></div>
 <span class='r-in'>                                package<span class='op'>=</span><span class='st'>"epialleleR"</span><span class='op'>)</span></span>
 <span class='r-in'>  <span class='va'>capture.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateCaptureReport</span><span class='op'>(</span>bam<span class='op'>=</span><span class='va'>capture.bam</span>, bed<span class='op'>=</span><span class='va'>capture.bed</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BED file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.017s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.019s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BAM file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.028s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.030s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Thresholding reads</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.001s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.002s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Preparing capture report</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.024s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.025s]</span>
 <span class='r-in'>  </span>
 <span class='r-in'>  <span class='co'># generateAmpliconReport and generateCaptureReport are just aliases</span></span>
 <span class='r-in'>  <span class='co'># of the generateBedReport</span></span>
 <span class='r-in'>  <span class='va'>bed.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateBedReport</span><span class='op'>(</span>bam<span class='op'>=</span><span class='va'>capture.bam</span>, bed<span class='op'>=</span><span class='va'>capture.bed</span>,</span>
 <span class='r-in'>                                  bed.type<span class='op'>=</span><span class='st'>"capture"</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BED file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.017s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.019s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BAM file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.025s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.027s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Thresholding reads</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.001s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.002s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Preparing capture report</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.025s]</span>
 <span class='r-in'>  <span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span><span class='op'>(</span><span class='va'>capture.report</span>, <span class='va'>bed.report</span><span class='op'>)</span></span>

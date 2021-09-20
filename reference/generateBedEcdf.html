@@ -259,7 +259,8 @@ regions (if any). Every list item is a list on it's own, consisting of two
 eCDF functions for within- and out-of-context per-read beta values.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The function matches reads (or read pairs as a single entity) to the genomic
+    <p>The function matches reads (for paired-end sequencing alignment files - read
+pairs as a single entity) to the genomic
 regions provided in a BED file/<code>GRanges</code> object, computes
 average per-read beta values according to the cytosine context parameter
 `ecdf.context`, and returns a list of eCDFs for within- and out-of-context
@@ -288,11 +289,11 @@ usage and sample data.</p></div>
 <span class='r-in'>  <span class='va'>amplicon.ecdfs</span> <span class='op'>&lt;-</span> <span class='fu'>generateBedEcdf</span><span class='op'>(</span>bam<span class='op'>=</span><span class='va'>amplicon.bam</span>, bed<span class='op'>=</span><span class='va'>amplicon.bed</span>,</span>
 <span class='r-in'>                                    bed.rows<span class='op'>=</span><span class='cn'>NULL</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BED file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.074s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.077s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BAM file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.010s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.011s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Computing ECDFs for within- and out-of-context per-read beta values</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.067s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.070s]</span>
 <span class='r-in'>  </span>
 <span class='r-in'>  <span class='co'># there are 5 items in amplicon.ecdfs, let's plot them all</span></span>
 <span class='r-in'>  <span class='fu'><a href='https://rdrr.io/r/graphics/par.html'>par</a></span><span class='op'>(</span>mfrow<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>amplicon.ecdfs</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span></span>

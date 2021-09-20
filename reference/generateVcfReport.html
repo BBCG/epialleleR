@@ -289,22 +289,23 @@ NULL if report.file was specified. The report columns are:</p><ul>
 <li><p>[M|U][+|-][Ref|Alt] -- number of <strong>Ref</strong>erence or
   <strong>Alt</strong>ernative bases that were found at this particular position
   within <strong>M</strong>ethylated (above threshold) or <strong>U</strong>nmethylated
-  (below threshold) reads that were mapped to <strong>"+"</strong> (forward) or
-  <strong>"-"</strong> (reverse) DNA strand. NA values mean that it is not possible
-  to determine the number of bases due to the bisulfite conversion-related
-  limitations (C-&gt;T variants on "+" and G-&gt;A on "-" strands)</p></li>
+  (below threshold) reads that were mapped to <strong>"+"</strong> (forward)
+  or <strong>"-"</strong> (reverse) DNA strand. NA values mean that it is not
+  possible to determine the number of bases due to the bisulfite
+  conversion-related limitations (C-&gt;T variants on "+" and G-&gt;A on "-"
+  strands)</p></li>
 <li><p>SumRef -- sum of all <strong>Ref</strong>erence base counts</p></li>
 <li><p>SumAlt -- sum of all <strong>Alt</strong>ernative base counts</p></li>
 <li><p>FEp+ -- Fisher's Exact test p-value for association of a variation
-  with methylation status of the reads that map to the <strong>"+"</strong> (forward)
-  DNA strand. Calculated using following contingency table:</p><table class='table'>
+  with methylation status of the reads that map to the <strong>"+"</strong>
+  (forward) DNA strand. Calculated using following contingency table:</p><table class='table'>
 <tr><td>M+Ref</td><td>M+Alt</td></tr>
 <tr><td>U+Ref</td><td>U+Alt</td></tr>
 </table>
 </li>
 <li><p>FEp- -- Fisher's Exact test p-value for association of a variation
-  with methylation status of the reads that map to the <strong>"-"</strong> (reverse)
-  DNA strand. Calculated using following contingency table:</p><table class='table'>
+  with methylation status of the reads that map to the <strong>"-"</strong>
+  (reverse) DNA strand. Calculated using following contingency table:</p><table class='table'>
 <tr><td>M-Ref</td><td>M-Alt</td></tr>
 <tr><td>U-Ref</td><td>U-Alt</td></tr>
 </table>
@@ -314,7 +315,8 @@ NULL if report.file was specified. The report columns are:</p><ul>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Using BAM reads and sequence variation information as an input,
-`generateVcfReport` function thresholds the reads (or read pairs as a single
+`generateVcfReport` function thresholds the reads (for paired-end sequencing
+alignment files - read pairs as a single
 entity) according to supplied parameters and calculates the occurrence of
 <strong>Ref</strong>erence and <strong>Alt</strong>ernative bases within reads, taking into
 the account DNA strand the read mapped to and average methylation level
@@ -360,15 +362,15 @@ the seqlevels style.</p></div>
 <span class='r-in'>  <span class='va'>vcf.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateVcfReport</span><span class='op'>(</span>bam<span class='op'>=</span><span class='va'>capture.bam</span>, bed<span class='op'>=</span><span class='va'>capture.bed</span>,</span>
 <span class='r-in'>                                  vcf<span class='op'>=</span><span class='va'>capture.vcf</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BED file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.017s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.018s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading VCF file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [9.697s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [10.259s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BAM file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.030s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.032s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Thresholding reads</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.001s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Extracting base frequences</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.961s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [1.120s]</span>
 </code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

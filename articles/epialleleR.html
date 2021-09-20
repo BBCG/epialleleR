@@ -63,12 +63,12 @@
 
       
 
-      </header><script src="epialleleR_files/header-attrs-2.10/header-attrs.js"></script><div class="row">
+      </header><script src="epialleleR_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>The epialleleR User’s Guide</h1>
             
-            <h4 data-toc-skip class="date">19 September, 2021</h4>
+            <h4 data-toc-skip class="date">20 September, 2021</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BBCG/epialleleR/blob/master/vignettes/epialleleR.Rmd" class="external-link"><code>vignettes/epialleleR.Rmd</code></a></small>
       <div class="hidden name"><code>epialleleR.Rmd</code></div>
@@ -91,7 +91,7 @@
 <p>The cytosine DNA methylation is an important epigenetic mechanism for regulation of gene expression. Abnormal methylation is linked to several diseases, being for example the most common molecular lesion in cancer cell<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>. Multiple studies suggest that alterations in DNA methylation, despite occurring at a low mosaic level, may confer increased risk of cancer later in life<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>.</p>
 <p>The cytosine methylation levels within relatively small regions of the human genome are thought to be often concordant, resulting in a limited number of distinct methylation patterns of short sequencing reads<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>. Due to the cell-to-cell variations in methylation, DNA purified from tissue samples contains a mix of hyper- and hypomethylated alleles with varying ratios that depend on the genomic region and tissue type.</p>
 <p>Unsurprisingly, when the frequencies of hypermethylated epialleles are low (e.g. 1e-02 and lower) and cytosine methylation levels are averaged and reported using conventional algorithms, the identification of such hypermethylated epialleles becomes nearly impossible. In order to increase the sensitivity of DNA methylation analysis we have developed <em><code>epialleleR</code></em> — an R package for calling hypermethylated variant epiallele frequencies (VEF).</p>
-<p><em><code>epialleleR</code></em> is a fast and scalable solution for analysis of data obtained by next-generation sequencing of bisulfite-treated DNA samples. The minimum requirement for the input is a Binary Alignment Map (BAM) file containing sequencing reads. These reads can be obtained from either deep or ultra-deep sequencing, using either narrowly targeted gene panels (amplicon sequencing), larger methylation capture panels, or even whole-genome approaches.</p>
+<p><em><code>epialleleR</code></em> is a very fast and scalable solution for analysis of data obtained by next-generation sequencing of bisulfite-treated DNA samples. The minimum requirement for the input is a Binary Alignment Map (BAM) file containing sequencing reads. These reads can be obtained from either deep or ultra-deep sequencing, using either narrowly targeted gene panels (amplicon sequencing), larger methylation capture panels, or even whole-genome approaches.</p>
 <div id="current-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#current-features" class="anchor" aria-hidden="true"></a>Current Features</h2>
@@ -202,19 +202,19 @@
 <div id="typical-workflow" class="section level1">
 <h1 class="hasAnchor">
 <a href="#typical-workflow" class="anchor" aria-hidden="true"></a>Typical workflow</h1>
-<p>As mentioned earlier, <em><code>epialleleR</code></em> uses data stored in Binary Alignment Map (BAM) files as its input. It is a prerequisite that records in a BAM file contain an XM tag with the methylation call string — such files are produced by virtually any software tool for mapping and alignment of bisulfite sequencing reads (such as Bismark, BSMAP or Illumina DRAGEN Bio-IT Platform).</p>
+<p>As mentioned earlier, <em><code>epialleleR</code></em> uses data stored in Binary Alignment Map (BAM) files as its input. It is a prerequisite that records in the BAM file are sorted by their name (and not a genomic location), contain an XG tag with a genomic strand they map to, and an XM tag with the methylation call string — such files are produced by virtually any software tool for mapping and alignment of bisulfite sequencing reads (such as Bismark, BSMAP or Illumina DRAGEN Bio-IT Platform).</p>
 <p>Please use the function help files for a full description of available parameters, as well as explanation of the function’s logic and output values.</p>
 <div id="reading-the-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#reading-the-data" class="anchor" aria-hidden="true"></a>Reading the data</h2>
 <p>All <em><code>epialleleR</code></em> methods can load BAM data using the file path. However, if a file is very large and several reports need to be prepared, it is advised to use the <em><code>preprocessBam</code></em> convenience function as shown below. This function is also used internally when a BAM file location string is supplied as an input for other <em><code>epialleleR</code></em> methods.</p>
-<p><code>preprocessBam</code> currently accepts only BAM files that are derived from paired-end sequencing (create an issue if you need to process single-end BAM files). During preprocessing, paired reads are merged according to their base quality: nucleotide base with the highest value in the QUAL string is taken, unless its quality is less than <em><code>min.baseq</code></em>, which results in no information for that particular position (“-”/“N”). These <strong>merged reads</strong> are then processed as a <strong>single entity</strong> in all <em><code>epialleleR</code></em> methods.</p>
+<p><code>preprocessBam</code> currently accepts only BAM files that are derived from paired-end sequencing (create an issue if you need to process single-end BAM files). During preprocessing, paired reads are merged according to their base quality: nucleotide base with the highest value in the QUAL string is taken, unless its quality is less than <em><code>min.baseq</code></em>, which results in no information for that particular position (“-”/“N”). These <strong>merged reads</strong> are then processed as a <strong>single entity</strong> in all <em><code>epialleleR</code></em> methods. Due to merging, overlapping bases in read pairs are counted only once, and the base with the highest quality is taken.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/BBCG/epialleleR" class="external-link">epialleleR</a></span><span class="op">)</span>
 
 <span class="va">capture.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="va">bam.data</span>    <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preprocessBam.html">preprocessBam</a></span><span class="op">(</span><span class="va">capture.bam</span><span class="op">)</span>
-<span class="co">#&gt; Reading BAM file [0.029s]</span></code></pre></div>
+<span class="co">#&gt; Reading BAM file [0.030s]</span></code></pre></div>
 </div>
 <div id="making-cytosine-reports" class="section level2">
 <h2 class="hasAnchor">
@@ -226,8 +226,8 @@
 <span class="co"># CpG VEF report</span>
 <span class="va">cg.vef.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span><span class="op">)</span>
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq', 'min.baseq', 'skip.duplicates' and 'nthreads' will have no effect.</span>
-<span class="co">#&gt; Thresholding reads [0.001s]</span>
-<span class="co">#&gt; Preparing cytosine report [0.040s]</span>
+<span class="co">#&gt; Thresholding reads [0.002s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.042s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cg.vef.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;    rname strand      pos context meth unmeth</span>
 <span class="co">#&gt; 1: chr17      + 61864475      CG    7      9</span>
@@ -239,7 +239,7 @@
 <span class="co"># CpG cytosine report</span>
 <span class="va">cg.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq', 'min.baseq', 'skip.duplicates' and 'nthreads' will have no effect.</span>
-<span class="co">#&gt; Preparing cytosine report [0.032s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.034s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cg.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;    rname strand      pos context meth unmeth</span>
 <span class="co">#&gt; 1: chr17      + 61864475      CG    8      8</span>
@@ -274,10 +274,10 @@
   bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.067s]</span>
-<span class="co">#&gt; Reading BAM file [0.007s]</span>
-<span class="co">#&gt; Thresholding reads [0.000s]</span>
-<span class="co">#&gt; Preparing amplicon report [0.060s]</span>
+<span class="co">#&gt; Reading BED file [0.068s]</span>
+<span class="co">#&gt; Reading BAM file [0.008s]</span>
+<span class="co">#&gt; Thresholding reads [0.001s]</span>
+<span class="co">#&gt; Preparing amplicon report [0.065s]</span>
 <span class="va">amplicon.report</span>
 <span class="co">#&gt;    seqnames    start      end width strand amplicon nreads+ nreads-        VEF</span>
 <span class="co">#&gt; 1:    chr17 43125624 43126026   403      * CpG00-13       0     156 0.08333333</span>
@@ -291,10 +291,10 @@
   bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.049s]</span>
-<span class="co">#&gt; Reading BAM file [0.026s]</span>
-<span class="co">#&gt; Thresholding reads [0.001s]</span>
-<span class="co">#&gt; Preparing capture report [0.028s]</span>
+<span class="co">#&gt; Reading BED file [0.047s]</span>
+<span class="co">#&gt; Reading BAM file [0.027s]</span>
+<span class="co">#&gt; Thresholding reads [0.002s]</span>
+<span class="co">#&gt; Preparing capture report [0.030s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">capture.report</span><span class="op">)</span>
 <span class="co">#&gt;    seqnames    start      end width strand     V4 nreads+ nreads-       VEF</span>
 <span class="co">#&gt; 1:     chr1  3067647  3069703  2057      * PRDM16       2       1 1.0000000</span>
@@ -310,9 +310,9 @@
   bed.type<span class="op">=</span><span class="st">"capture"</span>
 <span class="op">)</span>
 <span class="co">#&gt; Reading BED file [0.020s]</span>
-<span class="co">#&gt; Reading BAM file [0.025s]</span>
+<span class="co">#&gt; Reading BAM file [0.027s]</span>
 <span class="co">#&gt; Thresholding reads [0.001s]</span>
-<span class="co">#&gt; Preparing capture report [0.027s]</span>
+<span class="co">#&gt; Preparing capture report [0.028s]</span>
 <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">capture.report</span>, <span class="va">bed.report</span><span class="op">)</span>
 <span class="co">#&gt; [1] TRUE</span></code></pre></div>
 </div>
@@ -338,9 +338,9 @@
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed.rows<span class="op">=</span><span class="cn">NULL</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.018s]</span>
-<span class="co">#&gt; Reading BAM file [0.008s]</span>
-<span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.021s]</span>
+<span class="co">#&gt; Reading BED file [0.020s]</span>
+<span class="co">#&gt; Reading BAM file [0.007s]</span>
+<span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.022s]</span>
 <span class="co"># there are 5 items in amplicon.ecdfs, let's plot all of them</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
@@ -410,11 +410,11 @@
   <span class="co"># to convert them internally</span>
   vcf.style<span class="op">=</span><span class="st">"NCBI"</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.018s]</span>
-<span class="co">#&gt; Reading VCF file [1.063s]</span>
-<span class="co">#&gt; Reading BAM file [0.008s]</span>
+<span class="co">#&gt; Reading BED file [0.020s]</span>
+<span class="co">#&gt; Reading VCF file [1.118s]</span>
+<span class="co">#&gt; Reading BAM file [0.009s]</span>
 <span class="co">#&gt; Thresholding reads [0.000s]</span>
-<span class="co">#&gt; Extracting base frequences [0.075s]</span>
+<span class="co">#&gt; Extracting base frequences [0.077s]</span>
 <span class="co"># NA values are shown for the C-&gt;T variants on the "+" and G-&gt;A on the "-"</span>
 <span class="co"># strands, because bisulfite conversion makes their counting impossible</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">vcf.report</span><span class="op">)</span>
@@ -512,7 +512,7 @@
 <span class="co">#&gt; [22] desc_1.3.0                  DelayedArray_0.19.3         rtracklayer_1.53.1         </span>
 <span class="co">#&gt; [25] sass_0.4.0                  rappdirs_0.3.3              pkgdown_1.6.1.9001         </span>
 <span class="co">#&gt; [28] systemfonts_1.0.2           stringr_1.4.0               digest_0.6.27              </span>
-<span class="co">#&gt; [31] Rsamtools_2.9.1             rmarkdown_2.10              XVector_0.33.0             </span>
+<span class="co">#&gt; [31] Rsamtools_2.9.1             rmarkdown_2.11              XVector_0.33.0             </span>
 <span class="co">#&gt; [34] pkgconfig_2.0.3             htmltools_0.5.2             MatrixGenerics_1.5.4       </span>
 <span class="co">#&gt; [37] highr_0.9                   dbplyr_2.1.1                fastmap_1.1.0              </span>
 <span class="co">#&gt; [40] BSgenome_1.61.0             rlang_0.4.11                RSQLite_2.2.8              </span>
@@ -530,7 +530,7 @@
 <span class="co">#&gt; [76] XML_3.99-0.7                glue_1.4.2                  evaluate_0.14              </span>
 <span class="co">#&gt; [79] data.table_1.14.0           png_0.1-7                   vctrs_0.3.8                </span>
 <span class="co">#&gt; [82] purrr_0.3.4                 assertthat_0.2.1            cachem_1.0.6               </span>
-<span class="co">#&gt; [85] xfun_0.25                   restfulr_0.0.13             ragg_1.1.3                 </span>
+<span class="co">#&gt; [85] xfun_0.26                   restfulr_0.0.13             ragg_1.1.3                 </span>
 <span class="co">#&gt; [88] tibble_3.1.4                GenomicAlignments_1.29.0    AnnotationDbi_1.55.1       </span>
 <span class="co">#&gt; [91] memoise_2.0.0               ellipsis_0.3.2</span></code></pre></div>
 <hr>
