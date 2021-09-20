@@ -114,7 +114,8 @@ This function computes empirical cumulative distribution functions (eCDF) for
 per-read beta values of the sequencing reads.
 }
 \details{
-The function matches reads (or read pairs as a single entity) to the genomic
+The function matches reads (for paired-end sequencing alignment files - read
+pairs as a single entity) to the genomic
 regions provided in a BED file/\code{\linkS4class{GRanges}} object, computes
 average per-read beta values according to the cytosine context parameter
 `ecdf.context`, and returns a list of eCDFs for within- and out-of-context

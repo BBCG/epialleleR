@@ -19,7 +19,7 @@ test_preprocessBam <- function () {
   )
   
   quality.data <- preprocessBam(capture.bam, verbose=FALSE,
-                                min.mapq=30, min.baseq=20)
+                                min.mapq=30, min.baseq=20, nthreads=2)
   RUnit::checkEquals(
     dim(quality.data),
     c(2968,5)

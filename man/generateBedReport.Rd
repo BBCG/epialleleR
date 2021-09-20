@@ -188,8 +188,8 @@ The report columns are:
   \item strand -- strand
   \item ... -- other columns that were present in BED or metadata columns of
   \code{\link[GenomicRanges]{GRanges}} object 
-  \item nreads+ -- number of reads mapped to the forward ("+") strand
-  \item nreads- -- number of reads mapped to the reverse ("-") strand
+  \item nreads+ -- number of reads (pairs) mapped to the forward ("+") strand
+  \item nreads- -- number of reads (pairs) mapped to the reverse ("-") strand
   \item VEF -- frequency of reads passing the threshold
 }
 }
@@ -201,8 +201,9 @@ threshold.
 }
 \details{
 Functions report hypermethylated variant epiallele frequencies (VEF) per
-genomic region of interest using BAM and BED files as input. Reads (or read
-pairs as a single entity) are matched to genomic locations by exact
+genomic region of interest using BAM and BED files as input. Reads (for
+paired-end sequencing alignment files - read pairs as a single
+entity) are matched to genomic locations by exact
 coordinates (`generateAmpliconReport` or `generateBedReport` with an option
 bed.type="amplicon") or minimum overlap (`generateCaptureReport` or
 `generateBedReport` with an option bed.type="capture") -- the former to be

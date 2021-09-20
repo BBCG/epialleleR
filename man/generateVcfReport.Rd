@@ -134,23 +134,24 @@ NULL if report.file was specified. The report columns are:
   \item [M|U][+|-][Ref|Alt] -- number of \strong{Ref}erence or
   \strong{Alt}ernative bases that were found at this particular position
   within \strong{M}ethylated (above threshold) or \strong{U}nmethylated
-  (below threshold) reads that were mapped to \strong{"+"} (forward) or
-  \strong{"-"} (reverse) DNA strand. NA values mean that it is not possible
-  to determine the number of bases due to the bisulfite conversion-related
-  limitations (C->T variants on "+" and G->A on "-" strands)
+  (below threshold) reads that were mapped to \strong{"+"} (forward)
+  or \strong{"-"} (reverse) DNA strand. NA values mean that it is not
+  possible to determine the number of bases due to the bisulfite
+  conversion-related limitations (C->T variants on "+" and G->A on "-"
+  strands)
   \item SumRef -- sum of all \strong{Ref}erence base counts
   \item SumAlt -- sum of all \strong{Alt}ernative base counts
   \item FEp+ -- Fisher's Exact test p-value for association of a variation
-  with methylation status of the reads that map to the \strong{"+"} (forward)
-  DNA strand. Calculated using following contingency table:
+  with methylation status of the reads that map to the \strong{"+"}
+  (forward) DNA strand. Calculated using following contingency table:
   \tabular{ll}{
     M+Ref \tab M+Alt \cr
     U+Ref \tab U+Alt 
   }
   
   \item FEp- -- Fisher's Exact test p-value for association of a variation
-  with methylation status of the reads that map to the \strong{"-"} (reverse)
-  DNA strand. Calculated using following contingency table:
+  with methylation status of the reads that map to the \strong{"-"}
+  (reverse) DNA strand. Calculated using following contingency table:
   \tabular{ll}{
     M-Ref \tab M-Alt \cr
     U-Ref \tab U-Alt 
@@ -163,7 +164,8 @@ tests their association with the methylation status of the sequencing reads.
 }
 \details{
 Using BAM reads and sequence variation information as an input,
-`generateVcfReport` function thresholds the reads (or read pairs as a single
+`generateVcfReport` function thresholds the reads (for paired-end sequencing
+alignment files - read pairs as a single
 entity) according to supplied parameters and calculates the occurrence of
 \strong{Ref}erence and \strong{Alt}ernative bases within reads, taking into
 the account DNA strand the read mapped to and average methylation level

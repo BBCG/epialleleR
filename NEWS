@@ -48,8 +48,8 @@ Changes in version 1.1.0 (2021-05-21)
 + released at bioconductor
 
 Changes in version 1.1.9 (2021-09-19)
-+ fast end memory-efficient BAM loading using HTSlib
-- now opens paired-end BAM only
++ very fast end memory-efficient BAM loading using HTSlib
+- for now reads paired-end BAM only
 + min.baseq to reduce the effect of sequencing errors
 + very fast Fisher Exact from HTSlib
 + old code removed

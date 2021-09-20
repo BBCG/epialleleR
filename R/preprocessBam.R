@@ -18,15 +18,18 @@
 #' quality: nucleotide base with the highest value in the QUAL string is taken,
 #' unless its quality is less than `min.baseq`, which results in no information
 #' for that particular position ("-"/"N"). These merged reads are then
-#' processed as a single entity in all `epialleleR` methods.
+#' processed as a single entity in all `epialleleR` methods. Due to merging,
+#' overlapping bases in read pairs are counted only once, and the base with the
+#' highest quality is taken.
 #' 
 #' It is also a requirement currently that BAM file is sorted by QNAME instead
 #' of genomic location (i.e., "unsorted") to perform merging of paired-end
 #' reads. Error message is shown if it is sorted by genomic location, in this
 #' case please sort it by QNAME using 'samtools sort -n -o out.bam in.bam'.
 #' 
-#' Please also note that for all its methods, `epialleleR` requires methylation
-#' call string to be present in a BAM file - i.e., methylation calling must be
+#' Please also note that for all its methods, `epialleleR` requires genomic
+#' strand (XG tag) and a methylation call string (XM tag) to be present in a
+#' BAM file - i.e., methylation calling must be
 #' performed after read mapping/alignment by your software of choice.
 #'
 #' @param bam.file BAM file location string.
@@ -38,8 +41,8 @@
 #' skipped (default: FALSE). Option has no effect if duplicate reads were not
 #' marked by alignment software.
 #' @param nthreads non-negative integer for the number of HTSlib threads to be
-#' used during BAM file decompression (default: 1). 2 threads make sense for the
-#' files larger than 100 MB.
+#' used during BAM file decompression (default: 1). Two threads (and usually no
+#' more than two) make sense for the files larger than 100 MB.
 #' @param verbose boolean to report progress and timings (default: TRUE).
 #' @return \code{\link[data.table]{data.table}} object containing preprocessed
 #' BAM data.

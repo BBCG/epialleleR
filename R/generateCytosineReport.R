@@ -7,7 +7,8 @@
 #' @details
 #' The function reports cytosine methylation information using BAM file or data
 #' as an input. In contrast to the other currently available software, reads
-#' (or read pairs as a single entity) can be thresholded by their average
+#' (for paired-end sequencing alignment files - read
+#' pairs as a single entity) can be thresholded by their average
 #' methylation level before counting methylated bases, effectively resulting in
 #' hypermethylated variant epiallele frequency (VEF) being reported instead of
 #' beta value. The function's logic is explained below.
@@ -21,7 +22,7 @@
 #' \tabular{llll}{
 #'   methylation string \tab threshold \tab explained \tab methylation reported \cr
 #'   ...Z..x+.h..x..h. \tab below \tab min.context.sites < 2 (only one zZ base) \tab all cytosines unmethylated \cr
-#'   ...Z..z.h..x..h.  \tab above \tab pass all criteria \tab only C4 is methylated \cr
+#'   ...Z..z.h..x..h.  \tab above \tab pass all criteria \tab only C4 (Z at position 4) is methylated \cr
 #'   ...Z..z.h..X..h.  \tab below \tab max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) \tab all cytosines unmethylated \cr
 #'   ...Z..z.h..z-.h.  \tab below \tab min.context.beta < 0.5 (1Z / 3zZ = 0.33) \tab all cytosines unmethylated
 #' }
