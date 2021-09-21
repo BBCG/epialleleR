@@ -283,11 +283,12 @@ max.outofcontext.beta = 0.1), the input and results will look as following:</p>
 <p>Only the second read will satisfy all of the thresholding criteria, leading
 to the following CX report (given that all reads map to chr1:+:1-16):</p>
 <table class='table'>
-<tr><td>rname</td><td>strand</td><td>pos</td><td>context</td><td>meth</td><td>unmeth</td><td>chr1</td></tr>
-<tr><td>+</td><td>4</td><td>CG</td><td>1</td><td>3</td><td>chr1</td><td>+</td></tr>
-<tr><td>7</td><td>CG</td><td>0</td><td>3</td><td>chr1</td><td>+</td><td>9</td></tr>
-<tr><td>CHH</td><td>0</td><td>4</td><td>chr1</td><td>+</td><td>12</td><td>CHG</td></tr>
-<tr><td>0</td><td>3</td><td>chr1</td><td>+</td><td>15</td><td>CHH</td><td>0</td></tr>
+<tr><td>rname</td><td>strand</td><td>pos</td><td>context</td><td>meth</td><td>unmeth</td></tr>
+<tr><td>chr1</td><td>+</td><td>4</td><td>CG</td><td>1</td><td>3</td></tr>
+<tr><td>chr1</td><td>+</td><td>7</td><td>CG</td><td>0</td><td>3</td></tr>
+<tr><td>chr1</td><td>+</td><td>9</td><td>CHH</td><td>0</td><td>4</td></tr>
+<tr><td>chr1</td><td>+</td><td>12</td><td>CHG</td><td>0</td><td>3</td></tr>
+<tr><td>chr1</td><td>+</td><td>15</td><td>CHH</td><td>0</td><td>4</td></tr>
 </table>
 
 
@@ -296,11 +297,12 @@ will retain their status, so the CX report will be similar to the reports
 produced by other methylation callers (such as Bismark or Illumina DRAGEN Bio
 IT Platform):</p>
 <table class='table'>
-<tr><td>rname</td><td>strand</td><td>pos</td><td>context</td><td>meth</td><td>unmeth</td><td>chr1</td></tr>
-<tr><td>+</td><td>4</td><td>CG</td><td>4</td><td>0</td><td>chr1</td><td>+</td></tr>
-<tr><td>7</td><td>CG</td><td>0</td><td>3</td><td>chr1</td><td>+</td><td>9</td></tr>
-<tr><td>CHH</td><td>0</td><td>4</td><td>chr1</td><td>+</td><td>12</td><td>CHG</td></tr>
-<tr><td>1</td><td>2</td><td>chr1</td><td>+</td><td>15</td><td>CHH</td><td>0</td></tr>
+<tr><td>rname</td><td>strand</td><td>pos</td><td>context</td><td>meth</td><td>unmeth</td></tr>
+<tr><td>chr1</td><td>+</td><td>4</td><td>CG</td><td>4</td><td>0</td></tr>
+<tr><td>chr1</td><td>+</td><td>7</td><td>CG</td><td>0</td><td>3</td></tr>
+<tr><td>chr1</td><td>+</td><td>9</td><td>CHH</td><td>0</td><td>4</td></tr>
+<tr><td>chr1</td><td>+</td><td>12</td><td>CHG</td><td>1</td><td>2</td></tr>
+<tr><td>chr1</td><td>+</td><td>15</td><td>CHH</td><td>0</td><td>4</td></tr>
 </table>
 
 
@@ -316,8 +318,8 @@ are simply ignored. This allows reports to be prepared without using the
 reference genome sequence.</p>
 <p>The downside of not using the reference genome sequence is the inability to
 determine the actual sequence of triplet for every base in the cytosine 
-report. Therefore this sequence is not reported, and this will stay until
-such information will be considered as worth adding.</p>
+report. Therefore this sequence is not reported, and this won't change
+until such information will be considered as worth adding.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='preprocessBam.html'>preprocessBam</a></code> for preloading BAM data,
@@ -337,15 +339,15 @@ sample data.</p></div>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Thresholding reads</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.001s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Preparing cytosine report</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.028s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.029s]</span>
 <span class='r-in'>  </span>
 <span class='r-in'>  <span class='co'># CX report without thresholding</span></span>
 <span class='r-in'>  <span class='va'>cx.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateCytosineReport</span><span class='op'>(</span><span class='va'>capture.bam</span>, threshold.reads<span class='op'>=</span><span class='cn'>FALSE</span>,</span>
 <span class='r-in'>               report.context<span class='op'>=</span><span class='st'>"CX"</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BAM file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.023s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.025s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Preparing cytosine report</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.040s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.042s]</span>
 </code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

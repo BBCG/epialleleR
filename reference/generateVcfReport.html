@@ -160,8 +160,8 @@ these requirements and BAM preprocessing at <code><a href='preprocessBam.html'>p
       <th>vcf</th>
       <td><p>Variant Call Format (VCF) file location string OR a VCF object
 returned by <code><a href='https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html'>readVcf</a></code> function. If VCF object
-is supplied, its seqlevels must match the seqlevels of the BAM file/object
-used.</p></td>
+is supplied, the style of its seqlevels must match the style of seqlevels of
+the BAM file/object used.</p></td>
     </tr>
     <tr>
       <th>vcf.style</th>
@@ -180,8 +180,8 @@ to the VCF file location and `bed` is not NULL. Possible values:</p><ul>
 class <code>GRanges</code> holding genomic coordinates for
 regions of interest. It is used to include only the specific genomic ranges
 when the VCF file is loaded. This option has no effect when VCF object is
-supplied as a `vcf` parameter. The seqlevels of BED file/object must match
-the seqlevels of the BAM file/object used.</p></td>
+supplied as a `vcf` parameter. The style of seqlevels of BED file/object
+must match the style of seqlevels of the BAM file/object used.</p></td>
     </tr>
     <tr>
       <th>report.file</th>
@@ -296,14 +296,14 @@ NULL if report.file was specified. The report columns are:</p><ul>
   strands)</p></li>
 <li><p>SumRef -- sum of all <strong>Ref</strong>erence base counts</p></li>
 <li><p>SumAlt -- sum of all <strong>Alt</strong>ernative base counts</p></li>
-<li><p>FEp+ -- Fisher's Exact test p-value for association of a variation
+<li><p>FEp+ -- Fisher Exact test p-value for association of a variation
   with methylation status of the reads that map to the <strong>"+"</strong>
   (forward) DNA strand. Calculated using following contingency table:</p><table class='table'>
 <tr><td>M+Ref</td><td>M+Alt</td></tr>
 <tr><td>U+Ref</td><td>U+Alt</td></tr>
 </table>
 </li>
-<li><p>FEp- -- Fisher's Exact test p-value for association of a variation
+<li><p>FEp- -- Fisher Exact test p-value for association of a variation
   with methylation status of the reads that map to the <strong>"-"</strong>
   (reverse) DNA strand. Calculated using following contingency table:</p><table class='table'>
 <tr><td>M-Ref</td><td>M-Alt</td></tr>
@@ -328,9 +328,9 @@ files can be extremely large, it is strongly advised to use only relevant
 subset of their data, prefiltering the VCF object manually before calling
 `generateVcfReport` or specifying `bed` parameter when `vcf` points to the
 location of such large VCF file. Please note that all the BAM, BED and VCF
-files must use the same seqlevels (i.e. chromosome names).</p>
+files must use the same style for seqlevels (i.e. chromosome names).</p>
 <p>After counting, function checks if certain bases occur more often within
-reads belonging to certain epialleles using Fisher's Exact test
+reads belonging to certain epialleles using Fisher Exact test
 (HTSlib's own implementation) and reports separate p-values for reads
 mapped to <strong>"+"</strong> (forward) and <strong>"-"</strong> (reverse) DNA strands.</p>
 <p>Please note that the final report currently includes only the VCF entries
@@ -362,15 +362,15 @@ the seqlevels style.</p></div>
 <span class='r-in'>  <span class='va'>vcf.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateVcfReport</span><span class='op'>(</span>bam<span class='op'>=</span><span class='va'>capture.bam</span>, bed<span class='op'>=</span><span class='va'>capture.bed</span>,</span>
 <span class='r-in'>                                  vcf<span class='op'>=</span><span class='va'>capture.vcf</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BED file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.014s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.015s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading VCF file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [7.498s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [7.825s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BAM file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.027s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.029s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Thresholding reads</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.001s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Extracting base frequences</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.918s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.967s]</span>
 </code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

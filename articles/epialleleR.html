@@ -68,7 +68,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>The epialleleR User’s Guide</h1>
             
-            <h4 data-toc-skip class="date">20 September, 2021</h4>
+            <h4 data-toc-skip class="date">21 September, 2021</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BBCG/epialleleR/blob/master/vignettes/epialleleR.Rmd" class="external-link"><code>vignettes/epialleleR.Rmd</code></a></small>
       <div class="hidden name"><code>epialleleR.Rmd</code></div>
@@ -226,8 +226,8 @@
 <span class="co"># CpG VEF report</span>
 <span class="va">cg.vef.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span><span class="op">)</span>
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq', 'min.baseq', 'skip.duplicates' and 'nthreads' will have no effect.</span>
-<span class="co">#&gt; Thresholding reads [0.001s]</span>
-<span class="co">#&gt; Preparing cytosine report [0.035s]</span>
+<span class="co">#&gt; Thresholding reads [0.002s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.036s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cg.vef.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;    rname strand      pos context meth unmeth</span>
 <span class="co">#&gt; 1: chr17      + 61864475      CG    7      9</span>
@@ -274,10 +274,10 @@
   bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.167s]</span>
-<span class="co">#&gt; Reading BAM file [0.019s]</span>
-<span class="co">#&gt; Thresholding reads [0.001s]</span>
-<span class="co">#&gt; Preparing amplicon report [0.129s]</span>
+<span class="co">#&gt; Reading BED file [0.056s]</span>
+<span class="co">#&gt; Reading BAM file [0.007s]</span>
+<span class="co">#&gt; Thresholding reads [0.000s]</span>
+<span class="co">#&gt; Preparing amplicon report [0.049s]</span>
 <span class="va">amplicon.report</span>
 <span class="co">#&gt;    seqnames    start      end width strand amplicon nreads+ nreads-        VEF</span>
 <span class="co">#&gt; 1:    chr17 43125624 43126026   403      * CpG00-13       0     156 0.08333333</span>
@@ -291,10 +291,10 @@
   bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.111s]</span>
-<span class="co">#&gt; Reading BAM file [0.075s]</span>
-<span class="co">#&gt; Thresholding reads [0.004s]</span>
-<span class="co">#&gt; Preparing capture report [0.077s]</span>
+<span class="co">#&gt; Reading BED file [0.039s]</span>
+<span class="co">#&gt; Reading BAM file [0.025s]</span>
+<span class="co">#&gt; Thresholding reads [0.001s]</span>
+<span class="co">#&gt; Preparing capture report [0.024s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">capture.report</span><span class="op">)</span>
 <span class="co">#&gt;    seqnames    start      end width strand     V4 nreads+ nreads-       VEF</span>
 <span class="co">#&gt; 1:     chr1  3067647  3069703  2057      * PRDM16       2       1 1.0000000</span>
@@ -309,10 +309,10 @@
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed.type<span class="op">=</span><span class="st">"capture"</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.054s]</span>
-<span class="co">#&gt; Reading BAM file [0.074s]</span>
-<span class="co">#&gt; Thresholding reads [0.003s]</span>
-<span class="co">#&gt; Preparing capture report [0.059s]</span>
+<span class="co">#&gt; Reading BED file [0.017s]</span>
+<span class="co">#&gt; Reading BAM file [0.024s]</span>
+<span class="co">#&gt; Thresholding reads [0.002s]</span>
+<span class="co">#&gt; Preparing capture report [0.023s]</span>
 <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">capture.report</span>, <span class="va">bed.report</span><span class="op">)</span>
 <span class="co">#&gt; [1] TRUE</span></code></pre></div>
 </div>
@@ -338,9 +338,9 @@
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed.rows<span class="op">=</span><span class="cn">NULL</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.018s]</span>
-<span class="co">#&gt; Reading BAM file [0.008s]</span>
-<span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.030s]</span>
+<span class="co">#&gt; Reading BED file [0.015s]</span>
+<span class="co">#&gt; Reading BAM file [0.007s]</span>
+<span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.017s]</span>
 <span class="co"># there are 5 items in amplicon.ecdfs, let's plot all of them</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
@@ -397,24 +397,26 @@
 <div id="exploring-sequence-variants-in-epialleles" class="section level2">
 <h2 class="hasAnchor">
 <a href="#exploring-sequence-variants-in-epialleles" class="anchor" aria-hidden="true"></a>Exploring sequence variants in epialleles</h2>
-<p>It is known that sequence variants can affect the methylation status of a DNA<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>. The <em><code>generateVcfReport</code></em> function calculates frequencies of single nucleotide variants (SNVs) within epialleles and tests for the association between SNV and epiallelic status using Fisher’s exact test. Base counts and the test’s p-values are included in the returned value.</p>
+<p>It is known that sequence variants can affect the methylation status of a DNA<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>. The <em><code>generateVcfReport</code></em> function calculates frequencies of single nucleotide variants (SNVs) within epialleles and tests for the association between SNV and epiallelic status using Fisher Exact test. Base counts and the test’s p-values are included in the returned value.</p>
 <p>In addition to BAM file location string or preprocessed BAM object, the function requires a location string for the Variant Call Format (VCF) file or the VCF object that was obtained using <em><code><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html" class="external-link">VariantAnnotation::readVcf</a></code></em> function. As VCF files can be extremely large, it is strongly advised to prefilter the VCF object by the relevant set of genomic regions, or specify such relevant set of regions as a <em><code>bed</code></em> parameter when <em><code>vcf</code></em> points to a VCF file location.</p>
-<p>Please note, that the output report is currently limited to SNVs only.</p>
+<p>Please note, that the output report is currently limited to SNVs only. Also, the default (<code>min.baseq=0</code>) output of <code>generateVcfReport</code> is equivalent to the one of <code>samtools mplieup -Q 0 ...</code>, and therefore may result in false SNVs caused by misalignments. Remember to increase <code>min.baseq</code> (<code>samtools mplieup -Q</code> default value is 13) to obtain results of a higher quality.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># VCF report</span>
 <span class="va">vcf.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateVcfReport.html">generateVcfReport</a></span><span class="op">(</span>
   bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   vcf<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.vcf.gz"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
+  <span class="co"># thresholds on alignment and base quality</span>
+  min.mapq<span class="op">=</span><span class="fl">30</span>, min.baseq<span class="op">=</span><span class="fl">13</span>,
   <span class="co"># when VCF seqlevels are different from BED and BAM it is possible</span>
   <span class="co"># to convert them internally</span>
   vcf.style<span class="op">=</span><span class="st">"NCBI"</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.019s]</span>
-<span class="co">#&gt; Reading VCF file [0.987s]</span>
-<span class="co">#&gt; Reading BAM file [0.008s]</span>
+<span class="co">#&gt; Reading BED file [0.015s]</span>
+<span class="co">#&gt; Reading VCF file [1.149s]</span>
+<span class="co">#&gt; Reading BAM file [0.007s]</span>
 <span class="co">#&gt; Thresholding reads [0.000s]</span>
-<span class="co">#&gt; Extracting base frequences [0.062s]</span>
+<span class="co">#&gt; Extracting base frequences [0.063s]</span>
 <span class="co"># NA values are shown for the C-&gt;T variants on the "+" and G-&gt;A on the "-"</span>
 <span class="co"># strands, because bisulfite conversion makes their counting impossible</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">vcf.report</span><span class="op">)</span>
@@ -422,9 +424,9 @@
 <span class="co">#&gt; 1: rs546660277    chr17 43124874   A   C     0     0     9    74     0     0     0     0     83</span>
 <span class="co">#&gt; 2: rs574263814    chr17 43124891   G   A     0     0    NA    NA     0     0    NA    NA      0</span>
 <span class="co">#&gt; 3:   rs8176076    chr17 43124935   G   A     0     0    NA    NA     0     0    NA    NA      0</span>
-<span class="co">#&gt; 4: rs535977743    chr17 43125016   C   T    NA    NA     9    75    NA    NA     0     0     84</span>
-<span class="co">#&gt; 5: rs191784032    chr17 43125050   C   A     0     0     9    74     0     0     0     1     83</span>
-<span class="co">#&gt; 6: rs111956204    chr17 43125083   C   A     0     0     9    75     0     0     0     0     84</span>
+<span class="co">#&gt; 4: rs535977743    chr17 43125016   C   T    NA    NA     9    73    NA    NA     0     0     82</span>
+<span class="co">#&gt; 5: rs191784032    chr17 43125050   C   A     0     0     9    73     0     0     0     1     82</span>
+<span class="co">#&gt; 6: rs111956204    chr17 43125083   C   A     0     0     9    74     0     0     0     0     83</span>
 <span class="co">#&gt;    SumAlt FEp+ FEp-</span>
 <span class="co">#&gt; 1:      0    1    1</span>
 <span class="co">#&gt; 2:      0    1   NA</span>
@@ -436,28 +438,28 @@
 <span class="co"># the p-values are given separately for reads that map to the "+"</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">vcf.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">`FEp-`</span>, na.last<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;           name seqnames    range REF ALT M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt U-Alt SumRef</span>
-<span class="co">#&gt; 1: rs187992882    chr17 43125347   C   A     0     0    11   141     0     0     1     1    152</span>
-<span class="co">#&gt; 2: rs546660277    chr17 43124874   A   C     0     0     9    74     0     0     0     0     83</span>
-<span class="co">#&gt; 3: rs535977743    chr17 43125016   C   T    NA    NA     9    75    NA    NA     0     0     84</span>
-<span class="co">#&gt; 4: rs191784032    chr17 43125050   C   A     0     0     9    74     0     0     0     1     83</span>
-<span class="co">#&gt; 5: rs111956204    chr17 43125083   C   A     0     0     9    75     0     0     0     0     84</span>
-<span class="co">#&gt; 6:  rs55680227    chr17 43125086   A   C     0     0     9    73     0     0     0     0     82</span>
-<span class="co">#&gt;    SumAlt FEp+      FEp-</span>
-<span class="co">#&gt; 1:      2    1 0.1502419</span>
-<span class="co">#&gt; 2:      0    1 1.0000000</span>
-<span class="co">#&gt; 3:      0   NA 1.0000000</span>
-<span class="co">#&gt; 4:      1    1 1.0000000</span>
-<span class="co">#&gt; 5:      0    1 1.0000000</span>
-<span class="co">#&gt; 6:      0    1 1.0000000</span>
+<span class="co">#&gt; 1: rs546660277    chr17 43124874   A   C     0     0     9    74     0     0     0     0     83</span>
+<span class="co">#&gt; 2: rs535977743    chr17 43125016   C   T    NA    NA     9    73    NA    NA     0     0     82</span>
+<span class="co">#&gt; 3: rs191784032    chr17 43125050   C   A     0     0     9    73     0     0     0     1     82</span>
+<span class="co">#&gt; 4: rs111956204    chr17 43125083   C   A     0     0     9    74     0     0     0     0     83</span>
+<span class="co">#&gt; 5:  rs55680227    chr17 43125086   A   C     0     0     8    64     0     0     0     0     72</span>
+<span class="co">#&gt; 6: rs539733232    chr17 43125088   C   A     0     0     8    71     0     0     0     0     79</span>
+<span class="co">#&gt;    SumAlt FEp+ FEp-</span>
+<span class="co">#&gt; 1:      0    1    1</span>
+<span class="co">#&gt; 2:      0   NA    1</span>
+<span class="co">#&gt; 3:      1    1    1</span>
+<span class="co">#&gt; 4:      0    1    1</span>
+<span class="co">#&gt; 5:      0    1    1</span>
+<span class="co">#&gt; 6:      0    1    1</span>
 <span class="co"># and to the "-" strand</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">vcf.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">`FEp+`</span>, na.last<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;           name seqnames    range REF ALT M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt U-Alt SumRef</span>
 <span class="co">#&gt; 1: rs546660277    chr17 43124874   A   C     0     0     9    74     0     0     0     0     83</span>
 <span class="co">#&gt; 2: rs574263814    chr17 43124891   G   A     0     0    NA    NA     0     0    NA    NA      0</span>
 <span class="co">#&gt; 3:   rs8176076    chr17 43124935   G   A     0     0    NA    NA     0     0    NA    NA      0</span>
-<span class="co">#&gt; 4: rs191784032    chr17 43125050   C   A     0     0     9    74     0     0     0     1     83</span>
-<span class="co">#&gt; 5: rs111956204    chr17 43125083   C   A     0     0     9    75     0     0     0     0     84</span>
-<span class="co">#&gt; 6:  rs55680227    chr17 43125086   A   C     0     0     9    73     0     0     0     0     82</span>
+<span class="co">#&gt; 4: rs191784032    chr17 43125050   C   A     0     0     9    73     0     0     0     1     82</span>
+<span class="co">#&gt; 5: rs111956204    chr17 43125083   C   A     0     0     9    74     0     0     0     0     83</span>
+<span class="co">#&gt; 6:  rs55680227    chr17 43125086   A   C     0     0     8    64     0     0     0     0     72</span>
 <span class="co">#&gt;    SumAlt FEp+ FEp-</span>
 <span class="co">#&gt; 1:      0    1    1</span>
 <span class="co">#&gt; 2:      0    1   NA</span>
