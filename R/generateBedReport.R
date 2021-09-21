@@ -52,8 +52,8 @@
 #' these requirements and BAM preprocessing at \code{\link{preprocessBam}}.
 #' @param bed Browser Extensible Data (BED) file location string OR object of
 #' class \code{\link[GenomicRanges]{GRanges}} holding genomic coordinates for
-#' regions of interest. The seqlevels of BED file/object must be the same as
-#' seqlevels of BAM file/object used.
+#' regions of interest. The style of seqlevels of BED file/object must be the
+#' same as the style of seqlevels of BAM file/object used.
 #' @param report.file file location string to write the BED report. If NULL
 #' (the default) then report is returned as a
 #' \code{\link[data.table]{data.table}} object.

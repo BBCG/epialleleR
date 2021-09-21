@@ -34,8 +34,8 @@ these requirements and BAM preprocessing at \code{\link{preprocessBam}}.}
 
 \item{vcf}{Variant Call Format (VCF) file location string OR a VCF object
 returned by \code{\link[VariantAnnotation]{readVcf}} function. If VCF object
-is supplied, its seqlevels must match the seqlevels of the BAM file/object
-used.}
+is supplied, the style of its seqlevels must match the style of seqlevels of
+the BAM file/object used.}
 
 \item{vcf.style}{string for the seqlevels style of the VCF file, if
 different from BED file/object. Only has effect when `vcf` parameter points
@@ -51,8 +51,8 @@ to the VCF file location and `bed` is not NULL. Possible values:
 class \code{\linkS4class{GRanges}} holding genomic coordinates for
 regions of interest. It is used to include only the specific genomic ranges
 when the VCF file is loaded. This option has no effect when VCF object is
-supplied as a `vcf` parameter. The seqlevels of BED file/object must match
-the seqlevels of the BAM file/object used.}
+supplied as a `vcf` parameter. The style of seqlevels of BED file/object
+must match the style of seqlevels of the BAM file/object used.}
 
 \item{report.file}{file location string to write the VCF report. If NULL
 (the default) then report is returned as a
@@ -141,7 +141,7 @@ NULL if report.file was specified. The report columns are:
   strands)
   \item SumRef -- sum of all \strong{Ref}erence base counts
   \item SumAlt -- sum of all \strong{Alt}ernative base counts
-  \item FEp+ -- Fisher's Exact test p-value for association of a variation
+  \item FEp+ -- Fisher Exact test p-value for association of a variation
   with methylation status of the reads that map to the \strong{"+"}
   (forward) DNA strand. Calculated using following contingency table:
   \tabular{ll}{
@@ -149,7 +149,7 @@ NULL if report.file was specified. The report columns are:
     U+Ref \tab U+Alt 
   }
   
-  \item FEp- -- Fisher's Exact test p-value for association of a variation
+  \item FEp- -- Fisher Exact test p-value for association of a variation
   with methylation status of the reads that map to the \strong{"-"}
   (reverse) DNA strand. Calculated using following contingency table:
   \tabular{ll}{
@@ -178,10 +178,10 @@ files can be extremely large, it is strongly advised to use only relevant
 subset of their data, prefiltering the VCF object manually before calling
 `generateVcfReport` or specifying `bed` parameter when `vcf` points to the
 location of such large VCF file. Please note that all the BAM, BED and VCF
-files must use the same seqlevels (i.e. chromosome names).
+files must use the same style for seqlevels (i.e. chromosome names).
 
 After counting, function checks if certain bases occur more often within
-reads belonging to certain epialleles using Fisher's Exact test
+reads belonging to certain epialleles using Fisher Exact test
 (HTSlib's own implementation) and reports separate p-values for reads
 mapped to \strong{"+"} (forward) and \strong{"-"} (reverse) DNA strands.
 

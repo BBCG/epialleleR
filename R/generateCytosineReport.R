@@ -30,7 +30,7 @@
 #' Only the second read will satisfy all of the thresholding criteria, leading
 #' to the following CX report (given that all reads map to chr1:+:1-16):
 #' 
-#' \tabular{lllllll}{
+#' \tabular{llllll}{
 #'   rname \tab strand \tab pos \tab context \tab meth \tab unmeth \cr
 #'   chr1 \tab + \tab 4 \tab CG \tab 1 \tab 3 \cr
 #'   chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \cr
@@ -44,7 +44,7 @@
 #' produced by other methylation callers (such as Bismark or Illumina DRAGEN Bio
 #' IT Platform):
 #' 
-#' \tabular{lllllll}{
+#' \tabular{llllll}{
 #'   rname \tab strand \tab pos \tab context \tab meth \tab unmeth \cr
 #'   chr1 \tab + \tab 4 \tab CG \tab 4 \tab 0 \cr
 #'   chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \cr
@@ -68,8 +68,8 @@
 #' 
 #' The downside of not using the reference genome sequence is the inability to
 #' determine the actual sequence of triplet for every base in the cytosine 
-#' report. Therefore this sequence is not reported, and this will stay until
-#' such information will be considered as worth adding.
+#' report. Therefore this sequence is not reported, and this won't change
+#' until such information will be considered as worth adding.
 #'
 #' @param bam BAM file location string OR preprocessed output of
 #' \code{\link[epialleleR]{preprocessBam}} function. BAM file alignment records

@@ -399,7 +399,7 @@ for (f in bam.files) {
 It is known that sequence variants can affect the methylation status of a
 DNA[^7]. The *`generateVcfReport`* function calculates frequencies of single
 nucleotide variants (SNVs) within epialleles and tests for the association
-between SNV and epiallelic status using Fisher's exact test. Base counts and the
+between SNV and epiallelic status using Fisher Exact test. Base counts and the
 test's p-values are included in the returned value.
 
 In addition to BAM file location string or preprocessed BAM object, the function
@@ -409,7 +409,12 @@ files can be extremely large, it is strongly advised to prefilter the VCF object
 by the relevant set of genomic regions, or specify such relevant set of regions
 as a *`bed`* parameter when *`vcf`* points to a VCF file location.
 
-Please note, that the output report is currently limited to SNVs only.
+Please note, that the output report is currently limited to SNVs only. Also,
+the default (`min.baseq=0`) output of `generateVcfReport` is equivalent to the
+one of `samtools mplieup -Q 0 ...`, and therefore may result in false SNVs
+caused by misalignments. Remember to increase `min.baseq`
+(`samtools mplieup -Q` default value is 13) to obtain results of a higher
+quality.
 
 ```{r}
 # VCF report
@@ -417,6 +422,8 @@ vcf.report <- generateVcfReport(
   bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
   bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
   vcf=system.file("extdata", "amplicon.vcf.gz", package="epialleleR"),
+  # thresholds on alignment and base quality
+  min.mapq=30, min.baseq=13,
   # when VCF seqlevels are different from BED and BAM it is possible
   # to convert them internally
   vcf.style="NCBI"

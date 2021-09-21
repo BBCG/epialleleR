@@ -31,8 +31,8 @@ these requirements and BAM preprocessing at \code{\link{preprocessBam}}.}
 \item{bed}{Browser Extensible Data (BED) file location string OR object of
 class \code{\linkS4class{GRanges}} holding genomic coordinates for
 regions of interest. It is used to match sequencing reads to the genomic
-regions prior to eCDF computation. The seqlevels of BED file/object must
-match the seqlevels of the BAM file/object used.}
+regions prior to eCDF computation. The style of seqlevels of BED file/object
+must match the style of seqlevels of the BAM file/object used.}
 
 \item{bed.type}{character string for the type of assay that was used to
 produce sequencing reads:
