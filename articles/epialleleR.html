@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.10</span>
       </span>
     </div>
 
@@ -68,7 +68,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>The epialleleR User’s Guide</h1>
             
-            <h4 data-toc-skip class="date">21 September, 2021</h4>
+            <h4 data-toc-skip class="date">22 September, 2021</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BBCG/epialleleR/blob/master/vignettes/epialleleR.Rmd" class="external-link"><code>vignettes/epialleleR.Rmd</code></a></small>
       <div class="hidden name"><code>epialleleR.Rmd</code></div>
@@ -214,7 +214,7 @@
 
 <span class="va">capture.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="va">bam.data</span>    <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preprocessBam.html">preprocessBam</a></span><span class="op">(</span><span class="va">capture.bam</span><span class="op">)</span>
-<span class="co">#&gt; Reading BAM file [0.028s]</span></code></pre></div>
+<span class="co">#&gt; Reading BAM file [0.031s]</span></code></pre></div>
 </div>
 <div id="making-cytosine-reports" class="section level2">
 <h2 class="hasAnchor">
@@ -227,7 +227,7 @@
 <span class="va">cg.vef.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span><span class="op">)</span>
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq', 'min.baseq', 'skip.duplicates' and 'nthreads' will have no effect.</span>
 <span class="co">#&gt; Thresholding reads [0.002s]</span>
-<span class="co">#&gt; Preparing cytosine report [0.036s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.047s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cg.vef.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;    rname strand      pos context meth unmeth</span>
 <span class="co">#&gt; 1: chr17      + 61864475      CG    7      9</span>
@@ -239,7 +239,7 @@
 <span class="co"># CpG cytosine report</span>
 <span class="va">cg.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq', 'min.baseq', 'skip.duplicates' and 'nthreads' will have no effect.</span>
-<span class="co">#&gt; Preparing cytosine report [0.028s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.040s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cg.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;    rname strand      pos context meth unmeth</span>
 <span class="co">#&gt; 1: chr17      + 61864475      CG    8      8</span>
@@ -252,7 +252,7 @@
 <span class="va">cx.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span>,
                                     report.context<span class="op">=</span><span class="st">"CX"</span><span class="op">)</span>
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq', 'min.baseq', 'skip.duplicates' and 'nthreads' will have no effect.</span>
-<span class="co">#&gt; Preparing cytosine report [0.041s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.056s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cx.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;    rname strand      pos context meth unmeth</span>
 <span class="co">#&gt; 1: chr17      + 61864338     CHG    1     25</span>
@@ -274,10 +274,10 @@
   bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.056s]</span>
-<span class="co">#&gt; Reading BAM file [0.007s]</span>
-<span class="co">#&gt; Thresholding reads [0.000s]</span>
-<span class="co">#&gt; Preparing amplicon report [0.049s]</span>
+<span class="co">#&gt; Reading BED file [0.082s]</span>
+<span class="co">#&gt; Reading BAM file [0.008s]</span>
+<span class="co">#&gt; Thresholding reads [0.001s]</span>
+<span class="co">#&gt; Preparing amplicon report [0.078s]</span>
 <span class="va">amplicon.report</span>
 <span class="co">#&gt;    seqnames    start      end width strand amplicon nreads+ nreads-        VEF</span>
 <span class="co">#&gt; 1:    chr17 43125624 43126026   403      * CpG00-13       0     156 0.08333333</span>
@@ -291,10 +291,10 @@
   bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.039s]</span>
-<span class="co">#&gt; Reading BAM file [0.025s]</span>
+<span class="co">#&gt; Reading BED file [0.056s]</span>
+<span class="co">#&gt; Reading BAM file [0.027s]</span>
 <span class="co">#&gt; Thresholding reads [0.001s]</span>
-<span class="co">#&gt; Preparing capture report [0.024s]</span>
+<span class="co">#&gt; Preparing capture report [0.032s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">capture.report</span><span class="op">)</span>
 <span class="co">#&gt;    seqnames    start      end width strand     V4 nreads+ nreads-       VEF</span>
 <span class="co">#&gt; 1:     chr1  3067647  3069703  2057      * PRDM16       2       1 1.0000000</span>
@@ -309,10 +309,10 @@
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed.type<span class="op">=</span><span class="st">"capture"</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.017s]</span>
-<span class="co">#&gt; Reading BAM file [0.024s]</span>
+<span class="co">#&gt; Reading BED file [0.023s]</span>
+<span class="co">#&gt; Reading BAM file [0.028s]</span>
 <span class="co">#&gt; Thresholding reads [0.002s]</span>
-<span class="co">#&gt; Preparing capture report [0.023s]</span>
+<span class="co">#&gt; Preparing capture report [0.033s]</span>
 <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">capture.report</span>, <span class="va">bed.report</span><span class="op">)</span>
 <span class="co">#&gt; [1] TRUE</span></code></pre></div>
 </div>
@@ -338,9 +338,9 @@
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed.rows<span class="op">=</span><span class="cn">NULL</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.015s]</span>
-<span class="co">#&gt; Reading BAM file [0.007s]</span>
-<span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.017s]</span>
+<span class="co">#&gt; Reading BED file [0.021s]</span>
+<span class="co">#&gt; Reading BAM file [0.008s]</span>
+<span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.025s]</span>
 <span class="co"># there are 5 items in amplicon.ecdfs, let's plot all of them</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
 
@@ -412,11 +412,11 @@
   <span class="co"># to convert them internally</span>
   vcf.style<span class="op">=</span><span class="st">"NCBI"</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.015s]</span>
-<span class="co">#&gt; Reading VCF file [1.149s]</span>
-<span class="co">#&gt; Reading BAM file [0.007s]</span>
-<span class="co">#&gt; Thresholding reads [0.000s]</span>
-<span class="co">#&gt; Extracting base frequences [0.063s]</span>
+<span class="co">#&gt; Reading BED file [0.022s]</span>
+<span class="co">#&gt; Reading VCF file [1.449s]</span>
+<span class="co">#&gt; Reading BAM file [0.009s]</span>
+<span class="co">#&gt; Thresholding reads [0.001s]</span>
+<span class="co">#&gt; Extracting base frequences [0.073s]</span>
 <span class="co"># NA values are shown for the C-&gt;T variants on the "+" and G-&gt;A on the "-"</span>
 <span class="co"># strands, because bisulfite conversion makes their counting impossible</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">vcf.report</span><span class="op">)</span>
@@ -501,7 +501,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; other attached packages:</span>
 <span class="co">#&gt; [1] GenomeInfoDb_1.29.8 IRanges_2.27.2      S4Vectors_0.31.3    BiocGenerics_0.39.2</span>
-<span class="co">#&gt; [5] epialleleR_1.1.9   </span>
+<span class="co">#&gt; [5] epialleleR_1.1.10  </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; loaded via a namespace (and not attached):</span>
 <span class="co">#&gt;  [1] bitops_1.0-7                matrixStats_0.61.0          fs_1.5.0                   </span>
@@ -519,7 +519,7 @@
 <span class="co">#&gt; [37] highr_0.9                   dbplyr_2.1.1                fastmap_1.1.0              </span>
 <span class="co">#&gt; [40] BSgenome_1.61.0             rlang_0.4.11                RSQLite_2.2.8              </span>
 <span class="co">#&gt; [43] jquerylib_0.1.4             BiocIO_1.3.0                generics_0.1.0             </span>
-<span class="co">#&gt; [46] jsonlite_1.7.2              BiocParallel_1.27.8         dplyr_1.0.7                </span>
+<span class="co">#&gt; [46] jsonlite_1.7.2              BiocParallel_1.27.9         dplyr_1.0.7                </span>
 <span class="co">#&gt; [49] VariantAnnotation_1.39.0    RCurl_1.98-1.5              magrittr_2.0.1             </span>
 <span class="co">#&gt; [52] GenomeInfoDbData_1.2.6      Matrix_1.3-4                Rcpp_1.0.7                 </span>
 <span class="co">#&gt; [55] fansi_0.5.0                 lifecycle_1.0.0             stringi_1.7.4              </span>
