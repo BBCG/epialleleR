@@ -80,8 +80,8 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
     
     // check if not the same template (QNAME)
     if ((strcmp(templ_qname, rec_qname) != 0)) {                
-      // store previous template if not first record
-      if (nrecs!=1) push_template;
+      // store previous template if it's a valid record
+      if (templ_strand!=0) push_template;                                       // templ_strand is 0 for empty records (very start of BAM and/or when invalid records are in front of BAM)
       
       // initialize new template
       strcpy(templ_qname, rec_qname);                                           // store template QNAME
