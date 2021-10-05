@@ -83,7 +83,7 @@ threshold." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.10</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.11</span>
       </span>
     </div>
 
@@ -409,11 +409,11 @@ the seqlevels style.</p></div>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BED file</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.018s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BAM file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.009s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.007s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Thresholding reads</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.001s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Preparing amplicon report</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.058s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.051s]</span>
 <span class='r-in'>  </span>
 <span class='r-in'>  <span class='co'># capture NGS</span></span>
 <span class='r-in'>  <span class='va'>capture.bam</span>    <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"capture.bam"</span>,</span>
@@ -422,26 +422,26 @@ the seqlevels style.</p></div>
 <span class='r-in'>                                package<span class='op'>=</span><span class='st'>"epialleleR"</span><span class='op'>)</span></span>
 <span class='r-in'>  <span class='va'>capture.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateCaptureReport</span><span class='op'>(</span>bam<span class='op'>=</span><span class='va'>capture.bam</span>, bed<span class='op'>=</span><span class='va'>capture.bed</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BED file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.020s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.018s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BAM file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.032s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.027s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Thresholding reads</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.002s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.001s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Preparing capture report</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.029s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.053s]</span>
 <span class='r-in'>  </span>
 <span class='r-in'>  <span class='co'># generateAmpliconReport and generateCaptureReport are just aliases</span></span>
 <span class='r-in'>  <span class='co'># of the generateBedReport</span></span>
 <span class='r-in'>  <span class='va'>bed.report</span> <span class='op'>&lt;-</span> <span class='fu'>generateBedReport</span><span class='op'>(</span>bam<span class='op'>=</span><span class='va'>capture.bam</span>, bed<span class='op'>=</span><span class='va'>capture.bed</span>,</span>
 <span class='r-in'>                                  bed.type<span class='op'>=</span><span class='st'>"capture"</span><span class='op'>)</span></span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BED file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.020s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.015s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Reading BAM file</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.029s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.027s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Thresholding reads</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.001s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.002s]</span>
 <span class='r-msg co'><span class='r-pr'>#&gt;</span> Preparing capture report</span>
-<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.030s]</span>
+<span class='r-msg co'><span class='r-pr'>#&gt;</span>  [0.023s]</span>
 <span class='r-in'>  <span class='fu'><a href='https://rdrr.io/r/base/identical.html'>identical</a></span><span class='op'>(</span><span class='va'>capture.report</span>, <span class='va'>bed.report</span><span class='op'>)</span></span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> [1] TRUE</span>
 </code></pre></div>
@@ -460,7 +460,7 @@ the seqlevels style.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.9000.9000.9000.</p></p>
 </div>
 
       </footer>
