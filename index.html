@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.11</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.12</span>
       </span>
     </div>
 
@@ -73,18 +73,17 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div id="fast-epiallele-aware-methylation-reporter-" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#fast-epiallele-aware-methylation-reporter-" class="anchor" aria-hidden="true"></a>Fast, epiallele-aware methylation reporter <img align="right" src="inst/epialleleR_logo.svg">
+<div class="page-header"><h1>Fast, epiallele-aware methylation reporter <img align="right" src="inst/epialleleR_logo.svg"><a class="anchor" aria-label="anchor" href="#fast-epiallele-aware-methylation-reporter-"></a>
 </h1></div>
 
 <div id="introduction" class="section level2">
-<h2 class="hasAnchor">
-<a href="#introduction" class="anchor" aria-hidden="true"></a>Introduction</h2>
-<p>DISCLAIMER: This is a work in progress, however the package is already usable, and the obtained experimental results will soon be published. Main methods (<em><code>preprocessBam</code></em>, <em><code>generateCytosineReport</code></em>, <em><code>generateBedReport</code></em>) wonât change. The <em><code>generateVcfReport</code></em> method might at some point be improved to include variable-length sequence variations, while <em><code>generateBedEcdf</code></em> should be considered somewhat experimental and may undergo significant changes or be substituted with some other method in the future.</p>
+<h2>Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h2>
+<p>DISCLAIMER: This is a work in progress, however the package is already usable, and the obtained experimental results will soon be published. Main methods (<em><code>preprocessBam</code></em>, <em><code>generateCytosineReport</code></em>, <em><code>generateBedReport</code></em>) won’t change. The <em><code>generateVcfReport</code></em> method might at some point be improved to include variable-length sequence variations, while <em><code>generateBedEcdf</code></em> should be considered somewhat experimental and may undergo significant changes or be substituted with some other method in the future.</p>
 <p><em><code>epialleleR</code></em> is an R package for calling hypermethylated variant epiallele frequencies (VEF) at the level of genomic regions or individual cytosines in next-generation sequencing data using binary alignment map (BAM) files as an input. Other functionality includes computing the empirical cumulative distribution function for per-read beta values, and testing the significance of the association between epiallele methylation status and base frequencies at particular genomic positions (SNPs).</p>
 <div id="current-features" class="section level3">
-<h3 class="hasAnchor">
-<a href="#current-features" class="anchor" aria-hidden="true"></a>Current Features</h3>
+<h3>Current Features<a class="anchor" aria-label="anchor" href="#current-features"></a>
+</h3>
 <ul>
 <li>conventional reporting of cytosine methylation (<em><code>generateCytosineReport</code></em>)</li>
 <li>calling the hypermethylated variant epiallele frequency (VEF) at the level of genomic regions (<em><code>generateBedReport</code></em>) or individual cytosines (<em><code>generateCytosineReport</code></em>)</li>
@@ -93,8 +92,8 @@
 </ul>
 </div>
 <div id="recent-improvements-v12" class="section level3">
-<h3 class="hasAnchor">
-<a href="#recent-improvements-v12" class="anchor" aria-hidden="true"></a>Recent improvements (v1.2)</h3>
+<h3>Recent improvements (v1.2)<a class="anchor" aria-label="anchor" href="#recent-improvements-v12"></a>
+</h3>
 <ul>
 <li>even faster and more memory-efficient BAM loading (by means of HTSlib)</li>
 <li>min.baseq parameter to reduce the effect of low quality bases on methylation or SNV calling (in v1.0 the output of <em><code>generateVcfReport</code></em> was equivalent to the one of <code>samtools mpileup -Q 0 ...</code>)</li>
@@ -103,11 +102,11 @@
 </div>
 </div>
 <div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor" aria-hidden="true"></a>Installation</h2>
+<h2>Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <div id="install-via-bioconductor" class="section level3">
-<h3 class="hasAnchor">
-<a href="#install-via-bioconductor" class="anchor" aria-hidden="true"></a>install via Bioconductor</h3>
+<h3>install via Bioconductor<a class="anchor" aria-label="anchor" href="#install-via-bioconductor"></a>
+</h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
     <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
@@ -115,8 +114,8 @@
 <span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"epialleleR"</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="install-the-latest-version-via-install_github" class="section level3">
-<h3 class="hasAnchor">
-<a href="#install-the-latest-version-via-install_github" class="anchor" aria-hidden="true"></a>Install the latest version via install_github</h3>
+<h3>Install the latest version via install_github<a class="anchor" aria-label="anchor" href="#install-the-latest-version-via-install_github"></a>
+</h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span>
 <span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"BBCG/epialleleR"</span>, build_vignettes<span class="op">=</span><span class="cn">FALSE</span>,
@@ -126,9 +125,9 @@
 </div>
 </div>
 <div id="using-the-package" class="section level2">
-<h2 class="hasAnchor">
-<a href="#using-the-package" class="anchor" aria-hidden="true"></a>Using the package</h2>
-<p>Please read <em><code>epialleleR</code></em> vignettes at <a href="https://bbcg.github.io/epialleleR/articles/epialleleR.html" class="external-link">GitHub pages</a> or within the R environment: <code><a href="articles/epialleleR.html">vignette("epialleleR", package="epialleleR")</a></code>, or consult the functionâs help pages for the extensive information on usage, parameters and output values.</p>
+<h2>Using the package<a class="anchor" aria-label="anchor" href="#using-the-package"></a>
+</h2>
+<p>Please read <em><code>epialleleR</code></em> vignettes at <a href="https://bbcg.github.io/epialleleR/articles/epialleleR.html" class="external-link">GitHub pages</a> or within the R environment: <code><a href="articles/epialleleR.html">vignette("epialleleR", package="epialleleR")</a></code>, or consult the function’s help pages for the extensive information on usage, parameters and output values.</p>
 <p>Very brief synopsis:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/BBCG/epialleleR" class="external-link">epialleleR</a></span><span class="op">)</span>
@@ -154,20 +153,21 @@
                                 vcf<span class="op">=</span><span class="va">amplicon.vcf</span>, vcf.style<span class="op">=</span><span class="st">"NCBI"</span><span class="op">)</span></code></pre></div>
 <hr>
 <div id="citing-the-epialleler-package" class="section level3">
-<h3 class="hasAnchor">
-<a href="#citing-the-epialleler-package" class="anchor" aria-hidden="true"></a>Citing the <em><code>epialleleR</code></em> package</h3>
+<h3>Citing the <em><code>epialleleR</code></em> package<a class="anchor" aria-label="anchor" href="#citing-the-epialleler-package"></a>
+</h3>
 <p>The experimental data analysed using the package has not been published yet. The citation information will be updated in the nearest future.</p>
 </div>
 <div id="epialleler-at-bioconductor" class="section level3">
-<h3 class="hasAnchor">
-<a href="#epialleler-at-bioconductor" class="anchor" aria-hidden="true"></a><em><code>epialleleR</code></em> at Bioconductor</h3>
+<h3>
+<em><code>epialleleR</code></em> at Bioconductor<a class="anchor" aria-label="anchor" href="#epialleler-at-bioconductor"></a>
+</h3>
 <p><a href="https://bioconductor.org/packages/release/bioc/html/epialleleR.html" class="external-link">release</a>, <a href="https://bioconductor.org/packages/devel/bioc/html/epialleleR.html" class="external-link">development version</a></p>
 <hr>
 </div>
 </div>
 <div id="license" class="section level2">
-<h2 class="hasAnchor">
-<a href="#license" class="anchor" aria-hidden="true"></a>License</h2>
+<h2>License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h2>
 <p>Artistic License/GPL</p>
 </div>
 </div>
