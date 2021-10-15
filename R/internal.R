@@ -131,6 +131,7 @@ utils::globalVariables(
   vcf.param  <- VariantAnnotation::ScanVcfParam(info=NA, geno=NA)
   
   if (!is.null(bed)) {
+    bed <- GenomicRanges::reduce(bed)
     bed.style  <- GenomeInfoDb::seqlevelsStyle(bed)
     if (!is.null(vcf.style))
       GenomeInfoDb::seqlevelsStyle(bed) <- vcf.style
@@ -360,6 +361,9 @@ utils::globalVariables(
   #   levels(bam.processed$rname)
   vcf.dt <- data.table::as.data.table(vcf.ranges)
   vcf.dt[, seqnames := factor(seqnames, levels=levels(bam.processed$rname))]
+  if (all(is.na(vcf.dt$seqnames)))
+    stop("Looks like seqlevels styles of BAM and VCF don't match. ",
+         "Please provide VCF as an object with correct seqlevels.")
   
   freqs <- rcpp_get_base_freqs(bam.processed, pass, vcf.dt)
   colnames(freqs) <- c("","U+A","","U+C","U+T","","U+N","U+G",

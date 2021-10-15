@@ -194,7 +194,7 @@ generateVcfReport <- function (bam,
       bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed,
                       verbose=verbose)
     vcf <- .readVcf(vcf.file=vcf, vcf.style=vcf.style,
-                    bed=GenomicRanges::reduce(bed), verbose=verbose)
+                    bed=bed, verbose=verbose)
   } else {
     if (verbose)
       message("Already preprocessed VCF supplied as an input. Options",

@@ -16,6 +16,13 @@ test_generateVcfReport <- function () {
     verbose=FALSE
   )
   
+  capture.report.nobed <- generateVcfReport(
+    bam=system.file("extdata", "capture.bam", package="epialleleR"),
+    bed=NULL,
+    vcf=capture.vcf,
+    verbose=FALSE
+  )
+  
   nothreshold.report <- generateVcfReport(
     bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
     bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
@@ -28,9 +35,22 @@ test_generateVcfReport <- function () {
     c(56,17)
   )
   
+  RUnit::checkTrue(
+    identical(capture.report, capture.report.nobed)
+  )
+  
   RUnit::checkEquals(
     dim(capture.report),
     c(26292,17)
+  )
+  
+  RUnit::checkException(
+    generateVcfReport(
+      bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
+      bed=NULL,
+      vcf=system.file("extdata", "amplicon.vcf.gz", package="epialleleR"),
+      vcf.style="NCBI", threshold.reads=FALSE, verbose=TRUE
+    )
   )
   
   RUnit::checkEquals(
