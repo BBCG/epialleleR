@@ -20,8 +20,8 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
                                       int nthreads)                             // HTSlib threads, >1 for multiple
 {
   // constants
-  int max_qname_width = 256;                                                    // max QNAME length, not expanded yet, ever error-prone?
-  int max_templ_width = 1024;                                                   // max insert size, expanded if necessary
+  int max_qname_width = 1024;                                                   // max QNAME length, not expanded yet, ever error-prone?
+  int max_templ_width = 8192;                                                   // max insert size, expanded if necessary
   
   // file IO
   htsFile *bam_fp = hts_open(fn.c_str(), "r");                                  // try open file
@@ -41,12 +41,11 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   int nrecs = 0, ntempls = 0;                                                   // counters: BAM records, templates (read pairs)
   
   // reserve some memory
-  rname.reserve(10000); strand.reserve(10000); start.reserve(10000); 
-  seq.reserve(10000); xm.reserve(10000);
+  rname.reserve(100000); strand.reserve(100000); start.reserve(100000); 
+  seq.reserve(100000); xm.reserve(100000);
   
   // template holders
   char *templ_qname = (char*) malloc(max_qname_width * sizeof(char));           // template QNAME
-  char *rec_qname   = (char*) malloc(max_qname_width * sizeof(char));           // current read QNAME
   uint8_t *templ_qual_rs = (uint8_t*) malloc(max_templ_width * sizeof(uint8_t));// template QUAL array
   uint8_t *templ_seq_rs  = (uint8_t*) malloc(max_templ_width * sizeof(uint8_t));// template SEQ array
   uint8_t *templ_xm_rs   = (uint8_t*) malloc(max_templ_width * sizeof(uint8_t));// template XM array
@@ -57,8 +56,8 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
     rname.push_back(templ_rname + 1);                            /* RNAME+1 */ \
     strand.push_back(templ_strand);                               /* STRAND */ \
     start.push_back(templ_start + 1);                              /* POS+1 */ \
-    seq.push_back(std::string((char *) templ_seq_rs, templ_width));  /* SEQ */ \
-    xm.push_back( std::string((char *) templ_xm_rs,  templ_width));   /* XM */ \
+    seq.emplace_back((const char*) templ_seq_rs, templ_width);       /* SEQ */ \
+    xm.emplace_back( (const char*) templ_xm_rs,  templ_width);        /* XM */ \
     ntempls++;                                                        /* +1 */ \
   }
   
@@ -73,18 +72,13 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
         (!(bam_rec->core.flag & BAM_FPROPER_PAIR)) ||                           // or if not a proper pair
         (skip_duplicates && (bam_rec->core.flag & BAM_FDUP))) continue;         // or if record is an optical/PCR duplicate
     
-    // save qname
-    strcpy(rec_qname, bam_get_qname(bam_rec));
-    // std::reverse(rec_qname, rec_qname + bam_rec->core.l_qname                // reversing it to make strcmp faster:
-    //                - bam_rec->core.l_extranul - 1);                          // doesn't make any sense now, because compare only once
-    
     // check if not the same template (QNAME)
-    if ((strcmp(templ_qname, rec_qname) != 0)) {                
+    if ((strcmp(templ_qname, bam_get_qname(bam_rec)) != 0)) {                
       // store previous template if it's a valid record
       if (templ_strand!=0) push_template;                                       // templ_strand is 0 for empty records (very start of BAM and/or when invalid records are in front of BAM)
       
       // initialize new template
-      strcpy(templ_qname, rec_qname);                                           // store template QNAME
+      strcpy(templ_qname, bam_get_qname(bam_rec));                              // store template QNAME
       templ_rname = bam_rec->core.tid;                                          // store template RNAME
       templ_start = bam_rec->core.pos < bam_rec->core.mpos ?                    // smallest of POS,MPOS is a start
         bam_rec->core.pos : bam_rec->core.mpos;
@@ -103,9 +97,12 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
         if (templ_qual_rs==NULL || templ_seq_rs==NULL || templ_xm_rs==NULL)     // check memory allocation
           Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs);
       }
-      std::fill_n(templ_qual_rs, templ_width, (uint8_t) min_baseq);             // clean template holders
-      std::fill_n(templ_seq_rs,  templ_width, 'N');
-      std::fill_n(templ_xm_rs,   templ_width, '-');
+      std::memset(templ_qual_rs, (uint8_t) min_baseq, templ_width);             // clean template holders
+      std::memset(templ_seq_rs, 'N', templ_width);
+      std::memset(templ_xm_rs,  '-', templ_width);
+      // std::fill_n(templ_qual_rs, templ_width, (uint8_t) min_baseq);             // clean template holders
+      // std::fill_n(templ_seq_rs,  templ_width, 'N');
+      // std::fill_n(templ_xm_rs,   templ_width, '-');
      }
     
     // add another read to the template
@@ -170,7 +167,6 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   hts_close(bam_fp);                                                            // close BAM file
   if (thread_pool.pool) hts_tpool_destroy(thread_pool.pool);                    // free thread pool
   free(templ_qname);                                                            // and free manually allocated memory
-  free(rec_qname); 
   free(templ_qual_rs);
   free(templ_seq_rs);
   free(templ_xm_rs);
