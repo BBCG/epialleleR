@@ -65,14 +65,14 @@ std::vector<int> rcpp_cx_report(Rcpp::DataFrame &df,                            
   #define ctx_to_idx(c) ((c+2)>>2) & 15
   #define spit_results {                                                       \
     for (it=cx_map.begin(); it!=cx_map.end(); it++) {                          \
-      it->second[9] -= it->second[11];                 /* discarding the +- */ \
-      if (it->second[12]*2 > it->second[9])           /* skip if most are . */ \
+      it->second[9] /= 2;                              /* half the coverage */ \
+      if (it->second[12] > it->second[9])             /* skip if most are . */ \
         continue;                                                              \
-      else if ((it->second[2] + it->second[10])*2 > it->second[9])             \
+      else if ((it->second[2] + it->second[10]) > it->second[9])               \
         max_freq_ctx='H', max_freq_idx=2;                                      \
-      else if ((it->second[6] + it->second[14])*2 > it->second[9])             \
+      else if ((it->second[6] + it->second[14]) > it->second[9])               \
         max_freq_ctx='X', max_freq_idx=6;                                      \
-      else if ((it->second[7] + it->second[15])*2 > it->second[9])             \
+      else if ((it->second[7] + it->second[15]) > it->second[9])               \
         max_freq_ctx='Z', max_freq_idx=7;                                      \
       else continue;                               /* skip if none is > 50% */ \
       if (ctx.find(max_freq_ctx)!=std::string::npos) {     /* if within ctx */ \
@@ -117,6 +117,7 @@ std::vector<int> rcpp_cx_report(Rcpp::DataFrame &df,                            
       map_val[1] = start[x]+i;
       map_key = ((T_key)map_val[1] << 2) | map_val[8];
       idx_to_increase = ctx_to_idx(xm[x][i]);                                   // see the table above
+      if (idx_to_increase==11) continue;                                        // skip +-
       idx_to_increase |= pass_x;                                                // if not pass - lowercase
       hint = cx_map.try_emplace(hint, map_key, map_val);
       hint->second[idx_to_increase]++;
