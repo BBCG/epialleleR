@@ -26,9 +26,9 @@ quality (default: 0).}
 skipped (default: FALSE). Option has no effect if duplicate reads were not
 marked by alignment software.}
 
-\item{nthreads}{non-negative integer for the number of HTSlib threads to be
-used during BAM file decompression (default: 1). Two threads (and usually no
-more than two) make sense for the files larger than 100 MB.}
+\item{nthreads}{non-negative integer for the number of additional HTSlib
+threads to be used during BAM file decompression (default: 1). Two threads
+(and usually no more than two) make sense for the files larger than 100 MB.}
 
 \item{verbose}{boolean to report progress and timings (default: TRUE).}
 }

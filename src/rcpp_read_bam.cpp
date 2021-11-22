@@ -17,7 +17,7 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
                                       int min_mapq,                             // min read mapping quality
                                       int min_baseq,                            // min base quality
                                       bool skip_duplicates,                     // skip marked duplicates
-                                      int nthreads)                             // HTSlib threads, >1 for multiple
+                                      int nthreads)                             // HTSlib threads, >0 for multiple
 {
   // constants
   int max_qname_width = 1024;                                                   // max QNAME length, not expanded yet, ever error-prone?
@@ -27,8 +27,8 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   htsFile *bam_fp = hts_open(fn.c_str(), "r");                                  // try open file
   if (bam_fp==NULL) Rcpp::stop("Unable to open BAM file for reading");          // fall back if error
   htsThreadPool thread_pool = {NULL, 0};                                        // thread pool cuts time by 30%
-  if (nthreads>1) {
-    thread_pool.pool = hts_tpool_init(nthreads);                                // when initiated for 2 threads
+  if (nthreads>0) {
+    thread_pool.pool = hts_tpool_init(nthreads);                                // when initiated for >0 threads
     hts_set_opt(bam_fp, HTS_OPT_THREAD_POOL, &thread_pool);                     // and bound to the file pointer
   }
   bam_hdr_t *bam_hdr = sam_hdr_read(bam_fp);                                    // try read file header

@@ -154,8 +154,9 @@ sequencing), larger methylation capture panels, or even whole-genome approaches.
 
 Currently *`epialleleR`* runs in a single-thread mode only. Loading the BAM
 data is now done by means of *`HTSlib`*, therefore it is possible to speed
-it up using >1 threads (`nthreads` option in *`preprocessBam`*). All operations
-are performed using optimised C++ functions, and usually take reasonable time.
+it up using additional decompression threads (`nthreads` option in
+*`preprocessBam`*). All operations are performed using optimised C++ functions,
+and usually take reasonable time.
 Running time for complete task "BAM on disk -> CX report on disk" depends on the
 size of the BAM file, and the speed is usually within the range of 20-30 MB/s
 (or 150-200 thousand reads per second) for a single core of a relatively
