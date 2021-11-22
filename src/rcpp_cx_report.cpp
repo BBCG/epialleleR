@@ -114,7 +114,7 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
     }
     map_val[0] = rname[x];
     map_val[8] = strand[x];
-    pass_x = pass[x]<<3;                                                        // should we lowercase this XM (TRUE==8, FALSE==0)
+    pass_x = (!pass[x])<<3;                                                     // should we lowercase this XM (TRUE==0, FALSE==8)
     for (unsigned int i=0; i<xm[x].size(); i++) {
       map_val[1] = start[x]+i;
       map_key = ((T_key)map_val[1] << 2) | map_val[8];
