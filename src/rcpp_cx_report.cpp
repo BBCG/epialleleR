@@ -20,7 +20,7 @@
 // Parses XM tags and outputs summarised CX report only if most frequent context
 // is observed in more than 50% of reads (not including +-) and is within ctx
 // string parameter.
-// Output report is an int array with six fields for every cytosine:
+// Output report is a data.frame with six columns and rows for every cytosine:
 // rname (factor), strand (factor), pos, ctx (char), meth, unmeth
 // 
 // 1) all XM positions counted in int[16]: index is equal to char+2>>2&00001111
@@ -42,9 +42,9 @@
 // z    01111010  01111100  1111    15
 // 
 // [[Rcpp::export("rcpp_cx_report")]]
-std::vector<int> rcpp_cx_report(Rcpp::DataFrame &df,                            // data frame with BAM data
-                                Rcpp::LogicalVector &pass,                      // does it pass the threshold
-                                std::string ctx)                                // context string for bases to report
+Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             // data frame with BAM data
+                               Rcpp::LogicalVector &pass,                       // does it pass the threshold
+                               std::string ctx)                                 // context string for bases to report
 {
   // walking trough bunch of reads <- filling the map
   // pos<<2|strand -> {0: rname,  1: pos,       2: 'H',  3: '',    4: '',   5: 'U',  6: 'X',  7: 'Z',
@@ -76,13 +76,12 @@ std::vector<int> rcpp_cx_report(Rcpp::DataFrame &df,                            
         max_freq_ctx='Z', max_freq_idx=7;                                      \
       else continue;                               /* skip if none is > 50% */ \
       if (ctx.find(max_freq_ctx)!=std::string::npos) {     /* if within ctx */ \
-        res.push_back(it->second[0]);                              /* rname */ \
-        res.push_back(it->second[8]);                             /* strand */ \
-        res.push_back(it->second[1]);                                /* pos */ \
-        res.push_back(max_freq_ctx);                             /* context */ \
-        res.push_back(it->second[max_freq_idx]);                    /* meth */ \
-        max_freq_idx |= 8;                                     /* lowercase */ \
-        res.push_back(it->second[max_freq_idx]);                  /* unmeth */ \
+        res_rname.push_back(it->second[0]);                        /* rname */ \
+        res_strand.push_back(it->second[8]);                      /* strand */ \
+        res_pos.push_back(it->second[1]);                            /* pos */ \
+        res_ctx.push_back(max_freq_idx);                         /* context */ \
+        res_meth.push_back(it->second[max_freq_idx]);               /* meth */ \
+        res_unmeth.push_back(it->second[max_freq_idx | 8]);       /* unmeth */ \
       }                                                                        \
     }                                                                          \
     cx_map.clear();                                                            \
@@ -91,10 +90,13 @@ std::vector<int> rcpp_cx_report(Rcpp::DataFrame &df,                            
 
   // result
   // { (rname, strand, pos, ctx, meth, unmeth) * n }
-  std::vector<int> res;
+  std::vector<int> res_rname, res_strand, res_pos, res_ctx, res_meth, res_unmeth;
+  size_t nitems = rname.size()*pow(ctx.size()<<2,2);
   // reserving space makes it only slow?
-  res.reserve(rname.size()*pow(ctx.size(),2));
-
+  res_rname.reserve(nitems); res_strand.reserve(nitems);
+  res_pos.reserve(nitems); res_ctx.reserve(nitems);
+  res_meth.reserve(nitems); res_unmeth.reserve(nitems);
+  
   // iterating over XM vector, saving the results when necessary
   T_cx_fmap cx_map;
   T_cx_fmap::iterator it, hint;
@@ -107,12 +109,12 @@ std::vector<int> rcpp_cx_report(Rcpp::DataFrame &df,                            
     // checking for the interrupt
     if ((x & 0xFFFF) == 0) Rcpp::checkUserInterrupt();                          // every ~65k reads
     
-    if (start[x]>map_val[1] || rname[x]!=map_val[0]) {
+    if ((start[x]>map_val[1]) || (rname[x]!=map_val[0])) {
       spit_results;
     }
     map_val[0] = rname[x];
     map_val[8] = strand[x];
-    pass_x = pass[x]?0:8;                                                       // should we lowercase this XM
+    pass_x = pass[x]<<3;                                                        // should we lowercase this XM (TRUE==8, FALSE==0)
     for (unsigned int i=0; i<xm[x].size(); i++) {
       map_val[1] = start[x]+i;
       map_key = ((T_key)map_val[1] << 2) | map_val[8];
@@ -125,6 +127,15 @@ std::vector<int> rcpp_cx_report(Rcpp::DataFrame &df,                            
     }
   }
   spit_results;
+  
+  Rcpp::DataFrame res = Rcpp::DataFrame::create(                                // final CX report
+    Rcpp::Named("rname") = res_rname,                                           // numeric ids (factor) for reference names
+    Rcpp::Named("strand") = res_strand,                                         // numeric ids (factor) for reference strands
+    Rcpp::Named("pos") = res_pos,                                               // position of cytosine
+    Rcpp::Named("context") = res_ctx,                                           // cytosine context
+    Rcpp::Named("meth") = res_meth,                                             // number of methylated
+    Rcpp::Named("unmeth") = res_unmeth                                          // number of unmethylated
+  );
   
   return res;
 }

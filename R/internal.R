@@ -240,20 +240,15 @@ utils::globalVariables(
   if (verbose) message("Preparing cytosine report", appendLF=FALSE)
   tm <- proc.time()
   
-  # check if ordered? reorder if not
-  # reporting, vectorised
-  cx.report <- as.data.frame(
-    matrix(
-      rcpp_cx_report(bam.processed, pass, ctx), ncol=6, byrow=TRUE,
-      dimnames=list(NULL, c("rname","strand","pos","context","meth","unmeth"))
-    )
-  )
+  # must be ordered
+  cx.report <- rcpp_cx_report(bam.processed, pass, ctx)
   data.table::setDT(cx.report)
-  cx.report[, data.table::setattr(rname,  "class", "factor")]
-  cx.report[, data.table::setattr(rname,  "levels", levels(bam.processed$rname))]
-  cx.report[, data.table::setattr(strand, "class", "factor")]
-  cx.report[, data.table::setattr(strand, "levels", levels(bam.processed$strand))]
-  cx.report[, `:=` (context = rcpp_char_to_context(context))]
+  cx.report[, data.table::setattr(rname,   "class", "factor")]
+  cx.report[, data.table::setattr(rname,   "levels", levels(bam.processed$rname))]
+  cx.report[, data.table::setattr(strand,  "class", "factor")]
+  cx.report[, data.table::setattr(strand,  "levels", levels(bam.processed$strand))]
+  cx.report[, data.table::setattr(context, "class", "factor")]
+  cx.report[, data.table::setattr(context, "levels", c(NA,"CHH",NA,NA,NA,"CHG","CG"))]
 
   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(cx.report)

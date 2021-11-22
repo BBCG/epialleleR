@@ -22,7 +22,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_cx_report
-std::vector<int> rcpp_cx_report(Rcpp::DataFrame& df, Rcpp::LogicalVector& pass, std::string ctx);
+Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame& df, Rcpp::LogicalVector& pass, std::string ctx);
 RcppExport SEXP _epialleleR_rcpp_cx_report(SEXP dfSEXP, SEXP passSEXP, SEXP ctxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

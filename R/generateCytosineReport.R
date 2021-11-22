@@ -196,8 +196,7 @@ generateCytosineReport <- function (bam,
   
   cx.report <- .getCytosineReport(
     bam.processed=bam, pass=pass,
-    ctx=paste0(.context.to.bases[[report.context]][["ctx.unmeth"]],
-               .context.to.bases[[report.context]][["ctx.meth"]]),
+    ctx=.context.to.bases[[report.context]][["ctx.meth"]],
     verbose=verbose
   )
   
