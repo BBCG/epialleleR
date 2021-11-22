@@ -18,7 +18,7 @@ tests their association with the methylation status of the sequencing reads."><!
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.12</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.1</span>
       </span>
     </div>
 
@@ -30,7 +30,7 @@ tests their association with the methylation status of the sequencing reads."><!
   <a href="../reference/index.html">Reference</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://github.com/BBCG/epialleleR/">
+  <a href="https://github.com/BBCG/epialleleR/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -45,7 +45,7 @@ tests their association with the methylation status of the sequencing reads."><!
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>generateVcfReport</h1>
-    <small class="dont-index">Source: <a href="https://github.com/BBCG/epialleleR/blob/master/R/generateVcfReport.R"><code>R/generateVcfReport.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/BBCG/epialleleR/blob/HEAD/R/generateVcfReport.R" class="external-link"><code>R/generateVcfReport.R</code></a></small>
     <div class="hidden name"><code>generateVcfReport.Rd</code></div>
     </div>
 
@@ -62,7 +62,7 @@ tests their association with the methylation status of the sequencing reads.</p>
   report.file <span class="op">=</span> <span class="cn">NULL</span>,
   zero.based.bed <span class="op">=</span> <span class="cn">FALSE</span>,
   threshold.reads <span class="op">=</span> <span class="cn">TRUE</span>,
-  threshold.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,
+  threshold.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,
   min.context.sites <span class="op">=</span> <span class="fl">2</span>,
   min.context.beta <span class="op">=</span> <span class="fl">0.5</span>,
   max.outofcontext.beta <span class="op">=</span> <span class="fl">0.1</span>,
@@ -74,51 +74,52 @@ tests their association with the methylation status of the sequencing reads.</p>
   verbose <span class="op">=</span> <span class="cn">TRUE</span>
 <span class="op">)</span></code></pre></div>
 
+    <div id="ref-sections">
     <div id="arguments">
-    <h2>Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <table class="ref-arguments"><colgroup><col class="name"><col class="desc"></colgroup><tr><th>bam</th>
-      <td><p>BAM file location string OR preprocessed output of
+    <h2>Arguments</h2>
+    <dl><dt>bam</dt>
+<dd><p>BAM file location string OR preprocessed output of
 <code><a href="preprocessBam.html">preprocessBam</a></code> function. BAM file alignment records
 must derive from paired-end sequencing, be sorted
 by QNAME (instead of genomic position), contain XG tag (strand information
 for the reference genome) and methylation call strings. Read more about
-these requirements and BAM preprocessing at <code><a href="preprocessBam.html">preprocessBam</a></code>.</p></td>
-    </tr><tr><th>vcf</th>
-      <td><p>Variant Call Format (VCF) file location string OR a VCF object
-returned by <code><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html">readVcf</a></code> function. If VCF object
+these requirements and BAM preprocessing at <code><a href="preprocessBam.html">preprocessBam</a></code>.</p></dd>
+<dt>vcf</dt>
+<dd><p>Variant Call Format (VCF) file location string OR a VCF object
+returned by <code><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html" class="external-link">readVcf</a></code> function. If VCF object
 is supplied, the style of its seqlevels must match the style of seqlevels of
-the BAM file/object used.</p></td>
-    </tr><tr><th>vcf.style</th>
-      <td><p>string for the seqlevels style of the VCF file, if
+the BAM file/object used.</p></dd>
+<dt>vcf.style</dt>
+<dd><p>string for the seqlevels style of the VCF file, if
 different from BED file/object. Only has effect when `vcf` parameter points
 to the VCF file location and `bed` is not NULL. Possible values:</p><ul><li><p>NULL (the default) -- seqlevels in BED file/object and VCF file are
   the same</p></li>
 <li><p>"NCBI", "UCSC", ... -- valid parameters of
-  <code><a href="https://rdrr.io/pkg/GenomeInfoDb/man/seqlevelsStyle.html">seqlevelsStyle</a></code> function</p></li>
-</ul></td>
-    </tr><tr><th>bed</th>
-      <td><p>Browser Extensible Data (BED) file location string OR object of
+  <code><a href="https://rdrr.io/pkg/GenomeInfoDb/man/seqlevelsStyle.html" class="external-link">seqlevelsStyle</a></code> function</p></li>
+</ul></dd>
+<dt>bed</dt>
+<dd><p>Browser Extensible Data (BED) file location string OR object of
 class <code>GRanges</code> holding genomic coordinates for
 regions of interest. It is used to include only the specific genomic ranges
 when the VCF file is loaded. This option has no effect when VCF object is
 supplied as a `vcf` parameter. The style of seqlevels of BED file/object
-must match the style of seqlevels of the BAM file/object used.</p></td>
-    </tr><tr><th>report.file</th>
-      <td><p>file location string to write the VCF report. If NULL
+must match the style of seqlevels of the BAM file/object used.</p></dd>
+<dt>report.file</dt>
+<dd><p>file location string to write the VCF report. If NULL
 (the default) then report is returned as a
-<code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html">data.table</a></code> object.</p></td>
-    </tr><tr><th>zero.based.bed</th>
-      <td><p>boolean defining if BED coordinates are zero based
-(default: FALSE).</p></td>
-    </tr><tr><th>threshold.reads</th>
-      <td><p>boolean defining if sequence reads should be
+<code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object.</p></dd>
+<dt>zero.based.bed</dt>
+<dd><p>boolean defining if BED coordinates are zero based
+(default: FALSE).</p></dd>
+<dt>threshold.reads</dt>
+<dd><p>boolean defining if sequence reads should be
 thresholded before counting bases in reference and variant epialleles
 (default: TRUE). Disabling thresholding is possible but makes no sense in
 this context as all the reads will be assigned to the variant epiallele,
 which will result in Fisher's Exact test p-value of 1 (in columns `FEp+` and
-`FEP-`).</p></td>
-    </tr><tr><th>threshold.context</th>
-      <td><p>string defining cytosine methylation context used
+`FEP-`).</p></dd>
+<dt>threshold.context</dt>
+<dd><p>string defining cytosine methylation context used
 for thresholding the reads:</p><ul><li><p>"CG" (the default) -- within-the-context: CpG cytosines (called as
   zZ), out-of-context: all the other cytosines (hHxX)</p></li>
 <li><p>"CHG" -- within-the-context: CHG cytosines (xX), out-of-context: hHzZ</p></li>
@@ -127,52 +128,51 @@ for thresholding the reads:</p><ul><li><p>"CG" (the default) -- within-the-conte
   out-of-context: CHH cytosines (hH)</p></li>
 <li><p>"CX" -- all cytosines are considered within-the-context, this
   effectively results in no thresholding</p></li>
-</ul><p>This option has no effect when read thresholding is disabled.</p></td>
-    </tr><tr><th>min.context.sites</th>
-      <td><p>non-negative integer for minimum number of cytosines
+</ul><p>This option has no effect when read thresholding is disabled.</p></dd>
+<dt>min.context.sites</dt>
+<dd><p>non-negative integer for minimum number of cytosines
 within the `threshold.context` (default: 2). Reads containing <strong>fewer</strong>
 within-the-context cytosines are considered completely unmethylated (thus
 belonging to the reference epiallele). This option has no effect when read
-thresholding is disabled.</p></td>
-    </tr><tr><th>min.context.beta</th>
-      <td><p>real number in the range [0;1] (default: 0.5). Reads
+thresholding is disabled.</p></dd>
+<dt>min.context.beta</dt>
+<dd><p>real number in the range [0;1] (default: 0.5). Reads
 with average beta value for within-the-context cytosines <strong>below</strong> this
 threshold are considered completely unmethylated (thus belonging to the
 reference epiallele). This option has no effect when read thresholding is
-disabled.</p></td>
-    </tr><tr><th>max.outofcontext.beta</th>
-      <td><p>real number in the range [0;1] (default: 0.1).
+disabled.</p></dd>
+<dt>max.outofcontext.beta</dt>
+<dd><p>real number in the range [0;1] (default: 0.1).
 Reads with average beta value for out-of-context cytosines <strong>above</strong>
 this threshold are considered completely unmethylated (thus belonging to the
 reference epiallele). This option has no effect when read thresholding is
-disabled.</p></td>
-    </tr><tr><th>min.mapq</th>
-      <td><p>non-negative integer threshold for minimum read mapping
+disabled.</p></dd>
+<dt>min.mapq</dt>
+<dd><p>non-negative integer threshold for minimum read mapping
 quality (default: 0). Option has no effect if preprocessed BAM data was
-supplied as an input.</p></td>
-    </tr><tr><th>min.baseq</th>
-      <td><p>non-negative integer threshold for minimum nucleotide base
+supplied as an input.</p></dd>
+<dt>min.baseq</dt>
+<dd><p>non-negative integer threshold for minimum nucleotide base
 quality (default: 0). Option has no effect if preprocessed BAM data was
-supplied as an input.</p></td>
-    </tr><tr><th>skip.duplicates</th>
-      <td><p>boolean defining if duplicate aligned reads should be
+supplied as an input.</p></dd>
+<dt>skip.duplicates</dt>
+<dd><p>boolean defining if duplicate aligned reads should be
 skipped (default: FALSE). Option has no effect if preprocessed BAM data was
 supplied as an input OR duplicate reads were not marked by alignment
-software.</p></td>
-    </tr><tr><th>nthreads</th>
-      <td><p>non-negative integer for the number of HTSlib threads to be
+software.</p></dd>
+<dt>nthreads</dt>
+<dd><p>non-negative integer for the number of HTSlib threads to be
 used during BAM file decompression (default: 1). 2 threads make sense for the
 files larger than 100 MB. Option has no effect if preprocessed BAM data was
-supplied as an input.</p></td>
-    </tr><tr><th>gzip</th>
-      <td><p>boolean to compress the report (default: FALSE).</p></td>
-    </tr><tr><th>verbose</th>
-      <td><p>boolean to report progress and timings (default: TRUE).</p></td>
-    </tr></table></div>
-
+supplied as an input.</p></dd>
+<dt>gzip</dt>
+<dd><p>boolean to compress the report (default: FALSE).</p></dd>
+<dt>verbose</dt>
+<dd><p>boolean to report progress and timings (default: TRUE).</p></dd>
+</dl></div>
     <div id="value">
-    <h2>Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p><code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html">data.table</a></code> object containing VCF report or
+    <h2>Value</h2>
+    <p><code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object containing VCF report or
 NULL if report.file was specified. The report columns are:</p><ul><li><p>name -- variation identifier (e.g. "rs123456789")</p></li>
 <li><p>seqnames -- reference sequence name</p></li>
 <li><p>range -- genomic coordinates of the variation</p></li>
@@ -190,13 +190,13 @@ NULL if report.file was specified. The report columns are:</p><ul><li><p>name --
 <li><p>SumAlt -- sum of all <strong>Alt</strong>ernative base counts</p></li>
 <li><p>FEp+ -- Fisher Exact test p-value for association of a variation
   with methylation status of the reads that map to the <strong>"+"</strong>
-  (forward) DNA strand. Calculated using following contingency table:</p><table class="table"><tr><td>M+Ref</td><td>M+Alt</td></tr><tr><td>U+Ref</td><td>U+Alt</td></tr></table></li>
+  (forward) DNA strand. Calculated using following contingency table:</p><table class="table table"><tr><td>M+Ref</td><td>M+Alt</td></tr><tr><td>U+Ref</td><td>U+Alt</td></tr></table></li>
 <li><p>FEp- -- Fisher Exact test p-value for association of a variation
   with methylation status of the reads that map to the <strong>"-"</strong>
-  (reverse) DNA strand. Calculated using following contingency table:</p><table class="table"><tr><td>M-Ref</td><td>M-Alt</td></tr><tr><td>U-Ref</td><td>U-Alt</td></tr></table></li>
+  (reverse) DNA strand. Calculated using following contingency table:</p><table class="table table"><tr><td>M-Ref</td><td>M-Alt</td></tr><tr><td>U-Ref</td><td>U-Alt</td></tr></table></li>
 </ul></div>
     <div id="details">
-    <h2>Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <h2>Details</h2>
     <p>Using BAM reads and sequence variation information as an input,
 `generateVcfReport` function thresholds the reads (for paired-end sequencing
 alignment files - read pairs as a single
@@ -206,7 +206,7 @@ the account DNA strand the read mapped to and average methylation level
 (epiallele status) of the read.</p>
 <p>The information on sequence variation can be supplied as a Variant Call
 Format (VCF) file location or an object of class VCF, returned by the
-<code><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html">readVcf</a></code> function call. As whole-genome VCF
+<code><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html" class="external-link">readVcf</a></code> function call. As whole-genome VCF
 files can be extremely large, it is strongly advised to use only relevant
 subset of their data, prefiltering the VCF object manually before calling
 `generateVcfReport` or specifying `bed` parameter when `vcf` points to the
@@ -224,39 +224,40 @@ by misalignments. Remember to increase `min.baseq` (`samtools mplieup -Q`
 default value is 13) to obtain higher-quality results.</p>
     </div>
     <div id="see-also">
-    <h2>See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <h2>See also</h2>
     <div class="dont-index"><p><code><a href="preprocessBam.html">preprocessBam</a></code> for preloading BAM data,
 <code><a href="generateCytosineReport.html">generateCytosineReport</a></code> for methylation statistics at the level
 of individual cytosines, <code><a href="generateBedReport.html">generateBedReport</a></code> for genomic
 region-based statistics, <code><a href="generateBedEcdf.html">generateBedEcdf</a></code> for analysing the
 distribution of per-read beta values, and `epialleleR` vignettes for the
 description of usage and sample data.</p>
-<p><code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html">GRanges</a></code> class for working with genomic ranges,
-<code><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html">readVcf</a></code> function for loading VCF data,
-<code><a href="https://rdrr.io/pkg/GenomeInfoDb/man/seqlevelsStyle.html">seqlevelsStyle</a></code> function for getting or setting
+<p><code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></code> class for working with genomic ranges,
+<code><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html" class="external-link">readVcf</a></code> function for loading VCF data,
+<code><a href="https://rdrr.io/pkg/GenomeInfoDb/man/seqlevelsStyle.html" class="external-link">seqlevelsStyle</a></code> function for getting or setting
 the seqlevels style.</p></div>
+    </div>
     </div>
 
     <div id="examples">
-    <h2>Examples<a class="anchor" aria-label="anchor" href="#examples"></a></h2>
-    <div class="ref-examples sourceCode"><pre class="sourceCode r"><code><span class="r-in">  <span class="va">capture.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">capture.bed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">capture.vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.vcf.gz"</span>,</span>
+    <h2>Examples</h2>
+    <div class="ref-examples sourceCode"><pre class="sourceCode r"><code><span class="r-in">  <span class="va">capture.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
+<span class="r-in">  <span class="va">capture.bed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
+<span class="r-in">  <span class="va">capture.vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.vcf.gz"</span>,</span>
 <span class="r-in">                             package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
 <span class="r-in">  </span>
 <span class="r-in">  <span class="co"># VCF report</span></span>
 <span class="r-in">  <span class="va">vcf.report</span> <span class="op">&lt;-</span> <span class="fu">generateVcfReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span>,</span>
 <span class="r-in">                                  vcf<span class="op">=</span><span class="va">capture.vcf</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.016s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.015s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading VCF file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [7.898s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [7.549s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.027s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.028s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.002s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting base frequences</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.220s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.248s]</span>
 </code></pre></div>
     </div>
   </div>

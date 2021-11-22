@@ -1,7 +1,7 @@
 pandoc: 2.14.0.3
 pkgdown: 1.9000.9000.9000
-pkgdown_sha: 3d38179ceb039be4991155a1213959fb5d20fbfe
+pkgdown_sha: e72fc30f333dc4f50f3f9d1f274fc29d67e34974
 articles:
   epialleleR: epialleleR.html
-last_built: 2021-10-15T10:04Z
+last_built: 2021-11-22T08:12Z
 

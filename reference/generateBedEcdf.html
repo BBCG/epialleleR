@@ -18,7 +18,7 @@ per-read beta values of the sequencing reads."><!-- mathjax --><script src="http
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.12</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.1</span>
       </span>
     </div>
 
@@ -30,7 +30,7 @@ per-read beta values of the sequencing reads."><!-- mathjax --><script src="http
   <a href="../reference/index.html">Reference</a>
 </li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
-  <a href="https://github.com/BBCG/epialleleR/">
+  <a href="https://github.com/BBCG/epialleleR/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -45,7 +45,7 @@ per-read beta values of the sequencing reads."><!-- mathjax --><script src="http
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>generateBedEcdf</h1>
-    <small class="dont-index">Source: <a href="https://github.com/BBCG/epialleleR/blob/master/R/generateBedEcdf.R"><code>R/generateBedEcdf.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/BBCG/epialleleR/blob/HEAD/R/generateBedEcdf.R" class="external-link"><code>R/generateBedEcdf.R</code></a></small>
     <div class="hidden name"><code>generateBedEcdf.Rd</code></div>
     </div>
 
@@ -57,12 +57,12 @@ per-read beta values of the sequencing reads.</p>
     <div class="ref-usage sourceCode"><pre class="sourceCode r"><code><span class="fu">generateBedEcdf</span><span class="op">(</span>
   <span class="va">bam</span>,
   <span class="va">bed</span>,
-  bed.type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"amplicon"</span>, <span class="st">"capture"</span><span class="op">)</span>,
-  bed.rows <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>,
+  bed.type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"amplicon"</span>, <span class="st">"capture"</span><span class="op">)</span>,
+  bed.rows <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>,
   zero.based.bed <span class="op">=</span> <span class="cn">FALSE</span>,
   match.tolerance <span class="op">=</span> <span class="fl">1</span>,
   match.min.overlap <span class="op">=</span> <span class="fl">1</span>,
-  ecdf.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,
+  ecdf.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,
   min.mapq <span class="op">=</span> <span class="fl">0</span>,
   min.baseq <span class="op">=</span> <span class="fl">0</span>,
   skip.duplicates <span class="op">=</span> <span class="cn">FALSE</span>,
@@ -70,57 +70,58 @@ per-read beta values of the sequencing reads.</p>
   verbose <span class="op">=</span> <span class="cn">TRUE</span>
 <span class="op">)</span></code></pre></div>
 
+    <div id="ref-sections">
     <div id="arguments">
-    <h2>Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <table class="ref-arguments"><colgroup><col class="name"><col class="desc"></colgroup><tr><th>bam</th>
-      <td><p>BAM file location string OR preprocessed output of
+    <h2>Arguments</h2>
+    <dl><dt>bam</dt>
+<dd><p>BAM file location string OR preprocessed output of
 <code><a href="preprocessBam.html">preprocessBam</a></code> function. BAM file alignment records
 must derive from paired-end sequencing, be sorted
 by QNAME (instead of genomic position), contain XG tag (strand information
 for the reference genome) and methylation call strings. Read more about
-these requirements and BAM preprocessing at <code><a href="preprocessBam.html">preprocessBam</a></code>.</p></td>
-    </tr><tr><th>bed</th>
-      <td><p>Browser Extensible Data (BED) file location string OR object of
+these requirements and BAM preprocessing at <code><a href="preprocessBam.html">preprocessBam</a></code>.</p></dd>
+<dt>bed</dt>
+<dd><p>Browser Extensible Data (BED) file location string OR object of
 class <code>GRanges</code> holding genomic coordinates for
 regions of interest. It is used to match sequencing reads to the genomic
 regions prior to eCDF computation. The style of seqlevels of BED file/object
-must match the style of seqlevels of the BAM file/object used.</p></td>
-    </tr><tr><th>bed.type</th>
-      <td><p>character string for the type of assay that was used to
+must match the style of seqlevels of the BAM file/object used.</p></dd>
+<dt>bed.type</dt>
+<dd><p>character string for the type of assay that was used to
 produce sequencing reads:</p><ul><li><p>"amplicon" (the default) -- used for amplicon-based next-generation
   sequencing when exact coordinates of sequenced fragments are known.
   Matching of reads to genomic ranges are then performed by the read's start
   or end positions, either of which should be no further than
   `match.tolerance` bases away from the start or end position of genomic
-  ranges given in BED file/<code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html">GRanges</a></code> object</p></li>
+  ranges given in BED file/<code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></code> object</p></li>
 <li><p>"capture" -- used for capture-based next-generation sequencing when
   reads partially overlap with the capture target regions. Read is considered
   to match the genomic range when their overlap is more or equal to
   `match.min.overlap`. If read matches two or more BED genomic regions, only
-  the first match is taken (input <code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html">GRanges</a></code> are
+  the first match is taken (input <code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></code> are
   <strong>not</strong> sorted internally)</p></li>
-</ul></td>
-    </tr><tr><th>bed.rows</th>
-      <td><p>integer vector specifying what `bed` regions should be
+</ul></dd>
+<dt>bed.rows</dt>
+<dd><p>integer vector specifying what `bed` regions should be
 included in the output. If `c(1)` (the default), then function returns eCDFs
 for the first region of `bed`, if NULL - eCDF functions for all `bed`
 genomic regions as well as for the reads that didn't match any of the regions
-(last element of the return value; only if there are such reads).</p></td>
-    </tr><tr><th>zero.based.bed</th>
-      <td><p>boolean defining if BED coordinates are zero based
-(default: FALSE).</p></td>
-    </tr><tr><th>match.tolerance</th>
-      <td><p>integer for the largest difference between read's and
-BED <code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html">GRanges</a></code> start or end positions during
-matching of amplicon-based NGS reads (default: 1).</p></td>
-    </tr><tr><th>match.min.overlap</th>
-      <td><p>integer for the smallest overlap between read's and
-BED <code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html">GRanges</a></code> start or end positions during
+(last element of the return value; only if there are such reads).</p></dd>
+<dt>zero.based.bed</dt>
+<dd><p>boolean defining if BED coordinates are zero based
+(default: FALSE).</p></dd>
+<dt>match.tolerance</dt>
+<dd><p>integer for the largest difference between read's and
+BED <code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></code> start or end positions during
+matching of amplicon-based NGS reads (default: 1).</p></dd>
+<dt>match.min.overlap</dt>
+<dd><p>integer for the smallest overlap between read's and
+BED <code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></code> start or end positions during
 matching of capture-based NGS reads (default: 1). If read matches two or more
 BED genomic regions, only the first match is taken (input
-<code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html">GRanges</a></code> are <strong>not</strong> sorted internally).</p></td>
-    </tr><tr><th>ecdf.context</th>
-      <td><p>string defining cytosine methylation context used
+<code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></code> are <strong>not</strong> sorted internally).</p></dd>
+<dt>ecdf.context</dt>
+<dd><p>string defining cytosine methylation context used
 for computing within-the-context and out-of-context eCDFs:</p><ul><li><p>"CG" (the default) -- within-the-context: CpG cytosines (called as
   zZ), out-of-context: all the other cytosines (hHxX)</p></li>
 <li><p>"CHG" -- within-the-context: CHG cytosines (xX), out-of-context: hHzZ</p></li>
@@ -128,31 +129,30 @@ for computing within-the-context and out-of-context eCDFs:</p><ul><li><p>"CG" (t
 <li><p>"CxG" -- within-the-context: CG and CHG cytosines (zZxX),
   out-of-context: CHH cytosines (hH)</p></li>
 <li><p>"CX" -- all cytosines are considered within-the-context</p></li>
-</ul></td>
-    </tr><tr><th>min.mapq</th>
-      <td><p>non-negative integer threshold for minimum read mapping
+</ul></dd>
+<dt>min.mapq</dt>
+<dd><p>non-negative integer threshold for minimum read mapping
 quality (default: 0). Option has no effect if preprocessed BAM data was
-supplied as an input.</p></td>
-    </tr><tr><th>min.baseq</th>
-      <td><p>non-negative integer threshold for minimum nucleotide base
+supplied as an input.</p></dd>
+<dt>min.baseq</dt>
+<dd><p>non-negative integer threshold for minimum nucleotide base
 quality (default: 0). Option has no effect if preprocessed BAM data was
-supplied as an input.</p></td>
-    </tr><tr><th>skip.duplicates</th>
-      <td><p>boolean defining if duplicate aligned reads should be
+supplied as an input.</p></dd>
+<dt>skip.duplicates</dt>
+<dd><p>boolean defining if duplicate aligned reads should be
 skipped (default: FALSE). Option has no effect if preprocessed BAM data was
 supplied as an input OR duplicate reads were not marked by alignment
-software.</p></td>
-    </tr><tr><th>nthreads</th>
-      <td><p>non-negative integer for the number of HTSlib threads to be
+software.</p></dd>
+<dt>nthreads</dt>
+<dd><p>non-negative integer for the number of HTSlib threads to be
 used during BAM file decompression (default: 1). 2 threads make sense for the
 files larger than 100 MB. Option has no effect if preprocessed BAM data was
-supplied as an input.</p></td>
-    </tr><tr><th>verbose</th>
-      <td><p>boolean to report progress and timings (default: TRUE).</p></td>
-    </tr></table></div>
-
+supplied as an input.</p></dd>
+<dt>verbose</dt>
+<dd><p>boolean to report progress and timings (default: TRUE).</p></dd>
+</dl></div>
     <div id="value">
-    <h2>Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <h2>Value</h2>
     <p>list with a number of elements equal to the length of `bed.rows` (if
 not NULL), or to the number of genomic regions within `bed` (if 
 `bed.rows==NULL`) plus one item for all reads not matching `bed` genomic
@@ -160,7 +160,7 @@ regions (if any). Every list item is a list on it's own, consisting of two
 eCDF functions for within- and out-of-context per-read beta values.</p>
     </div>
     <div id="details">
-    <h2>Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <h2>Details</h2>
     <p>The function matches reads (for paired-end sequencing alignment files - read
 pairs as a single entity) to the genomic
 regions provided in a BED file/<code>GRanges</code> object, computes
@@ -173,7 +173,7 @@ to that region are methylated in an "all-CpGs-or-none" manner or if some
 intermediate methylation levels are more frequent.</p>
     </div>
     <div id="see-also">
-    <h2>See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <h2>See also</h2>
     <div class="dont-index"><p><code><a href="preprocessBam.html">preprocessBam</a></code> for preloading BAM data,
 <code><a href="generateCytosineReport.html">generateCytosineReport</a></code> for methylation statistics at the level
 of individual cytosines, <code><a href="generateBedReport.html">generateBedReport</a></code> for genomic
@@ -181,48 +181,49 @@ region-based statistics, <code><a href="generateVcfReport.html">generateVcfRepor
 epiallele-SNV associations, and `epialleleR` vignettes for the description of
 usage and sample data.</p></div>
     </div>
+    </div>
 
     <div id="examples">
-    <h2>Examples<a class="anchor" aria-label="anchor" href="#examples"></a></h2>
+    <h2>Examples</h2>
     <div class="ref-examples sourceCode"><pre class="sourceCode r"><code><span class="r-in">  <span class="co"># amplicon data</span></span>
-<span class="r-in">  <span class="va">amplicon.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>,</span>
+<span class="r-in">  <span class="va">amplicon.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>,</span>
 <span class="r-in">                              package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">amplicon.bed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>,</span>
+<span class="r-in">  <span class="va">amplicon.bed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>,</span>
 <span class="r-in">                              package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
 <span class="r-in">  </span>
 <span class="r-in">  <span class="co"># let's compute eCDF</span></span>
 <span class="r-in">  <span class="va">amplicon.ecdfs</span> <span class="op">&lt;-</span> <span class="fu">generateBedEcdf</span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>, bed<span class="op">=</span><span class="va">amplicon.bed</span>,</span>
 <span class="r-in">                                    bed.rows<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.064s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.078s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.009s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.010s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing ECDFs for within- and out-of-context per-read beta values</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.058s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.074s]</span>
 <span class="r-in">  </span>
 <span class="r-in">  <span class="co"># there are 5 items in amplicon.ecdfs, let's plot them all</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in">  </span>
 <span class="r-in">  <span class="co"># cycle through items</span></span>
-<span class="r-in">  <span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span class="r-in">  <span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in">    <span class="co"># four of them have names corresponding to amplicon.bed genomic regions, </span></span>
 <span class="r-in">    <span class="co"># fifth - NA for all the reads that don't match to any of those regions</span></span>
-<span class="r-in">    <span class="va">main</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">[</span><span class="va">x</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="st">"unmatched"</span></span>
-<span class="r-in">            <span class="kw">else</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">[</span><span class="va">x</span><span class="op">]</span><span class="op">)</span></span>
+<span class="r-in">    <span class="va">main</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">[</span><span class="va">x</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="st">"unmatched"</span></span>
+<span class="r-in">            <span class="kw">else</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">[</span><span class="va">x</span><span class="op">]</span><span class="op">)</span></span>
 <span class="r-in">    </span>
 <span class="r-in">    <span class="co"># plotting eCDF for within-the-context per-read beta values (in red)</span></span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">[[</span><span class="va">x</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">context</span>, col<span class="op">=</span><span class="st">"red"</span>, verticals<span class="op">=</span><span class="cn">TRUE</span>,</span>
-<span class="r-in">         do.points<span class="op">=</span><span class="cn">FALSE</span>, xlim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span>, xlab<span class="op">=</span><span class="st">"per-read beta value"</span>,</span>
+<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">[[</span><span class="va">x</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">context</span>, col<span class="op">=</span><span class="st">"red"</span>, verticals<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span class="r-in">         do.points<span class="op">=</span><span class="cn">FALSE</span>, xlim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span>, xlab<span class="op">=</span><span class="st">"per-read beta value"</span>,</span>
 <span class="r-in">         ylab<span class="op">=</span><span class="st">"cumulative density"</span>, main<span class="op">=</span><span class="va">main</span><span class="op">)</span></span>
 <span class="r-in">    </span>
 <span class="r-in">    <span class="co"># adding eCDF for out-of-context per-read beta values (in blue)</span></span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">[[</span><span class="va">x</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">out.of.context</span>, add<span class="op">=</span><span class="cn">TRUE</span>, col<span class="op">=</span><span class="st">"blue"</span>,</span>
+<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">[[</span><span class="va">x</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">out.of.context</span>, add<span class="op">=</span><span class="cn">TRUE</span>, col<span class="op">=</span><span class="st">"blue"</span>,</span>
 <span class="r-in">         verticals<span class="op">=</span><span class="cn">TRUE</span>, do.points<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span class="r-in">  <span class="op">}</span></span>
-<span class="r-plt"><img src="generateBedEcdf-1.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="generateBedEcdf-1.png" alt="" width="700" height="433"></span>
 <span class="r-in">  </span>
 <span class="r-in">  <span class="co"># recover default plotting parameters</span></span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span class="r-in">  </span>
 </code></pre></div>
     </div>
