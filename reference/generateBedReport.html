@@ -20,7 +20,7 @@ threshold."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.2</span>
       </span>
     </div>
 
@@ -58,7 +58,8 @@ the fraction of reads with an average methylation level passing an arbitrary
 threshold.</p>
     </div>
 
-    <div class="ref-usage sourceCode"><pre class="sourceCode r"><code><span class="fu">generateAmpliconReport</span><span class="op">(</span>
+    <div id="ref-usage">
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">generateAmpliconReport</span><span class="op">(</span>
   <span class="va">bam</span>,
   <span class="va">bed</span>,
   report.file <span class="op">=</span> <span class="cn">NULL</span>,
@@ -116,8 +117,8 @@ threshold.</p>
   gzip <span class="op">=</span> <span class="cn">FALSE</span>,
   verbose <span class="op">=</span> <span class="cn">TRUE</span>
 <span class="op">)</span></code></pre></div>
+    </div>
 
-    <div id="ref-sections">
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>bam</dt>
@@ -273,11 +274,10 @@ description of usage and sample data.</p>
 <code><a href="https://rdrr.io/pkg/GenomeInfoDb/man/seqlevelsStyle.html" class="external-link">seqlevelsStyle</a></code> function for getting or setting
 the seqlevels style.</p></div>
     </div>
-    </div>
 
-    <div id="examples">
+    <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="ref-examples sourceCode"><pre class="sourceCode r"><code><span class="r-in">  <span class="co"># amplicon data</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">  <span class="co"># amplicon data</span></span>
 <span class="r-in">  <span class="va">amplicon.bam</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>,</span>
 <span class="r-in">                                 package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
 <span class="r-in">  <span class="va">amplicon.bed</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>,</span>
@@ -285,13 +285,13 @@ the seqlevels style.</p></div>
 <span class="r-in">  <span class="va">amplicon.report</span> <span class="op">&lt;-</span> <span class="fu">generateAmpliconReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>,</span>
 <span class="r-in">                                            bed<span class="op">=</span><span class="va">amplicon.bed</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.013s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.012s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.006s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.007s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing amplicon report</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.047s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.045s]</span>
 <span class="r-in">  </span>
 <span class="r-in">  <span class="co"># capture NGS</span></span>
 <span class="r-in">  <span class="va">capture.bam</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>,</span>
@@ -300,9 +300,9 @@ the seqlevels style.</p></div>
 <span class="r-in">                                package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
 <span class="r-in">  <span class="va">capture.report</span> <span class="op">&lt;-</span> <span class="fu">generateCaptureReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.013s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.012s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.024s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.020s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.002s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing capture report</span>
@@ -313,9 +313,9 @@ the seqlevels style.</p></div>
 <span class="r-in">  <span class="va">bed.report</span> <span class="op">&lt;-</span> <span class="fu">generateBedReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span>,</span>
 <span class="r-in">                                  bed.type<span class="op">=</span><span class="st">"capture"</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.012s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.011s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.018s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.019s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing capture report</span>
@@ -336,7 +336,7 @@ the seqlevels style.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.9000.9000.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.9000.</p>
 </div>
 
       </footer></div>
