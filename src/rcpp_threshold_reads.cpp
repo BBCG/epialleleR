@@ -20,15 +20,17 @@ std::vector<bool> rcpp_threshold_reads(Rcpp::DataFrame &df,                     
                                        double min_ctx_meth_frac,                // minimum fraction of methylated to total context bases (min context beta value)
                                        double max_ooctx_meth_frac)              // maximum fraction of methylated to total out-of-context bases (max out-of-context beta value)
 {
-  Rcpp::CharacterVector xm = df["XM"];                                          // merged refspaced template XMs
+  // Rcpp::CharacterVector xm = df["XM"];                                          // merged refspaced template XMs
+  Rcpp::XPtr<std::vector<std::string>> xm((SEXP)df.attr("xm_xptr"));            // merged refspaced template XMs, as a pointer to std::vector<std::string>
+  Rcpp::IntegerVector templid = df["templid"];                                  // template id, effectively holds indexes of corresponding std::string in std::vector
   
-  std::vector<bool> res (xm.size(), true);
-  for (unsigned int x=0; x<xm.size(); x++) {
+  std::vector<bool> res (xm->size(), true);
+  for (unsigned int x=0; x<xm->size(); x++) {
     // checking for the interrupt
     if ((x & 0xFFFFF) == 0) Rcpp::checkUserInterrupt();
     
     unsigned int ascii_map [128] = {0};
-    std::for_each(xm[x].begin(), xm[x].end(), [&ascii_map] (unsigned int const &c) {
+    std::for_each(xm->at(templid[x]).begin(), xm->at(templid[x]).end(), [&ascii_map] (unsigned int const &c) {
       ascii_map[c]++;
     });
     

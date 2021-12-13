@@ -36,13 +36,14 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   bam1_t *bam_rec = bam_init1();                                                // create BAM alignment structure
   
   // main containers
-  std::vector<std::string> seq, xm;                                             // SEQ, XM
+  std::vector<std::string>* seq = new std::vector<std::string>;                 // SEQ
+  std::vector<std::string>* xm = new std::vector<std::string>;                  // XM
   std::vector<int> rname, strand, start;                                        // id for RNAME, id for CT==1/GA==2, POS
   int nrecs = 0, ntempls = 0;                                                   // counters: BAM records, templates (read pairs)
   
   // reserve some memory
-  rname.reserve(100000); strand.reserve(100000); start.reserve(100000); 
-  seq.reserve(100000); xm.reserve(100000);
+  rname.reserve(0xFFFFF); strand.reserve(0xFFFFF); start.reserve(0xFFFFF); 
+  seq->reserve(0xFFFFF); xm->reserve(0xFFFFF);
   
   // template holders
   char *templ_qname = (char*) malloc(max_qname_width * sizeof(char));           // template QNAME
@@ -56,8 +57,8 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
     rname.push_back(templ_rname + 1);                            /* RNAME+1 */ \
     strand.push_back(templ_strand);                               /* STRAND */ \
     start.push_back(templ_start + 1);                              /* POS+1 */ \
-    seq.emplace_back((const char*) templ_seq_rs, templ_width);       /* SEQ */ \
-    xm.emplace_back( (const char*) templ_xm_rs,  templ_width);        /* XM */ \
+    seq->emplace_back((const char*) templ_seq_rs, templ_width);      /* SEQ */ \
+    xm->emplace_back( (const char*) templ_xm_rs,  templ_width);       /* XM */ \
     ntempls++;                                                        /* +1 */ \
   }
   
@@ -187,10 +188,15 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   Rcpp::DataFrame res = Rcpp::DataFrame::create(                                // final DF
     Rcpp::Named("rname") = w_rname,                                             // numeric ids (factor) for reference names
     Rcpp::Named("strand") = w_strand,                                           // numeric ids (factor) for reference strands
-    Rcpp::Named("start") = start,                                               // start positions of reads
-    Rcpp::Named("seq") = seq,                                                   // sequences
-    Rcpp::Named("XM") = xm                                                      // methylation strings
+    Rcpp::Named("start") = start                                                // start positions of reads
+    // Rcpp::Named("seq") = seq,                                                   // sequences
+    // Rcpp::Named("XM") = xm                                                      // methylation strings
   );
+  
+  Rcpp::XPtr<std::vector<std::string>> seq_xptr(seq, true);
+  res.attr("seq_xptr") = seq_xptr;                                              // external pointer to sequences
+  Rcpp::XPtr<std::vector<std::string>> xm_xptr(xm, true);
+  res.attr("xm_xptr") = xm_xptr;                                                // external pointer to methylation strings
   
   return(res);
 }

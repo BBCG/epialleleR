@@ -17,14 +17,17 @@
 // MATCH VCF ENTRIES, RETURN BASE FREQS
 // fast, vectorised
 // [[Rcpp::export("rcpp_get_base_freqs")]]
-Rcpp::NumericMatrix rcpp_get_base_freqs(Rcpp::DataFrame &bam,                   // BAM data
+Rcpp::NumericMatrix rcpp_get_base_freqs(Rcpp::DataFrame &df,                    // BAM data
                                         std::vector<bool> pass,                 // read passes the threshold?
                                         Rcpp::DataFrame &vcf)                   // VCF data
 {
-  Rcpp::IntegerVector read_rname = bam["rname"];                                // template rname
-  Rcpp::IntegerVector read_strand = bam["strand"];                              // template strand
-  Rcpp::IntegerVector read_start = bam["start"];                                // template start
-  Rcpp::CharacterVector read_seq = bam["seq"];                                  // template SEQ
+  Rcpp::IntegerVector read_rname = df["rname"];                                 // template rname
+  Rcpp::IntegerVector read_strand = df["strand"];                               // template strand
+  Rcpp::IntegerVector read_start = df["start"];                                 // template start
+  // Rcpp::CharacterVector read_seq = bam["seq"];                                  // template SEQ
+  Rcpp::XPtr<std::vector<std::string>> read_seq((SEXP)df.attr("seq_xptr"));     // merged refspaced template SEQ, as a pointer to std::vector<std::string>
+  Rcpp::IntegerVector templid = df["templid"];                                  // template id, effectively holds indexes of corresponding std::string in std::vector
+  
   Rcpp::IntegerVector vcf_chr = vcf["seqnames"];                                // VCF rname
   Rcpp::IntegerVector vcf_pos = vcf["start"];                                   // VCF start
   
@@ -35,20 +38,20 @@ Rcpp::NumericMatrix rcpp_get_base_freqs(Rcpp::DataFrame &bam,                   
     // checking for the interrupt
     if ((x & 0xFFFFF) == 0) Rcpp::checkUserInterrupt();
     
-    int read_end = read_start[x] + read_seq[x].size() - 1;
+    int read_end = read_start[x] + read_seq->at(templid[x]).size() - 1;
     for (unsigned int i=cur_vcf; i<vcf_pos.size(); i++) {
       if (vcf_chr[i]<read_rname[x] || 
-          (vcf_chr[i]==read_rname[x] && vcf_pos[i]<read_start[x])) {    // skip VCF if before read
+          (vcf_chr[i]==read_rname[x] && vcf_pos[i]<read_start[x])) {            // skip VCF if before read
         cur_vcf=i;
         continue;
       }
       if (vcf_chr[i]>read_rname[x] ||
-          (vcf_chr[i]==read_rname[x] && vcf_pos[i]>read_end)) {      // start over from cur_vcf for new read
+          (vcf_chr[i]==read_rname[x] && vcf_pos[i]>read_end)) {                 // start over from cur_vcf for new read
         break;
       }
       if (vcf_chr[i]==read_rname[x] &&
-          vcf_pos[i]>=read_start[x] && vcf_pos[i]<=read_end) {       // match found
-        int idx = read_seq[x][vcf_pos[i]-read_start[x]] & 7;
+          vcf_pos[i]>=read_start[x] && vcf_pos[i]<=read_end) {                  // match found
+        int idx = read_seq->at(templid[x])[vcf_pos[i]-read_start[x]] & 7;
         if (read_strand[x]==2) idx |= 8;
         if (pass[x]) idx |= 16;
         res(i,idx)++;

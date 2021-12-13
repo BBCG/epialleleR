@@ -51,10 +51,13 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
   //                   8: strand, 9: coverage, 10: 'h', 11: '+-', 12: '.', 13: 'u', 14: 'x', 15: 'z'}
   // boost::container::flat_map<uint64_t, std::array<int,16>>
   
-  Rcpp::IntegerVector rname  = df["rname"];                                     // template rname
-  Rcpp::IntegerVector strand = df["strand"];                                    // template strand
-  Rcpp::IntegerVector start  = df["start"];                                     // template start
-  Rcpp::CharacterVector xm   = df["XM"];                                        // merged refspaced template XMs
+  Rcpp::IntegerVector rname   = df["rname"];                                    // template rname
+  Rcpp::IntegerVector strand  = df["strand"];                                   // template strand
+  Rcpp::IntegerVector start   = df["start"];                                    // template start
+  Rcpp::IntegerVector templid = df["templid"];                                  // template id, effectively holds indexes of corresponding std::string in std::vector
+  
+  // Rcpp::CharacterVector xm    = df["XM"];                                       // merged refspaced template XMs
+  Rcpp::XPtr<std::vector<std::string>> xm((SEXP)df.attr("xm_xptr"));            // merged refspaced template XMs, as a pointer to std::vector<std::string>
   
   // main typedefs
   typedef uint64_t T_key;                                                       // {62bit:pos, 2bit:strand}
@@ -115,10 +118,10 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
     map_val[0] = rname[x];
     map_val[8] = strand[x];
     pass_x = (!pass[x])<<3;                                                     // should we lowercase this XM (TRUE==0, FALSE==8)
-    for (unsigned int i=0; i<xm[x].size(); i++) {
+    for (unsigned int i=0; i<xm->at(templid[x]).size(); i++) {                  // xm->at(templid[x]) is a reference to a corresponding XM string
       map_val[1] = start[x]+i;
       map_key = ((T_key)map_val[1] << 2) | map_val[8];
-      idx_to_increase = ctx_to_idx(xm[x][i]);                                   // see the table above
+      idx_to_increase = ctx_to_idx(xm->at(templid[x])[i]);                      // see the table above
       if (idx_to_increase==11) continue;                                        // skip +-
       idx_to_increase |= pass_x;                                                // if not pass - lowercase
       hint = cx_map.try_emplace(hint, map_key, map_val);

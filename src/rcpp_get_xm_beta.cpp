@@ -6,19 +6,21 @@
 
 // fast, vectorised
 // [[Rcpp::export("rcpp_get_xm_beta")]]
-std::vector<double> rcpp_get_xm_beta(Rcpp::DataFrame &bam,                      // BAM data
+std::vector<double> rcpp_get_xm_beta(Rcpp::DataFrame &df,                       // BAM data
                                      std::string ctx_meth,                      // methylated context string, e.g. "XZ". NON-EMPTY
                                      std::string ctx_unmeth)                    // unmethylated context string, e.g. "xz". NON-EMPTY
 {
-  Rcpp::CharacterVector xm = bam["XM"];                                         // template XM
+  // Rcpp::CharacterVector xm = bam["XM"];                                         // template XM
+  Rcpp::XPtr<std::vector<std::string>> xm((SEXP)df.attr("xm_xptr"));            // merged refspaced template XMs, as a pointer to std::vector<std::string>
+  Rcpp::IntegerVector templid = df["templid"];                                  // template id, effectively holds indexes of corresponding std::string in std::vector
   
-  std::vector<double> res (xm.size(), 0);
-  for (unsigned int x=0; x<xm.size(); x++) {
+  std::vector<double> res (xm->size(), 0);
+  for (unsigned int x=0; x<xm->size(); x++) {
     // checking for the interrupt
     if ((x & 0xFFFFF) == 0) Rcpp::checkUserInterrupt();
     
     unsigned int ascii_map [128] = {0};
-    std::for_each(xm[x].begin(), xm[x].end(), [&ascii_map] (unsigned int const &c) {
+    std::for_each(xm->at(templid[x]).begin(), xm->at(templid[x]).end(), [&ascii_map] (unsigned int const &c) {
       ascii_map[c]++;
     });
     unsigned int n_ctx_meth = 0;

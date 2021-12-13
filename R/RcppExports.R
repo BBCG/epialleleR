@@ -13,20 +13,20 @@ rcpp_fep <- function(df, colnames) {
     .Call(`_epialleleR_rcpp_fep`, df, colnames)
 }
 
-rcpp_get_base_freqs <- function(bam, pass, vcf) {
-    .Call(`_epialleleR_rcpp_get_base_freqs`, bam, pass, vcf)
+rcpp_get_base_freqs <- function(df, pass, vcf) {
+    .Call(`_epialleleR_rcpp_get_base_freqs`, df, pass, vcf)
 }
 
-rcpp_get_xm_beta <- function(bam, ctx_meth, ctx_unmeth) {
-    .Call(`_epialleleR_rcpp_get_xm_beta`, bam, ctx_meth, ctx_unmeth)
+rcpp_get_xm_beta <- function(df, ctx_meth, ctx_unmeth) {
+    .Call(`_epialleleR_rcpp_get_xm_beta`, df, ctx_meth, ctx_unmeth)
 }
 
-rcpp_match_amplicon <- function(bam, bed, tolerance) {
-    .Call(`_epialleleR_rcpp_match_amplicon`, bam, bed, tolerance)
+rcpp_match_amplicon <- function(df, bed, tolerance) {
+    .Call(`_epialleleR_rcpp_match_amplicon`, df, bed, tolerance)
 }
 
-rcpp_match_capture <- function(bam, bed, min_overlap) {
-    .Call(`_epialleleR_rcpp_match_capture`, bam, bed, min_overlap)
+rcpp_match_capture <- function(df, bed, min_overlap) {
+    .Call(`_epialleleR_rcpp_match_capture`, df, bed, min_overlap)
 }
 
 rcpp_read_bam_paired <- function(fn, min_mapq, min_baseq, skip_duplicates, nthreads) {

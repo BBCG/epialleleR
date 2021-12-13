@@ -53,3 +53,6 @@ Changes in version 1.1.9 (2021-09-19)
 + min.baseq to reduce the effect of sequencing errors
 + very fast Fisher Exact from HTSlib
 + old code removed
+
+Changes in version 1.3.2 (2021-12-24)
++ more efficient data handling (XPtr instead of Rcpp::wrap'ping)

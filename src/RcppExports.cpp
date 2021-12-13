@@ -47,54 +47,54 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_get_base_freqs
-Rcpp::NumericMatrix rcpp_get_base_freqs(Rcpp::DataFrame& bam, std::vector<bool> pass, Rcpp::DataFrame& vcf);
-RcppExport SEXP _epialleleR_rcpp_get_base_freqs(SEXP bamSEXP, SEXP passSEXP, SEXP vcfSEXP) {
+Rcpp::NumericMatrix rcpp_get_base_freqs(Rcpp::DataFrame& df, std::vector<bool> pass, Rcpp::DataFrame& vcf);
+RcppExport SEXP _epialleleR_rcpp_get_base_freqs(SEXP dfSEXP, SEXP passSEXP, SEXP vcfSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type bam(bamSEXP);
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
     Rcpp::traits::input_parameter< std::vector<bool> >::type pass(passSEXP);
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type vcf(vcfSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_get_base_freqs(bam, pass, vcf));
+    rcpp_result_gen = Rcpp::wrap(rcpp_get_base_freqs(df, pass, vcf));
     return rcpp_result_gen;
 END_RCPP
 }
 // rcpp_get_xm_beta
-std::vector<double> rcpp_get_xm_beta(Rcpp::DataFrame& bam, std::string ctx_meth, std::string ctx_unmeth);
-RcppExport SEXP _epialleleR_rcpp_get_xm_beta(SEXP bamSEXP, SEXP ctx_methSEXP, SEXP ctx_unmethSEXP) {
+std::vector<double> rcpp_get_xm_beta(Rcpp::DataFrame& df, std::string ctx_meth, std::string ctx_unmeth);
+RcppExport SEXP _epialleleR_rcpp_get_xm_beta(SEXP dfSEXP, SEXP ctx_methSEXP, SEXP ctx_unmethSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type bam(bamSEXP);
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
     Rcpp::traits::input_parameter< std::string >::type ctx_meth(ctx_methSEXP);
     Rcpp::traits::input_parameter< std::string >::type ctx_unmeth(ctx_unmethSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_get_xm_beta(bam, ctx_meth, ctx_unmeth));
+    rcpp_result_gen = Rcpp::wrap(rcpp_get_xm_beta(df, ctx_meth, ctx_unmeth));
     return rcpp_result_gen;
 END_RCPP
 }
 // rcpp_match_amplicon
-std::vector<int> rcpp_match_amplicon(Rcpp::DataFrame& bam, Rcpp::DataFrame& bed, int tolerance);
-RcppExport SEXP _epialleleR_rcpp_match_amplicon(SEXP bamSEXP, SEXP bedSEXP, SEXP toleranceSEXP) {
+std::vector<int> rcpp_match_amplicon(Rcpp::DataFrame& df, Rcpp::DataFrame& bed, int tolerance);
+RcppExport SEXP _epialleleR_rcpp_match_amplicon(SEXP dfSEXP, SEXP bedSEXP, SEXP toleranceSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type bam(bamSEXP);
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type bed(bedSEXP);
     Rcpp::traits::input_parameter< int >::type tolerance(toleranceSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_match_amplicon(bam, bed, tolerance));
+    rcpp_result_gen = Rcpp::wrap(rcpp_match_amplicon(df, bed, tolerance));
     return rcpp_result_gen;
 END_RCPP
 }
 // rcpp_match_capture
-std::vector<int> rcpp_match_capture(Rcpp::DataFrame& bam, Rcpp::DataFrame& bed, signed int min_overlap);
-RcppExport SEXP _epialleleR_rcpp_match_capture(SEXP bamSEXP, SEXP bedSEXP, SEXP min_overlapSEXP) {
+std::vector<int> rcpp_match_capture(Rcpp::DataFrame& df, Rcpp::DataFrame& bed, signed int min_overlap);
+RcppExport SEXP _epialleleR_rcpp_match_capture(SEXP dfSEXP, SEXP bedSEXP, SEXP min_overlapSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type bam(bamSEXP);
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type bed(bedSEXP);
     Rcpp::traits::input_parameter< signed int >::type min_overlap(min_overlapSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_match_capture(bam, bed, min_overlap));
+    rcpp_result_gen = Rcpp::wrap(rcpp_match_capture(df, bed, min_overlap));
     return rcpp_result_gen;
 END_RCPP
 }

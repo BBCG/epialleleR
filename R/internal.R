@@ -34,7 +34,7 @@
 
 utils::globalVariables(
   c(".", ".I", ".N", ":=", "bedmatch", "context", "rname", "start", "strand",
-    "FALSE+", "FALSE-", "TRUE+", "TRUE-", "REF", "ALT",
+    "templid", "FALSE+", "FALSE-", "TRUE+", "TRUE-", "REF", "ALT",
     "M+Ref","U+Ref","M+Alt","U+Alt", "M-Ref","U-Ref","M-Alt","U-Alt",
     "M+A", "M+C", "M+G", "M+T", "M-A", "M-C", "M-G", "M-T",
     "U+A", "U+C", "U+G", "U+T", "U-A", "U-C", "U-G", "U-T")
@@ -84,6 +84,7 @@ utils::globalVariables(
   bam.processed <- rcpp_read_bam_paired(bam.file, min.mapq, min.baseq, 
                                         skip.duplicates, nthreads)
   data.table::setDT(bam.processed)
+  bam.processed[,templid:=c(0:(.N-1))]
   data.table::setorder(bam.processed, rname, start)
   
   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
