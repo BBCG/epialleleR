@@ -73,6 +73,10 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
         (!(bam_rec->core.flag & BAM_FPROPER_PAIR)) ||                           // or if not a proper pair
         (skip_duplicates && (bam_rec->core.flag & BAM_FDUP))) continue;         // or if record is an optical/PCR duplicate
     
+    char *rec_strand = (char*) bam_aux_get(bam_rec, "XG");                      // genome strand
+    char *rec_xm = (char*) bam_aux_get(bam_rec, "XM");                          // methylation string
+    if ((rec_strand==NULL) || (rec_xm==NULL)) continue;                         // skip if no XM/XG tags (no methylation info available)
+    
     // check if not the same template (QNAME)
     if ((strcmp(templ_qname, bam_get_qname(bam_rec)) != 0)) {                
       // store previous template if it's a valid record
@@ -84,9 +88,9 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
       templ_start = bam_rec->core.pos < bam_rec->core.mpos ?                    // smallest of POS,MPOS is a start
         bam_rec->core.pos : bam_rec->core.mpos;
       templ_width = abs(bam_rec->core.isize);                                   // template ISIZE
-      char *rec_strand = (char*) bam_aux_get(bam_rec, "XG");                    // genome strand
-      if (rec_strand==NULL)                                                     // fall back if absent
-        Rcpp::stop("Genome strand is missing for BAM record #%i", nrecs);
+      // char *rec_strand = (char*) bam_aux_get(bam_rec, "XG");                    // genome strand
+      // if (rec_strand==NULL)                                                     // fall back if absent
+      //   Rcpp::stop("Genome strand is missing for BAM record #%i", nrecs);
       templ_strand = ( rec_strand[1] == 'C' ) ? 1 : 2 ;                         // STRAND is 1 if "ZCT"/"+", 2 if "ZGA"/"-"
       
       // resize containers if necessary
@@ -109,10 +113,10 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
     // add another read to the template
     // source containers
     uint8_t *rec_qual = bam_get_qual(bam_rec);                                  // quality string (Phred scale with no +33 offset)
-    char *rec_xm = (char*) bam_aux_get(bam_rec, "XM");                          // methylation string
-    if (rec_xm==NULL)                                                           // fall back if absent 
-      Rcpp::stop("Methylation string is missing for BAM record #%i", nrecs); 
-    rec_xm++;                                                                   // remove leading 'Z'
+    // char *rec_xm = (char*) bam_aux_get(bam_rec, "XM");                          // methylation string
+    // if (rec_xm==NULL)                                                           // fall back if absent 
+    //   Rcpp::stop("Methylation string is missing for BAM record #%i", nrecs); 
+    rec_xm++;                                                                   // remove leading 'Z' from XM string
     uint8_t *rec_pseq = bam_get_seq(bam_rec);                                   // packed sequence string (4 bit per base)
     
     // apply CIGAR
