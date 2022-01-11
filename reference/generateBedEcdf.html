@@ -18,7 +18,7 @@ per-read beta values of the sequencing reads."><!-- mathjax --><script src="http
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.4</span>
       </span>
     </div>
 
@@ -195,11 +195,11 @@ usage and sample data.</p></div>
 <span class="r-in">  <span class="va">amplicon.ecdfs</span> <span class="op">&lt;-</span> <span class="fu">generateBedEcdf</span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>, bed<span class="op">=</span><span class="va">amplicon.bed</span>,</span>
 <span class="r-in">                                    bed.rows<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.043s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.055s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.016s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.014s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing ECDFs for within- and out-of-context per-read beta values</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.037s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.047s]</span>
 <span class="r-in">  </span>
 <span class="r-in">  <span class="co"># there are 5 items in amplicon.ecdfs, let's plot them all</span></span>
 <span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
