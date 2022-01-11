@@ -5,13 +5,18 @@ test_generateCytosineReport <- function () {
                                         report.context="CX", verbose=FALSE)
   
   RUnit::checkEquals(
+    nrow(cx.report[duplicated(paste(rname,pos))]),
+    0
+  )
+  
+  RUnit::checkEquals(
     dim(cg.report),
-    c(15413,6)
+    c(15408,6)
   )
   
   RUnit::checkEquals(
     dim(cx.report),
-    c(97237,6)
+    c(97186,6)
   )
   
   RUnit::checkEquals(
@@ -45,12 +50,12 @@ test_generateCytosineReport <- function () {
   
   RUnit::checkEquals(
     dim(cg.quality),
-    c(15187,6)
+    c(15182,6)
   )
   
   RUnit::checkEquals(
     dim(cx.quality),
-    c(96040,6)
+    c(95990,6)
   )
   
   RUnit::checkEquals(

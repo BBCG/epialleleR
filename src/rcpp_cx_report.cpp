@@ -87,6 +87,7 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
         res_unmeth.push_back(it->second[max_freq_idx | 8]);       /* unmeth */ \
       }                                                                        \
     }                                                                          \
+    max_pos=0;                                                                 \
     cx_map.clear();                                                            \
     hint = cx_map.end();                                                       \
   }
@@ -105,14 +106,15 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
   T_cx_fmap::iterator it, hint;
   T_key map_key;
   T_val map_val = {0};
-  unsigned int idx_to_increase, max_freq_ctx, max_freq_idx, pass_x;
+  unsigned int max_pos, idx_to_increase, max_freq_ctx, max_freq_idx, pass_x;
   
   cx_map.reserve(100000);                                                       // reserving helps?
   for (unsigned int x=0; x<rname.size(); x++) {
     // checking for the interrupt
     if ((x & 0xFFFF) == 0) Rcpp::checkUserInterrupt();                          // every ~65k reads
     
-    if ((start[x]>map_val[1]) || (rname[x]!=map_val[0])) {
+    // if ((start[x]>map_val[1]) || (rname[x]!=map_val[0])) {
+    if ((start[x]>max_pos) || (rname[x]!=map_val[0])) {                         // if current position is further downstream or another reference
       spit_results;
     }
     map_val[0] = rname[x];
@@ -128,6 +130,7 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
       hint->second[idx_to_increase]++;
       hint->second[9]++;                                                        // total coverage
     }
+    max_pos=max_pos<map_val[1]?map_val[1]:max_pos;                              // last position of C in cx_map
   }
   spit_results;
   
