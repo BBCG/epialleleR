@@ -95,7 +95,7 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
   // result
   // { (rname, strand, pos, ctx, meth, unmeth) * n }
   std::vector<int> res_rname, res_strand, res_pos, res_ctx, res_meth, res_unmeth;
-  size_t nitems = rname.size()*pow(ctx.size()<<2,2);
+  size_t nitems = std::min(rname.size()*pow(ctx.size()<<2,2), 1e+9);
   // reserving space makes it only slow?
   res_rname.reserve(nitems); res_strand.reserve(nitems);
   res_pos.reserve(nitems); res_ctx.reserve(nitems);
