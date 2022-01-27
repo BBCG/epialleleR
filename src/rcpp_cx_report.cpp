@@ -114,18 +114,18 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
     if ((x & 0xFFFF) == 0) Rcpp::checkUserInterrupt();                          // every ~65k reads
     
     // if ((start[x]>map_val[1]) || (rname[x]!=map_val[0])) {
-    if ((start[x]>max_pos) || (rname[x]!=map_val[0])) {                         // if current position is further downstream or another reference
+    if (((start[x]>max_pos) && cx_map.size()>0xFFFF) || (rname[x]!=map_val[0])) { // if current position is further downstream or another reference
       spit_results;
     }
     map_val[0] = rname[x];
     map_val[8] = strand[x];
     pass_x = (!pass[x])<<3;                                                     // should we lowercase this XM (TRUE==0, FALSE==8)
     for (unsigned int i=0; i<xm->at(templid[x]).size(); i++) {                  // xm->at(templid[x]) is a reference to a corresponding XM string
-      map_val[1] = start[x]+i;
-      map_key = ((T_key)map_val[1] << 2) | map_val[8];
       idx_to_increase = ctx_to_idx(xm->at(templid[x])[i]);                      // see the table above
       if (idx_to_increase==11) continue;                                        // skip +-
       idx_to_increase |= pass_x;                                                // if not pass - lowercase
+      map_val[1] = start[x]+i;
+      map_key = ((T_key)map_val[1] << 2) | map_val[8];
       hint = cx_map.try_emplace(hint, map_key, map_val);
       hint->second[idx_to_increase]++;
       hint->second[9]++;                                                        // total coverage
