@@ -56,7 +56,6 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
   Rcpp::IntegerVector start   = df["start"];                                    // template start
   Rcpp::IntegerVector templid = df["templid"];                                  // template id, effectively holds indexes of corresponding std::string in std::vector
   
-  // Rcpp::CharacterVector xm    = df["XM"];                                       // merged refspaced template XMs
   Rcpp::XPtr<std::vector<std::string>> xm((SEXP)df.attr("xm_xptr"));            // merged refspaced template XMs, as a pointer to std::vector<std::string>
   
   // main typedefs
@@ -68,17 +67,16 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
   #define ctx_to_idx(c) ((c+2)>>2) & 15
   #define spit_results {                                                       \
     for (it=cx_map.begin(); it!=cx_map.end(); it++) {                          \
-      it->second[9] /= 2;                              /* half the coverage */ \
-      if (it->second[12] > it->second[9])             /* skip if most are . */ \
-        continue;                                                              \
+      it->second[9] /= 2;                             /* halve the coverage */ \
+      if (it->second[12] > it->second[9]) continue;   /* skip if most are . */ \
       else if ((it->second[2] + it->second[10]) > it->second[9])               \
-        max_freq_ctx='H', max_freq_idx=2;                                      \
+        max_freq_idx=2;                                                /* H */ \
       else if ((it->second[6] + it->second[14]) > it->second[9])               \
-        max_freq_ctx='X', max_freq_idx=6;                                      \
+        max_freq_idx=6;                                                /* X */ \
       else if ((it->second[7] + it->second[15]) > it->second[9])               \
-        max_freq_ctx='Z', max_freq_idx=7;                                      \
+        max_freq_idx=7;                                                /* Z */ \
       else continue;                               /* skip if none is > 50% */ \
-      if (ctx.find(max_freq_ctx)!=std::string::npos) {     /* if within ctx */ \
+      if (ctx_map[max_freq_idx]) {                         /* if within ctx */ \
         res_rname.push_back(it->second[0]);                        /* rname */ \
         res_strand.push_back(it->second[8]);                      /* strand */ \
         res_pos.push_back(it->second[1]);                            /* pos */ \
@@ -92,11 +90,14 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
     hint = cx_map.end();                                                       \
   }
 
+  unsigned int ctx_map [16] = {0};                                              // array of contexts to print
+  std::for_each(ctx.begin(), ctx.end(), [&ctx_map] (unsigned int const &c) {
+    ctx_map[ctx_to_idx(c)]=1;
+  });
+
   // result
-  // { (rname, strand, pos, ctx, meth, unmeth) * n }
   std::vector<int> res_rname, res_strand, res_pos, res_ctx, res_meth, res_unmeth;
   size_t nitems = std::min(rname.size()*pow(ctx.size()<<2,2), 1e+9);
-  // reserving space makes it only slow?
   res_rname.reserve(nitems); res_strand.reserve(nitems);
   res_pos.reserve(nitems); res_ctx.reserve(nitems);
   res_meth.reserve(nitems); res_unmeth.reserve(nitems);
@@ -106,22 +107,24 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
   T_cx_fmap::iterator it, hint;
   T_key map_key;
   T_val map_val = {0};
-  unsigned int max_pos, idx_to_increase, max_freq_ctx, max_freq_idx, pass_x;
+  int max_pos;
+  unsigned int idx_to_increase, max_freq_idx, pass_x;
   
   cx_map.reserve(100000);                                                       // reserving helps?
   for (unsigned int x=0; x<rname.size(); x++) {
     // checking for the interrupt
     if ((x & 0xFFFF) == 0) Rcpp::checkUserInterrupt();                          // every ~65k reads
     
-    // if ((start[x]>map_val[1]) || (rname[x]!=map_val[0])) {
-    if (((start[x]>max_pos) && cx_map.size()>0xFFFF) || (rname[x]!=map_val[0])) { // if current position is further downstream or another reference
+    if ((start[x]>max_pos) || (rname[x]!=map_val[0])) {                         // if current position is further downstream or another reference
       spit_results;
+      map_val[0] = rname[x];
     }
-    map_val[0] = rname[x];
     map_val[8] = strand[x];
     pass_x = (!pass[x])<<3;                                                     // should we lowercase this XM (TRUE==0, FALSE==8)
-    for (unsigned int i=0; i<xm->at(templid[x]).size(); i++) {                  // xm->at(templid[x]) is a reference to a corresponding XM string
-      idx_to_increase = ctx_to_idx(xm->at(templid[x])[i]);                      // see the table above
+    const char* xm_x = xm->at(templid[x]).c_str();                              // xm->at(templid[x]) is a reference to a corresponding XM string
+    const unsigned int size_x = xm->at(templid[x]).size();
+    for (unsigned int i=0; i<size_x; i++) {                                     // char by char - it's faster this way than using std::string in the cycle
+      idx_to_increase = ctx_to_idx(xm_x[i]);                                    // see the table above
       if (idx_to_increase==11) continue;                                        // skip +-
       idx_to_increase |= pass_x;                                                // if not pass - lowercase
       map_val[1] = start[x]+i;
@@ -158,3 +161,24 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
 // Rcpp::sourceCpp("rcpp_cx_report.cpp")
 
 // #############################################################################
+// ## branched spit
+//  #define spit_results {                                                       \
+//    for (it=cx_map.begin(); it!=cx_map.end(); it++) {                          \
+//      it->second[9] /= 2;                              /* half the coverage */ \
+//      if (it->second[12] > it->second[9]) continue;   /* skip if most are . */ \
+//      max_freq_idx = ((it->second[2]+it->second[10]) > it->second[9])*2+ /*H*/ \
+//                     ((it->second[6]+it->second[14]) > it->second[9])*6+ /*X*/ \
+//                     ((it->second[7]+it->second[15]) > it->second[9])*7; /*Z*/ \
+//      if (ctx_map[max_freq_idx]) {                         /* if within ctx */ \
+//        res_rname.push_back(it->second[0]);                        /* rname */ \
+//        res_strand.push_back(it->second[8]);                      /* strand */ \
+//        res_pos.push_back(it->second[1]);                            /* pos */ \
+//        res_ctx.push_back(max_freq_idx);                         /* context */ \
+//        res_meth.push_back(it->second[max_freq_idx]);               /* meth */ \
+//        res_unmeth.push_back(it->second[max_freq_idx | 8]);       /* unmeth */ \
+//      }                                                                        \
+//    }                                                                          \
+//    max_pos=0;                                                                 \
+//    cx_map.clear();                                                            \
+//    hint = cx_map.end();                                                       \
+//  }
