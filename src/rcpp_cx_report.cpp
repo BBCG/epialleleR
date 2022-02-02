@@ -66,7 +66,7 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
   // macros
   #define ctx_to_idx(c) ((c+2)>>2) & 15
   #define spit_results {                                                       \
-    for (it=cx_map.begin(); it!=cx_map.end(); it++) {                          \
+    for (T_cx_fmap::iterator it=cx_map.begin(); it!=cx_map.end(); it++) {      \
       it->second[9] /= 2;                             /* halve the coverage */ \
       if (it->second[12] > it->second[9]) continue;   /* skip if most are . */ \
       else if ((it->second[2] + it->second[10]) > it->second[9])               \
@@ -77,7 +77,7 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
         max_freq_idx=7;                                                /* Z */ \
       else continue;                               /* skip if none is > 50% */ \
       if (ctx_map[max_freq_idx]) {                         /* if within ctx */ \
-        res_rname.push_back(it->second[0]);                        /* rname */ \
+        /* res_rname.push_back(it->second[0]);                        rname */ \
         res_strand.push_back(it->second[8]);                      /* strand */ \
         res_pos.push_back(it->second[1]);                            /* pos */ \
         res_ctx.push_back(max_freq_idx);                         /* context */ \
@@ -85,55 +85,56 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
         res_unmeth.push_back(it->second[max_freq_idx | 8]);       /* unmeth */ \
       }                                                                        \
     }                                                                          \
+    res_rname.resize(res_strand.size(), map_val[0]);         /* same rname! */ \
     max_pos=0;                                                                 \
     cx_map.clear();                                                            \
     hint = cx_map.end();                                                       \
   }
 
-  unsigned int ctx_map [16] = {0};                                              // array of contexts to print
+  // array of contexts to print
+  unsigned int ctx_map [16] = {0};
   std::for_each(ctx.begin(), ctx.end(), [&ctx_map] (unsigned int const &c) {
     ctx_map[ctx_to_idx(c)]=1;
   });
 
   // result
   std::vector<int> res_rname, res_strand, res_pos, res_ctx, res_meth, res_unmeth;
-  size_t nitems = std::min(rname.size()*pow(ctx.size()<<2,2), 1e+9);
+  size_t nitems = std::min(rname.size()*pow(ctx.size()<<2,2), 3e+9);
   res_rname.reserve(nitems); res_strand.reserve(nitems);
   res_pos.reserve(nitems); res_ctx.reserve(nitems);
   res_meth.reserve(nitems); res_unmeth.reserve(nitems);
   
   // iterating over XM vector, saving the results when necessary
   T_cx_fmap cx_map;
-  T_cx_fmap::iterator it, hint;
-  T_key map_key;
+  T_cx_fmap::iterator hint;
   T_val map_val = {0};
   int max_pos;
-  unsigned int idx_to_increase, max_freq_idx, pass_x;
+  unsigned int max_freq_idx;
   
   cx_map.reserve(100000);                                                       // reserving helps?
   for (unsigned int x=0; x<rname.size(); x++) {
     // checking for the interrupt
     if ((x & 0xFFFF) == 0) Rcpp::checkUserInterrupt();                          // every ~65k reads
     
-    if ((start[x]>max_pos) || (rname[x]!=map_val[0])) {                         // if current position is further downstream or another reference
+    const int start_x = start[x];                                               // start of the current read
+    if ((start_x>max_pos) || (rname[x]!=map_val[0])) {                          // if current position is further downstream or another reference
       spit_results;
       map_val[0] = rname[x];
     }
     map_val[8] = strand[x];
-    pass_x = (!pass[x])<<3;                                                     // should we lowercase this XM (TRUE==0, FALSE==8)
+    const unsigned int pass_x = (!pass[x])<<3;                                  // should we lowercase this XM (TRUE==0, FALSE==8)
     const char* xm_x = xm->at(templid[x]).c_str();                              // xm->at(templid[x]) is a reference to a corresponding XM string
-    const unsigned int size_x = xm->at(templid[x]).size();
+    const unsigned int size_x = xm->at(templid[x]).size();                      // length of the current read
     for (unsigned int i=0; i<size_x; i++) {                                     // char by char - it's faster this way than using std::string in the cycle
-      idx_to_increase = ctx_to_idx(xm_x[i]);                                    // see the table above
+      const unsigned int idx_to_increase = (ctx_to_idx(xm_x[i])) | pass_x;      // see the table above; if not pass -> lowercase
       if (idx_to_increase==11) continue;                                        // skip +-
-      idx_to_increase |= pass_x;                                                // if not pass - lowercase
-      map_val[1] = start[x]+i;
-      map_key = ((T_key)map_val[1] << 2) | map_val[8];
+      map_val[1] = start_x+i;
+      const T_key map_key = ((T_key)map_val[1] << 2) | map_val[8];
       hint = cx_map.try_emplace(hint, map_key, map_val);
       hint->second[idx_to_increase]++;
       hint->second[9]++;                                                        // total coverage
     }
-    max_pos=max_pos<map_val[1]?map_val[1]:max_pos;                              // last position of C in cx_map
+    if (max_pos<map_val[1]) max_pos=map_val[1];                                 // last position of C in cx_map
   }
   spit_results;
   
@@ -161,7 +162,7 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
 // Rcpp::sourceCpp("rcpp_cx_report.cpp")
 
 // #############################################################################
-// ## branched spit
+// ## debranched spit
 //  #define spit_results {                                                       \
 //    for (it=cx_map.begin(); it!=cx_map.end(); it++) {                          \
 //      it->second[9] /= 2;                              /* half the coverage */ \
