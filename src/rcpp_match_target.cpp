@@ -7,8 +7,8 @@
 // Only first match is taken.
 //
 // Currently this code doesn't take advantage from the fact that both reads and
-// targets can be sorted. Thus it is possible to speed it up quite a bit, taking
-// the VCF code as an example
+// targets can be sorted. Thus it is possible to speed it up quite a bit, using
+// the VCF code as an example. HOWEVER: bed is not sorted intentionally.
 
 // MATCH AMPLICON BY POSITION
 // fast, vectorised
