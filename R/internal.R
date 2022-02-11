@@ -313,8 +313,8 @@ utils::globalVariables(
                             match.min.overlap=match.min.overlap)
   
   # Rcpp::sourceCpp("rcpp_get_xm_beta.cpp")
-  ctx.beta=rcpp_get_xm_beta(bam.processed, ctx.meth, ctx.unmeth)
-  ooctx.beta=rcpp_get_xm_beta(bam.processed, ooctx.meth, ooctx.unmeth)
+  ctx.beta <- rcpp_get_xm_beta(bam.processed, ctx.meth, ctx.unmeth)
+  ooctx.beta <- rcpp_get_xm_beta(bam.processed, ooctx.meth, ooctx.unmeth)
 
   all.bed.rows <- sort(unique(bed.match), na.last=TRUE)
   if (is.null(bed.rows))
