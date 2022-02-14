@@ -5,6 +5,10 @@ rcpp_cx_report <- function(df, pass, ctx) {
     .Call(`_epialleleR_rcpp_cx_report`, df, pass, ctx)
 }
 
+rcpp_extract_patterns <- function(df, target_rname, target_start, target_end, min_overlap, ctx, clip, reverse_offset) {
+    .Call(`_epialleleR_rcpp_extract_patterns`, df, target_rname, target_start, target_end, min_overlap, ctx, clip, reverse_offset)
+}
+
 rcpp_fep <- function(df, colnames) {
     .Call(`_epialleleR_rcpp_fep`, df, colnames)
 }

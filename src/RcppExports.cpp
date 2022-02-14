@@ -23,6 +23,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_extract_patterns
+Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame& df, unsigned int target_rname, unsigned int target_start, unsigned int target_end, signed int min_overlap, std::string& ctx, bool clip, unsigned int reverse_offset);
+RcppExport SEXP _epialleleR_rcpp_extract_patterns(SEXP dfSEXP, SEXP target_rnameSEXP, SEXP target_startSEXP, SEXP target_endSEXP, SEXP min_overlapSEXP, SEXP ctxSEXP, SEXP clipSEXP, SEXP reverse_offsetSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
+    Rcpp::traits::input_parameter< unsigned int >::type target_rname(target_rnameSEXP);
+    Rcpp::traits::input_parameter< unsigned int >::type target_start(target_startSEXP);
+    Rcpp::traits::input_parameter< unsigned int >::type target_end(target_endSEXP);
+    Rcpp::traits::input_parameter< signed int >::type min_overlap(min_overlapSEXP);
+    Rcpp::traits::input_parameter< std::string& >::type ctx(ctxSEXP);
+    Rcpp::traits::input_parameter< bool >::type clip(clipSEXP);
+    Rcpp::traits::input_parameter< unsigned int >::type reverse_offset(reverse_offsetSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_extract_patterns(df, target_rname, target_start, target_end, min_overlap, ctx, clip, reverse_offset));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_fep
 std::vector<double> rcpp_fep(Rcpp::DataFrame& df, std::vector<std::string> colnames);
 RcppExport SEXP _epialleleR_rcpp_fep(SEXP dfSEXP, SEXP colnamesSEXP) {
@@ -123,6 +141,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_epialleleR_rcpp_cx_report", (DL_FUNC) &_epialleleR_rcpp_cx_report, 3},
+    {"_epialleleR_rcpp_extract_patterns", (DL_FUNC) &_epialleleR_rcpp_extract_patterns, 8},
     {"_epialleleR_rcpp_fep", (DL_FUNC) &_epialleleR_rcpp_fep, 2},
     {"_epialleleR_rcpp_get_base_freqs", (DL_FUNC) &_epialleleR_rcpp_get_base_freqs, 3},
     {"_epialleleR_rcpp_get_xm_beta", (DL_FUNC) &_epialleleR_rcpp_get_xm_beta, 3},
