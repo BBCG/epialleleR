@@ -408,3 +408,33 @@ utils::globalVariables(
   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(bf.report)
 }
+
+################################################################################
+
+# descr: extracts methylation patterns for particular range
+# value: data.table with patterns
+
+.getPatterns <- function (bam.processed, bed, bed.row, match.min.overlap,
+                          extract.context, min.context.freq,
+                          clip.patterns, strand.offset,
+                          verbose)
+{
+  if (verbose) message("Extracting methylation patterns", appendLF=FALSE)
+  tm <- proc.time()
+  
+  bed.dt <- data.table::as.data.table(bed)
+  bed.dt[, seqnames := factor(seqnames, levels=levels(bam.processed$rname))]
+  
+  patterns <- rcpp_extract_patterns(bam.processed,
+                                    as.integer(bed.dt$seqnames[bed.row]),
+                                    as.integer(bed.dt$start[bed.row]),
+                                    as.integer(bed.dt$end[bed.row]),
+                                    match.min.overlap, extract.context,
+                                    min.context.freq,
+                                    clip.patterns, strand.offset)
+  data.table::setDT(patterns)
+  colnames(patterns) <- sub("^X([0-9]+)$", "\\1", colnames(patterns))
+  
+  if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+  return(patterns)
+}
