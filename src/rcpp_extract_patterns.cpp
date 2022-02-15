@@ -164,6 +164,7 @@ Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame &df,                      
   // for (auto it=pat.begin(); it!=pat.end(); it++) {
   //   it->second.resize(npat, NA_INTEGER);                                  // top up all vectors with NA values
   // }
+  Rcpp::Rcout << npat << "!";
   
   if (!npat) return Rcpp::DataFrame::create();                                  // return empty DataFrame if no patterns were found
   
