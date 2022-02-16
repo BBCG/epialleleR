@@ -1,4 +1,5 @@
 #include <Rcpp.h>
+#include <boost/container/flat_map.hpp>
 // using namespace Rcpp;
 
 // Scans trough reads and extracts methylation patterns from the reads that
@@ -36,21 +37,26 @@ Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame &df,                      
 }
 #define ctx_to_idx(c) ((c+2)>>2) & 15
   
-  // variables
-  uint64_t offset_basis=14695981039346656037u;                                  // FNV-1a offset basis
+  // consts, vars, typedefs
+  const uint64_t offset_basis=14695981039346656037u;                            // FNV-1a offset basis
   unsigned int npat = 0;                                                        // pattern counter
   typedef int T_key;                                                            // map key
   typedef std::vector<int> T_val;                                               // map value
-  std::unordered_map<T_key, T_key> pos_map;                                     // all positions to figure out valid ones
-  std::unordered_map<T_key, T_key>::iterator pos_hint = pos_map.begin();        // position map iterator
+  boost::container::flat_map<T_key, T_key> pos_map;                             // all positions to figure out valid ones
+  boost::container::flat_map<T_key, T_key>::iterator pos_hint = pos_map.begin();// position map iterator
   std::map<T_key, T_val> pat;                                                   // per-pattern methylation counts
-  // std::map<T_key, T_val>::iterator hint = pat.begin();                          // map iterator
+  // std::map<T_key, T_val>::iterator hint = pat.begin();                       // map iterator
   std::vector<int> pat_strand, pat_start, pat_end, pat_nbase;                   // pattern strands, starts, ends, number of bases within context
   std::vector<double> pat_beta;                                                 // pattern betas
   std::vector<std::string> pat_fnv;                                             // FNV-1a hashes of patterns
   
   pos_map.reserve(std::max((int)(target_end-target_start), 0xFFFF));
   
+  // filling the context map
+  unsigned int ctx_map [128] = {0};
+  std::for_each(ctx.begin(), ctx.end(), [&ctx_map] (unsigned int const &c) {
+    ctx_map[c] = 1;
+  });
   
   // // rnames are sorted, should've been taking an advantage of it...
   // Rcpp::IntegerVector::const_iterator lower = std::lower_bound(rname.begin(), rname.end(), target_rname);
@@ -75,29 +81,21 @@ Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame &df,                      
         const unsigned int begin_i = clip ? (over_start_x - start_x) : 0;       // clip the XM?
         const unsigned int end_i = clip ? overlap : size_x;                     // clip the XM?
         for (unsigned int i=begin_i; i<end_i; i++) {                            // char by char - it's faster this way than using std::string in the cycle
-          if (ctx.find(xm_x[i]) != std::string::npos) {                         // if base is within context
+          if (ctx_map[(int)xm_x[i]]) {                                          // if base is within context
             const unsigned int pos = start_x + i - offset_x;                    // position of the base
             pos_hint = pos_map.try_emplace(pos_hint, pos, 0);                   // check if this position is already included, emplace if not
             pos_hint->second++;                                                 // position++
           }
         }
-        npat++;
-        if ((x & 0xFFF) == 0) {Rcpp::Rcout << x << ",";}
+        npat++;                                                                 // patterns++, to know how many
       }
     }
   }
   
-  Rcpp::Rcout << pos_map.size() << "|";
-  for (auto it=pos_map.begin(); it!=pos_map.end(); ) {
-    if ((double)it->second/npat < min_ctx_freq) {
-      it = pos_map.erase(it);
-    } else {
+  for (auto it=pos_map.begin(); it!=pos_map.end(); it++) {
+    if ((double)it->second/npat >= min_ctx_freq)
       pat.emplace(it->first, T_val (npat, NA_INTEGER));
-      it++;
-    }
   }
-  Rcpp::Rcout << pos_map.size() << "|";
-  Rcpp::Rcout << npat << "!";
   
   npat = 0;
   for (unsigned int x=0; x<rname.size(); x++) {   
@@ -116,55 +114,37 @@ Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame &df,                      
         const unsigned int offset_x = strand[x]==2 ? reverse_offset : 0;        // offset coordinates of reverse strand for symmetric methylation
         const unsigned int begin_i = clip ? (over_start_x - start_x) : 0;       // clip the XM?
         const unsigned int end_i = clip ? overlap : size_x;                     // clip the XM?
-        unsigned int meth=0, total=0;                                           // counters for methylated and total within context
-        uint64_t fnv=offset_basis;                                              // FNV-1a hash of current pattern
+        unsigned int meth = 0, total = 0;                                       // counters for methylated and total within context
+        uint64_t fnv = offset_basis;                                            // FNV-1a hash of current pattern
         for (unsigned int i=begin_i; i<end_i; i++) {                            // char by char - it's faster this way than using std::string in the cycle
-          if (ctx.find(xm_x[i]) != std::string::npos) {                         // if base is within context
+          if (ctx_map[(int)xm_x[i]]) {                                          // if base is within context
             const unsigned int pos = start_x + i - offset_x;                    // position of the base
-            auto hint = pat.find(pos);        // check if this position is already included
+            auto hint = pat.find(pos);                                          // find and check if this position is already included
             if (hint != pat.end()) {
-              const unsigned int base = ctx_to_idx(xm_x[i]);                      // rcpp_cx_report for details
-              hint->second[npat] = base;                                       // save base by position
-              meth += !(base & 8);                                                // methylated + (0 for lowercase, 1 for uppercase)
-              total++;                                                            // total++
-              fnv_add(fnv, reinterpret_cast<const char*>(&pos), sizeof(pos));     // FNV-1a: add position
-              fnv_add(fnv, xm_x+i, sizeof(char));                                 // FNV-1a: add base
+              const unsigned int base = ctx_to_idx(xm_x[i]);                    // rcpp_cx_report for details
+              hint->second[npat] = base;                                        // save base by position
+              meth += !(base & 8);                                              // methylated + (0 for lowercase, 1 for uppercase)
+              total++;                                                          // total++
+              fnv_add(fnv, reinterpret_cast<const char*>(&pos), sizeof(pos));   // FNV-1a: add int position
+              fnv_add(fnv, xm_x+i, sizeof(char));                               // FNV-1a: add char base
             }
           }
         }
         
-          // if (ctx.find(xm_x[i]) != std::string::npos) {                         // if base is within context
-          //   const unsigned int pos = start_x + i - offset_x;                    // position of the base
-          //   if (pos_map.find(pos) != pos_map.end()) {
-          //     hint = pat.try_emplace(hint, pos, T_val (npat, NA_INTEGER));        // check if this position is already included, emplace if not
-          //     const unsigned int base = ctx_to_idx(xm_x[i]);                      // rcpp_cx_report for details
-          //     hint->second.resize(npat, NA_INTEGER);
-          //     hint->second.push_back(base);                                       // save base by position
-          //     meth += !(base & 8);                                                // methylated + (0 for lowercase, 1 for uppercase)
-          //     total++;                                                            // total++
-          //     fnv_add(fnv, reinterpret_cast<const char*>(&pos), sizeof(pos));     // FNV-1a: add position
-          //     fnv_add(fnv, xm_x+i, sizeof(char));                                 // FNV-1a: add base
-          //   }
-          // }
-        if (fnv != offset_basis) {                                              // if nonempty pattern
-          npat++;                                                                 // patterns++
-          if ((npat & 0xFFF) == 0) {Rcpp::Rcout << npat << ",";}
-          pat_strand.push_back(strand[x]);
-          pat_start.push_back(start_x+begin_i);
-          pat_end.push_back(start_x+end_i-1);
-          pat_nbase.push_back(total);
-          pat_beta.push_back((double)meth/total);
+        if (fnv != offset_basis) {                                              // only if nonempty pattern
+          npat++;                                                               // patterns++
+          pat_strand.push_back(strand[x]);                                      // push strand
+          pat_start.push_back(start_x+begin_i);                                 // push start
+          pat_end.push_back(start_x+end_i-1);                                   // push end
+          pat_nbase.push_back(total);                                           // push total
+          pat_beta.push_back((double)meth/total);                               // push beta
           char fnv_str[17] = {0};
           snprintf(fnv_str, 17, "%.16lX", fnv);
-          pat_fnv.emplace_back(fnv_str, 16);
+          pat_fnv.emplace_back(fnv_str, 16);                                    // push FNV-1a hash
         }
       }
     }
   }
-  // for (auto it=pat.begin(); it!=pat.end(); it++) {
-  //   it->second.resize(npat, NA_INTEGER);                                  // top up all vectors with NA values
-  // }
-  Rcpp::Rcout << npat << "!";
   
   if (!npat) return Rcpp::DataFrame::create();                                  // return empty DataFrame if no patterns were found
   
