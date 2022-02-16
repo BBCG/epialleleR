@@ -143,6 +143,7 @@
 #' @seealso \code{\link{preprocessBam}} for preloading BAM data,
 #' \code{\link{generateBedReport}} for genomic region-based statistics,
 #' \code{\link{generateVcfReport}} for evaluating epiallele-SNV associations,
+#' \code{\link{extractPatterns}} for exploring methylation patterns,
 #' \code{\link{generateBedEcdf}} for analysing the distribution of per-read
 #' beta values, and `epialleleR` vignettes for the description of usage and
 #' sample data.

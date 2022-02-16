@@ -166,6 +166,7 @@ intermediate methylation levels are more frequent.
 \code{\link{generateCytosineReport}} for methylation statistics at the level
 of individual cytosines, \code{\link{generateBedReport}} for genomic
 region-based statistics, \code{\link{generateVcfReport}} for evaluating
-epiallele-SNV associations, and `epialleleR` vignettes for the description of
+epiallele-SNV associations, \code{\link{extractPatterns}} for exploring
+methylation patterns, and `epialleleR` vignettes for the description of
 usage and sample data.
 }

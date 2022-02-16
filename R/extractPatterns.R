@@ -1,4 +1,149 @@
-
+#' extractPatterns
+#'
+#' @description
+#' This function extracts methylation patterns (epialleles) for a given genomic
+#' region of interest.
+#'
+#' @details
+#' The function matches reads (for paired-end sequencing alignment files - read
+#' pairs as a single entity) to the genomic
+#' region provided in a BED file/\code{\linkS4class{GRanges}} object, extracts
+#' methylation statuses of bases within those reads, and returns a data frame
+#' which can be used for plotting of DNA methylation patterns.
+#' 
+#' @param bam BAM file location string OR preprocessed output of
+#' \code{\link{preprocessBam}} function. BAM file alignment records
+#' must derive from paired-end sequencing, be sorted
+#' by QNAME (instead of genomic position), contain XG tag (strand information
+#' for the reference genome) and methylation call strings. Read more about
+#' these requirements and BAM preprocessing at \code{\link{preprocessBam}}.
+#' @param bed Browser Extensible Data (BED) file location string OR object of
+#' class \code{\linkS4class{GRanges}} holding genomic coordinates for
+#' regions of interest. It is used to match sequencing reads to the genomic
+#' regions prior to eCDF computation. The style of seqlevels of BED file/object
+#' must match the style of seqlevels of the BAM file/object used. The 
+#' BED/\code{\link[GenomicRanges]{GRanges}} rows are \strong{not} sorted
+#' internally.
+#' @param bed.row single non-negative integer specifying what `bed` region
+#' should be included in the output (default: 1).
+#' @param zero.based.bed boolean defining if BED coordinates are zero based
+#' (default: FALSE).
+#' @param match.min.overlap integer for the smallest overlap between read's and
+#' BED/\code{\link[GenomicRanges]{GRanges}} start or end positions during
+#' matching of capture-based NGS reads (default: 1).
+#' @param extract.context string defining cytosine methylation context used
+#' to report:
+#' \itemize{
+#'   \item "CG" (the default) -- CpG cytosines (called as zZ)
+#'   \item "CHG" -- CHG cytosines (xX)
+#'   \item "CHH" -- CHH cytosines (hH)
+#'   \item "CxG" -- CG and CHG cytosines (zZxX)
+#'   \item "CX" -- all cytosines
+#' }
+#' @param min.context.freq real number in the range [0;1] (default: 0.01).
+#' Genomic positions that are covered by smaller fraction of patterns won't be
+#' included in the report.
+#' @param clip.patterns boolean if patterns should not extend over the edge of
+#' `bed` region (default: FALSE).
+#' @param strand.offset single non-negative integer specifying the offset of
+#' bases at the reverse (-) strand compared to the forward (+) strand. Allows
+#' to "merge" genomic positions when methylation is symmetric (in CG and CHG
+#' contexts). By default, equals 1 for `extract.context`=="CG", 2 for "CHG", or
+#' 0 otherwise.
+#' @param min.mapq non-negative integer threshold for minimum read mapping
+#' quality (default: 0). Option has no effect if preprocessed BAM data was
+#' supplied as an input.
+#' @param min.baseq non-negative integer threshold for minimum nucleotide base
+#' quality (default: 0). Option has no effect if preprocessed BAM data was
+#' supplied as an input.
+#' @param skip.duplicates boolean defining if duplicate aligned reads should be
+#' skipped (default: FALSE). Option has no effect if preprocessed BAM data was
+#' supplied as an input OR duplicate reads were not marked by alignment
+#' software.
+#' @param nthreads non-negative integer for the number of HTSlib threads to be
+#' used during BAM file decompression (default: 1). 2 threads make sense for the
+#' files larger than 100 MB. Option has no effect if preprocessed BAM data was
+#' supplied as an input.
+#' @param verbose boolean to report progress and timings (default: TRUE).
+#' @return \code{\link[data.table]{data.table}} object containing
+#' per-read (pair) base methylation information for the genomic region of
+#' interest. The report columns are:
+#' \itemize{
+#'   \item seqnames -- read (pair) reference sequence name
+#'   \item strand -- read (pair) strand
+#'   \item start -- start of the read (pair)
+#'   \item end -- end of the read (pair)
+#'   \item nbase -- number of within-the-context bases for this read (pair)
+#'   \item beta -- beta value of this read (pair), calculated as a ratio of the
+#'   number of methylated within-the-context bases to the total number of
+#'   within-the-context bases
+#'   \item pattern -- hex representation of 64-bit FNV-1a hash calculated for
+#'   all reported base positions and bases in this read (pair). This
+#'   hash value depends only on included genomic positions and their methylation
+#'   call string chars (hHxXzZ), thus it is expected to be unique for every
+#'   methylation pattern, although equal for identical methylation patterns
+#'   independently on read (pair) start, end, or strand (when correct
+#'   `strand.offset` is given)
+#'   \item ... -- columns for each genomic position that hold corresponding
+#'   methylation call string char, or NA if position is not present in the read
+#'   (pair)
+#' }
+#' @seealso \code{\link{preprocessBam}} for preloading BAM data,
+#' \code{\link{generateCytosineReport}} for methylation statistics at the level
+#' of individual cytosines, \code{\link{generateBedReport}} for genomic
+#' region-based statistics, \code{\link{generateVcfReport}} for evaluating
+#' epiallele-SNV associations, \code{\link{generateBedEcdf}} for analysing the
+#' distribution of per-read beta values, and `epialleleR` vignettes for the
+#' description of usage and sample data.
+#' @examples
+#'   # amplicon data
+#'   amplicon.bam <- system.file("extdata", "amplicon010meth.bam",
+#'                               package="epialleleR")
+#'   amplicon.bed <- system.file("extdata", "amplicon.bed",
+#'                               package="epialleleR")
+#'   
+#'   # let's get our patterns
+#'   patterns <- extractPatterns(bam=amplicon.bam, bed=amplicon.bed, bed.row=2)
+#'   nrow(patterns)  # read pairs overlap genomic region of interest
+#'   
+#'   # these are positions of bases
+#'   base.positions <- grep("^[0-9]+$", colnames(patterns), value=TRUE)
+#'   
+#'   # let's make a summary table with counts of every pattern
+#'   patterns.summary <- patterns[, c(lapply(.SD, unique), .N),
+#'                                by=.(pattern, beta), .SDcols=base.positions]
+#'   nrow(patterns.summary)  # unique methylation patterns
+#'   
+#'   # let's melt and plot them
+#'   plot.data <- melt.data.table(patterns.summary, measure.vars=base.positions,
+#'                                variable.name="pos", value.name="base")
+#'   
+#'   # categorical positions, all patterns sorted by beta
+#'   if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
+#'     ggplot(na.omit(plot.data),
+#'            aes(x=pos, y=reorder(pattern,beta),
+#'                group=pattern, color=factor(base))) +
+#'       geom_line(color="grey", position=position_dodgev(height=0.5)) +
+#'       geom_point(position=position_dodgev(height=0.5)) +
+#'       scale_colour_grey(start=0.8, end=0) +
+#'       theme_light() +
+#'       theme(axis.text.x=element_text(angle=60, hjust=1, vjust=1)) +
+#'       labs(x="position", y="pattern", title="epialleles", color="base")
+#'   }
+#'   
+#'   # continuous positions, nonunique patterns according to their counts
+#'   if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
+#'     ggplot(na.omit(plot.data)[N>1],
+#'            aes(x=as.numeric(as.character(pos)), y=factor(N),
+#'                group=pattern, color=factor(base))) +
+#'       geom_line(color="grey", position=position_dodgev(height=0.5)) +
+#'       geom_point(position=position_dodgev(height=0.5)) +
+#'       scale_colour_grey(start=0.8, end=0) +
+#'       theme_light() +
+#'       labs(x="position", y="count", title="epialleles", color="base")
+#'   }
+#'   
+#' @export
 extractPatterns <- function (bam,
                              bed,
                              bed.row=1,

@@ -206,7 +206,8 @@ default value is 13) to obtain higher-quality results.
 \code{\link{preprocessBam}} for preloading BAM data,
 \code{\link{generateCytosineReport}} for methylation statistics at the level
 of individual cytosines, \code{\link{generateBedReport}} for genomic
-region-based statistics, \code{\link{generateBedEcdf}} for analysing the
+region-based statistics, \code{\link{extractPatterns}} for exploring
+methylation patterns, \code{\link{generateBedEcdf}} for analysing the
 distribution of per-read beta values, and `epialleleR` vignettes for the
 description of usage and sample data.
 
