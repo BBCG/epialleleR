@@ -45,7 +45,6 @@ Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame &df,                      
   boost::container::flat_map<T_key, T_key> pos_map;                             // all positions to figure out valid ones
   boost::container::flat_map<T_key, T_key>::iterator pos_hint = pos_map.begin();// position map iterator
   std::map<T_key, T_val> pat;                                                   // per-pattern methylation counts
-  // std::map<T_key, T_val>::iterator hint = pat.begin();                       // map iterator
   std::vector<int> pat_strand, pat_start, pat_end, pat_nbase;                   // pattern strands, starts, ends, number of bases within context
   std::vector<double> pat_beta;                                                 // pattern betas
   std::vector<std::string> pat_fnv;                                             // FNV-1a hashes of patterns
@@ -93,8 +92,8 @@ Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame &df,                      
   }
   
   for (auto it=pos_map.begin(); it!=pos_map.end(); it++) {
-    if ((double)it->second/npat >= min_ctx_freq)
-      pat.emplace(it->first, T_val (npat, NA_INTEGER));
+    if ((double)it->second/npat >= min_ctx_freq)                                // if position frequency in patterns is higher than the min
+      pat.emplace(it->first, T_val (npat, NA_INTEGER));                         // add position to the pattern map
   }
   
   npat = 0;
@@ -189,7 +188,7 @@ Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame &df,                      
 
 /*** R
 bam <- preprocessBam(bam.file=system.file("extdata", "amplicon010meth.bam", package="epialleleR"))
-z <- data.table::data.table(rcpp_extract_patterns(bam, 47, 43124861, 43125249, 1, "zZ", TRUE, 0))
+z <- data.table::data.table(rcpp_extract_patterns(bam, 47, 43124861, 43125249, 1, "zZ", 0.1, TRUE, 0))
 z[, c(lapply(.SD, unique), .N), by=pattern, .SDcols=grep("^X", colnames(z), value=TRUE)][order(-N)]
 */
 
