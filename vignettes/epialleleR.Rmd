@@ -359,7 +359,7 @@ if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
     labs(x="position", y="pattern", title="epialleles", color="base") +
     scale_x_discrete(expand=c(0.05,0)) +
     geom_text(inherit.aes=FALSE, data=patterns.summary,
-              mapping=aes(x=0, y=pattern, label=N), size=3)
+              mapping=aes(x="count", y=pattern, label=N), size=3)
 }
 
 # continuous positions, nonunique patterns according to their counts
