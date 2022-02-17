@@ -41,8 +41,8 @@
 #'   \item "CX" -- all cytosines
 #' }
 #' @param min.context.freq real number in the range [0;1] (default: 0.01).
-#' Genomic positions that are covered by smaller fraction of patterns won't be
-#' included in the report.
+#' Genomic positions that are covered by smaller fraction of patterns (e.g.,
+#' with erroneous context) won't be included in the report.
 #' @param clip.patterns boolean if patterns should not extend over the edge of
 #' `bed` region (default: FALSE).
 #' @param strand.offset single non-negative integer specifying the offset of
@@ -50,6 +50,11 @@
 #' to "merge" genomic positions when methylation is symmetric (in CG and CHG
 #' contexts). By default, equals 1 for `extract.context`=="CG", 2 for "CHG", or
 #' 0 otherwise.
+#' @param highlight.positions integer vector with genomic positions of bases
+#' to include in every overlapping pattern. Allows to visualize the
+#' distribution of single-nucleotide variations (SNVs) among methylation
+#' patterns. `highlight.positions` takes precedence if any of these positions
+#' overlap with within-the-context positions of methylation pattern.
 #' @param min.mapq non-negative integer threshold for minimum read mapping
 #' quality (default: 0). Option has no effect if preprocessed BAM data was
 #' supplied as an input.
@@ -80,7 +85,8 @@
 #'   \item pattern -- hex representation of 64-bit FNV-1a hash calculated for
 #'   all reported base positions and bases in this read (pair). This
 #'   hash value depends only on included genomic positions and their methylation
-#'   call string chars (hHxXzZ), thus it is expected to be unique for every
+#'   call string chars (hHxXzZ) or nucleotides (ACGT, for highlighted bases
+#'   only), thus it is expected to be unique for every
 #'   methylation pattern, although equal for identical methylation patterns
 #'   independently on read (pair) start, end, or strand (when correct
 #'   `strand.offset` is given)
@@ -103,7 +109,7 @@
 #'                               package="epialleleR")
 #'   
 #'   # let's get our patterns
-#'   patterns <- extractPatterns(bam=amplicon.bam, bed=amplicon.bed, bed.row=2)
+#'   patterns <- extractPatterns(bam=amplicon.bam, bed=amplicon.bed, bed.row=3)
 #'   nrow(patterns)  # read pairs overlap genomic region of interest
 #'   
 #'   # these are positions of bases
@@ -115,8 +121,8 @@
 #'   nrow(patterns.summary)  # unique methylation patterns
 #'   
 #'   # let's melt and plot them
-#'   plot.data <- melt.data.table(patterns.summary, measure.vars=base.positions,
-#'                                variable.name="pos", value.name="base")
+#'   plot.data <- data.table::melt.data.table(patterns.summary,
+#'     measure.vars=base.positions, variable.name="pos", value.name="base")
 #'   
 #'   # categorical positions, all patterns sorted by beta
 #'   if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
@@ -154,15 +160,17 @@ extractPatterns <- function (bam,
                              clip.patterns=FALSE,
                              strand.offset=c("CG"=1, "CHG"=2, "CHH"=0,
                                              "CxG"=0, "CX"=0)[extract.context],
+                             highlight.positions=c(),
                              min.mapq=0,
                              min.baseq=0,
                              skip.duplicates=FALSE,
                              nthreads=1,
                              verbose=TRUE)
 {
-  bed.row         <- as.integer(bed.row[1])
-  extract.context <- match.arg(extract.context, extract.context)
-  strand.offset   <- as.integer(strand.offset[1])
+  bed.row             <- as.integer(bed.row[1])
+  extract.context     <- match.arg(extract.context, extract.context)
+  strand.offset       <- as.integer(strand.offset[1])
+  highlight.positions <- as.integer(highlight.positions)
   
   if (!methods::is(bed, "GRanges"))
     bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed,
@@ -178,7 +186,8 @@ extractPatterns <- function (bam,
     extract.context=paste0(.context.to.bases[[extract.context]]
                            [c("ctx.meth","ctx.unmeth")], collapse=""),
     min.context.freq=min.context.freq, clip.patterns=clip.patterns,
-    strand.offset=strand.offset, verbose=verbose
+    strand.offset=strand.offset, highlight.positions=highlight.positions,
+    verbose=verbose
   )
   
   return(patterns)

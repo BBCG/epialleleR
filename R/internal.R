@@ -244,12 +244,6 @@ utils::globalVariables(
   # must be ordered
   cx.report <- rcpp_cx_report(bam.processed, pass, ctx)
   data.table::setDT(cx.report)
-  cx.report[, data.table::setattr(rname,   "class", "factor")]
-  cx.report[, data.table::setattr(rname,   "levels", levels(bam.processed$rname))]
-  cx.report[, data.table::setattr(strand,  "class", "factor")]
-  cx.report[, data.table::setattr(strand,  "levels", levels(bam.processed$strand))]
-  cx.report[, data.table::setattr(context, "class", "factor")]
-  cx.report[, data.table::setattr(context, "levels", c(NA,"CHH",NA,NA,NA,"CHG","CG"))]
 
   if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(cx.report)
@@ -416,22 +410,28 @@ utils::globalVariables(
 
 .getPatterns <- function (bam.processed, bed, bed.row, match.min.overlap,
                           extract.context, min.context.freq,
-                          clip.patterns, strand.offset,
+                          clip.patterns, strand.offset, highlight.positions,
                           verbose)
 {
   if (verbose) message("Extracting methylation patterns", appendLF=FALSE)
   tm <- proc.time()
   
-  bed.dt <- data.table::as.data.table(bed)
+  bed.dt <- data.table::as.data.table(bed)[bed.row]
   bed.dt[, seqnames := factor(seqnames, levels=levels(bam.processed$rname))]
   
+  highlight.positions <- sort(unique(
+    highlight.positions[highlight.positions>=bed.dt$start &
+                        highlight.positions<=bed.dt$end]
+  ))
+  
   patterns <- rcpp_extract_patterns(bam.processed,
-                                    as.integer(bed.dt$seqnames[bed.row]),
-                                    as.integer(bed.dt$start[bed.row]),
-                                    as.integer(bed.dt$end[bed.row]),
+                                    as.integer(bed.dt$seqnames),
+                                    as.integer(bed.dt$start),
+                                    as.integer(bed.dt$end),
                                     match.min.overlap, extract.context,
                                     min.context.freq,
-                                    clip.patterns, strand.offset)
+                                    clip.patterns, strand.offset,
+                                    highlight.positions)
   data.table::setDT(patterns)
   colnames(patterns) <- sub("^X([0-9]+)$", "\\1", colnames(patterns))
   
