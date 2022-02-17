@@ -14,6 +14,7 @@ extractPatterns(
   min.context.freq = 0.01,
   clip.patterns = FALSE,
   strand.offset = c(CG = 1, CHG = 2, CHH = 0, CxG = 0, CX = 0)[extract.context],
+  highlight.positions = c(),
   min.mapq = 0,
   min.baseq = 0,
   skip.duplicates = FALSE,
@@ -58,8 +59,8 @@ to report:
 }}
 
 \item{min.context.freq}{real number in the range [0;1] (default: 0.01).
-Genomic positions that are covered by smaller fraction of patterns won't be
-included in the report.}
+Genomic positions that are covered by smaller fraction of patterns (e.g.,
+with erroneous context) won't be included in the report.}
 
 \item{clip.patterns}{boolean if patterns should not extend over the edge of
 `bed` region (default: FALSE).}
@@ -69,6 +70,12 @@ bases at the reverse (-) strand compared to the forward (+) strand. Allows
 to "merge" genomic positions when methylation is symmetric (in CG and CHG
 contexts). By default, equals 1 for `extract.context`=="CG", 2 for "CHG", or
 0 otherwise.}
+
+\item{highlight.positions}{integer vector with genomic positions of bases
+to include in every overlapping pattern. Allows to visualize the
+distribution of single-nucleotide variations (SNVs) among methylation
+patterns. `highlight.positions` takes precedence if any of these positions
+overlap with within-the-context positions of methylation pattern.}
 
 \item{min.mapq}{non-negative integer threshold for minimum read mapping
 quality (default: 0). Option has no effect if preprocessed BAM data was
@@ -106,7 +113,8 @@ interest. The report columns are:
   \item pattern -- hex representation of 64-bit FNV-1a hash calculated for
   all reported base positions and bases in this read (pair). This
   hash value depends only on included genomic positions and their methylation
-  call string chars (hHxXzZ), thus it is expected to be unique for every
+  call string chars (hHxXzZ) or nucleotides (ACGT, for highlighted bases
+  only), thus it is expected to be unique for every
   methylation pattern, although equal for identical methylation patterns
   independently on read (pair) start, end, or strand (when correct
   `strand.offset` is given)
@@ -134,7 +142,7 @@ which can be used for plotting of DNA methylation patterns.
                               package="epialleleR")
   
   # let's get our patterns
-  patterns <- extractPatterns(bam=amplicon.bam, bed=amplicon.bed, bed.row=2)
+  patterns <- extractPatterns(bam=amplicon.bam, bed=amplicon.bed, bed.row=3)
   nrow(patterns)  # read pairs overlap genomic region of interest
   
   # these are positions of bases
@@ -146,8 +154,8 @@ which can be used for plotting of DNA methylation patterns.
   nrow(patterns.summary)  # unique methylation patterns
   
   # let's melt and plot them
-  plot.data <- melt.data.table(patterns.summary, measure.vars=base.positions,
-                               variable.name="pos", value.name="base")
+  plot.data <- data.table::melt.data.table(patterns.summary,
+    measure.vars=base.positions, variable.name="pos", value.name="base")
   
   # categorical positions, all patterns sorted by beta
   if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {

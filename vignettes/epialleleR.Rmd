@@ -145,6 +145,8 @@ sequencing), larger methylation capture panels, or even whole-genome approaches.
  hypermethylated alleles at the level of individual cytosines
  (*`generateCytosineReport`*) or supplied genomic regions
  (*`generateBedReport`*)
+ * DNA methylation patterns of genomic region of interest can be explored
+ using (*`extractPatterns`*)
  * Potential bimodality of methylation for genomic regions of interest can be
  assessed using *`generateBedEcdf`* method
  * The association of single-nucleotide variations with the epiallelic status
@@ -158,8 +160,8 @@ it up using additional decompression threads (`nthreads` option in
 *`preprocessBam`*). All operations are performed using optimised C++ functions,
 and usually take reasonable time.
 Running time for complete task "BAM on disk -> CX report on disk" depends on the
-size of the BAM file, and the speed is usually within the range of 20-30 MB/s
-(or 150-200 thousand reads per second) for a single core of a relatively
+size of the BAM file, and the speed is usually within the range of 30-50 MB/s
+(or 250-400 thousand reads per second) for a single core of a relatively
 modern CPU (Intel(R) Core(TM) i7-7700).
 
 Major bottlenecks (in BAM loading and preprocessing) were removed in the release
@@ -312,6 +314,92 @@ bed.report <- generateBedReport(
 identical(capture.report, bed.report)
 ```
 
+## Exploring DNA methylation patterns
+
+Individual epialleles can be extracted and plotted in order to visualize
+methylation patters within a genomic region of interest.  For this,
+*`epialleleR`* provides method *`extractPatterns`* which can be used as follows:
+
+```{r, fig.width=10, fig.height=6, out.width="100%", out.height="100%"}
+# First, let's extract base methylation information for sequencing reads
+# of 1:9 mix of methylated and non-methylated control DNA
+patterns <- extractPatterns(
+  bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
+  bed=as("chr17:43125200-43125600","GRanges")
+)
+
+# that many read pairs overlap genomic region of interest
+nrow(patterns)
+
+# these are positions of bases within relevant read pairs
+base.positions <- grep("^[0-9]+$", colnames(patterns), value=TRUE)
+
+# let's make a summary table with counts for every pattern
+patterns.summary <- patterns[, c(lapply(.SD, unique), .N),
+                             by=.(pattern, beta), .SDcols=base.positions]
+
+# that many unique methylation patterns were found
+nrow(patterns.summary)
+
+# let's melt and plot patterns
+plot.data <- data.table::melt.data.table(patterns.summary,
+  measure.vars=base.positions, variable.name="pos", value.name="base")
+
+# categorical positions, all patterns sorted by beta, with counts on the left
+if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
+  ggplot(na.omit(plot.data),
+         aes(x=pos, y=reorder(pattern,beta),
+             group=pattern, color=factor(base))) +
+    geom_line(color="grey", position=position_dodgev(height=0.5)) +
+    geom_point(position=position_dodgev(height=0.5)) +
+    scale_colour_grey(start=0.8, end=0) +
+    theme_light() +
+    theme(axis.text.x=element_text(angle=60, hjust=1, vjust=1),
+          axis.text.y=element_blank()) +
+    labs(x="position", y="pattern", title="epialleles", color="base") +
+    scale_x_discrete(expand=c(0.05,0)) +
+    geom_text(inherit.aes=FALSE, data=patterns.summary,
+              mapping=aes(x=0, y=pattern, label=N), size=3)
+}
+
+# continuous positions, nonunique patterns according to their counts
+if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
+  ggplot(na.omit(plot.data)[N>1],
+         aes(x=as.numeric(as.character(pos)), y=factor(N),
+             group=pattern, color=factor(base))) +
+    geom_line(color="grey", position=position_dodgev(height=0.5)) +
+    geom_point(position=position_dodgev(height=0.5)) +
+    scale_colour_grey(start=0.8, end=0) +
+    theme_light() +
+    labs(x="position", y="count", title="epialleles", color="base")
+}
+
+# now let's explore methylation patterns in RAD51C gene promoter using
+# methylation capture data
+capture.patterns <- extractPatterns(
+  bam=system.file("extdata", "capture.bam", package="epialleleR"),
+  bed=as("chr17:58691673-58693108", "GRanges"),
+  verbose=FALSE
+)
+capture.positions <- grep("^[0-9]+$", colnames(capture.patterns), value=TRUE)
+capture.summary <-
+  capture.patterns[, c(lapply(.SD, unique), .N),
+                   by=.(pattern, beta), .SDcols=capture.positions]
+capture.data <- data.table::melt.data.table(capture.summary,
+  measure.vars=capture.positions, variable.name="pos", value.name="base")
+if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
+  ggplot(na.omit(capture.data),
+         aes(x=as.numeric(as.character(pos)), y=factor(N),
+             group=pattern, color=factor(base))) +
+    geom_line(color="grey", position=position_dodgev(height=0.9)) +
+    geom_point(position=position_dodgev(height=0.9)) +
+    scale_colour_grey(start=0.8, end=0) +
+    theme_light() +
+    labs(x="position", y="count", title="RAD51C", color="base")
+}
+```
+
+
 ## Plotting the distribution of per-read beta values
 
 As stated in the introduction, human genomic DNA regions often show bimodal
@@ -440,6 +528,33 @@ head(vcf.report[order(`FEp-`, na.last=TRUE)])
 
 # and to the "-" strand
 head(vcf.report[order(`FEp+`, na.last=TRUE)])
+
+# and finally, let's plot methylation patterns overlapping one of the most
+# covered SNPs in the methylation capture test data set - rs573296191
+# (chr17:61864584) in BRIP1 gene
+vcf.report[order(-SumRef-SumAlt)][1]
+brip1.patterns <- extractPatterns(
+  bam=system.file("extdata", "capture.bam", package="epialleleR"),
+  bed=as("chr17:61864583-61864585", "GRanges"),
+  highlight.positions=61864584,
+  verbose=FALSE
+)
+brip1.positions <- grep("^[0-9]+$", colnames(brip1.patterns), value=TRUE)
+brip1.summary <-
+  brip1.patterns[, c(lapply(.SD, unique), .N),
+                 by=.(pattern, beta), .SDcols=brip1.positions]
+brip1.data <- data.table::melt.data.table(brip1.summary,
+  measure.vars=brip1.positions, variable.name="pos", value.name="base")
+if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
+  ggplot(na.omit(brip1.data),
+         aes(x=as.numeric(as.character(pos)), y=factor(N),
+             group=pattern, color=factor(base))) +
+    geom_line(color="grey", position=position_dodgev(height=0.9)) +
+    geom_point(position=position_dodgev(height=0.9)) +
+    scale_colour_manual(values=c("blue","red","grey80","black")) +
+    theme_light() +
+    labs(x="position", y="count", title="BRIP1", color="base")
+}
 ```
 
 *****
