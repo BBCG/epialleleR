@@ -17,28 +17,39 @@ substituted with some other method in the future.
 *`epialleleR`* is an R package for calling hypermethylated variant epiallele
 frequencies (VEF) at the level of genomic regions or individual cytosines
 in next-generation sequencing data using binary alignment map (BAM) files as
-an input. Other functionality includes computing the empirical cumulative
-distribution function for per-read beta values, and testing the significance
-of the association between epiallele methylation status and base frequencies
-at particular genomic positions (SNPs).
+an input. Other functionality includes extracting methylation patterns,
+computing the empirical cumulative distribution function for per-read beta
+values, and testing the significance of the association between epiallele
+methylation status and base frequencies at particular genomic positions (SNPs).
 
 ### Current Features
 
  * conventional reporting of cytosine methylation (*`generateCytosineReport`*)
  * calling the hypermethylated variant epiallele frequency (VEF) at the
- level of genomic regions (*`generateBedReport`*) or individual cytosines
- (*`generateCytosineReport`*)
+ level of genomic regions (*`generate[Bed|Amplicon|Capture]Report`*) or
+ individual cytosines (*`generateCytosineReport`*)
+ * extracting methylation patterns for genomic region of interest
+ (*`extractPatterns`*)
  * assessing the distribution of per-read beta values for genomic regions of
  interest (*`generateBedEcdf`*)
  * testing for the association between epiallele methylation
  status and sequence variations (*`generateVcfReport`*)
 
-### Recent improvements (v1.2)
+### Recent improvements
+
+##### v1.4
+
+ * significant speed-up
+ * method to visualize methylation patterns
+
+##### v1.2
 
  * even faster and more memory-efficient BAM loading (by means of HTSlib)
  * min.baseq parameter to reduce the effect of low quality bases on 
  methylation or SNV calling (in v1.0 the output of *`generateVcfReport`* was
  equivalent to the one of `samtools mpileup -Q 0 ...`)
+
+check out NEWS for more!
  
 -------
 
@@ -84,6 +95,9 @@ amplicon.vcf <- system.file("extdata", "amplicon.vcf.gz", package="epialleleR")
 # preloading the data
 bam.data <- preprocessBam(amplicon.bam)
 
+# methylation patterns, check vignettes or method description for plotting them
+patterns <- extractPatterns(bam=amplicon.bam, bed=amplicon.bed, bed.row=3)
+
 # CpG VEF report for individual bases
 cg.vef.report <- generateCytosineReport(bam.data)
 
@@ -110,4 +124,4 @@ The citation information will be updated in the nearest future.
 
 License
 ---------
-Artistic License/GPL
+Artistic License 2.0

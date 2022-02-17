@@ -56,3 +56,7 @@ Changes in version 1.1.9 (2021-09-19)
 
 Changes in version 1.3.2 (2021-12-24)
 + more efficient data handling (XPtr instead of Rcpp::wrap'ping)
+
+Changes in version 1.3.6 (2022-02-16)
++ significant speed-up (1.3.5)
++ methylation patterns
