@@ -24,8 +24,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_extract_patterns
-Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame& df, unsigned int target_rname, unsigned int target_start, unsigned int target_end, signed int min_overlap, std::string& ctx, double min_ctx_freq, bool clip, unsigned int reverse_offset);
-RcppExport SEXP _epialleleR_rcpp_extract_patterns(SEXP dfSEXP, SEXP target_rnameSEXP, SEXP target_startSEXP, SEXP target_endSEXP, SEXP min_overlapSEXP, SEXP ctxSEXP, SEXP min_ctx_freqSEXP, SEXP clipSEXP, SEXP reverse_offsetSEXP) {
+Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame& df, unsigned int target_rname, unsigned int target_start, unsigned int target_end, signed int min_overlap, std::string& ctx, double min_ctx_freq, bool clip, unsigned int reverse_offset, Rcpp::IntegerVector& hlght);
+RcppExport SEXP _epialleleR_rcpp_extract_patterns(SEXP dfSEXP, SEXP target_rnameSEXP, SEXP target_startSEXP, SEXP target_endSEXP, SEXP min_overlapSEXP, SEXP ctxSEXP, SEXP min_ctx_freqSEXP, SEXP clipSEXP, SEXP reverse_offsetSEXP, SEXP hlghtSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -38,7 +38,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type min_ctx_freq(min_ctx_freqSEXP);
     Rcpp::traits::input_parameter< bool >::type clip(clipSEXP);
     Rcpp::traits::input_parameter< unsigned int >::type reverse_offset(reverse_offsetSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_extract_patterns(df, target_rname, target_start, target_end, min_overlap, ctx, min_ctx_freq, clip, reverse_offset));
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector& >::type hlght(hlghtSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_extract_patterns(df, target_rname, target_start, target_end, min_overlap, ctx, min_ctx_freq, clip, reverse_offset, hlght));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -142,7 +143,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_epialleleR_rcpp_cx_report", (DL_FUNC) &_epialleleR_rcpp_cx_report, 3},
-    {"_epialleleR_rcpp_extract_patterns", (DL_FUNC) &_epialleleR_rcpp_extract_patterns, 9},
+    {"_epialleleR_rcpp_extract_patterns", (DL_FUNC) &_epialleleR_rcpp_extract_patterns, 10},
     {"_epialleleR_rcpp_fep", (DL_FUNC) &_epialleleR_rcpp_fep, 2},
     {"_epialleleR_rcpp_get_base_freqs", (DL_FUNC) &_epialleleR_rcpp_get_base_freqs, 3},
     {"_epialleleR_rcpp_get_xm_beta", (DL_FUNC) &_epialleleR_rcpp_get_xm_beta, 3},
