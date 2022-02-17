@@ -532,7 +532,6 @@ head(vcf.report[order(`FEp+`, na.last=TRUE)])
 # and finally, let's plot methylation patterns overlapping one of the most
 # covered SNPs in the methylation capture test data set - rs573296191
 # (chr17:61864584) in BRIP1 gene
-vcf.report[order(-SumRef-SumAlt)][1]
 brip1.patterns <- extractPatterns(
   bam=system.file("extdata", "capture.bam", package="epialleleR"),
   bed=as("chr17:61864583-61864585", "GRanges"),
