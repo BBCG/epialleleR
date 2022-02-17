@@ -345,7 +345,7 @@ nrow(patterns.summary)
 plot.data <- data.table::melt.data.table(patterns.summary,
   measure.vars=base.positions, variable.name="pos", value.name="base")
 
-# categorical positions, all patterns sorted by beta, with counts on the left
+# categorical positions, all patterns sorted by beta, with counts on the right
 if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
   ggplot(na.omit(plot.data),
          aes(x=pos, y=reorder(pattern,beta),
