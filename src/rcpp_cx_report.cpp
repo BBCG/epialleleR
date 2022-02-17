@@ -27,7 +27,7 @@
 // 2) when gap in reads or another chr - spit map to res, clear map
 // 3) spit if within context and same context in more than 50% of the reads
 // 
-// Here's the ctx_to_idx convertion:
+// Here's the ctx_to_idx conversion:
 // ctx  bin       +2        >>2&15  idx
 // +    00101011  00101101  1011    11
 // -    00101101  00101111  1011    11
@@ -146,6 +146,22 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
     Rcpp::Named("meth") = res_meth,                                             // number of methylated
     Rcpp::Named("unmeth") = res_unmeth                                          // number of unmethylated
   );
+  
+  Rcpp::IntegerVector col_rname = res["rname"];                                 // making rname a factor
+  col_rname.attr("class") = "factor";
+  col_rname.attr("levels") = rname.attr("levels");
+  
+  Rcpp::IntegerVector col_strand = res["strand"];;                              // making strand a factor
+  col_strand.attr("class") = "factor";
+  col_strand.attr("levels") = strand.attr("levels");
+  
+  Rcpp::CharacterVector contexts = Rcpp::CharacterVector::create(               // base contexts
+    "NA1","CHH","NA3","NA4","NA5","CHG","CG"
+  );
+  Rcpp::IntegerVector col_context = res["context"];;                            // making context a factor
+  col_context.attr("class") = "factor";
+  col_context.attr("levels") = contexts;
+  
   
   return res;
 }

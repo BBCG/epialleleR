@@ -177,25 +177,24 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   free(templ_xm_rs);
   
   // wrap and return the results
+  Rcpp::DataFrame res = Rcpp::DataFrame::create(                                // final DF
+    Rcpp::Named("rname") = rname,                                               // numeric ids (factor) for reference names
+    Rcpp::Named("strand") = strand,                                             // numeric ids (factor) for reference strands
+    Rcpp::Named("start") = start                                                // start positions of reads
+  );
+  
+  // factor levels
   std::vector<std::string> chromosomes (                                        // vector of reference names
       bam_hdr->target_name, bam_hdr->target_name + bam_hdr->n_targets);
   std::vector<std::string> strands = {"+", "-"};
-  // make rname a factor
-  Rcpp::IntegerVector w_rname = Rcpp::wrap(rname);
-  w_rname.attr("class") = "factor";
-  w_rname.attr("levels") = chromosomes;
-  // make strand a factor
-  Rcpp::IntegerVector w_strand = Rcpp::wrap(strand);
-  w_strand.attr("class") = "factor";
-  w_strand.attr("levels") = strands;
   
-  Rcpp::DataFrame res = Rcpp::DataFrame::create(                                // final DF
-    Rcpp::Named("rname") = w_rname,                                             // numeric ids (factor) for reference names
-    Rcpp::Named("strand") = w_strand,                                           // numeric ids (factor) for reference strands
-    Rcpp::Named("start") = start                                                // start positions of reads
-    // Rcpp::Named("seq") = seq,                                                   // sequences
-    // Rcpp::Named("XM") = xm                                                      // methylation strings
-  );
+  Rcpp::IntegerVector col_rname = res["rname"];                                 // make rname a factor
+  col_rname.attr("class") = "factor";
+  col_rname.attr("levels") = chromosomes;
+  
+  Rcpp::IntegerVector col_strand = res["strand"];                               // make strand a factor
+  col_strand.attr("class") = "factor";
+  col_strand.attr("levels") = strands;
   
   Rcpp::XPtr<std::vector<std::string>> seq_xptr(seq, true);
   res.attr("seq_xptr") = seq_xptr;                                              // external pointer to sequences
