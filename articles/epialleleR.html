@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.6</span>
       </span>
     </div>
 
@@ -68,7 +68,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>The epialleleR User’s Guide</h1>
             
-            <h4 data-toc-skip class="date">02 February, 2022</h4>
+            <h4 data-toc-skip class="date">17 February, 2022</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BBCG/epialleleR/blob/HEAD/vignettes/epialleleR.Rmd" class="external-link"><code>vignettes/epialleleR.Rmd</code></a></small>
       <div class="hidden name"><code>epialleleR.Rmd</code></div>
@@ -97,6 +97,7 @@
 </h3>
 <ul>
 <li>In addition to conventional reporting of cytosine DNA methylation levels (beta values), <em><code>epialleleR</code></em> can call variant epiallele frequencies (VEF) of hypermethylated alleles at the level of individual cytosines (<em><code>generateCytosineReport</code></em>) or supplied genomic regions (<em><code>generateBedReport</code></em>)</li>
+<li>DNA methylation patterns of genomic region of interest can be explored using (<em><code>extractPatterns</code></em>)</li>
 <li>Potential bimodality of methylation for genomic regions of interest can be assessed using <em><code>generateBedEcdf</code></em> method</li>
 <li>The association of single-nucleotide variations with the epiallelic status can be tested using <em><code>generateVcfReport</code></em>
 </li>
@@ -105,7 +106,7 @@
 <div class="section level3">
 <h3 id="processing-speed">Processing speed<a class="anchor" aria-label="anchor" href="#processing-speed"></a>
 </h3>
-<p>Currently <em><code>epialleleR</code></em> runs in a single-thread mode only. Loading the BAM data is now done by means of <em><code>HTSlib</code></em>, therefore it is possible to speed it up using additional decompression threads (<code>nthreads</code> option in <em><code>preprocessBam</code></em>). All operations are performed using optimised C++ functions, and usually take reasonable time. Running time for complete task “BAM on disk -&gt; CX report on disk” depends on the size of the BAM file, and the speed is usually within the range of 20-30 MB/s (or 150-200 thousand reads per second) for a single core of a relatively modern CPU (Intel(R) Core(TM) i7-7700).</p>
+<p>Currently <em><code>epialleleR</code></em> runs in a single-thread mode only. Loading the BAM data is now done by means of <em><code>HTSlib</code></em>, therefore it is possible to speed it up using additional decompression threads (<code>nthreads</code> option in <em><code>preprocessBam</code></em>). All operations are performed using optimised C++ functions, and usually take reasonable time. Running time for complete task “BAM on disk -&gt; CX report on disk” depends on the size of the BAM file, and the speed is usually within the range of 30-50 MB/s (or 250-400 thousand reads per second) for a single core of a relatively modern CPU (Intel(R) Core(TM) i7-7700).</p>
 <p>Major bottlenecks (in BAM loading and preprocessing) were removed in the release v1.2, full multithreading and minor improvements are expected in the future.</p>
 <hr>
 </div>
@@ -214,7 +215,7 @@
 
 <span class="va">capture.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="va">bam.data</span>    <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preprocessBam.html">preprocessBam</a></span><span class="op">(</span><span class="va">capture.bam</span><span class="op">)</span>
-<span class="co">#&gt; Reading BAM file [0.025s]</span></code></pre></div>
+<span class="co">#&gt; Reading BAM file [0.027s]</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="making-cytosine-reports">Making cytosine reports<a class="anchor" aria-label="anchor" href="#making-cytosine-reports"></a>
@@ -226,8 +227,8 @@
 <span class="co"># CpG VEF report</span>
 <span class="va">cg.vef.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span><span class="op">)</span>
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq', 'min.baseq', 'skip.duplicates' and 'nthreads' will have no effect.</span>
-<span class="co">#&gt; Thresholding reads [0.002s]</span>
-<span class="co">#&gt; Preparing cytosine report [0.025s]</span>
+<span class="co">#&gt; Thresholding reads [0.001s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.016s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cg.vef.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;    rname strand      pos context meth unmeth</span>
 <span class="co">#&gt; 1: chr17      + 61864475      CG    7      9</span>
@@ -240,7 +241,7 @@
 <span class="co"># CpG cytosine report</span>
 <span class="va">cg.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq', 'min.baseq', 'skip.duplicates' and 'nthreads' will have no effect.</span>
-<span class="co">#&gt; Preparing cytosine report [0.022s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.016s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cg.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;    rname strand      pos context meth unmeth</span>
 <span class="co">#&gt; 1: chr17      + 61864475      CG    8      8</span>
@@ -254,7 +255,7 @@
 <span class="va">cx.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span>,
                                     report.context<span class="op">=</span><span class="st">"CX"</span><span class="op">)</span>
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq', 'min.baseq', 'skip.duplicates' and 'nthreads' will have no effect.</span>
-<span class="co">#&gt; Preparing cytosine report [0.867s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.019s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cx.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;    rname strand      pos context meth unmeth</span>
 <span class="co">#&gt; 1: chr17      + 61864338     CHG    1     25</span>
@@ -276,10 +277,10 @@
   bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.065s]</span>
-<span class="co">#&gt; Reading BAM file [0.007s]</span>
+<span class="co">#&gt; Reading BED file [0.053s]</span>
+<span class="co">#&gt; Reading BAM file [0.006s]</span>
 <span class="co">#&gt; Thresholding reads [0.000s]</span>
-<span class="co">#&gt; Preparing amplicon report [0.053s]</span>
+<span class="co">#&gt; Preparing amplicon report [0.050s]</span>
 <span class="va">amplicon.report</span>
 <span class="co">#&gt;    seqnames    start      end width strand amplicon nreads+ nreads-        VEF</span>
 <span class="co">#&gt; 1:    chr17 43125624 43126026   403      * CpG00-13       0     156 0.08333333</span>
@@ -294,10 +295,10 @@
   bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.038s]</span>
-<span class="co">#&gt; Reading BAM file [0.021s]</span>
-<span class="co">#&gt; Thresholding reads [0.002s]</span>
-<span class="co">#&gt; Preparing capture report [0.023s]</span>
+<span class="co">#&gt; Reading BED file [0.037s]</span>
+<span class="co">#&gt; Reading BAM file [0.020s]</span>
+<span class="co">#&gt; Thresholding reads [0.001s]</span>
+<span class="co">#&gt; Preparing capture report [0.022s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">capture.report</span><span class="op">)</span>
 <span class="co">#&gt;    seqnames    start      end width strand     V4 nreads+ nreads-       VEF</span>
 <span class="co">#&gt; 1:     chr1  3067647  3069703  2057      * PRDM16       2       1 1.0000000</span>
@@ -314,11 +315,108 @@
   bed.type<span class="op">=</span><span class="st">"capture"</span>
 <span class="op">)</span>
 <span class="co">#&gt; Reading BED file [0.012s]</span>
-<span class="co">#&gt; Reading BAM file [0.019s]</span>
-<span class="co">#&gt; Thresholding reads [0.001s]</span>
-<span class="co">#&gt; Preparing capture report [0.023s]</span>
+<span class="co">#&gt; Reading BAM file [0.015s]</span>
+<span class="co">#&gt; Thresholding reads [0.002s]</span>
+<span class="co">#&gt; Preparing capture report [0.022s]</span>
 <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">capture.report</span>, <span class="va">bed.report</span><span class="op">)</span>
 <span class="co">#&gt; [1] TRUE</span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="exploring-dna-methylation-patterns">Exploring DNA methylation patterns<a class="anchor" aria-label="anchor" href="#exploring-dna-methylation-patterns"></a>
+</h3>
+<p>Individual epialleles can be extracted and plotted in order to visualize methylation patters within a genomic region of interest. For this, <em><code>epialleleR</code></em> provides method <em><code>extractPatterns</code></em> which can be used as follows:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># First, let's extract base methylation information for sequencing reads</span>
+<span class="co"># of 1:9 mix of methylated and non-methylated control DNA</span>
+<span class="va">patterns</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extractPatterns.html">extractPatterns</a></span><span class="op">(</span>
+  bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
+  bed<span class="op">=</span><span class="fu">as</span><span class="op">(</span><span class="st">"chr17:43125200-43125600"</span>,<span class="st">"GRanges"</span><span class="op">)</span>
+<span class="op">)</span>
+<span class="co">#&gt; Reading BAM file [0.006s]</span>
+<span class="co">#&gt; Extracting methylation patterns [0.026s]</span>
+
+<span class="co"># that many read pairs overlap genomic region of interest</span>
+<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">patterns</span><span class="op">)</span>
+<span class="co">#&gt; [1] 238</span>
+
+<span class="co"># these are positions of bases within relevant read pairs</span>
+<span class="va">base.positions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"^[0-9]+$"</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">patterns</span><span class="op">)</span>, value<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
+
+<span class="co"># let's make a summary table with counts for every pattern</span>
+<span class="va">patterns.summary</span> <span class="op">&lt;-</span> <span class="va">patterns</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">.SD</span>, <span class="va">unique</span><span class="op">)</span>, <span class="va">.N</span><span class="op">)</span>,
+                             by<span class="op">=</span><span class="fu">.</span><span class="op">(</span><span class="va">pattern</span>, <span class="va">beta</span><span class="op">)</span>, .SDcols<span class="op">=</span><span class="va">base.positions</span><span class="op">]</span>
+
+<span class="co"># that many unique methylation patterns were found</span>
+<span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">patterns.summary</span><span class="op">)</span>
+<span class="co">#&gt; [1] 45</span>
+
+<span class="co"># let's melt and plot patterns</span>
+<span class="va">plot.data</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/melt.data.table.html" class="external-link">melt.data.table</a></span><span class="op">(</span><span class="va">patterns.summary</span>,
+  measure.vars<span class="op">=</span><span class="va">base.positions</span>, variable.name<span class="op">=</span><span class="st">"pos"</span>, value.name<span class="op">=</span><span class="st">"base"</span><span class="op">)</span>
+
+<span class="co"># categorical positions, all patterns sorted by beta, with counts on the left</span>
+<span class="kw">if</span> <span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;</span> <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://github.com/lionel-/ggstance" class="external-link">"ggstance"</a></span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">plot.data</span><span class="op">)</span>,
+         <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">pos</span>, y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/reorder.factor.html" class="external-link">reorder</a></span><span class="op">(</span><span class="va">pattern</span>,<span class="va">beta</span><span class="op">)</span>,
+             group<span class="op">=</span><span class="va">pattern</span>, color<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">base</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"grey"</span>, position<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ggstance/man/position-vertical.html" class="external-link">position_dodgev</a></span><span class="op">(</span>height<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>position<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ggstance/man/position-vertical.html" class="external-link">position_dodgev</a></span><span class="op">(</span>height<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_grey.html" class="external-link">scale_colour_grey</a></span><span class="op">(</span>start<span class="op">=</span><span class="fl">0.8</span>, end<span class="op">=</span><span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle<span class="op">=</span><span class="fl">60</span>, hjust<span class="op">=</span><span class="fl">1</span>, vjust<span class="op">=</span><span class="fl">1</span><span class="op">)</span>,
+          axis.text.y<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x<span class="op">=</span><span class="st">"position"</span>, y<span class="op">=</span><span class="st">"pattern"</span>, title<span class="op">=</span><span class="st">"epialleles"</span>, color<span class="op">=</span><span class="st">"base"</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_discrete.html" class="external-link">scale_x_discrete</a></span><span class="op">(</span>expand<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span>inherit.aes<span class="op">=</span><span class="cn">FALSE</span>, data<span class="op">=</span><span class="va">patterns.summary</span>,
+              mapping<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="fl">0</span>, y<span class="op">=</span><span class="va">pattern</span>, label<span class="op">=</span><span class="va">N</span><span class="op">)</span>, size<span class="op">=</span><span class="fl">3</span><span class="op">)</span>
+<span class="op">}</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Attaching package: 'ggstance'</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; The following objects are masked from 'package:ggplot2':</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     geom_errorbarh, GeomErrorbarh</span></code></pre></div>
+<p><img src="epialleleR_files/figure-html/unnamed-chunk-5-1.png" width="100%" height="100%"></p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="co"># continuous positions, nonunique patterns according to their counts</span>
+<span class="kw">if</span> <span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;</span> <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://github.com/lionel-/ggstance" class="external-link">"ggstance"</a></span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">plot.data</span><span class="op">)</span><span class="op">[</span><span class="va">N</span><span class="op">&gt;</span><span class="fl">1</span><span class="op">]</span>,
+         <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">pos</span><span class="op">)</span><span class="op">)</span>, y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span>,
+             group<span class="op">=</span><span class="va">pattern</span>, color<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">base</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"grey"</span>, position<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ggstance/man/position-vertical.html" class="external-link">position_dodgev</a></span><span class="op">(</span>height<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>position<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ggstance/man/position-vertical.html" class="external-link">position_dodgev</a></span><span class="op">(</span>height<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_grey.html" class="external-link">scale_colour_grey</a></span><span class="op">(</span>start<span class="op">=</span><span class="fl">0.8</span>, end<span class="op">=</span><span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x<span class="op">=</span><span class="st">"position"</span>, y<span class="op">=</span><span class="st">"count"</span>, title<span class="op">=</span><span class="st">"epialleles"</span>, color<span class="op">=</span><span class="st">"base"</span><span class="op">)</span>
+<span class="op">}</span></code></pre></div>
+<p><img src="epialleleR_files/figure-html/unnamed-chunk-5-2.png" width="100%" height="100%"></p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="co"># now let's explore methylation patterns in RAD51C gene promoter using</span>
+<span class="co"># methylation capture data</span>
+<span class="va">capture.patterns</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extractPatterns.html">extractPatterns</a></span><span class="op">(</span>
+  bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
+  bed<span class="op">=</span><span class="fu">as</span><span class="op">(</span><span class="st">"chr17:58691673-58693108"</span>, <span class="st">"GRanges"</span><span class="op">)</span>,
+  verbose<span class="op">=</span><span class="cn">FALSE</span>
+<span class="op">)</span>
+<span class="va">capture.positions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"^[0-9]+$"</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">capture.patterns</span><span class="op">)</span>, value<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">capture.summary</span> <span class="op">&lt;-</span>
+  <span class="va">capture.patterns</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">.SD</span>, <span class="va">unique</span><span class="op">)</span>, <span class="va">.N</span><span class="op">)</span>,
+                   by<span class="op">=</span><span class="fu">.</span><span class="op">(</span><span class="va">pattern</span>, <span class="va">beta</span><span class="op">)</span>, .SDcols<span class="op">=</span><span class="va">capture.positions</span><span class="op">]</span>
+<span class="va">capture.data</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/melt.data.table.html" class="external-link">melt.data.table</a></span><span class="op">(</span><span class="va">capture.summary</span>,
+  measure.vars<span class="op">=</span><span class="va">capture.positions</span>, variable.name<span class="op">=</span><span class="st">"pos"</span>, value.name<span class="op">=</span><span class="st">"base"</span><span class="op">)</span>
+<span class="kw">if</span> <span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;</span> <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://github.com/lionel-/ggstance" class="external-link">"ggstance"</a></span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">capture.data</span><span class="op">)</span>,
+         <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">pos</span><span class="op">)</span><span class="op">)</span>, y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span>,
+             group<span class="op">=</span><span class="va">pattern</span>, color<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">base</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"grey"</span>, position<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ggstance/man/position-vertical.html" class="external-link">position_dodgev</a></span><span class="op">(</span>height<span class="op">=</span><span class="fl">0.9</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>position<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ggstance/man/position-vertical.html" class="external-link">position_dodgev</a></span><span class="op">(</span>height<span class="op">=</span><span class="fl">0.9</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_grey.html" class="external-link">scale_colour_grey</a></span><span class="op">(</span>start<span class="op">=</span><span class="fl">0.8</span>, end<span class="op">=</span><span class="fl">0</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x<span class="op">=</span><span class="st">"position"</span>, y<span class="op">=</span><span class="st">"count"</span>, title<span class="op">=</span><span class="st">"RAD51C"</span>, color<span class="op">=</span><span class="st">"base"</span><span class="op">)</span>
+<span class="op">}</span></code></pre></div>
+<p><img src="epialleleR_files/figure-html/unnamed-chunk-5-3.png" width="100%" height="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="plotting-the-distribution-of-per-read-beta-values">Plotting the distribution of per-read beta values<a class="anchor" aria-label="anchor" href="#plotting-the-distribution-of-per-read-beta-values"></a>
@@ -330,7 +428,7 @@
 <li>1:9 mix of methylated and non-methylated DNA — expected VEF = 0.1, observed 1-eCDF(0.5) ≈ 0.1</li>
 <li>and fully methylated DNA — expected VEF = 1, observed 1-eCDF(0.5) ≈ 1</li>
 </ul>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># First, let's visualise eCDFs for within- and out-of-context beta values</span>
 <span class="co"># for all four amplicons and unmatched reads. Note that within-the-context eCDF</span>
 <span class="co"># of 0.5 is very close to the expected 1-VEF value (0.1) for all amplicons</span>
@@ -343,8 +441,8 @@
   bed.rows<span class="op">=</span><span class="cn">NULL</span>
 <span class="op">)</span>
 <span class="co">#&gt; Reading BED file [0.010s]</span>
-<span class="co">#&gt; Reading BAM file [0.006s]</span>
-<span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.016s]</span>
+<span class="co">#&gt; Reading BAM file [0.009s]</span>
+<span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.013s]</span>
 
 <span class="co"># there are 5 items in amplicon.ecdfs, let's plot all of them</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
@@ -365,8 +463,8 @@
   <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">[[</span><span class="va">x</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">out.of.context</span>, add<span class="op">=</span><span class="cn">TRUE</span>, col<span class="op">=</span><span class="st">"blue"</span>,
        verticals<span class="op">=</span><span class="cn">TRUE</span>, do.points<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
-<p><img src="epialleleR_files/figure-html/unnamed-chunk-5-1.png" width="100%" height="100%"></p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<p><img src="epialleleR_files/figure-html/unnamed-chunk-6-1.png" width="100%" height="100%"></p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 
 <span class="co"># Second, let's compare eCDFs for within-the-context beta values for only one</span>
@@ -399,7 +497,7 @@
   <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">out.of.context</span>, add<span class="op">=</span><span class="cn">TRUE</span>, col<span class="op">=</span><span class="st">"blue"</span>,
        verticals<span class="op">=</span><span class="cn">TRUE</span>, do.points<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 <span class="op">}</span></code></pre></div>
-<p><img src="epialleleR_files/figure-html/unnamed-chunk-5-2.png" width="100%" height="100%"></p>
+<p><img src="epialleleR_files/figure-html/unnamed-chunk-6-2.png" width="100%" height="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="exploring-sequence-variants-in-epialleles">Exploring sequence variants in epialleles<a class="anchor" aria-label="anchor" href="#exploring-sequence-variants-in-epialleles"></a>
@@ -407,7 +505,7 @@
 <p>It is known that sequence variants can affect the methylation status of a DNA<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>. The <em><code>generateVcfReport</code></em> function calculates frequencies of single nucleotide variants (SNVs) within epialleles and tests for the association between SNV and epiallelic status using Fisher Exact test. Base counts and the test’s p-values are included in the returned value.</p>
 <p>In addition to BAM file location string or preprocessed BAM object, the function requires a location string for the Variant Call Format (VCF) file or the VCF object that was obtained using <em><code><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html" class="external-link">VariantAnnotation::readVcf</a></code></em> function. As VCF files can be extremely large, it is strongly advised to prefilter the VCF object by the relevant set of genomic regions, or specify such relevant set of regions as a <em><code>bed</code></em> parameter when <em><code>vcf</code></em> points to a VCF file location.</p>
 <p>Please note, that the output report is currently limited to SNVs only. Also, the default (<code>min.baseq=0</code>) output of <code>generateVcfReport</code> is equivalent to the one of <code>samtools mplieup -Q 0 ...</code>, and therefore may result in false SNVs caused by misalignments. Remember to increase <code>min.baseq</code> (<code>samtools mplieup -Q</code> default value is 13) to obtain results of a higher quality.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># VCF report</span>
 <span class="va">vcf.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateVcfReport.html">generateVcfReport</a></span><span class="op">(</span>
   bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
@@ -419,11 +517,11 @@
   <span class="co"># to convert them internally</span>
   vcf.style<span class="op">=</span><span class="st">"NCBI"</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.011s]</span>
-<span class="co">#&gt; Reading VCF file [1.040s]</span>
-<span class="co">#&gt; Reading BAM file [0.011s]</span>
-<span class="co">#&gt; Thresholding reads [0.001s]</span>
-<span class="co">#&gt; Extracting base frequences [0.070s]</span>
+<span class="co">#&gt; Reading BED file [0.010s]</span>
+<span class="co">#&gt; Reading VCF file [0.954s]</span>
+<span class="co">#&gt; Reading BAM file [0.005s]</span>
+<span class="co">#&gt; Thresholding reads [0.000s]</span>
+<span class="co">#&gt; Extracting base frequences [0.053s]</span>
 
 <span class="co"># NA values are shown for the C-&gt;T variants on the "+" and G-&gt;A on the "-"</span>
 <span class="co"># strands, because bisulfite conversion makes their counting impossible</span>
@@ -476,7 +574,39 @@
 <span class="co">#&gt; 3:      0    1   NA</span>
 <span class="co">#&gt; 4:      1    1    1</span>
 <span class="co">#&gt; 5:      0    1    1</span>
-<span class="co">#&gt; 6:      0    1    1</span></code></pre></div>
+<span class="co">#&gt; 6:      0    1    1</span>
+
+<span class="co"># and finally, let's plot methylation patterns overlapping one of the most</span>
+<span class="co"># covered SNPs in the methylation capture test data set - rs573296191</span>
+<span class="co"># (chr17:61864584) in BRIP1 gene</span>
+<span class="va">vcf.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="op">-</span><span class="va">SumRef</span><span class="op">-</span><span class="va">SumAlt</span><span class="op">)</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>
+<span class="co">#&gt;           name seqnames    range REF ALT M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt U-Alt SumRef</span>
+<span class="co">#&gt; 1: rs186775935    chr17 43125629   G   T     0     0    20   195     0     0     0     0    215</span>
+<span class="co">#&gt;    SumAlt FEp+ FEp-</span>
+<span class="co">#&gt; 1:      0    1    1</span>
+<span class="va">brip1.patterns</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extractPatterns.html">extractPatterns</a></span><span class="op">(</span>
+  bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
+  bed<span class="op">=</span><span class="fu">as</span><span class="op">(</span><span class="st">"chr17:61864583-61864585"</span>, <span class="st">"GRanges"</span><span class="op">)</span>,
+  highlight.positions<span class="op">=</span><span class="fl">61864584</span>,
+  verbose<span class="op">=</span><span class="cn">FALSE</span>
+<span class="op">)</span>
+<span class="va">brip1.positions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"^[0-9]+$"</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">brip1.patterns</span><span class="op">)</span>, value<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">brip1.summary</span> <span class="op">&lt;-</span>
+  <span class="va">brip1.patterns</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">.SD</span>, <span class="va">unique</span><span class="op">)</span>, <span class="va">.N</span><span class="op">)</span>,
+                 by<span class="op">=</span><span class="fu">.</span><span class="op">(</span><span class="va">pattern</span>, <span class="va">beta</span><span class="op">)</span>, .SDcols<span class="op">=</span><span class="va">brip1.positions</span><span class="op">]</span>
+<span class="va">brip1.data</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/melt.data.table.html" class="external-link">melt.data.table</a></span><span class="op">(</span><span class="va">brip1.summary</span>,
+  measure.vars<span class="op">=</span><span class="va">brip1.positions</span>, variable.name<span class="op">=</span><span class="st">"pos"</span>, value.name<span class="op">=</span><span class="st">"base"</span><span class="op">)</span>
+<span class="kw">if</span> <span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;</span> <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://github.com/lionel-/ggstance" class="external-link">"ggstance"</a></span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">brip1.data</span><span class="op">)</span>,
+         <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">pos</span><span class="op">)</span><span class="op">)</span>, y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span>,
+             group<span class="op">=</span><span class="va">pattern</span>, color<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">base</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"grey"</span>, position<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ggstance/man/position-vertical.html" class="external-link">position_dodgev</a></span><span class="op">(</span>height<span class="op">=</span><span class="fl">0.9</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>position<span class="op">=</span><span class="fu"><a href="https://rdrr.io/pkg/ggstance/man/position-vertical.html" class="external-link">position_dodgev</a></span><span class="op">(</span>height<span class="op">=</span><span class="fl">0.9</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_colour_manual</a></span><span class="op">(</span>values<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"blue"</span>,<span class="st">"red"</span>,<span class="st">"grey80"</span>,<span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x<span class="op">=</span><span class="st">"position"</span>, y<span class="op">=</span><span class="st">"count"</span>, title<span class="op">=</span><span class="st">"BRIP1"</span>, color<span class="op">=</span><span class="st">"base"</span><span class="op">)</span>
+<span class="op">}</span></code></pre></div>
+<p><img src="epialleleR_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <hr>
 </div>
 </div>
@@ -491,9 +621,9 @@
 <div class="section level3">
 <h3 id="session-info">Session Info<a class="anchor" aria-label="anchor" href="#session-info"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; R Under development (unstable) (2022-01-29 r81593)</span>
+<span class="co">#&gt; R Under development (unstable) (2022-02-14 r81736)</span>
 <span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span>
 <span class="co">#&gt; Running under: Ubuntu 20.04.3 LTS</span>
 <span class="co">#&gt; </span>
@@ -511,40 +641,43 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; other attached packages:</span>
 <span class="co">#&gt; [1] GenomeInfoDb_1.31.4 IRanges_2.29.1      S4Vectors_0.33.10   BiocGenerics_0.41.2</span>
-<span class="co">#&gt; [5] epialleleR_1.3.5   </span>
+<span class="co">#&gt; [5] ggstance_0.3.5      ggplot2_3.3.5       epialleleR_1.3.6   </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; loaded via a namespace (and not attached):</span>
-<span class="co">#&gt;  [1] bitops_1.0-7                matrixStats_0.61.0          fs_1.5.2                   </span>
-<span class="co">#&gt;  [4] bit64_4.0.5                 filelock_1.0.2              progress_1.2.2             </span>
-<span class="co">#&gt;  [7] httr_1.4.2                  rprojroot_2.0.2             tools_4.2.0                </span>
-<span class="co">#&gt; [10] bslib_0.3.1                 utf8_1.2.2                  R6_2.5.1                   </span>
-<span class="co">#&gt; [13] DBI_1.1.2                   tidyselect_1.1.1            prettyunits_1.1.1          </span>
-<span class="co">#&gt; [16] bit_4.0.4                   curl_4.3.2                  compiler_4.2.0             </span>
-<span class="co">#&gt; [19] textshaping_0.3.6           cli_3.1.1                   Biobase_2.55.0             </span>
-<span class="co">#&gt; [22] xml2_1.3.3                  desc_1.4.0                  DelayedArray_0.21.2        </span>
-<span class="co">#&gt; [25] rtracklayer_1.55.3          sass_0.4.0                  rappdirs_0.3.3             </span>
-<span class="co">#&gt; [28] pkgdown_2.0.2.9000          systemfonts_1.0.3           stringr_1.4.0              </span>
-<span class="co">#&gt; [31] digest_0.6.29               Rsamtools_2.11.0            rmarkdown_2.11             </span>
-<span class="co">#&gt; [34] XVector_0.35.0              pkgconfig_2.0.3             htmltools_0.5.2            </span>
-<span class="co">#&gt; [37] MatrixGenerics_1.7.0        highr_0.9                   BSgenome_1.63.4            </span>
-<span class="co">#&gt; [40] dbplyr_2.1.1                fastmap_1.1.0               rlang_1.0.0                </span>
-<span class="co">#&gt; [43] RSQLite_2.2.9               jquerylib_0.1.4             BiocIO_1.5.0               </span>
-<span class="co">#&gt; [46] generics_0.1.2              jsonlite_1.7.3              BiocParallel_1.29.12       </span>
-<span class="co">#&gt; [49] dplyr_1.0.7                 VariantAnnotation_1.41.3    RCurl_1.98-1.5             </span>
-<span class="co">#&gt; [52] magrittr_2.0.2              GenomeInfoDbData_1.2.7      Matrix_1.4-0               </span>
-<span class="co">#&gt; [55] Rcpp_1.0.8                  fansi_1.0.2                 lifecycle_1.0.1            </span>
-<span class="co">#&gt; [58] stringi_1.7.6               yaml_2.2.2                  SummarizedExperiment_1.25.3</span>
-<span class="co">#&gt; [61] zlibbioc_1.41.0             BiocFileCache_2.3.4         grid_4.2.0                 </span>
-<span class="co">#&gt; [64] blob_1.2.2                  parallel_4.2.0              crayon_1.4.2               </span>
-<span class="co">#&gt; [67] lattice_0.20-45             Biostrings_2.63.1           GenomicFeatures_1.47.7     </span>
-<span class="co">#&gt; [70] hms_1.1.1                   KEGGREST_1.35.0             knitr_1.37                 </span>
-<span class="co">#&gt; [73] pillar_1.7.0                GenomicRanges_1.47.6        rjson_0.2.21               </span>
-<span class="co">#&gt; [76] biomaRt_2.51.2              XML_3.99-0.8                glue_1.6.1                 </span>
-<span class="co">#&gt; [79] evaluate_0.14               data.table_1.14.2           png_0.1-7                  </span>
-<span class="co">#&gt; [82] vctrs_0.3.8                 purrr_0.3.4                 assertthat_0.2.1           </span>
-<span class="co">#&gt; [85] cachem_1.0.6                xfun_0.29                   restfulr_0.0.13            </span>
-<span class="co">#&gt; [88] ragg_1.2.1                  tibble_3.1.6                GenomicAlignments_1.31.2   </span>
-<span class="co">#&gt; [91] AnnotationDbi_1.57.1        memoise_2.0.1               ellipsis_0.3.2</span></code></pre></div>
+<span class="co">#&gt;   [1] bitops_1.0-7                matrixStats_0.61.0          fs_1.5.2                   </span>
+<span class="co">#&gt;   [4] bit64_4.0.5                 filelock_1.0.2              progress_1.2.2             </span>
+<span class="co">#&gt;   [7] httr_1.4.2                  rprojroot_2.0.2             tools_4.2.0                </span>
+<span class="co">#&gt;  [10] bslib_0.3.1                 utf8_1.2.2                  R6_2.5.1                   </span>
+<span class="co">#&gt;  [13] colorspace_2.0-2            DBI_1.1.2                   withr_2.4.3                </span>
+<span class="co">#&gt;  [16] tidyselect_1.1.1            prettyunits_1.1.1           bit_4.0.4                  </span>
+<span class="co">#&gt;  [19] curl_4.3.2                  compiler_4.2.0              textshaping_0.3.6          </span>
+<span class="co">#&gt;  [22] cli_3.2.0                   Biobase_2.55.0              xml2_1.3.3                 </span>
+<span class="co">#&gt;  [25] desc_1.4.0                  DelayedArray_0.21.2         labeling_0.4.2             </span>
+<span class="co">#&gt;  [28] rtracklayer_1.55.3          sass_0.4.0                  scales_1.1.1               </span>
+<span class="co">#&gt;  [31] rappdirs_0.3.3              pkgdown_2.0.2.9000          systemfonts_1.0.4          </span>
+<span class="co">#&gt;  [34] stringr_1.4.0               digest_0.6.29               Rsamtools_2.11.0           </span>
+<span class="co">#&gt;  [37] rmarkdown_2.11              XVector_0.35.0              pkgconfig_2.0.3            </span>
+<span class="co">#&gt;  [40] htmltools_0.5.2             MatrixGenerics_1.7.0        highr_0.9                  </span>
+<span class="co">#&gt;  [43] BSgenome_1.63.4             dbplyr_2.1.1                fastmap_1.1.0              </span>
+<span class="co">#&gt;  [46] rlang_1.0.1                 RSQLite_2.2.10              farver_2.1.0               </span>
+<span class="co">#&gt;  [49] jquerylib_0.1.4             BiocIO_1.5.0                generics_0.1.2             </span>
+<span class="co">#&gt;  [52] jsonlite_1.7.3              BiocParallel_1.29.12        dplyr_1.0.8                </span>
+<span class="co">#&gt;  [55] VariantAnnotation_1.41.3    RCurl_1.98-1.6              magrittr_2.0.2             </span>
+<span class="co">#&gt;  [58] GenomeInfoDbData_1.2.7      Matrix_1.4-0                munsell_0.5.0              </span>
+<span class="co">#&gt;  [61] Rcpp_1.0.8                  fansi_1.0.2                 lifecycle_1.0.1            </span>
+<span class="co">#&gt;  [64] stringi_1.7.6               yaml_2.2.2                  SummarizedExperiment_1.25.3</span>
+<span class="co">#&gt;  [67] zlibbioc_1.41.0             plyr_1.8.6                  BiocFileCache_2.3.4        </span>
+<span class="co">#&gt;  [70] grid_4.2.0                  blob_1.2.2                  parallel_4.2.0             </span>
+<span class="co">#&gt;  [73] crayon_1.5.0                lattice_0.20-45             Biostrings_2.63.1          </span>
+<span class="co">#&gt;  [76] GenomicFeatures_1.47.7      hms_1.1.1                   KEGGREST_1.35.0            </span>
+<span class="co">#&gt;  [79] knitr_1.37                  pillar_1.7.0                GenomicRanges_1.47.6       </span>
+<span class="co">#&gt;  [82] rjson_0.2.21                biomaRt_2.51.3              XML_3.99-0.8               </span>
+<span class="co">#&gt;  [85] glue_1.6.1                  evaluate_0.14               data.table_1.14.2          </span>
+<span class="co">#&gt;  [88] png_0.1-7                   vctrs_0.3.8                 gtable_0.3.0               </span>
+<span class="co">#&gt;  [91] purrr_0.3.4                 assertthat_0.2.1            cachem_1.0.6               </span>
+<span class="co">#&gt;  [94] xfun_0.29                   restfulr_0.0.13             ragg_1.2.1                 </span>
+<span class="co">#&gt;  [97] tibble_3.1.6                GenomicAlignments_1.31.2    AnnotationDbi_1.57.1       </span>
+<span class="co">#&gt; [100] memoise_2.0.1               ellipsis_0.3.2</span></code></pre></div>
 <hr>
 </div>
 </div>
