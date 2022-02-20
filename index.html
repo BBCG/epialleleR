@@ -41,7 +41,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.7</span>
       </span>
     </div>
 
@@ -74,23 +74,48 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="fast-epiallele-aware-methylation-reporter-">Fast, epiallele-aware methylation reporter <img align="right" src="inst/epialleleR_logo.svg"><a class="anchor" aria-label="anchor" href="#fast-epiallele-aware-methylation-reporter-"></a>
+<div class="page-header"><h1 id="fast-epiallele-aware-methylation-reporter-">Fast, epiallele-aware methylation reporter
+<img align="right" src="inst/epialleleR_logo.svg"><a class="anchor" aria-label="anchor" href="#fast-epiallele-aware-methylation-reporter-"></a>
 </h1></div>
 
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>DISCLAIMER: This is a work in progress, however the package is already usable, and the obtained experimental results will soon be published. Main methods (<em><code>preprocessBam</code></em>, <em><code>generateCytosineReport</code></em>, <em><code>generateBedReport</code></em>) won’t change. The <em><code>generateVcfReport</code></em> method might at some point be improved to include variable-length sequence variations, while <em><code>generateBedEcdf</code></em> should be considered somewhat experimental and may undergo significant changes or be substituted with some other method in the future.</p>
-<p><em><code>epialleleR</code></em> is an R package for calling hypermethylated variant epiallele frequencies (VEF) at the level of genomic regions or individual cytosines in next-generation sequencing data using binary alignment map (BAM) files as an input. Other functionality includes extracting methylation patterns, computing the empirical cumulative distribution function for per-read beta values, and testing the significance of the association between epiallele methylation status and base frequencies at particular genomic positions (SNPs).</p>
+<p>DISCLAIMER: This is a work in progress, however the package is
+already usable, and the obtained experimental results will soon be
+published. Main methods (<em><code>preprocessBam</code></em>,
+<em><code>generateCytosineReport</code></em>,
+<em><code>generateBedReport</code></em>) won’t change. The
+<em><code>generateVcfReport</code></em> method might at some point be
+improved to include variable-length sequence variations, while
+<em><code>generateBedEcdf</code></em> should be considered somewhat
+experimental and may undergo significant changes or be substituted with
+some other method in the future.</p>
+<p><em><code>epialleleR</code></em> is an R package for calling
+hypermethylated variant epiallele frequencies (VEF) at the level of
+genomic regions or individual cytosines in next-generation sequencing
+data using binary alignment map (BAM) files as an input. Other
+functionality includes extracting methylation patterns, computing the
+empirical cumulative distribution function for per-read beta values, and
+testing the significance of the association between epiallele
+methylation status and base frequencies at particular genomic positions
+(SNPs).</p>
 <div class="section level3">
 <h3 id="current-features">Current Features<a class="anchor" aria-label="anchor" href="#current-features"></a>
 </h3>
 <ul>
-<li>conventional reporting of cytosine methylation (<em><code>generateCytosineReport</code></em>)</li>
-<li>calling the hypermethylated variant epiallele frequency (VEF) at the level of genomic regions (<em><code>generate[Bed|Amplicon|Capture]Report</code></em>) or individual cytosines (<em><code>generateCytosineReport</code></em>)</li>
-<li>extracting methylation patterns for genomic region of interest (<em><code>extractPatterns</code></em>)</li>
-<li>assessing the distribution of per-read beta values for genomic regions of interest (<em><code>generateBedEcdf</code></em>)</li>
-<li>testing for the association between epiallele methylation status and sequence variations (<em><code>generateVcfReport</code></em>)</li>
+<li>conventional reporting of cytosine methylation
+(<em><code>generateCytosineReport</code></em>)</li>
+<li>calling the hypermethylated variant epiallele frequency (VEF) at the
+level of genomic regions
+(<em><code>generate[Bed|Amplicon|Capture]Report</code></em>) or
+individual cytosines (<em><code>generateCytosineReport</code></em>)</li>
+<li>extracting methylation patterns for genomic region of interest
+(<em><code>extractPatterns</code></em>)</li>
+<li>assessing the distribution of per-read beta values for genomic
+regions of interest (<em><code>generateBedEcdf</code></em>)</li>
+<li>testing for the association between epiallele methylation status and
+sequence variations (<em><code>generateVcfReport</code></em>)</li>
 </ul>
 </div>
 <div class="section level3">
@@ -108,8 +133,12 @@
 <h5 id="v12">v1.2<a class="anchor" aria-label="anchor" href="#v12"></a>
 </h5>
 <ul>
-<li>even faster and more memory-efficient BAM loading (by means of HTSlib)</li>
-<li>min.baseq parameter to reduce the effect of low quality bases on methylation or SNV calling (in v1.0 the output of <em><code>generateVcfReport</code></em> was equivalent to the one of <code>samtools mpileup -Q 0 ...</code>)</li>
+<li>even faster and more memory-efficient BAM loading (by means of
+HTSlib)</li>
+<li>min.baseq parameter to reduce the effect of low quality bases on
+methylation or SNV calling (in v1.0 the output of
+<em><code>generateVcfReport</code></em> was equivalent to the one of
+<code>samtools mpileup -Q 0 ...</code>)</li>
 </ul>
 <p>check out NEWS for more!</p>
 <hr>
@@ -142,7 +171,11 @@
 <div class="section level2">
 <h2 id="using-the-package">Using the package<a class="anchor" aria-label="anchor" href="#using-the-package"></a>
 </h2>
-<p>Please read <em><code>epialleleR</code></em> vignettes at <a href="https://bbcg.github.io/epialleleR/articles/epialleleR.html" class="external-link">GitHub pages</a> or within the R environment: <code><a href="articles/epialleleR.html">vignette("epialleleR", package="epialleleR")</a></code>, or consult the function’s help pages for the extensive information on usage, parameters and output values.</p>
+<p>Please read <em><code>epialleleR</code></em> vignettes at <a href="https://bbcg.github.io/epialleleR/articles/epialleleR.html" class="external-link">GitHub
+pages</a> or within the R environment:
+<code><a href="articles/epialleleR.html">vignette("epialleleR", package="epialleleR")</a></code>, or consult
+the function’s help pages for the extensive information on usage,
+parameters and output values.</p>
 <p>Very brief synopsis:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/BBCG/epialleleR" class="external-link">epialleleR</a></span><span class="op">)</span>
@@ -173,13 +206,17 @@
 <div class="section level3">
 <h3 id="citing-the-epialleler-package">Citing the <em><code>epialleleR</code></em> package<a class="anchor" aria-label="anchor" href="#citing-the-epialleler-package"></a>
 </h3>
-<p>The experimental data analysed using the package has not been published yet. The citation information will be updated in the nearest future.</p>
+<p>The experimental data analysed using the package has not been
+published yet. The citation information will be updated in the nearest
+future.</p>
 </div>
 <div class="section level3">
 <h3 id="epialleler-at-bioconductor">
 <em><code>epialleleR</code></em> at Bioconductor<a class="anchor" aria-label="anchor" href="#epialleler-at-bioconductor"></a>
 </h3>
-<p><a href="https://bioconductor.org/packages/release/bioc/html/epialleleR.html" class="external-link">release</a>, <a href="https://bioconductor.org/packages/devel/bioc/html/epialleleR.html" class="external-link">development version</a></p>
+<p><a href="https://bioconductor.org/packages/release/bioc/html/epialleleR.html" class="external-link">release</a>,
+<a href="https://bioconductor.org/packages/devel/bioc/html/epialleleR.html" class="external-link">development
+version</a></p>
 <hr>
 </div>
 </div>
@@ -243,7 +280,8 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.2.9000.</p>
 </div>
 
       </footer>

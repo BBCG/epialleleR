@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.7</span>
       </span>
     </div>
 
@@ -68,7 +68,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>The epialleleR User’s Guide</h1>
             
-            <h4 data-toc-skip class="date">17 February, 2022</h4>
+            <h4 data-toc-skip class="date">20 February, 2022</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BBCG/epialleleR/blob/HEAD/vignettes/epialleleR.Rmd" class="external-link"><code>vignettes/epialleleR.Rmd</code></a></small>
       <div class="hidden name"><code>epialleleR.Rmd</code></div>
@@ -78,7 +78,9 @@
     
         <div class="abstract">
       <p class="abstract">Abstract</p>
-      <p>A comprehensive guide to using the epialleleR package for calling the hypermethylated epiallele frequencies from next-generation sequencing data</p>
+      <p>A comprehensive guide to using the epialleleR package for
+      calling the hypermethylated epiallele frequencies from
+      next-generation sequencing data</p>
     </div>
     
 <hr>
@@ -88,37 +90,87 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>The cytosine DNA methylation is an important epigenetic mechanism for regulation of gene expression. Abnormal methylation is linked to several diseases, being for example the most common molecular lesion in cancer cell<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>. Multiple studies suggest that alterations in DNA methylation, despite occurring at a low mosaic level, may confer increased risk of cancer later in life<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>.</p>
-<p>The cytosine methylation levels within relatively small regions of the human genome are thought to be often concordant, resulting in a limited number of distinct methylation patterns of short sequencing reads<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>. Due to the cell-to-cell variations in methylation, DNA purified from tissue samples contains a mix of hyper- and hypomethylated alleles with varying ratios that depend on the genomic region and tissue type.</p>
-<p>Unsurprisingly, when the frequencies of hypermethylated epialleles are low (e.g. 1e-02 and lower) and cytosine methylation levels are averaged and reported using conventional algorithms, the identification of such hypermethylated epialleles becomes nearly impossible. In order to increase the sensitivity of DNA methylation analysis we have developed <em><code>epialleleR</code></em> — an R package for calling hypermethylated variant epiallele frequencies (VEF).</p>
-<p><em><code>epialleleR</code></em> is a very fast and scalable solution for analysis of data obtained by next-generation sequencing of bisulfite-treated DNA samples. The minimum requirement for the input is a Binary Alignment Map (BAM) file containing sequencing reads. These reads can be obtained from either deep or ultra-deep sequencing, using either narrowly targeted gene panels (amplicon sequencing), larger methylation capture panels, or even whole-genome approaches.</p>
+<p>The cytosine DNA methylation is an important epigenetic mechanism for
+regulation of gene expression. Abnormal methylation is linked to several
+diseases, being for example the most common molecular lesion in cancer
+cell<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>.
+Multiple studies suggest that alterations in DNA methylation, despite
+occurring at a low mosaic level, may confer increased risk of cancer
+later in life<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>.</p>
+<p>The cytosine methylation levels within relatively small regions of
+the human genome are thought to be often concordant, resulting in a
+limited number of distinct methylation patterns of short sequencing
+reads<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>.
+Due to the cell-to-cell variations in methylation, DNA purified from
+tissue samples contains a mix of hyper- and hypomethylated alleles with
+varying ratios that depend on the genomic region and tissue type.</p>
+<p>Unsurprisingly, when the frequencies of hypermethylated epialleles
+are low (e.g. 1e-02 and lower) and cytosine methylation levels are
+averaged and reported using conventional algorithms, the identification
+of such hypermethylated epialleles becomes nearly impossible. In order
+to increase the sensitivity of DNA methylation analysis we have
+developed <em><code>epialleleR</code></em> — an R package for calling
+hypermethylated variant epiallele frequencies (VEF).</p>
+<p><em><code>epialleleR</code></em> is a very fast and scalable solution
+for analysis of data obtained by next-generation sequencing of
+bisulfite-treated DNA samples. The minimum requirement for the input is
+a Binary Alignment Map (BAM) file containing sequencing reads. These
+reads can be obtained from either deep or ultra-deep sequencing, using
+either narrowly targeted gene panels (amplicon sequencing), larger
+methylation capture panels, or even whole-genome approaches.</p>
 <div class="section level3">
 <h3 id="current-features">Current Features<a class="anchor" aria-label="anchor" href="#current-features"></a>
 </h3>
 <ul>
-<li>In addition to conventional reporting of cytosine DNA methylation levels (beta values), <em><code>epialleleR</code></em> can call variant epiallele frequencies (VEF) of hypermethylated alleles at the level of individual cytosines (<em><code>generateCytosineReport</code></em>) or supplied genomic regions (<em><code>generateBedReport</code></em>)</li>
-<li>DNA methylation patterns of genomic region of interest can be explored using (<em><code>extractPatterns</code></em>)</li>
-<li>Potential bimodality of methylation for genomic regions of interest can be assessed using <em><code>generateBedEcdf</code></em> method</li>
-<li>The association of single-nucleotide variations with the epiallelic status can be tested using <em><code>generateVcfReport</code></em>
+<li>In addition to conventional reporting of cytosine DNA methylation
+levels (beta values), <em><code>epialleleR</code></em> can call variant
+epiallele frequencies (VEF) of hypermethylated alleles at the level of
+individual cytosines (<em><code>generateCytosineReport</code></em>) or
+supplied genomic regions (<em><code>generateBedReport</code></em>)</li>
+<li>DNA methylation patterns of genomic region of interest can be
+explored using (<em><code>extractPatterns</code></em>)</li>
+<li>Potential bimodality of methylation for genomic regions of interest
+can be assessed using <em><code>generateBedEcdf</code></em> method</li>
+<li>The association of single-nucleotide variations with the epiallelic
+status can be tested using <em><code>generateVcfReport</code></em>
 </li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="processing-speed">Processing speed<a class="anchor" aria-label="anchor" href="#processing-speed"></a>
 </h3>
-<p>Currently <em><code>epialleleR</code></em> runs in a single-thread mode only. Loading the BAM data is now done by means of <em><code>HTSlib</code></em>, therefore it is possible to speed it up using additional decompression threads (<code>nthreads</code> option in <em><code>preprocessBam</code></em>). All operations are performed using optimised C++ functions, and usually take reasonable time. Running time for complete task “BAM on disk -&gt; CX report on disk” depends on the size of the BAM file, and the speed is usually within the range of 30-50 MB/s (or 250-400 thousand reads per second) for a single core of a relatively modern CPU (Intel(R) Core(TM) i7-7700).</p>
-<p>Major bottlenecks (in BAM loading and preprocessing) were removed in the release v1.2, full multithreading and minor improvements are expected in the future.</p>
+<p>Currently <em><code>epialleleR</code></em> runs in a single-thread
+mode only. Loading the BAM data is now done by means of
+<em><code>HTSlib</code></em>, therefore it is possible to speed it up
+using additional decompression threads (<code>nthreads</code> option in
+<em><code>preprocessBam</code></em>). All operations are performed using
+optimised C++ functions, and usually take reasonable time. Running time
+for complete task “BAM on disk -&gt; CX report on disk” depends on the
+size of the BAM file, and the speed is usually within the range of 30-50
+MB/s (or 250-400 thousand reads per second) for a single core of a
+relatively modern CPU (Intel(R) Core(TM) i7-7700).</p>
+<p>Major bottlenecks (in BAM loading and preprocessing) were removed in
+the release v1.2, full multithreading and minor improvements are
+expected in the future.</p>
 <hr>
 </div>
 </div>
 <div class="section level2">
 <h2 id="sample-data">Sample data<a class="anchor" aria-label="anchor" href="#sample-data"></a>
 </h2>
-<p>The <em><code>epialleleR</code></em> package includes sample data, which was obtained using targeted sequencing. The description of assays and files is given below. All the genomic coordinates for external data files are according to GRCh38 reference assembly.</p>
+<p>The <em><code>epialleleR</code></em> package includes sample data,
+which was obtained using targeted sequencing. The description of assays
+and files is given below. All the genomic coordinates for external data
+files are according to GRCh38 reference assembly.</p>
 <div class="section level4">
 <h4 id="amplicon-based-methylation-ngs-data">Amplicon-based methylation NGS data<a class="anchor" aria-label="anchor" href="#amplicon-based-methylation-ngs-data"></a>
 </h4>
-<p>The samples of Human HCT116 DKO Non-Methylated (Zymo Research, cat # D5014-1), or Human HCT116 DKO Methylated (Zymo Research, cat # D5014-2) DNA<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>, or their mix were bisulfite-converted, and the BRCA1 gene promoter region was amplified using four pairs of primers. Amplicons were mixed, indexed and sequenced at Illumina MiSeq system. The related files are:</p>
+<p>The samples of Human HCT116 DKO Non-Methylated (Zymo Research, cat #
+D5014-1), or Human HCT116 DKO Methylated (Zymo Research, cat # D5014-2)
+DNA<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>, or
+their mix were bisulfite-converted, and the BRCA1 gene promoter region
+was amplified using four pairs of primers. Amplicons were mixed, indexed
+and sequenced at Illumina MiSeq system. The related files are:</p>
 <table class="table">
 <colgroup>
 <col width="33%">
@@ -139,7 +191,8 @@
 <tr class="even">
 <td>amplicon010meth.bam</td>
 <td>BAM</td>
-<td>a subset of reads for a 1:9 mix of methylated and non-methylated DNA samples</td>
+<td>a subset of reads for a 1:9 mix of methylated and non-methylated DNA
+samples</td>
 </tr>
 <tr class="odd">
 <td>amplicon100meth.bam</td>
@@ -149,7 +202,8 @@
 <tr class="even">
 <td>amplicon.bed</td>
 <td>BED</td>
-<td>genomic coordinates of four amplicons covering promoter area of BRCA1 gene</td>
+<td>genomic coordinates of four amplicons covering promoter area of
+BRCA1 gene</td>
 </tr>
 <tr class="odd">
 <td>amplicon.vcf.gz</td>
@@ -167,8 +221,16 @@
 <div class="section level4">
 <h4 id="capture-based-methylation-ngs-data">Capture-based methylation NGS data<a class="anchor" aria-label="anchor" href="#capture-based-methylation-ngs-data"></a>
 </h4>
-<p>The tumour DNA was bisulfite-converted, fragmented and hybridized with custom-made probes covering promoter regions of 283 tumour suppressor genes (as described in <a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>). Libraries were sequenced using Illumina MiSeq system. The related files are:</p>
+<p>The tumour DNA was bisulfite-converted, fragmented and hybridized
+with custom-made probes covering promoter regions of 283 tumour
+suppressor genes (as described in <a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>). Libraries were sequenced using Illumina
+MiSeq system. The related files are:</p>
 <table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
 <thead><tr class="header">
 <th>Name</th>
 <th>Type</th>
@@ -203,32 +265,65 @@
 <div class="section level2">
 <h2 id="typical-workflow">Typical workflow<a class="anchor" aria-label="anchor" href="#typical-workflow"></a>
 </h2>
-<p>As mentioned earlier, <em><code>epialleleR</code></em> uses data stored in Binary Alignment Map (BAM) files as its input. It is a prerequisite that records in the BAM file are sorted by their name (and not a genomic location), contain an XG tag with a genomic strand they map to, and an XM tag with the methylation call string — such files are produced by virtually any software tool for mapping and alignment of bisulfite sequencing reads (such as Bismark, BSMAP or Illumina DRAGEN Bio-IT Platform).</p>
-<p>Please use the function help files for a full description of available parameters, as well as explanation of the function’s logic and output values.</p>
+<p>As mentioned earlier, <em><code>epialleleR</code></em> uses data
+stored in Binary Alignment Map (BAM) files as its input. It is a
+prerequisite that records in the BAM file are sorted by their name (and
+not a genomic location), contain an XG tag with a genomic strand they
+map to, and an XM tag with the methylation call string — such files are
+produced by virtually any software tool for mapping and alignment of
+bisulfite sequencing reads (such as Bismark, BSMAP or Illumina DRAGEN
+Bio-IT Platform).</p>
+<p>Please use the function help files for a full description of
+available parameters, as well as explanation of the function’s logic and
+output values.</p>
 <div class="section level3">
 <h3 id="reading-the-data">Reading the data<a class="anchor" aria-label="anchor" href="#reading-the-data"></a>
 </h3>
-<p>All <em><code>epialleleR</code></em> methods can load BAM data using the file path. However, if a file is very large and several reports need to be prepared, it is advised to use the <em><code>preprocessBam</code></em> convenience function as shown below. This function is also used internally when a BAM file location string is supplied as an input for other <em><code>epialleleR</code></em> methods.</p>
-<p><code>preprocessBam</code> currently accepts only BAM files that are derived from paired-end sequencing (create an issue if you need to process single-end BAM files). During preprocessing, paired reads are merged according to their base quality: nucleotide base with the highest value in the QUAL string is taken, unless its quality is less than <em><code>min.baseq</code></em>, which results in no information for that particular position (“-”/“N”). These <strong>merged reads</strong> are then processed as a <strong>single entity</strong> in all <em><code>epialleleR</code></em> methods. Due to merging, overlapping bases in read pairs are counted only once, and the base with the highest quality is taken.</p>
+<p>All <em><code>epialleleR</code></em> methods can load BAM data using
+the file path. However, if a file is very large and several reports need
+to be prepared, it is advised to use the
+<em><code>preprocessBam</code></em> convenience function as shown below.
+This function is also used internally when a BAM file location string is
+supplied as an input for other <em><code>epialleleR</code></em>
+methods.</p>
+<p><code>preprocessBam</code> currently accepts only BAM files that are
+derived from paired-end sequencing (create an issue if you need to
+process single-end BAM files). During preprocessing, paired reads are
+merged according to their base quality: nucleotide base with the highest
+value in the QUAL string is taken, unless its quality is less than
+<em><code>min.baseq</code></em>, which results in no information for
+that particular position (“-”/“N”). These <strong>merged reads</strong>
+are then processed as a <strong>single entity</strong> in all
+<em><code>epialleleR</code></em> methods. Due to merging, overlapping
+bases in read pairs are counted only once, and the base with the highest
+quality is taken.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/BBCG/epialleleR" class="external-link">epialleleR</a></span><span class="op">)</span>
 
 <span class="va">capture.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="va">bam.data</span>    <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preprocessBam.html">preprocessBam</a></span><span class="op">(</span><span class="va">capture.bam</span><span class="op">)</span>
-<span class="co">#&gt; Reading BAM file [0.038s]</span></code></pre></div>
+<span class="co">#&gt; Reading BAM file [0.018s]</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="making-cytosine-reports">Making cytosine reports<a class="anchor" aria-label="anchor" href="#making-cytosine-reports"></a>
 </h3>
-<p><em><code>epialleleR</code></em> can generate conventional cytosine reports in a format, which is similar to the genome-wide cytosine report produced by the <em><code>coverage2cytosine</code></em> Bismark module<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a>.</p>
-<p>Please note that <em><code>generateCytosineReport</code></em> produces thresholded (VEF) report by default: <strong>methylated</strong> cytosines from reads that do <strong>not</strong> pass the threshold (<strong>hypo</strong>methylated reads) are counted as being <strong>un</strong>methylated. In order to make a conventional cytosine report, use <em><code>threshold.reads=FALSE</code></em>.</p>
+<p><em><code>epialleleR</code></em> can generate conventional cytosine
+reports in a format, which is similar to the genome-wide cytosine report
+produced by the <em><code>coverage2cytosine</code></em> Bismark module<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a>.</p>
+<p>Please note that <em><code>generateCytosineReport</code></em>
+produces thresholded (VEF) report by default:
+<strong>methylated</strong> cytosines from reads that do
+<strong>not</strong> pass the threshold (<strong>hypo</strong>methylated
+reads) are counted as being <strong>un</strong>methylated. In order to
+make a conventional cytosine report, use
+<em><code>threshold.reads=FALSE</code></em>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># data.table::data.table object for</span>
 <span class="co"># CpG VEF report</span>
 <span class="va">cg.vef.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span><span class="op">)</span>
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq', 'min.baseq', 'skip.duplicates' and 'nthreads' will have no effect.</span>
-<span class="co">#&gt; Thresholding reads [0.001s]</span>
-<span class="co">#&gt; Preparing cytosine report [0.020s]</span>
+<span class="co">#&gt; Thresholding reads [0.002s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.012s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cg.vef.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;    rname strand      pos context meth unmeth</span>
 <span class="co">#&gt; 1: chr17      + 61864475      CG    7      9</span>
@@ -241,7 +336,7 @@
 <span class="co"># CpG cytosine report</span>
 <span class="va">cg.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span>
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq', 'min.baseq', 'skip.duplicates' and 'nthreads' will have no effect.</span>
-<span class="co">#&gt; Preparing cytosine report [0.020s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.013s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cg.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;    rname strand      pos context meth unmeth</span>
 <span class="co">#&gt; 1: chr17      + 61864475      CG    8      8</span>
@@ -255,7 +350,7 @@
 <span class="va">cx.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span>,
                                     report.context<span class="op">=</span><span class="st">"CX"</span><span class="op">)</span>
 <span class="co">#&gt; Already preprocessed BAM supplied as an input. Options 'min.mapq', 'min.baseq', 'skip.duplicates' and 'nthreads' will have no effect.</span>
-<span class="co">#&gt; Preparing cytosine report [0.023s]</span>
+<span class="co">#&gt; Preparing cytosine report [0.014s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cx.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;    rname strand      pos context meth unmeth</span>
 <span class="co">#&gt; 1: chr17      + 61864338     CHG    1     25</span>
@@ -268,8 +363,19 @@
 <div class="section level3">
 <h3 id="making-vef-reports-for-a-set-of-genomic-regions">Making VEF reports for a set of genomic regions<a class="anchor" aria-label="anchor" href="#making-vef-reports-for-a-set-of-genomic-regions"></a>
 </h3>
-<p><em><code>epialleleR</code></em> allows to make reports not only for individual cytosine bases, but also for a set of genomic regions. It is especially useful when the targeted methylation sequencing was used to produce reads (such as amplicon sequencing or hybridization capture using, e.g., Agilent SureSelect Target Enrichment Probes).</p>
-<p>The amplicon sequencing principally differs from capture-based assays in that the coordinates of reads are known. Therefore, reads can be assigned to amplicons by their exact positions, while to the capture targets — by the overlap. For this, <em><code>epialleleR</code></em> provides generic <em><code>generateBedReport</code></em> function as well as two of its aliases, <em><code>generateAmpliconReport</code></em> (for amplicon-based NGS) and <em><code>generateCaptureReport</code></em> (for capture-based NGS).</p>
+<p><em><code>epialleleR</code></em> allows to make reports not only for
+individual cytosine bases, but also for a set of genomic regions. It is
+especially useful when the targeted methylation sequencing was used to
+produce reads (such as amplicon sequencing or hybridization capture
+using, e.g., Agilent SureSelect Target Enrichment Probes).</p>
+<p>The amplicon sequencing principally differs from capture-based assays
+in that the coordinates of reads are known. Therefore, reads can be
+assigned to amplicons by their exact positions, while to the capture
+targets — by the overlap. For this, <em><code>epialleleR</code></em>
+provides generic <em><code>generateBedReport</code></em> function as
+well as two of its aliases, <em><code>generateAmpliconReport</code></em>
+(for amplicon-based NGS) and <em><code>generateCaptureReport</code></em>
+(for capture-based NGS).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># report for amplicon-based data</span>
 <span class="co"># matching is done by exact start or end positions plus/minus tolerance</span>
@@ -277,10 +383,10 @@
   bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.061s]</span>
-<span class="co">#&gt; Reading BAM file [0.007s]</span>
-<span class="co">#&gt; Thresholding reads [0.001s]</span>
-<span class="co">#&gt; Preparing amplicon report [0.058s]</span>
+<span class="co">#&gt; Reading BED file [0.037s]</span>
+<span class="co">#&gt; Reading BAM file [0.005s]</span>
+<span class="co">#&gt; Thresholding reads [0.000s]</span>
+<span class="co">#&gt; Preparing amplicon report [0.032s]</span>
 <span class="va">amplicon.report</span>
 <span class="co">#&gt;    seqnames    start      end width strand amplicon nreads+ nreads-        VEF</span>
 <span class="co">#&gt; 1:    chr17 43125624 43126026   403      * CpG00-13       0     156 0.08333333</span>
@@ -295,10 +401,10 @@
   bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.043s]</span>
-<span class="co">#&gt; Reading BAM file [0.024s]</span>
+<span class="co">#&gt; Reading BED file [0.022s]</span>
+<span class="co">#&gt; Reading BAM file [0.014s]</span>
 <span class="co">#&gt; Thresholding reads [0.002s]</span>
-<span class="co">#&gt; Preparing capture report [0.025s]</span>
+<span class="co">#&gt; Preparing capture report [0.013s]</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">capture.report</span><span class="op">)</span>
 <span class="co">#&gt;    seqnames    start      end width strand     V4 nreads+ nreads-       VEF</span>
 <span class="co">#&gt; 1:     chr1  3067647  3069703  2057      * PRDM16       2       1 1.0000000</span>
@@ -314,17 +420,20 @@
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed.type<span class="op">=</span><span class="st">"capture"</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.014s]</span>
-<span class="co">#&gt; Reading BAM file [0.024s]</span>
+<span class="co">#&gt; Reading BED file [0.007s]</span>
+<span class="co">#&gt; Reading BAM file [0.011s]</span>
 <span class="co">#&gt; Thresholding reads [0.001s]</span>
-<span class="co">#&gt; Preparing capture report [0.026s]</span>
+<span class="co">#&gt; Preparing capture report [0.013s]</span>
 <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">capture.report</span>, <span class="va">bed.report</span><span class="op">)</span>
 <span class="co">#&gt; [1] TRUE</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="exploring-dna-methylation-patterns">Exploring DNA methylation patterns<a class="anchor" aria-label="anchor" href="#exploring-dna-methylation-patterns"></a>
 </h3>
-<p>Individual epialleles can be extracted and plotted in order to visualize methylation patters within a genomic region of interest. For this, <em><code>epialleleR</code></em> provides method <em><code>extractPatterns</code></em> which can be used as follows:</p>
+<p>Individual epialleles can be extracted and plotted in order to
+visualize methylation patters within a genomic region of interest. For
+this, <em><code>epialleleR</code></em> provides method
+<em><code>extractPatterns</code></em> which can be used as follows:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># First, let's extract base methylation information for sequencing reads</span>
 <span class="co"># of 1:9 mix of methylated and non-methylated control DNA</span>
@@ -332,8 +441,8 @@
   bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed<span class="op">=</span><span class="fu">as</span><span class="op">(</span><span class="st">"chr17:43125200-43125600"</span>,<span class="st">"GRanges"</span><span class="op">)</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BAM file [0.009s]</span>
-<span class="co">#&gt; Extracting methylation patterns [0.029s]</span>
+<span class="co">#&gt; Reading BAM file [0.008s]</span>
+<span class="co">#&gt; Extracting methylation patterns [0.017s]</span>
 
 <span class="co"># that many read pairs overlap genomic region of interest</span>
 <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">patterns</span><span class="op">)</span>
@@ -421,12 +530,19 @@
 <div class="section level3">
 <h3 id="plotting-the-distribution-of-per-read-beta-values">Plotting the distribution of per-read beta values<a class="anchor" aria-label="anchor" href="#plotting-the-distribution-of-per-read-beta-values"></a>
 </h3>
-<p>As stated in the introduction, human genomic DNA regions often show bimodal methylation patterns. <em><code>epialleleR</code></em> allows to visualize this information by plotting empirical cumulative distribution functions (eCDFs) for within- and out-of-context beta values.</p>
-<p>The code below produces plots for the sequencing reads of control DNA samples. Note that within-the-context eCDF(0.5) values are very close to the expected 1-VEF values for the corresponding control DNA samples:</p>
+<p>As stated in the introduction, human genomic DNA regions often show
+bimodal methylation patterns. <em><code>epialleleR</code></em> allows to
+visualize this information by plotting empirical cumulative distribution
+functions (eCDFs) for within- and out-of-context beta values.</p>
+<p>The code below produces plots for the sequencing reads of control DNA
+samples. Note that within-the-context eCDF(0.5) values are very close to
+the expected 1-VEF values for the corresponding control DNA samples:</p>
 <ul>
 <li>non-methylated DNA — expected VEF = 0, observed 1-eCDF(0.5) ≈ 0</li>
-<li>1:9 mix of methylated and non-methylated DNA — expected VEF = 0.1, observed 1-eCDF(0.5) ≈ 0.1</li>
-<li>and fully methylated DNA — expected VEF = 1, observed 1-eCDF(0.5) ≈ 1</li>
+<li>1:9 mix of methylated and non-methylated DNA — expected VEF = 0.1,
+observed 1-eCDF(0.5) ≈ 0.1</li>
+<li>and fully methylated DNA — expected VEF = 1, observed 1-eCDF(0.5) ≈
+1</li>
 </ul>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># First, let's visualise eCDFs for within- and out-of-context beta values</span>
@@ -440,9 +556,9 @@
   bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,
   bed.rows<span class="op">=</span><span class="cn">NULL</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.011s]</span>
-<span class="co">#&gt; Reading BAM file [0.005s]</span>
-<span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.015s]</span>
+<span class="co">#&gt; Reading BED file [0.007s]</span>
+<span class="co">#&gt; Reading BAM file [0.003s]</span>
+<span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.009s]</span>
 
 <span class="co"># there are 5 items in amplicon.ecdfs, let's plot all of them</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
@@ -502,9 +618,28 @@
 <div class="section level3">
 <h3 id="exploring-sequence-variants-in-epialleles">Exploring sequence variants in epialleles<a class="anchor" aria-label="anchor" href="#exploring-sequence-variants-in-epialleles"></a>
 </h3>
-<p>It is known that sequence variants can affect the methylation status of a DNA<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>. The <em><code>generateVcfReport</code></em> function calculates frequencies of single nucleotide variants (SNVs) within epialleles and tests for the association between SNV and epiallelic status using Fisher Exact test. Base counts and the test’s p-values are included in the returned value.</p>
-<p>In addition to BAM file location string or preprocessed BAM object, the function requires a location string for the Variant Call Format (VCF) file or the VCF object that was obtained using <em><code><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html" class="external-link">VariantAnnotation::readVcf</a></code></em> function. As VCF files can be extremely large, it is strongly advised to prefilter the VCF object by the relevant set of genomic regions, or specify such relevant set of regions as a <em><code>bed</code></em> parameter when <em><code>vcf</code></em> points to a VCF file location.</p>
-<p>Please note, that the output report is currently limited to SNVs only. Also, the default (<code>min.baseq=0</code>) output of <code>generateVcfReport</code> is equivalent to the one of <code>samtools mplieup -Q 0 ...</code>, and therefore may result in false SNVs caused by misalignments. Remember to increase <code>min.baseq</code> (<code>samtools mplieup -Q</code> default value is 13) to obtain results of a higher quality.</p>
+<p>It is known that sequence variants can affect the methylation status
+of a DNA<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>. The
+<em><code>generateVcfReport</code></em> function calculates frequencies
+of single nucleotide variants (SNVs) within epialleles and tests for the
+association between SNV and epiallelic status using Fisher Exact test.
+Base counts and the test’s p-values are included in the returned
+value.</p>
+<p>In addition to BAM file location string or preprocessed BAM object,
+the function requires a location string for the Variant Call Format
+(VCF) file or the VCF object that was obtained using
+<em><code><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html" class="external-link">VariantAnnotation::readVcf</a></code></em> function. As VCF files
+can be extremely large, it is strongly advised to prefilter the VCF
+object by the relevant set of genomic regions, or specify such relevant
+set of regions as a <em><code>bed</code></em> parameter when
+<em><code>vcf</code></em> points to a VCF file location.</p>
+<p>Please note, that the output report is currently limited to SNVs
+only. Also, the default (<code>min.baseq=0</code>) output of
+<code>generateVcfReport</code> is equivalent to the one of
+<code>samtools mplieup -Q 0 ...</code>, and therefore may result in
+false SNVs caused by misalignments. Remember to increase
+<code>min.baseq</code> (<code>samtools mplieup -Q</code> default value
+is 13) to obtain results of a higher quality.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># VCF report</span>
 <span class="va">vcf.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateVcfReport.html">generateVcfReport</a></span><span class="op">(</span>
@@ -517,11 +652,11 @@
   <span class="co"># to convert them internally</span>
   vcf.style<span class="op">=</span><span class="st">"NCBI"</span>
 <span class="op">)</span>
-<span class="co">#&gt; Reading BED file [0.012s]</span>
-<span class="co">#&gt; Reading VCF file [0.958s]</span>
-<span class="co">#&gt; Reading BAM file [0.012s]</span>
-<span class="co">#&gt; Thresholding reads [0.001s]</span>
-<span class="co">#&gt; Extracting base frequences [0.063s]</span>
+<span class="co">#&gt; Reading BED file [0.007s]</span>
+<span class="co">#&gt; Reading VCF file [0.721s]</span>
+<span class="co">#&gt; Reading BAM file [0.004s]</span>
+<span class="co">#&gt; Thresholding reads [0.000s]</span>
+<span class="co">#&gt; Extracting base frequences [0.039s]</span>
 
 <span class="co"># NA values are shown for the C-&gt;T variants on the "+" and G-&gt;A on the "-"</span>
 <span class="co"># strands, because bisulfite conversion makes their counting impossible</span>
@@ -611,14 +746,16 @@
 <div class="section level3">
 <h3 id="citing-the-epialleler-package">Citing the <em><code>epialleleR</code></em> package<a class="anchor" aria-label="anchor" href="#citing-the-epialleler-package"></a>
 </h3>
-<p>The experimental data analysed using the package has not been published yet. The citation information will be updated in the nearest future.</p>
+<p>The experimental data analysed using the package has not been
+published yet. The citation information will be updated in the nearest
+future.</p>
 </div>
 <div class="section level3">
 <h3 id="session-info">Session Info<a class="anchor" aria-label="anchor" href="#session-info"></a>
 </h3>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; R Under development (unstable) (2022-02-14 r81736)</span>
+<span class="co">#&gt; R Under development (unstable) (2022-02-17 r81757)</span>
 <span class="co">#&gt; Platform: x86_64-pc-linux-gnu (64-bit)</span>
 <span class="co">#&gt; Running under: Ubuntu 20.04.3 LTS</span>
 <span class="co">#&gt; </span>
@@ -636,7 +773,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; other attached packages:</span>
 <span class="co">#&gt; [1] GenomeInfoDb_1.31.4 IRanges_2.29.1      S4Vectors_0.33.10   BiocGenerics_0.41.2</span>
-<span class="co">#&gt; [5] ggstance_0.3.5      ggplot2_3.3.5       epialleleR_1.3.6   </span>
+<span class="co">#&gt; [5] ggstance_0.3.5      ggplot2_3.3.5       epialleleR_1.3.7   </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; loaded via a namespace (and not attached):</span>
 <span class="co">#&gt;   [1] bitops_1.0-7                matrixStats_0.61.0          fs_1.5.2                   </span>
@@ -660,14 +797,14 @@
 <span class="co">#&gt;  [55] VariantAnnotation_1.41.3    RCurl_1.98-1.6              magrittr_2.0.2             </span>
 <span class="co">#&gt;  [58] GenomeInfoDbData_1.2.7      Matrix_1.4-0                munsell_0.5.0              </span>
 <span class="co">#&gt;  [61] Rcpp_1.0.8                  fansi_1.0.2                 lifecycle_1.0.1            </span>
-<span class="co">#&gt;  [64] stringi_1.7.6               yaml_2.2.2                  SummarizedExperiment_1.25.3</span>
+<span class="co">#&gt;  [64] stringi_1.7.6               yaml_2.3.4                  SummarizedExperiment_1.25.3</span>
 <span class="co">#&gt;  [67] zlibbioc_1.41.0             plyr_1.8.6                  BiocFileCache_2.3.4        </span>
 <span class="co">#&gt;  [70] grid_4.2.0                  blob_1.2.2                  parallel_4.2.0             </span>
 <span class="co">#&gt;  [73] crayon_1.5.0                lattice_0.20-45             Biostrings_2.63.1          </span>
-<span class="co">#&gt;  [76] GenomicFeatures_1.47.7      hms_1.1.1                   KEGGREST_1.35.0            </span>
+<span class="co">#&gt;  [76] GenomicFeatures_1.47.11     hms_1.1.1                   KEGGREST_1.35.0            </span>
 <span class="co">#&gt;  [79] knitr_1.37                  pillar_1.7.0                GenomicRanges_1.47.6       </span>
 <span class="co">#&gt;  [82] rjson_0.2.21                biomaRt_2.51.3              XML_3.99-0.8               </span>
-<span class="co">#&gt;  [85] glue_1.6.1                  evaluate_0.14               data.table_1.14.2          </span>
+<span class="co">#&gt;  [85] glue_1.6.1                  evaluate_0.15               data.table_1.14.2          </span>
 <span class="co">#&gt;  [88] png_0.1-7                   vctrs_0.3.8                 gtable_0.3.0               </span>
 <span class="co">#&gt;  [91] purrr_0.3.4                 assertthat_0.2.1            cachem_1.0.6               </span>
 <span class="co">#&gt;  [94] xfun_0.29                   restfulr_0.0.13             ragg_1.2.1                 </span>
@@ -680,7 +817,7 @@
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 </div>
-<div class="footnotes">
+<div class="footnotes footnotes-end-of-document">
 <hr>
 <ol>
 <li id="fn1"><p><a href="https://doi.org/10.1146/annurev.pharmtox.45.120403.095832" class="external-link uri">https://doi.org/10.1146/annurev.pharmtox.45.120403.095832</a><a href="#fnref1" class="footnote-back">↩︎</a></p></li>
@@ -711,7 +848,8 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.2.9000.</p>
 </div>
 
       </footer>
