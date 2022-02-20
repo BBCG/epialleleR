@@ -72,7 +72,8 @@ Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame &df,                      
   std::for_each(ctx.begin(), ctx.end(), [&ctx_map] (unsigned int const &c) {
     ctx_map[c] = 1;
   });
-  ctx_map['A'] = 1; ctx_map['C'] = 1; ctx_map['G'] = 1; ctx_map['T'] = 1;       // make these bases valid for highlighting
+  ctx_map[(int)'A'] = 1; ctx_map[(int)'C'] = 1;                                 // make these bases valid for highlighting
+  ctx_map[(int)'G'] = 1; ctx_map[(int)'T'] = 1;
   
   // // rnames are sorted, should've been taking an advantage of it...
   // Rcpp::IntegerVector::const_iterator lower = std::lower_bound(rname.begin(), rname.end(), target_rname);
@@ -176,7 +177,7 @@ Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame &df,                      
           pat_nbase.push_back(total);                                           // push total
           pat_beta.push_back((double)meth/total);                               // push beta
           char fnv_str[17] = {0};
-          snprintf(fnv_str, 17, "%.16lX", fnv);
+          snprintf(fnv_str, 17, "%.16llX", fnv);
           pat_fnv.emplace_back(fnv_str, 16);                                    // push FNV-1a hash
         }
       }

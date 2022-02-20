@@ -108,7 +108,7 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
   T_cx_fmap cx_map;
   T_cx_fmap::iterator hint;
   T_val map_val = {0};
-  int max_pos;
+  int max_pos = 0;
   unsigned int max_freq_idx;
   
   cx_map.reserve(100000);                                                       // reserving helps?
