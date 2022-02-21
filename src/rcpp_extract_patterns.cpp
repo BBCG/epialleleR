@@ -1,4 +1,5 @@
 #include <Rcpp.h>
+#include <inttypes.h>
 #include <boost/container/flat_map.hpp>
 // using namespace Rcpp;
 
