@@ -1,6 +1,7 @@
 #include <Rcpp.h>
 #include <inttypes.h>
 #include <boost/container/flat_map.hpp>
+#define __STDC_FORMAT_MACROS
 // using namespace Rcpp;
 
 // Scans trough reads and extracts methylation patterns from the reads that
