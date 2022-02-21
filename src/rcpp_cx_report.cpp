@@ -63,33 +63,33 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
   typedef std::array<int,16> T_val;                                             // {0:rname, 1:pos, 8:strand, 9:coverage, and 10 more for 11 valid chars}
   typedef boost::container::flat_map<T_key, T_val> T_cx_fmap;                   // attaboy
   
-  // macros
-  #define ctx_to_idx(c) ((c+2)>>2) & 15
-  #define spit_results {                                                       \
-    for (T_cx_fmap::iterator it=cx_map.begin(); it!=cx_map.end(); it++) {      \
-      it->second[9] /= 2;                             /* halve the coverage */ \
-      if (it->second[12] > it->second[9]) continue;   /* skip if most are . */ \
-      else if ((it->second[2] + it->second[10]) > it->second[9])               \
-        max_freq_idx=2;                                                /* H */ \
-      else if ((it->second[6] + it->second[14]) > it->second[9])               \
-        max_freq_idx=6;                                                /* X */ \
-      else if ((it->second[7] + it->second[15]) > it->second[9])               \
-        max_freq_idx=7;                                                /* Z */ \
-      else continue;                               /* skip if none is > 50% */ \
-      if (ctx_map[max_freq_idx]) {                         /* if within ctx */ \
-        /* res_rname.push_back(it->second[0]);                        rname */ \
-        res_strand.push_back(it->second[8]);                      /* strand */ \
-        res_pos.push_back(it->second[1]);                            /* pos */ \
-        res_ctx.push_back(max_freq_idx);                         /* context */ \
-        res_meth.push_back(it->second[max_freq_idx]);               /* meth */ \
-        res_unmeth.push_back(it->second[max_freq_idx | 8]);       /* unmeth */ \
-      }                                                                        \
+// macros
+#define ctx_to_idx(c) ((c+2)>>2) & 15
+#define spit_results {                           /* save aggregated counts  */ \
+  for (T_cx_fmap::iterator it=cx_map.begin(); it!=cx_map.end(); it++) {        \
+    it->second[9] /= 2;                               /* halve the coverage */ \
+    if (it->second[12] > it->second[9]) continue;     /* skip if most are . */ \
+    else if ((it->second[2] + it->second[10]) > it->second[9])                 \
+      max_freq_idx=2;                                                  /* H */ \
+    else if ((it->second[6] + it->second[14]) > it->second[9])                 \
+      max_freq_idx=6;                                                  /* X */ \
+    else if ((it->second[7] + it->second[15]) > it->second[9])                 \
+      max_freq_idx=7;                                                  /* Z */ \
+    else continue;                                 /* skip if none is > 50% */ \
+    if (ctx_map[max_freq_idx]) {                           /* if within ctx */ \
+      /* res_rname.push_back(it->second[0]);                          rname */ \
+      res_strand.push_back(it->second[8]);                        /* strand */ \
+      res_pos.push_back(it->second[1]);                              /* pos */ \
+      res_ctx.push_back(max_freq_idx);                           /* context */ \
+      res_meth.push_back(it->second[max_freq_idx]);                 /* meth */ \
+      res_unmeth.push_back(it->second[max_freq_idx | 8]);         /* unmeth */ \
     }                                                                          \
-    res_rname.resize(res_strand.size(), map_val[0]);         /* same rname! */ \
-    max_pos=0;                                                                 \
-    cx_map.clear();                                                            \
-    hint = cx_map.end();                                                       \
-  }
+  }                                                                            \
+  res_rname.resize(res_strand.size(), map_val[0]);           /* same rname! */ \
+  max_pos=0;                                                                   \
+  cx_map.clear();                                                              \
+  hint = cx_map.end();                                                         \
+}
 
   // array of contexts to print
   unsigned int ctx_map [16] = {0};

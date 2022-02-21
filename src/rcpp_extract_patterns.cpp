@@ -177,7 +177,7 @@ Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame &df,                      
           pat_nbase.push_back(total);                                           // push total
           pat_beta.push_back((double)meth/total);                               // push beta
           char fnv_str[17] = {0};
-          snprintf(fnv_str, 17, "%.16llX", fnv);
+          snprintf(fnv_str, 17, "%.16" PRIX64, fnv);
           pat_fnv.emplace_back(fnv_str, 16);                                    // push FNV-1a hash
         }
       }
