@@ -1,14 +1,12 @@
 #include <Rcpp.h>
-#include <inttypes.h>
 #include <boost/container/flat_map.hpp>
-#define __STDC_FORMAT_MACROS
 // using namespace Rcpp;
 
 // Scans trough reads and extracts methylation patterns from the reads that
 // overlap target area. Clips overhangs if necessary.
 // Return value: a data frame with the following columns:
 // 1) pattern id (FNV hash)
-// 1) 
+// 2) just read the epialleleR::extractPatterns() manual...
 
 // ctx_to_idx conversion is described in the rcpp_cx_report.cpp
 // Here's the nt_to_idx conversion for the SEQ string:
@@ -178,7 +176,7 @@ Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame &df,                      
           pat_end.push_back(start_x+end_i-1);                                   // push end
           pat_nbase.push_back(total);                                           // push total
           pat_beta.push_back((double)meth/total);                               // push beta
-          char fnv_str[17] = {0};
+          char fnv_str[17] = {'0'};
           snprintf(fnv_str, 17, "%.16" PRIX64, fnv);
           pat_fnv.emplace_back(fnv_str, 16);                                    // push FNV-1a hash
         }
