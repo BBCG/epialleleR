@@ -5,6 +5,7 @@ test_extractPatterns <- function () {
     bed.row=2, verbose=TRUE
   )
   
+  message(paste(unique(noclip.patterns$pattern), collapse=" "))
   RUnit::checkEquals(
     length(unique(noclip.patterns$pattern)),
     34
