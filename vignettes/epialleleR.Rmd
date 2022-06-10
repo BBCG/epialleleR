@@ -113,13 +113,13 @@ options(width=100)
 
 The cytosine DNA methylation is an important epigenetic mechanism for regulation
 of gene expression. Abnormal methylation is linked to several diseases, being 
-for example the most common molecular lesion in cancer cell[^1]. Multiple
+for example the most common molecular lesion in cancer cell.[^1] Multiple
 studies suggest that alterations in DNA methylation, despite occurring at a low
-mosaic level, may confer increased risk of cancer later in life[^2].
+mosaic level, may confer increased risk of cancer later in life.[^2]
 
 The cytosine methylation levels within relatively small regions of the human
 genome are thought to be often concordant, resulting in a limited number of
-distinct methylation patterns of short sequencing reads[^3]. Due to the
+distinct methylation patterns of short sequencing reads.[^3] Due to the
 cell-to-cell variations in methylation, DNA purified from tissue samples
 contains a mix of hyper- and hypomethylated alleles with varying ratios that
 depend on the genomic region and tissue type.
@@ -130,6 +130,81 @@ using conventional algorithms, the identification of such hypermethylated
 epialleles becomes nearly impossible. In order to increase the sensitivity of
 DNA methylation analysis we have developed *`epialleleR`* &#8212; an R package
 for calling hypermethylated variant epiallele frequencies (VEF).
+
+Two edge cases epialleleR was designed to distinguish are presented below.
+While these are simplified and entirely artificial, they still give an idea of
+two different methylation patterns that may exist in real life, be characterised
+by very similar quantitative metrics (beta value, the ratio of methylated
+cytosines, $C$, to total number of cytosines, $C+T$, per genomic position
+&#8212; $\beta = \frac{C}{C+T}$), but have entirely different
+biological properties: non-functional scattered methylation / technical
+artefacts on the left, and epigenetic gene inactivation on the right. VEF
+values, that are essentially the ratio of methylated cytosines in
+hypermethylated (**a**bove threshold) reads, $C^a$, to total number of
+cytosines, $C+T$, per genomic position &#8212;
+$VEF = \frac{C^a}{C+T}$, clearly separate these cases and are thought to be
+more useful in detection and quantification of concordant methylation events.
+
+```{r, echo=FALSE, fig.width=10, fig.height=6, out.width="100%", out.height="100%"}
+data.beta <- data.table::data.table(
+  pattern=rep(letters[1:10], each=10),
+  pos=rep(10*c(1:10), 10),
+  base=rep(c('meth',rep('unmeth',10)), length.out=100)
+)
+val.beta <- data.table::data.table(
+  pos=rep(1:10, 2),
+  var=c(rep("VEF", 10), rep("beta\nvalue", 10)),
+  val=c(rep(0, 10), rep(0.1, 10))
+)
+data.vef <- data.table::data.table(
+  pattern=rep(letters[1:10], each=10),
+  pos=rep(10*c(1:10), 10),
+  base=c(rep('unmeth',20), rep('meth',10), rep('unmeth',70))
+)
+val.vef <- data.table::data.table(
+  pos=rep(1:10, 2),
+  var=c(rep("VEF", 10), rep("beta\nvalue", 10)),
+  val=c(rep(0.1, 10), rep(0.1, 10))
+)
+if (require("ggplot2", quietly=TRUE) & require("gridExtra", quietly=TRUE)) {
+  plot.data.beta <-
+    ggplot(data.beta,
+           aes(x=pos, y=pattern,
+               group=pattern, color=factor(base))) +
+      geom_line(color="grey") +
+      geom_point() +
+      scale_colour_grey(start=0, end=0.8) +
+      theme_light() +
+      theme(axis.text.x=element_blank(), axis.text.y=element_blank(), legend.position="top") +
+      labs(x="genomic position", y="epiallele", title="scattered CpG methylation", color="base")
+  plot.val.beta <-
+    ggplot(val.beta, aes(x=pos, y=var, label=val, fill=factor(val))) +
+      geom_text(size=3) +
+      theme_light() +
+      theme(axis.text.x=element_blank()) +
+      labs(x="", y="", title=NULL)
+  plot.data.vef <-
+    ggplot(data.vef,
+           aes(x=pos, y=pattern,
+               group=pattern, color=factor(base))) +
+    geom_line(color="grey") +
+    geom_point() +
+    scale_colour_grey(start=0, end=0.8) +
+    theme_light() +
+    theme(axis.text.x=element_blank(), axis.text.y=element_blank(), legend.position="top") +
+    labs(x="genomic position", y="epiallele", title="epimutation", color="base")
+  plot.val.vef <-
+    ggplot(val.vef, aes(x=pos, y=var, label=val, fill=factor(val))) +
+    geom_text(size=3) +
+    theme_light() +
+    theme(axis.text.x=element_blank()) +
+    labs(x="", y="", title=NULL)
+  grobs  <- lapply(list(plot.data.beta, plot.data.vef, plot.val.beta, plot.val.vef), ggplotGrob)
+  widths <- do.call(grid::unit.pmax, lapply(grobs, `[[`, "widths"))
+  for (i in 1:length(grobs)) grobs[[i]]$widths[2:5] <- widths[2:5]
+  do.call("grid.arrange", c(grobs, list(ncol=2, heights=c(3, 1))))
+}
+```
 
 *`epialleleR`* is a very fast and scalable solution for analysis of data
 obtained by next-generation sequencing of bisulfite-treated DNA samples. The
@@ -179,7 +254,7 @@ assembly.
 ### Amplicon-based methylation NGS data
 
 The samples of Human HCT116 DKO Non-Methylated (Zymo Research, cat # D5014-1),
-or Human HCT116 DKO Methylated (Zymo Research, cat # D5014-2) DNA[^4], or their
+or Human HCT116 DKO Methylated (Zymo Research, cat # D5014-2) DNA,[^4] or their
 mix were bisulfite-converted, and the BRCA1 gene promoter region was amplified
 using four pairs of primers. Amplicons were mixed, indexed and sequenced at
 Illumina MiSeq system. The related files are:
@@ -251,7 +326,7 @@ bam.data    <- preprocessBam(capture.bam)
 
 *`epialleleR`* can generate conventional cytosine reports in a format, which is
 similar to the genome-wide cytosine report produced by the *`coverage2cytosine`*
-Bismark module[^6].
+Bismark module.[^6]
 
 Please note that *`generateCytosineReport`* produces thresholded (VEF) report
 by default: **methylated** cytosines from reads that do **not** pass the
@@ -511,7 +586,7 @@ for (f in bam.files) {
 ## Exploring sequence variants in epialleles
 
 It is known that sequence variants can affect the methylation status of a
-DNA[^7]. The *`generateVcfReport`* function calculates frequencies of single
+DNA.[^7] The *`generateVcfReport`* function calculates frequencies of single
 nucleotide variants (SNVs) within epialleles and tests for the association
 between SNV and epiallelic status using Fisher Exact test. Base counts and the
 test's p-values are included in the returned value.
