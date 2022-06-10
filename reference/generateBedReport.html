@@ -20,7 +20,7 @@ threshold."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.0</span>
       </span>
     </div>
 
@@ -128,22 +128,32 @@ must derive from paired-end sequencing, be sorted
 by QNAME (instead of genomic position), contain XG tag (strand information
 for the reference genome) and methylation call strings. Read more about
 these requirements and BAM preprocessing at <code><a href="preprocessBam.html">preprocessBam</a></code>.</p></dd>
+
+
 <dt>bed</dt>
 <dd><p>Browser Extensible Data (BED) file location string OR object of
 class <code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></code> holding genomic coordinates for
 regions of interest. The style of seqlevels of BED file/object must be the
 same as the style of seqlevels of BAM file/object used.</p></dd>
+
+
 <dt>report.file</dt>
 <dd><p>file location string to write the BED report. If NULL
 (the default) then report is returned as a
 <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object.</p></dd>
+
+
 <dt>zero.based.bed</dt>
 <dd><p>boolean defining if BED coordinates are zero based
 (default: FALSE).</p></dd>
+
+
 <dt>match.tolerance</dt>
 <dd><p>integer for the largest difference between read's and
 BED <code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></code> start or end positions during
 matching of amplicon-based NGS reads (default: 1).</p></dd>
+
+
 <dt>threshold.reads</dt>
 <dd><p>boolean defining if sequence reads should be
 thresholded before counting reads belonging to variant epialleles (default:
@@ -151,6 +161,8 @@ TRUE). Disabling thresholding is possible but makes no sense in this context
 as all the reads will be assigned to the variant epiallele, which will result
 in VEF==1 (in such case `NA` VEF values are returned in order to avoid
 confusion).</p></dd>
+
+
 <dt>threshold.context</dt>
 <dd><p>string defining cytosine methylation context used
 for thresholding the reads:</p><ul><li><p>"CG" (the default) -- within-the-context: CpG cytosines (called as
@@ -162,52 +174,74 @@ for thresholding the reads:</p><ul><li><p>"CG" (the default) -- within-the-conte
 <li><p>"CX" -- all cytosines are considered within-the-context, this
   effectively results in no thresholding</p></li>
 </ul><p>This option has no effect when read thresholding is disabled.</p></dd>
+
+
 <dt>min.context.sites</dt>
 <dd><p>non-negative integer for minimum number of cytosines
 within the `threshold.context` (default: 2). Reads containing <strong>fewer</strong>
 within-the-context cytosines are considered completely unmethylated (thus
 belonging to the reference epiallele). This option has no effect when read
 thresholding is disabled.</p></dd>
+
+
 <dt>min.context.beta</dt>
 <dd><p>real number in the range [0;1] (default: 0.5). Reads
 with average beta value for within-the-context cytosines <strong>below</strong> this
 threshold are considered completely unmethylated (thus belonging to the
 reference epiallele). This option has no effect when read thresholding is
 disabled.</p></dd>
+
+
 <dt>max.outofcontext.beta</dt>
 <dd><p>real number in the range [0;1] (default: 0.1).
 Reads with average beta value for out-of-context cytosines <strong>above</strong>
 this threshold are considered completely unmethylated (thus belonging to the
 reference epiallele). This option has no effect when read thresholding is
 disabled.</p></dd>
+
+
 <dt>min.mapq</dt>
 <dd><p>non-negative integer threshold for minimum read mapping
 quality (default: 0). Option has no effect if preprocessed BAM data was
 supplied as an input.</p></dd>
+
+
 <dt>min.baseq</dt>
 <dd><p>non-negative integer threshold for minimum nucleotide base
 quality (default: 0). Option has no effect if preprocessed BAM data was
 supplied as an input.</p></dd>
+
+
 <dt>skip.duplicates</dt>
 <dd><p>boolean defining if duplicate aligned reads should be
 skipped (default: FALSE). Option has no effect if preprocessed BAM data was
 supplied as an input OR duplicate reads were not marked by alignment
 software.</p></dd>
+
+
 <dt>nthreads</dt>
 <dd><p>non-negative integer for the number of HTSlib threads to be
 used during BAM file decompression (default: 1). 2 threads make sense for the
 files larger than 100 MB. Option has no effect if preprocessed BAM data was
 supplied as an input.</p></dd>
+
+
 <dt>gzip</dt>
 <dd><p>boolean to compress the report (default: FALSE).</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>boolean to report progress and timings (default: TRUE).</p></dd>
+
+
 <dt>match.min.overlap</dt>
 <dd><p>integer for the smallest overlap between read's and
 BED <code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></code> start or end positions during
 matching of capture-based NGS reads (default: 1). If read matches two or more
 BED genomic regions, only the first match is taken (input
 <code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></code> are <strong>not</strong> sorted internally).</p></dd>
+
+
 <dt>bed.type</dt>
 <dd><p>character string for the type of assay that was used to
 produce sequencing reads:</p><ul><li><p>"amplicon" (the default) -- used for amplicon-based next-generation
@@ -223,10 +257,13 @@ produce sequencing reads:</p><ul><li><p>"amplicon" (the default) -- used for amp
   the first match is taken (input <code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></code> are
   <strong>not</strong> sorted internally)</p></li>
 </ul></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object containing VEF report for
+    
+
+<p><code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object containing VEF report for
 BED <code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></code> or NULL if report.file was
 specified. If BAM file contains reads that would not match to any of BED
 <code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></code>, the last row in the report will
@@ -286,13 +323,13 @@ the seqlevels style.</p></div>
 <span class="r-in">  <span class="va">amplicon.report</span> <span class="op">&lt;-</span> <span class="fu">generateAmpliconReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>,</span>
 <span class="r-in">                                            bed<span class="op">=</span><span class="va">amplicon.bed</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.008s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.011s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.004s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.007s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing amplicon report</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.014s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.020s]</span>
 <span class="r-in">  </span>
 <span class="r-in">  <span class="co"># capture NGS</span></span>
 <span class="r-in">  <span class="va">capture.bam</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>,</span>
@@ -301,26 +338,26 @@ the seqlevels style.</p></div>
 <span class="r-in">                                package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
 <span class="r-in">  <span class="va">capture.report</span> <span class="op">&lt;-</span> <span class="fu">generateCaptureReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.007s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.011s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.015s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.020s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.002s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing capture report</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.013s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.021s]</span>
 <span class="r-in">  </span>
 <span class="r-in">  <span class="co"># generateAmpliconReport and generateCaptureReport are just aliases</span></span>
 <span class="r-in">  <span class="co"># of the generateBedReport</span></span>
 <span class="r-in">  <span class="va">bed.report</span> <span class="op">&lt;-</span> <span class="fu">generateBedReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span>,</span>
 <span class="r-in">                                  bed.type<span class="op">=</span><span class="st">"capture"</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.007s]</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.011s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.016s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing capture report</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.013s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.022s]</span>
 <span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">capture.report</span>, <span class="va">bed.report</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 </code></pre></div>
@@ -337,8 +374,7 @@ the seqlevels style.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
 </div>
 
       </footer></div>

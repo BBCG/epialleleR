@@ -18,7 +18,7 @@ tests their association with the methylation status of the sequencing reads."><!
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.0</span>
       </span>
     </div>
 
@@ -85,11 +85,15 @@ must derive from paired-end sequencing, be sorted
 by QNAME (instead of genomic position), contain XG tag (strand information
 for the reference genome) and methylation call strings. Read more about
 these requirements and BAM preprocessing at <code><a href="preprocessBam.html">preprocessBam</a></code>.</p></dd>
+
+
 <dt>vcf</dt>
 <dd><p>Variant Call Format (VCF) file location string OR a VCF object
 returned by <code><a href="https://rdrr.io/pkg/VariantAnnotation/man/readVcf-methods.html" class="external-link">readVcf</a></code> function. If VCF object
 is supplied, the style of its seqlevels must match the style of seqlevels of
 the BAM file/object used.</p></dd>
+
+
 <dt>vcf.style</dt>
 <dd><p>string for the seqlevels style of the VCF file, if
 different from BED file/object. Only has effect when `vcf` parameter points
@@ -98,6 +102,8 @@ to the VCF file location and `bed` is not NULL. Possible values:</p><ul><li><p>N
 <li><p>"NCBI", "UCSC", ... -- valid parameters of
   <code><a href="https://rdrr.io/pkg/GenomeInfoDb/man/seqlevelsStyle.html" class="external-link">seqlevelsStyle</a></code> function</p></li>
 </ul></dd>
+
+
 <dt>bed</dt>
 <dd><p>Browser Extensible Data (BED) file location string OR object of
 class <code>GRanges</code> holding genomic coordinates for
@@ -105,13 +111,19 @@ regions of interest. It is used to include only the specific genomic ranges
 when the VCF file is loaded. This option has no effect when VCF object is
 supplied as a `vcf` parameter. The style of seqlevels of BED file/object
 must match the style of seqlevels of the BAM file/object used.</p></dd>
+
+
 <dt>report.file</dt>
 <dd><p>file location string to write the VCF report. If NULL
 (the default) then report is returned as a
 <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object.</p></dd>
+
+
 <dt>zero.based.bed</dt>
 <dd><p>boolean defining if BED coordinates are zero based
 (default: FALSE).</p></dd>
+
+
 <dt>threshold.reads</dt>
 <dd><p>boolean defining if sequence reads should be
 thresholded before counting bases in reference and variant epialleles
@@ -119,6 +131,8 @@ thresholded before counting bases in reference and variant epialleles
 this context as all the reads will be assigned to the variant epiallele,
 which will result in Fisher's Exact test p-value of 1 (in columns `FEp+` and
 `FEP-`).</p></dd>
+
+
 <dt>threshold.context</dt>
 <dd><p>string defining cytosine methylation context used
 for thresholding the reads:</p><ul><li><p>"CG" (the default) -- within-the-context: CpG cytosines (called as
@@ -130,50 +144,71 @@ for thresholding the reads:</p><ul><li><p>"CG" (the default) -- within-the-conte
 <li><p>"CX" -- all cytosines are considered within-the-context, this
   effectively results in no thresholding</p></li>
 </ul><p>This option has no effect when read thresholding is disabled.</p></dd>
+
+
 <dt>min.context.sites</dt>
 <dd><p>non-negative integer for minimum number of cytosines
 within the `threshold.context` (default: 2). Reads containing <strong>fewer</strong>
 within-the-context cytosines are considered completely unmethylated (thus
 belonging to the reference epiallele). This option has no effect when read
 thresholding is disabled.</p></dd>
+
+
 <dt>min.context.beta</dt>
 <dd><p>real number in the range [0;1] (default: 0.5). Reads
 with average beta value for within-the-context cytosines <strong>below</strong> this
 threshold are considered completely unmethylated (thus belonging to the
 reference epiallele). This option has no effect when read thresholding is
 disabled.</p></dd>
+
+
 <dt>max.outofcontext.beta</dt>
 <dd><p>real number in the range [0;1] (default: 0.1).
 Reads with average beta value for out-of-context cytosines <strong>above</strong>
 this threshold are considered completely unmethylated (thus belonging to the
 reference epiallele). This option has no effect when read thresholding is
 disabled.</p></dd>
+
+
 <dt>min.mapq</dt>
 <dd><p>non-negative integer threshold for minimum read mapping
 quality (default: 0). Option has no effect if preprocessed BAM data was
 supplied as an input.</p></dd>
+
+
 <dt>min.baseq</dt>
 <dd><p>non-negative integer threshold for minimum nucleotide base
 quality (default: 0). Option has no effect if preprocessed BAM data was
 supplied as an input.</p></dd>
+
+
 <dt>skip.duplicates</dt>
 <dd><p>boolean defining if duplicate aligned reads should be
 skipped (default: FALSE). Option has no effect if preprocessed BAM data was
 supplied as an input OR duplicate reads were not marked by alignment
 software.</p></dd>
+
+
 <dt>nthreads</dt>
 <dd><p>non-negative integer for the number of HTSlib threads to be
 used during BAM file decompression (default: 1). 2 threads make sense for the
 files larger than 100 MB. Option has no effect if preprocessed BAM data was
 supplied as an input.</p></dd>
+
+
 <dt>gzip</dt>
 <dd><p>boolean to compress the report (default: FALSE).</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>boolean to report progress and timings (default: TRUE).</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object containing VCF report or
+    
+
+<p><code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object containing VCF report or
 NULL if report.file was specified. The report columns are:</p><ul><li><p>name -- variation identifier (e.g. "rs123456789")</p></li>
 <li><p>seqnames -- reference sequence name</p></li>
 <li><p>range -- genomic coordinates of the variation</p></li>
@@ -250,15 +285,15 @@ the seqlevels style.</p></div>
 <span class="r-in">  <span class="va">vcf.report</span> <span class="op">&lt;-</span> <span class="fu">generateVcfReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span>,</span>
 <span class="r-in">                                  vcf<span class="op">=</span><span class="va">capture.vcf</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.010s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.013s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading VCF file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [4.506s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [6.889s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.011s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.016s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting base frequences</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.090s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.135s]</span>
 </code></pre></div>
     </div>
   </div>
@@ -273,8 +308,7 @@ the seqlevels style.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
 </div>
 
       </footer></div>

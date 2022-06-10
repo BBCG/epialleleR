@@ -18,7 +18,7 @@ per-read beta values of the sequencing reads."><!-- mathjax --><script src="http
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.0</span>
       </span>
     </div>
 
@@ -81,12 +81,16 @@ must derive from paired-end sequencing, be sorted
 by QNAME (instead of genomic position), contain XG tag (strand information
 for the reference genome) and methylation call strings. Read more about
 these requirements and BAM preprocessing at <code><a href="preprocessBam.html">preprocessBam</a></code>.</p></dd>
+
+
 <dt>bed</dt>
 <dd><p>Browser Extensible Data (BED) file location string OR object of
 class <code>GRanges</code> holding genomic coordinates for
 regions of interest. It is used to match sequencing reads to the genomic
 regions prior to eCDF computation. The style of seqlevels of BED file/object
 must match the style of seqlevels of the BAM file/object used.</p></dd>
+
+
 <dt>bed.type</dt>
 <dd><p>character string for the type of assay that was used to
 produce sequencing reads:</p><ul><li><p>"amplicon" (the default) -- used for amplicon-based next-generation
@@ -102,25 +106,35 @@ produce sequencing reads:</p><ul><li><p>"amplicon" (the default) -- used for amp
   the first match is taken (input <code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></code> are
   <strong>not</strong> sorted internally)</p></li>
 </ul></dd>
+
+
 <dt>bed.rows</dt>
 <dd><p>integer vector specifying what `bed` regions should be
 included in the output. If `c(1)` (the default), then function returns eCDFs
 for the first region of `bed`, if NULL - eCDF functions for all `bed`
 genomic regions as well as for the reads that didn't match any of the regions
 (last element of the return value; only if there are such reads).</p></dd>
+
+
 <dt>zero.based.bed</dt>
 <dd><p>boolean defining if BED coordinates are zero based
 (default: FALSE).</p></dd>
+
+
 <dt>match.tolerance</dt>
 <dd><p>integer for the largest difference between read's and
 BED <code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></code> start or end positions during
 matching of amplicon-based NGS reads (default: 1).</p></dd>
+
+
 <dt>match.min.overlap</dt>
 <dd><p>integer for the smallest overlap between read's and
 BED <code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></code> start or end positions during
 matching of capture-based NGS reads (default: 1). If read matches two or more
 BED genomic regions, only the first match is taken (input
 <code><a href="https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html" class="external-link">GRanges</a></code> are <strong>not</strong> sorted internally).</p></dd>
+
+
 <dt>ecdf.context</dt>
 <dd><p>string defining cytosine methylation context used
 for computing within-the-context and out-of-context eCDFs:</p><ul><li><p>"CG" (the default) -- within-the-context: CpG cytosines (called as
@@ -131,30 +145,43 @@ for computing within-the-context and out-of-context eCDFs:</p><ul><li><p>"CG" (t
   out-of-context: CHH cytosines (hH)</p></li>
 <li><p>"CX" -- all cytosines are considered within-the-context</p></li>
 </ul></dd>
+
+
 <dt>min.mapq</dt>
 <dd><p>non-negative integer threshold for minimum read mapping
 quality (default: 0). Option has no effect if preprocessed BAM data was
 supplied as an input.</p></dd>
+
+
 <dt>min.baseq</dt>
 <dd><p>non-negative integer threshold for minimum nucleotide base
 quality (default: 0). Option has no effect if preprocessed BAM data was
 supplied as an input.</p></dd>
+
+
 <dt>skip.duplicates</dt>
 <dd><p>boolean defining if duplicate aligned reads should be
 skipped (default: FALSE). Option has no effect if preprocessed BAM data was
 supplied as an input OR duplicate reads were not marked by alignment
 software.</p></dd>
+
+
 <dt>nthreads</dt>
 <dd><p>non-negative integer for the number of HTSlib threads to be
 used during BAM file decompression (default: 1). 2 threads make sense for the
 files larger than 100 MB. Option has no effect if preprocessed BAM data was
 supplied as an input.</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>boolean to report progress and timings (default: TRUE).</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>list with a number of elements equal to the length of `bed.rows` (if
+    
+
+<p>list with a number of elements equal to the length of `bed.rows` (if
 not NULL), or to the number of genomic regions within `bed` (if 
 `bed.rows==NULL`) plus one item for all reads not matching `bed` genomic
 regions (if any). Every list item is a list on it's own, consisting of two
@@ -196,11 +223,11 @@ usage and sample data.</p></div>
 <span class="r-in">  <span class="va">amplicon.ecdfs</span> <span class="op">&lt;-</span> <span class="fu">generateBedEcdf</span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>, bed<span class="op">=</span><span class="va">amplicon.bed</span>,</span>
 <span class="r-in">                                    bed.rows<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.023s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.032s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.004s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.006s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing ECDFs for within- and out-of-context per-read beta values</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.025s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.037s]</span>
 <span class="r-in">  </span>
 <span class="r-in">  <span class="co"># there are 5 items in amplicon.ecdfs, let's plot them all</span></span>
 <span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -240,8 +267,7 @@ usage and sample data.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
 </div>
 
       </footer></div>

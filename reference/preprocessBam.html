@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.3.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.0</span>
       </span>
     </div>
 
@@ -67,26 +67,39 @@
     <h2>Arguments</h2>
     <dl><dt>bam.file</dt>
 <dd><p>BAM file location string.</p></dd>
+
+
 <dt>min.mapq</dt>
 <dd><p>non-negative integer threshold for minimum read mapping
 quality (default: 0).</p></dd>
+
+
 <dt>min.baseq</dt>
 <dd><p>non-negative integer threshold for minimum nucleotide base
 quality (default: 0).</p></dd>
+
+
 <dt>skip.duplicates</dt>
 <dd><p>boolean defining if duplicate aligned reads should be
 skipped (default: FALSE). Option has no effect if duplicate reads were not
 marked by alignment software.</p></dd>
+
+
 <dt>nthreads</dt>
 <dd><p>non-negative integer for the number of additional HTSlib
 threads to be used during BAM file decompression (default: 1). Two threads
 (and usually no more than two) make sense for the files larger than 100 MB.</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>boolean to report progress and timings (default: TRUE).</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p><code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object containing preprocessed
+    
+
+<p><code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object containing preprocessed
 BAM data.</p>
     </div>
     <div id="details">
@@ -134,7 +147,7 @@ and <a href="https://support.illumina.com/content/dam/illumina-support/help/Illu
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">  <span class="va">capture.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
 <span class="r-in">  <span class="va">bam.data</span>    <span class="op">&lt;-</span> <span class="fu">preprocessBam</span><span class="op">(</span><span class="va">capture.bam</span><span class="op">)</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.012s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.016s]</span>
 </code></pre></div>
     </div>
   </div>
@@ -149,8 +162,7 @@ and <a href="https://support.illumina.com/content/dam/illumina-support/help/Illu
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.2.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
 </div>
 
       </footer></div>
