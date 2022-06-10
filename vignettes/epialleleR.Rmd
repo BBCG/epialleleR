@@ -374,6 +374,31 @@ if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
     labs(x="position", y="count", title="epialleles", color="base")
 }
 
+# upset-like plot of all patterns, continuous positions, sorted by counts
+if (require("ggplot2", quietly=TRUE) & require("gridExtra", quietly=TRUE)) {
+  grid.arrange(
+    ggplot(na.omit(plot.data),
+           aes(x=as.numeric(as.character(pos)), y=reorder(pattern,N),
+               color=factor(base))) +
+      geom_line(color="grey") +
+      geom_point() +
+      scale_colour_grey(start=0.8, end=0) +
+      theme_light() +
+      theme(axis.text.y=element_blank(), legend.position="none") +
+      labs(x="position", y=NULL, title="epialleles", color="base"),
+    
+    ggplot(unique(na.omit(plot.data)[, .(pattern, N, beta)]),
+           aes(x=N+0.5, y=reorder(pattern,N), alpha=beta, label=N)) +
+      geom_col() +
+      geom_text(alpha=0.5, nudge_x=0.2, size=3) +
+      scale_x_log10() +
+      theme_minimal() +
+      theme(axis.text.y=element_blank(), legend.position="none") +
+      labs(x="count", y=NULL, title=""),
+    ncol=2, widths=c(0.75, 0.25)
+  )
+}
+
 # now let's explore methylation patterns in RAD51C gene promoter using
 # methylation capture data
 capture.patterns <- extractPatterns(

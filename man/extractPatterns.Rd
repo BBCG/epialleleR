@@ -157,19 +157,6 @@ which can be used for plotting of DNA methylation patterns.
   plot.data <- data.table::melt.data.table(patterns.summary,
     measure.vars=base.positions, variable.name="pos", value.name="base")
   
-  # categorical positions, all patterns sorted by beta
-  if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
-    ggplot(na.omit(plot.data),
-           aes(x=pos, y=reorder(pattern,beta),
-               group=pattern, color=factor(base))) +
-      geom_line(color="grey", position=position_dodgev(height=0.5)) +
-      geom_point(position=position_dodgev(height=0.5)) +
-      scale_colour_grey(start=0.8, end=0) +
-      theme_light() +
-      theme(axis.text.x=element_text(angle=60, hjust=1, vjust=1)) +
-      labs(x="position", y="pattern", title="epialleles", color="base")
-  }
-  
   # continuous positions, nonunique patterns according to their counts
   if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
     ggplot(na.omit(plot.data)[N>1],
@@ -180,6 +167,32 @@ which can be used for plotting of DNA methylation patterns.
       scale_colour_grey(start=0.8, end=0) +
       theme_light() +
       labs(x="position", y="count", title="epialleles", color="base")
+  }
+  
+  # upset-like plot of all patterns, categorical positions, sorted by counts
+  if (require("ggplot2", quietly=TRUE) & require("gridExtra", quietly=TRUE)){
+    grid.arrange(
+      ggplot(na.omit(plot.data),
+             aes(x=pos, y=reorder(pattern,N),
+                 color=factor(base))) +
+        geom_line(color="grey") +
+        geom_point() +
+        scale_colour_grey(start=0.8, end=0) +
+        theme_light() +
+        scale_x_discrete(breaks=function(x){x[c(rep(FALSE,5), TRUE)]}) +
+        theme(axis.text.y=element_blank(), legend.position="none") +
+        labs(x="position", y=NULL, title="epialleles", color="base"),
+      
+      ggplot(unique(na.omit(plot.data)[, .(pattern, N, beta)]),
+             aes(x=N+0.5, y=reorder(pattern,N), alpha=beta, label=N)) +
+        geom_col() +
+        geom_text(alpha=0.5, nudge_x=0.2, size=3) +
+        scale_x_log10() +
+        theme_minimal() +
+        theme(axis.text.y=element_blank(), legend.position="none") +
+        labs(x="count", y=NULL, title=""),
+      ncol=2, widths=c(0.75, 0.25)
+    )
   }
   
 }
