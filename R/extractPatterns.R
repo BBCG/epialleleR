@@ -128,7 +128,7 @@
 #'   if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
 #'     ggplot(na.omit(plot.data)[N>1],
 #'            aes(x=as.numeric(as.character(pos)), y=factor(N),
-#'                group=pattern, color=factor(base))) +
+#'                group=pattern, color=factor(base, levels=c("z","Z")))) +
 #'       geom_line(color="grey", position=position_dodgev(height=0.5)) +
 #'       geom_point(position=position_dodgev(height=0.5)) +
 #'       scale_colour_grey(start=0.8, end=0) +
@@ -141,7 +141,7 @@
 #'     grid.arrange(
 #'       ggplot(na.omit(plot.data),
 #'              aes(x=pos, y=reorder(pattern,N),
-#'                  color=factor(base))) +
+#'                  color=factor(base, levels=c("z","Z")))) +
 #'         geom_line(color="grey") +
 #'         geom_point() +
 #'         scale_colour_grey(start=0.8, end=0) +
