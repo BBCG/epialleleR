@@ -135,13 +135,13 @@ Two edge cases epialleleR was designed to distinguish are presented below.
 While these are simplified and entirely artificial, they still give an idea of
 two different methylation patterns that may exist in real life, be characterised
 by very similar quantitative metrics (beta value, the ratio of methylated
-cytosines, $C$, to total number of cytosines, $C+T$, per genomic position
-&#8212; $\beta = \frac{C}{C+T}$), but have entirely different
+cytosines, $C$, to total number of cytosines, $C+T$, per genomic position, i.e.
+$\beta = \frac{C}{C+T}$), but have entirely different
 biological properties: non-functional scattered methylation / technical
 artefacts on the left, and epigenetic gene inactivation on the right. VEF
 values, that are essentially the ratio of methylated cytosines in
 hypermethylated (**a**bove threshold) reads, $C^a$, to total number of
-cytosines, $C+T$, per genomic position &#8212;
+cytosines, $C+T$, per genomic position, i.e.
 $VEF = \frac{C^a}{C+T}$, clearly separate these cases and are thought to be
 more useful in detection and quantification of concordant methylation events.
 
