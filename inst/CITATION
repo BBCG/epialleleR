@@ -1,0 +1,11 @@
+citHeader("To cite epialleleR in publications use:")
+
+citEntry(
+  entry    = "Article",
+  title    = "epialleleR: an R/BioC package for sensitive allele-specific methylation analysis in NGS data",
+  author   = c(person("Oleksii", "Nikolaienko"), person("Per Eystein", "Lønning"), person("Stian", "Knappskog")),
+  journal  = "bioRxiv",
+  year     = "2022",
+  url      = "https://www.biorxiv.org/content/10.1101/2022.06.30.498213v1",
+  textVersion = "Oleksii Nikolaienko, Per Eystein Lønning, Stian Knappskog. epialleleR: an R/BioC package for sensitive allele-specific methylation analysis in NGS data. bioRxiv 2022.06.30.498213, https://www.biorxiv.org/content/10.1101/2022.06.30.498213v1"
+)

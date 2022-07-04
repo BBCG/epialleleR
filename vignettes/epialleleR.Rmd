@@ -661,9 +661,17 @@ if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
 # Other information
 
 ## Citing the *`epialleleR`* package
+Oleksii Nikolaienko, Per Eystein Lønning, Stian Knappskog, *epialleleR*: an R/BioC package for sensitive allele-specific methylation analysis in NGS data. bioRxiv 2022.06.30.498213, [https://www.biorxiv.org/content/10.1101/2022.06.30.498213v1](https://www.biorxiv.org/content/10.1101/2022.06.30.498213v1)
 
-The experimental data analysed using the package has not been published yet.
-The citation information will be updated in the nearest future.
+## The data underlying *`epialleleR`* manuscript
+Replication Data for: "epialleleR: an R/BioC package for quantifying and analysing low-frequency DNA methylation", [https://doi.org/10.18710/2BQTJP](https://doi.org/10.18710/2BQTJP)
+
+NCBI GEO dataset GSE201690: "Methylation analysis of promoter regions for selected tumour suppressor genes in DNA from white blood cells", [https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE201690](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE201690)
+
+## The experimental data analysed using the package
+Per Eystein Lonning, Oleksii Nikolaienko, Kathy Pan, Allison W. Kurian, Hans Petter Petter Eikesdal, Mary Pettinger, Garnet L Anderson, Ross L Prentice, Rowan T. Chlebowski, and Stian Knappskog. Constitutional BRCA1 methylation and risk of incident triple-negative breast cancer and high-grade serous ovarian cancer. Journal of Clinical Oncology 2022 40:16_suppl, 10509-10509. [https://doi.org/10.1200/JCO.2022.40.16_suppl.10509](https://doi.org/10.1200/JCO.2022.40.16_suppl.10509)
+
+This and other papers will be published soon.
 
 
 ## Session Info
