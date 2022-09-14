@@ -41,7 +41,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.2</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>DISCLAIMER: This is a work in progress, however the package is already usable, and the obtained experimental results will soon be published. Main methods (<em><code>preprocessBam</code></em>, <em><code>generateCytosineReport</code></em>, <em><code>generateBedReport</code></em>) won’t change. The <em><code>generateVcfReport</code></em> method might at some point be improved to include variable-length sequence variations, while <em><code>generateBedEcdf</code></em> should be considered somewhat experimental and may undergo significant changes or be substituted with some other method in the future.</p>
+<p>DISCLAIMER: This is a work in progress, however the package is already usable, and the obtained experimental results has been published. Main methods (<em><code>preprocessBam</code></em>, <em><code>generateCytosineReport</code></em>, <em><code>generateBedReport</code></em>) won’t change. The <em><code>generateVcfReport</code></em> method might at some point be improved to include variable-length sequence variations, while <em><code>generateBedEcdf</code></em> should be considered somewhat experimental and may undergo significant changes or be substituted with some other method in the future.</p>
 <p><em><code>epialleleR</code></em> is an R package for calling hypermethylated variant epiallele frequencies (VEF) at the level of genomic regions or individual cytosines in next-generation sequencing data using binary alignment map (BAM) files as an input. Other functionality includes extracting methylation patterns, computing the empirical cumulative distribution function for per-read beta values, and testing the significance of the association between epiallele methylation status and base frequencies at particular genomic positions (SNPs).</p>
 <div class="section level3">
 <h3 id="current-features">Current Features<a class="anchor" aria-label="anchor" href="#current-features"></a>
@@ -123,19 +123,19 @@
 <h3 id="install-via-bioconductor">install via Bioconductor<a class="anchor" aria-label="anchor" href="#install-via-bioconductor"></a>
 </h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
-    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
-
-<span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"epialleleR"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"epialleleR"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="install-the-latest-version-via-install_github">Install the latest version via install_github<a class="anchor" aria-label="anchor" href="#install-the-latest-version-via-install_github"></a>
 </h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span>
-<span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"BBCG/epialleleR"</span>, build_vignettes<span class="op">=</span><span class="cn">FALSE</span>,
-  repos<span class="op">=</span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/repositories.html" class="external-link">repositories</a></span><span class="op">(</span><span class="op">)</span>,
-  dependencies<span class="op">=</span><span class="cn">TRUE</span>, type<span class="op">=</span><span class="st">"source"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"BBCG/epialleleR"</span>, build_vignettes<span class="op">=</span><span class="cn">FALSE</span>,</span>
+<span>  repos<span class="op">=</span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/repositories.html" class="external-link">repositories</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  dependencies<span class="op">=</span><span class="cn">TRUE</span>, type<span class="op">=</span><span class="st">"source"</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 </div>
@@ -145,35 +145,40 @@
 <p>Please read <em><code>epialleleR</code></em> vignettes at <a href="https://bbcg.github.io/epialleleR/articles/epialleleR.html" class="external-link">GitHub pages</a> or within the R environment: <code><a href="articles/epialleleR.html">vignette("epialleleR", package="epialleleR")</a></code>, or consult the function’s help pages for the extensive information on usage, parameters and output values.</p>
 <p>Very brief synopsis:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/BBCG/epialleleR" class="external-link">epialleleR</a></span><span class="op">)</span>
-
-<span class="co"># external files</span>
-<span class="va">amplicon.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>,
-                            package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
-<span class="va">amplicon.bed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
-<span class="va">amplicon.vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.vcf.gz"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>
-
-<span class="co"># preloading the data</span>
-<span class="va">bam.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/preprocessBam.html">preprocessBam</a></span><span class="op">(</span><span class="va">amplicon.bam</span><span class="op">)</span>
-
-<span class="co"># methylation patterns, check vignettes or method description for plotting them</span>
-<span class="va">patterns</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/extractPatterns.html">extractPatterns</a></span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>, bed<span class="op">=</span><span class="va">amplicon.bed</span>, bed.row<span class="op">=</span><span class="fl">3</span><span class="op">)</span>
-
-<span class="co"># CpG VEF report for individual bases</span>
-<span class="va">cg.vef.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span><span class="op">)</span>
-
-<span class="co"># BED-guided VEF report for genomic ranges</span>
-<span class="va">bed.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generateBedReport.html">generateBedReport</a></span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>, bed<span class="op">=</span><span class="va">amplicon.bed</span>,
-                                bed.type<span class="op">=</span><span class="st">"capture"</span><span class="op">)</span>
-
-<span class="co"># VCF report</span>
-<span class="va">vcf.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generateVcfReport.html">generateVcfReport</a></span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>, bed<span class="op">=</span><span class="va">amplicon.bed</span>,
-                                vcf<span class="op">=</span><span class="va">amplicon.vcf</span>, vcf.style<span class="op">=</span><span class="st">"NCBI"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/BBCG/epialleleR" class="external-link">epialleleR</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># external files</span></span>
+<span><span class="va">amplicon.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>,</span>
+<span>                            package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
+<span><span class="va">amplicon.bed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
+<span><span class="va">amplicon.vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.vcf.gz"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># preloading the data</span></span>
+<span><span class="va">bam.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/preprocessBam.html">preprocessBam</a></span><span class="op">(</span><span class="va">amplicon.bam</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># methylation patterns, check vignettes or method description for plotting them</span></span>
+<span><span class="va">patterns</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/extractPatterns.html">extractPatterns</a></span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>, bed<span class="op">=</span><span class="va">amplicon.bed</span>, bed.row<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># CpG VEF report for individual bases</span></span>
+<span><span class="va">cg.vef.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># BED-guided VEF report for genomic ranges</span></span>
+<span><span class="va">bed.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generateBedReport.html">generateBedReport</a></span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>, bed<span class="op">=</span><span class="va">amplicon.bed</span>,</span>
+<span>                                bed.type<span class="op">=</span><span class="st">"capture"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># VCF report</span></span>
+<span><span class="va">vcf.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generateVcfReport.html">generateVcfReport</a></span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>, bed<span class="op">=</span><span class="va">amplicon.bed</span>,</span>
+<span>                                vcf<span class="op">=</span><span class="va">amplicon.vcf</span>, vcf.style<span class="op">=</span><span class="st">"NCBI"</span><span class="op">)</span></span></code></pre></div>
 <hr>
 <div class="section level3">
 <h3 id="citing-the-epialleler-package">Citing the <em><code>epialleleR</code></em> package<a class="anchor" aria-label="anchor" href="#citing-the-epialleler-package"></a>
 </h3>
-<p>The experimental data analysed using the package has not been published yet. The citation information will be updated in the nearest future.</p>
+<p>Oleksii Nikolaienko, Per Eystein Lønning, Stian Knappskog, <em>epialleleR</em>: an R/BioC package for sensitive allele-specific methylation analysis in NGS data. bioRxiv 2022.06.30.498213, <a href="https://www.biorxiv.org/content/10.1101/2022.06.30.498213v1" class="external-link">https://www.biorxiv.org/content/10.1101/2022.06.30.498213v1</a></p>
+</div>
+<div class="section level3">
+<h3 id="the-experimental-data-analysed-using-the-package">The experimental data analysed using the package<a class="anchor" aria-label="anchor" href="#the-experimental-data-analysed-using-the-package"></a>
+</h3>
+<p>Per Eystein Lonning, Oleksii Nikolaienko, Kathy Pan, Allison W. Kurian, Hans Petter Petter Eikesdal, Mary Pettinger, Garnet L Anderson, Ross L Prentice, Rowan T. Chlebowski, and Stian Knappskog. Constitutional <em>BRCA1</em> methylation and risk of incident triple-negative breast cancer and high-grade serous ovarian cancer. JAMA Oncology 2022. <a href="https://doi.org/10.1001/jamaoncol.2022.3846" class="external-link">https://doi.org/10.1001/jamaoncol.2022.3846</a></p>
 </div>
 <div class="section level3">
 <h3 id="epialleler-at-bioconductor">
@@ -243,7 +248,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.9000.</p>
 </div>
 
       </footer>

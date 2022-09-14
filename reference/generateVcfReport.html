@@ -18,7 +18,7 @@ tests their association with the methylation status of the sequencing reads."><!
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.2</span>
       </span>
     </div>
 
@@ -55,25 +55,25 @@ tests their association with the methylation status of the sequencing reads.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">generateVcfReport</span><span class="op">(</span>
-  <span class="va">bam</span>,
-  <span class="va">vcf</span>,
-  vcf.style <span class="op">=</span> <span class="cn">NULL</span>,
-  bed <span class="op">=</span> <span class="cn">NULL</span>,
-  report.file <span class="op">=</span> <span class="cn">NULL</span>,
-  zero.based.bed <span class="op">=</span> <span class="cn">FALSE</span>,
-  threshold.reads <span class="op">=</span> <span class="cn">TRUE</span>,
-  threshold.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,
-  min.context.sites <span class="op">=</span> <span class="fl">2</span>,
-  min.context.beta <span class="op">=</span> <span class="fl">0.5</span>,
-  max.outofcontext.beta <span class="op">=</span> <span class="fl">0.1</span>,
-  min.mapq <span class="op">=</span> <span class="fl">0</span>,
-  min.baseq <span class="op">=</span> <span class="fl">0</span>,
-  skip.duplicates <span class="op">=</span> <span class="cn">FALSE</span>,
-  nthreads <span class="op">=</span> <span class="fl">1</span>,
-  gzip <span class="op">=</span> <span class="cn">FALSE</span>,
-  verbose <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateVcfReport</span><span class="op">(</span></span>
+<span>  <span class="va">bam</span>,</span>
+<span>  <span class="va">vcf</span>,</span>
+<span>  vcf.style <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  bed <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  report.file <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  zero.based.bed <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  threshold.reads <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  threshold.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,</span>
+<span>  min.context.sites <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  min.context.beta <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  max.outofcontext.beta <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  min.mapq <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  min.baseq <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  skip.duplicates <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  nthreads <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  gzip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -276,24 +276,24 @@ the seqlevels style.</p></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">  <span class="va">capture.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">capture.bed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">capture.vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.vcf.gz"</span>,</span>
-<span class="r-in">                             package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
-<span class="r-in">  </span>
-<span class="r-in">  <span class="co"># VCF report</span></span>
-<span class="r-in">  <span class="va">vcf.report</span> <span class="op">&lt;-</span> <span class="fu">generateVcfReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span>,</span>
-<span class="r-in">                                  vcf<span class="op">=</span><span class="va">capture.vcf</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="va">capture.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">capture.bed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">capture.vcf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.vcf.gz"</span>,</span></span>
+<span class="r-in"><span>                             package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># VCF report</span></span></span>
+<span class="r-in"><span>  <span class="va">vcf.report</span> <span class="op">&lt;-</span> <span class="fu">generateVcfReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span>,</span></span>
+<span class="r-in"><span>                                  vcf<span class="op">=</span><span class="va">capture.vcf</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.012s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.011s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading VCF file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [6.741s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [6.877s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.016s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.017s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.002s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting base frequences</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.129s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.134s]</span>
 </code></pre></div>
     </div>
   </div>
@@ -308,7 +308,7 @@ the seqlevels style.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.9000.</p>
 </div>
 
       </footer></div>

@@ -20,7 +20,7 @@ threshold."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.5.2</span>
       </span>
     </div>
 
@@ -59,64 +59,64 @@ threshold.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">generateAmpliconReport</span><span class="op">(</span>
-  <span class="va">bam</span>,
-  <span class="va">bed</span>,
-  report.file <span class="op">=</span> <span class="cn">NULL</span>,
-  zero.based.bed <span class="op">=</span> <span class="cn">FALSE</span>,
-  match.tolerance <span class="op">=</span> <span class="fl">1</span>,
-  threshold.reads <span class="op">=</span> <span class="cn">TRUE</span>,
-  threshold.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,
-  min.context.sites <span class="op">=</span> <span class="fl">2</span>,
-  min.context.beta <span class="op">=</span> <span class="fl">0.5</span>,
-  max.outofcontext.beta <span class="op">=</span> <span class="fl">0.1</span>,
-  min.mapq <span class="op">=</span> <span class="fl">0</span>,
-  min.baseq <span class="op">=</span> <span class="fl">0</span>,
-  skip.duplicates <span class="op">=</span> <span class="cn">FALSE</span>,
-  nthreads <span class="op">=</span> <span class="fl">0</span>,
-  gzip <span class="op">=</span> <span class="cn">FALSE</span>,
-  verbose <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span>
-
-<span class="fu">generateCaptureReport</span><span class="op">(</span>
-  <span class="va">bam</span>,
-  <span class="va">bed</span>,
-  report.file <span class="op">=</span> <span class="cn">NULL</span>,
-  zero.based.bed <span class="op">=</span> <span class="cn">FALSE</span>,
-  match.min.overlap <span class="op">=</span> <span class="fl">1</span>,
-  threshold.reads <span class="op">=</span> <span class="cn">TRUE</span>,
-  threshold.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,
-  min.context.sites <span class="op">=</span> <span class="fl">2</span>,
-  min.context.beta <span class="op">=</span> <span class="fl">0.5</span>,
-  max.outofcontext.beta <span class="op">=</span> <span class="fl">0.1</span>,
-  min.mapq <span class="op">=</span> <span class="fl">0</span>,
-  min.baseq <span class="op">=</span> <span class="fl">0</span>,
-  skip.duplicates <span class="op">=</span> <span class="cn">FALSE</span>,
-  nthreads <span class="op">=</span> <span class="fl">0</span>,
-  gzip <span class="op">=</span> <span class="cn">FALSE</span>,
-  verbose <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span>
-
-<span class="fu">generateBedReport</span><span class="op">(</span>
-  <span class="va">bam</span>,
-  <span class="va">bed</span>,
-  report.file <span class="op">=</span> <span class="cn">NULL</span>,
-  zero.based.bed <span class="op">=</span> <span class="cn">FALSE</span>,
-  bed.type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"amplicon"</span>, <span class="st">"capture"</span><span class="op">)</span>,
-  match.tolerance <span class="op">=</span> <span class="fl">1</span>,
-  match.min.overlap <span class="op">=</span> <span class="fl">1</span>,
-  threshold.reads <span class="op">=</span> <span class="cn">TRUE</span>,
-  threshold.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,
-  min.context.sites <span class="op">=</span> <span class="fl">2</span>,
-  min.context.beta <span class="op">=</span> <span class="fl">0.5</span>,
-  max.outofcontext.beta <span class="op">=</span> <span class="fl">0.1</span>,
-  min.mapq <span class="op">=</span> <span class="fl">0</span>,
-  min.baseq <span class="op">=</span> <span class="fl">0</span>,
-  skip.duplicates <span class="op">=</span> <span class="cn">FALSE</span>,
-  nthreads <span class="op">=</span> <span class="fl">1</span>,
-  gzip <span class="op">=</span> <span class="cn">FALSE</span>,
-  verbose <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateAmpliconReport</span><span class="op">(</span></span>
+<span>  <span class="va">bam</span>,</span>
+<span>  <span class="va">bed</span>,</span>
+<span>  report.file <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  zero.based.bed <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  match.tolerance <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  threshold.reads <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  threshold.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,</span>
+<span>  min.context.sites <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  min.context.beta <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  max.outofcontext.beta <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  min.mapq <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  min.baseq <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  skip.duplicates <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  nthreads <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  gzip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">generateCaptureReport</span><span class="op">(</span></span>
+<span>  <span class="va">bam</span>,</span>
+<span>  <span class="va">bed</span>,</span>
+<span>  report.file <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  zero.based.bed <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  match.min.overlap <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  threshold.reads <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  threshold.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,</span>
+<span>  min.context.sites <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  min.context.beta <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  max.outofcontext.beta <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  min.mapq <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  min.baseq <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  skip.duplicates <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  nthreads <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  gzip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">generateBedReport</span><span class="op">(</span></span>
+<span>  <span class="va">bam</span>,</span>
+<span>  <span class="va">bed</span>,</span>
+<span>  report.file <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  zero.based.bed <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  bed.type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"amplicon"</span>, <span class="st">"capture"</span><span class="op">)</span>,</span>
+<span>  match.tolerance <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  match.min.overlap <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  threshold.reads <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  threshold.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,</span>
+<span>  min.context.sites <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  min.context.beta <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  max.outofcontext.beta <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  min.mapq <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  min.baseq <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  skip.duplicates <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  nthreads <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  gzip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -315,50 +315,50 @@ the seqlevels style.</p></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in">  <span class="co"># amplicon data</span></span>
-<span class="r-in">  <span class="va">amplicon.bam</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>,</span>
-<span class="r-in">                                 package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">amplicon.bed</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>,</span>
-<span class="r-in">                                 package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">amplicon.report</span> <span class="op">&lt;-</span> <span class="fu">generateAmpliconReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>,</span>
-<span class="r-in">                                            bed<span class="op">=</span><span class="va">amplicon.bed</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="co"># amplicon data</span></span></span>
+<span class="r-in"><span>  <span class="va">amplicon.bam</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>,</span></span>
+<span class="r-in"><span>                                 package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">amplicon.bed</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>,</span></span>
+<span class="r-in"><span>                                 package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">amplicon.report</span> <span class="op">&lt;-</span> <span class="fu">generateAmpliconReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>,</span></span>
+<span class="r-in"><span>                                            bed<span class="op">=</span><span class="va">amplicon.bed</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.012s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.011s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.007s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.008s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing amplicon report</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.019s]</span>
-<span class="r-in">  </span>
-<span class="r-in">  <span class="co"># capture NGS</span></span>
-<span class="r-in">  <span class="va">capture.bam</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>,</span>
-<span class="r-in">                                package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">capture.bed</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>,</span>
-<span class="r-in">                                package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
-<span class="r-in">  <span class="va">capture.report</span> <span class="op">&lt;-</span> <span class="fu">generateCaptureReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span><span class="op">)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.022s]</span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># capture NGS</span></span></span>
+<span class="r-in"><span>  <span class="va">capture.bam</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>,</span></span>
+<span class="r-in"><span>                                package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">capture.bed</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>,</span></span>
+<span class="r-in"><span>                                package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">capture.report</span> <span class="op">&lt;-</span> <span class="fu">generateCaptureReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.010s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.011s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.020s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.022s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing capture report</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.021s]</span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># generateAmpliconReport and generateCaptureReport are just aliases</span></span></span>
+<span class="r-in"><span>  <span class="co"># of the generateBedReport</span></span></span>
+<span class="r-in"><span>  <span class="va">bed.report</span> <span class="op">&lt;-</span> <span class="fu">generateBedReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span>,</span></span>
+<span class="r-in"><span>                                  bed.type<span class="op">=</span><span class="st">"capture"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.011s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.018s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing capture report</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.019s]</span>
-<span class="r-in">  </span>
-<span class="r-in">  <span class="co"># generateAmpliconReport and generateCaptureReport are just aliases</span></span>
-<span class="r-in">  <span class="co"># of the generateBedReport</span></span>
-<span class="r-in">  <span class="va">bed.report</span> <span class="op">&lt;-</span> <span class="fu">generateBedReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span>,</span>
-<span class="r-in">                                  bed.type<span class="op">=</span><span class="st">"capture"</span><span class="op">)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.010s]</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.016s]</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.001s]</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing capture report</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.019s]</span>
-<span class="r-in">  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">capture.report</span>, <span class="va">bed.report</span><span class="op">)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.021s]</span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">capture.report</span>, <span class="va">bed.report</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 </code></pre></div>
     </div>
@@ -374,7 +374,7 @@ the seqlevels style.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.9000.</p>
 </div>
 
       </footer></div>
