@@ -221,7 +221,7 @@ sequencing), larger methylation capture panels, or even whole-genome approaches.
  (*`generateCytosineReport`*) or supplied genomic regions
  (*`generateBedReport`*)
  * DNA methylation patterns of genomic region of interest can be explored
- using (*`extractPatterns`*)
+ using *`extractPatterns`*
  * Potential bimodality of methylation for genomic regions of interest can be
  assessed using *`generateBedEcdf`* method
  * The association of single-nucleotide variations with the epiallelic status
@@ -669,9 +669,9 @@ Replication Data for: "epialleleR: an R/BioC package for quantifying and analysi
 NCBI GEO dataset GSE201690: "Methylation analysis of promoter regions for selected tumour suppressor genes in DNA from white blood cells", [https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE201690](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE201690)
 
 ## The experimental data analysed using the package
-Per Eystein Lonning, Oleksii Nikolaienko, Kathy Pan, Allison W. Kurian, Hans Petter Petter Eikesdal, Mary Pettinger, Garnet L Anderson, Ross L Prentice, Rowan T. Chlebowski, and Stian Knappskog. Constitutional BRCA1 methylation and risk of incident triple-negative breast cancer and high-grade serous ovarian cancer. Journal of Clinical Oncology 2022 40:16_suppl, 10509-10509. [https://doi.org/10.1200/JCO.2022.40.16_suppl.10509](https://doi.org/10.1200/JCO.2022.40.16_suppl.10509)
+Per Eystein Lonning, Oleksii Nikolaienko, Kathy Pan, Allison W. Kurian, Hans Petter Petter Eikesdal, Mary Pettinger, Garnet L Anderson, Ross L Prentice, Rowan T. Chlebowski, and Stian Knappskog. Constitutional *BRCA1* methylation and risk of incident triple-negative breast cancer and high-grade serous ovarian cancer. JAMA Oncology 2022. [https://doi.org/10.1001/jamaoncol.2022.3846](https://doi.org/10.1001/jamaoncol.2022.3846)
 
-This and other papers will be published soon.
+Other papers will be published soon.
 
 
 ## Session Info

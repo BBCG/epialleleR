@@ -7,7 +7,7 @@
 ## Introduction
 
 DISCLAIMER: This is a work in progress, however the package is already usable,
-and the obtained experimental results will soon be published. Main methods
+and the obtained experimental results has been published. Main methods
 (*`preprocessBam`*, *`generateCytosineReport`*, *`generateBedReport`*) won't
 change. The *`generateVcfReport`* method might at some point be improved to
 include variable-length sequence variations, while *`generateBedEcdf`* should
@@ -113,8 +113,10 @@ vcf.report <- generateVcfReport(bam=amplicon.bam, bed=amplicon.bed,
 -------
 
 ### Citing the *`epialleleR`* package
-The experimental data analysed using the package has not been published yet.
-The citation information will be updated in the nearest future.
+Oleksii Nikolaienko, Per Eystein Lønning, Stian Knappskog, *epialleleR*: an R/BioC package for sensitive allele-specific methylation analysis in NGS data. bioRxiv 2022.06.30.498213, [https://www.biorxiv.org/content/10.1101/2022.06.30.498213v1](https://www.biorxiv.org/content/10.1101/2022.06.30.498213v1)
+
+### The experimental data analysed using the package
+Per Eystein Lonning, Oleksii Nikolaienko, Kathy Pan, Allison W. Kurian, Hans Petter Petter Eikesdal, Mary Pettinger, Garnet L Anderson, Ross L Prentice, Rowan T. Chlebowski, and Stian Knappskog. Constitutional *BRCA1* methylation and risk of incident triple-negative breast cancer and high-grade serous ovarian cancer. JAMA Oncology 2022. [https://doi.org/10.1001/jamaoncol.2022.3846](https://doi.org/10.1001/jamaoncol.2022.3846)
 
 ### *`epialleleR`* at Bioconductor
 [release](https://bioconductor.org/packages/release/bioc/html/epialleleR.html), 
