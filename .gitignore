@@ -5,4 +5,5 @@ inst/doc
 epialleleR.Rproj
 .playground.R
 doc
-Meta
+Meta,
+.DS_Store

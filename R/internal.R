@@ -22,6 +22,7 @@
 #' @importFrom stats setNames
 #' @importFrom methods is
 #' @importFrom utils globalVariables
+#' @importFrom Rcpp evalCpp
 #' @useDynLib epialleleR, .registration=TRUE
 
 
