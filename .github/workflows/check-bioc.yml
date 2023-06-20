@@ -303,7 +303,7 @@ jobs:
 
       - name: Upload check results
         if: failure()
-        uses: actions/upload-artifact@devel
+        uses: actions/upload-artifact@master
         with:
           name: ${{ runner.os }}-biocversion-RELEASE_3_17-r-4.3-results
           path: check
