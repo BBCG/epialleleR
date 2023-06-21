@@ -38,17 +38,17 @@ test_preprocessBam <- function () {
   
   ### test BAMs
   
+  # empty
+  RUnit::checkException(
+    preprocessBam(system.file("extdata", "test", "empty.bam", package="epialleleR"), verbose=TRUE)
+  )
+  
   # paired, name-sorted, with XM
   RUnit::checkTrue(
     methods::is(
       preprocessBam(system.file("extdata", "test", "paired-name-xm.bam", package="epialleleR"), verbose=TRUE),
       "data.table"
     )
-  )
-  
-  # empty
-  RUnit::checkException(
-    preprocessBam(system.file("extdata", "test", "empty.bam", package="epialleleR"), verbose=TRUE)
   )
   
   # paired, name-sorted, no XM
@@ -66,14 +66,40 @@ test_preprocessBam <- function () {
     preprocessBam(system.file("extdata", "test", "paired-pos.bam", package="epialleleR"), verbose=TRUE)
   )
   
-  # single-ended, unsorted, with XM
+  # single-ended, name-sorted, with XM
+  RUnit::checkTrue(
+    methods::is(
+      preprocessBam(system.file("extdata", "test", "single-name-xm.bam", package="epialleleR"), verbose=TRUE),
+      "data.table"
+    )
+  )
+  
+  # single-ended, name-sorted, no XM
   RUnit::checkException(
-    preprocessBam(system.file("extdata", "test", "single-pos-xm.bam", package="epialleleR"), verbose=TRUE)
+    preprocessBam(system.file("extdata", "test", "single-name.bam", package="epialleleR"), verbose=TRUE)
+  )
+  
+  # single-ended, unsorted, with XM
+  RUnit::checkTrue(
+    methods::is(
+      preprocessBam(system.file("extdata", "test", "single-pos-xm.bam", package="epialleleR"), verbose=TRUE),
+      "data.table"
+    )
   )
   
   # single-ended, unsorted, no XM
   RUnit::checkException(
-    preprocessBam(system.file("extdata", "test", "paired-pos.bam", package="epialleleR"), verbose=TRUE)
+    preprocessBam(system.file("extdata", "test", "single-pos.bam", package="epialleleR"), verbose=TRUE)
+  )
+  
+  # paired-ended instead of single-ended
+  RUnit::checkException(
+    preprocessBam(system.file("extdata", "test", "paired-name-xm.bam", package="epialleleR"), paired=FALSE, verbose=TRUE)
+  )
+  
+  # single-ended instead of paired-ended
+  RUnit::checkException(
+    preprocessBam(system.file("extdata", "test", "single-name-xm.bam", package="epialleleR"), paired=TRUE, verbose=TRUE)
   )
   
   ### Rsamtools if avail

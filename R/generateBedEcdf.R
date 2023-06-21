@@ -69,20 +69,9 @@
 #'   out-of-context: CHH cytosines (hH)
 #'   \item "CX" -- all cytosines are considered within-the-context
 #' }
-#' @param min.mapq non-negative integer threshold for minimum read mapping
-#' quality (default: 0). Option has no effect if preprocessed BAM data was
-#' supplied as an input.
-#' @param min.baseq non-negative integer threshold for minimum nucleotide base
-#' quality (default: 0). Option has no effect if preprocessed BAM data was
-#' supplied as an input.
-#' @param skip.duplicates boolean defining if duplicate aligned reads should be
-#' skipped (default: FALSE). Option has no effect if preprocessed BAM data was
-#' supplied as an input OR duplicate reads were not marked by alignment
-#' software.
-#' @param nthreads non-negative integer for the number of HTSlib threads to be
-#' used during BAM file decompression (default: 1). 2 threads make sense for the
-#' files larger than 100 MB. Option has no effect if preprocessed BAM data was
-#' supplied as an input.
+#' @param ... other parameters to pass to the
+#' \code{\link[epialleleR]{preprocessBam}} function.
+#' Options have no effect if preprocessed BAM data was supplied as an input.
 #' @param verbose boolean to report progress and timings (default: TRUE).
 #' @return list with a number of elements equal to the length of `bed.rows` (if
 #' not NULL), or to the number of genomic regions within `bed` (if 
@@ -139,10 +128,7 @@ generateBedEcdf <- function (bam,
                              match.tolerance=1,
                              match.min.overlap=1,
                              ecdf.context=c("CG", "CHG", "CHH", "CxG", "CX"),
-                             min.mapq=0,
-                             min.baseq=0,
-                             skip.duplicates=FALSE,
-                             nthreads=1,
+                             ...,
                              verbose=TRUE)
 {
   bed.type     <- match.arg(bed.type, bed.type)
@@ -152,9 +138,7 @@ generateBedEcdf <- function (bam,
     bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed,
                     verbose=verbose)
 
-  bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq, min.baseq=min.baseq,
-                       skip.duplicates=skip.duplicates, nthreads=nthreads,
-                       verbose=verbose)
+  bam <- preprocessBam(bam.file=bam, ..., verbose=verbose)
   
   ecdf.list <- .getBedEcdf(
     bam.processed=bam, bed=bed, bed.type=bed.type, bed.rows=bed.rows,

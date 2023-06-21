@@ -6,6 +6,7 @@
 \usage{
 preprocessBam(
   bam.file,
+  paired = NULL,
   min.mapq = 0,
   min.baseq = 0,
   skip.duplicates = FALSE,
@@ -15,6 +16,9 @@ preprocessBam(
 }
 \arguments{
 \item{bam.file}{BAM file location string.}
+
+\item{paired}{boolean for expected alignment endness: `TRUE` for paired-end,
+`FALSE` for single-end, or `NULL` for auto detect (the default).}
 
 \item{min.mapq}{non-negative integer threshold for minimum read mapping
 quality (default: 0).}
@@ -48,12 +52,11 @@ by means of HTSlib threads.
 This function is also called internally when BAM file location is supplied as
 an input for other `epialleleR` methods.
 
-`preprocessBam` automatically determines if BAM file is paired- or single-end
+`preprocessBam` always tests if BAM file is paired- or single-end
 and has all necessary tags (XM/XG) available. It is recommended to use
 `verbose` processing and check messages for correct identification of
-alignment endness. As of this moment, function 
-accepts only BAM files that are derived from paired-end sequencing (this will
-be fixed soon). 
+alignment endness. Otherwise, if the `paired` parameter is set explicitly,
+exception is thrown when expected endness differs from the auto detected one.
 
 During preprocessing of paired-end alignments, paired reads are merged
 according to
@@ -64,12 +67,12 @@ then processed as a single entity in all `epialleleR` methods. Due to
 merging, overlapping bases in read pairs are counted only once, and the base
 with the highest quality is taken.
 
-During preprocessing of single-end alignments (coming soon!), no merging is
+During preprocessing of single-end alignments, no read merging is
 performed. Only bases with quality of at least `min.baseq` are considered.
 Lower base quality results in no information for that particular position
 ("-"/"N").
 
-It is also a requirement currently that paired-end BAM file is sorted by
+It is also a requirement currently that paired-end BAM file must be sorted by
 QNAME instead
 of genomic location (i.e., "unsorted") to perform merging of paired-end
 reads. Error message is shown if it is sorted by genomic location, in this

@@ -17,10 +17,7 @@ generateAmpliconReport(
   min.context.sites = 2,
   min.context.beta = 0.5,
   max.outofcontext.beta = 0.1,
-  min.mapq = 0,
-  min.baseq = 0,
-  skip.duplicates = FALSE,
-  nthreads = 0,
+  ...,
   gzip = FALSE,
   verbose = TRUE
 )
@@ -36,10 +33,7 @@ generateCaptureReport(
   min.context.sites = 2,
   min.context.beta = 0.5,
   max.outofcontext.beta = 0.1,
-  min.mapq = 0,
-  min.baseq = 0,
-  skip.duplicates = FALSE,
-  nthreads = 0,
+  ...,
   gzip = FALSE,
   verbose = TRUE
 )
@@ -57,10 +51,7 @@ generateBedReport(
   min.context.sites = 2,
   min.context.beta = 0.5,
   max.outofcontext.beta = 0.1,
-  min.mapq = 0,
-  min.baseq = 0,
-  skip.duplicates = FALSE,
-  nthreads = 1,
+  ...,
   gzip = FALSE,
   verbose = TRUE
 )
@@ -127,23 +118,9 @@ this threshold are considered completely unmethylated (thus belonging to the
 reference epiallele). This option has no effect when read thresholding is
 disabled.}
 
-\item{min.mapq}{non-negative integer threshold for minimum read mapping
-quality (default: 0). Option has no effect if preprocessed BAM data was
-supplied as an input.}
-
-\item{min.baseq}{non-negative integer threshold for minimum nucleotide base
-quality (default: 0). Option has no effect if preprocessed BAM data was
-supplied as an input.}
-
-\item{skip.duplicates}{boolean defining if duplicate aligned reads should be
-skipped (default: FALSE). Option has no effect if preprocessed BAM data was
-supplied as an input OR duplicate reads were not marked by alignment
-software.}
-
-\item{nthreads}{non-negative integer for the number of HTSlib threads to be
-used during BAM file decompression (default: 1). 2 threads make sense for the
-files larger than 100 MB. Option has no effect if preprocessed BAM data was
-supplied as an input.}
+\item{...}{other parameters to pass to the
+\code{\link[epialleleR]{preprocessBam}} function.
+Options have no effect if preprocessed BAM data was supplied as an input.}
 
 \item{gzip}{boolean to compress the report (default: FALSE).}
 
