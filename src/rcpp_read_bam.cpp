@@ -39,7 +39,7 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   std::vector<std::string>* seq = new std::vector<std::string>;                 // SEQ
   std::vector<std::string>* xm = new std::vector<std::string>;                  // XM
   std::vector<int> rname, strand, start;                                        // id for RNAME, id for CT==1/GA==2, POS
-  int nrecs = 0, ntempls = 0;                                                   // counters: BAM records, templates (read pairs)
+  int nrecs = 0, ntempls = 0;                                                   // counters: BAM records, templates (consecutive proper read pairs)
   
   // reserve some memory
   rname.reserve(0xFFFFF); strand.reserve(0xFFFFF); start.reserve(0xFFFFF); 
@@ -52,7 +52,7 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   uint8_t *templ_xm_rs   = (uint8_t*) malloc(max_templ_width * sizeof(uint8_t));// template XM array
   int templ_rname = 0, templ_start = 0, templ_strand = 0, templ_width = 0;      // template RNAME, POS, STRAND, ISIZE
   
-  #define unsorted (ntempls==0) || (nrecs/(ntempls>>1) < 3)                     /* TRUE if no templates OR fraction of two-read templates is <67% */
+  // #define unsorted (ntempls==0) || (nrecs/(ntempls>>1) < 3)                     /* TRUE if no templates OR fraction of two-read templates is <67% */
   #define push_template {               /* pushing template data to vectors */ \
     rname.push_back(templ_rname + 1);                            /* RNAME+1 */ \
     strand.push_back(templ_strand);                               /* STRAND */ \
@@ -67,7 +67,7 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
     nrecs++;                                                                    // BAM alignment records ++
     if ((nrecs & 0xFFFFF) == 0) {                                               // every ~1M reads
       Rcpp::checkUserInterrupt();                                               // checking for the interrupt
-      if (unsorted) break;                                                      // break out if seemingly unsorted
+      // if (unsorted) break;                                                      // break out if seemingly unsorted
     }
     if ((bam_rec->core.qual < min_mapq) ||                                      // skip if mapping quality < min.mapq
         (!(bam_rec->core.flag & BAM_FPROPER_PAIR)) ||                           // or if not a proper pair
@@ -161,10 +161,10 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   }
   
   // stop if single-end or seemingly unsorted
-  if (unsorted)
-    Rcpp::stop("BAM seems to be predominantly single-end or not sorted by QNAME. Single-end alignments are not supported yet. If paired-end, please sort using 'samtools sort -n -o out.bam in.bam'");
+  // if (unsorted)
+  //   Rcpp::stop("BAM seems to be predominantly single-end or not sorted by QNAME. Single-end alignments are not supported yet. If paired-end, please sort using 'samtools sort -n -o out.bam in.bam'");
   
-  // push last, yet unsaved template
+  // push last, yet unsaved template (no empty files enter this function)
   push_template;
   
   // cleaning

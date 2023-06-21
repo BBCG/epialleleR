@@ -1,4 +1,7 @@
 test_preprocessBam <- function () {
+  
+  ### good BAMs
+  
   capture.bam  <- system.file("extdata", "capture.bam", package="epialleleR")
   capture.data <- preprocessBam(capture.bam, verbose=FALSE)
   RUnit::checkEquals(
@@ -32,6 +35,48 @@ test_preprocessBam <- function () {
   RUnit::checkTrue(
     identical(data.table::data.table(capture.data[,1:3]), data.table::data.table(quality.data[,1:3]))
   )
+  
+  ### test BAMs
+  
+  # paired, name-sorted, with XM
+  RUnit::checkTrue(
+    methods::is(
+      preprocessBam(system.file("extdata", "test", "paired-name-xm.bam", package="epialleleR"), verbose=TRUE),
+      "data.table"
+    )
+  )
+  
+  # empty
+  RUnit::checkException(
+    preprocessBam(system.file("extdata", "test", "empty.bam", package="epialleleR"), verbose=TRUE)
+  )
+  
+  # paired, name-sorted, no XM
+  RUnit::checkException(
+    preprocessBam(system.file("extdata", "test", "paired-name.bam", package="epialleleR"), verbose=TRUE)
+  )
+  
+  # paired, unsorted, with XM
+  RUnit::checkException(
+    preprocessBam(system.file("extdata", "test", "paired-pos-xm.bam", package="epialleleR"), verbose=TRUE)
+  )
+  
+  # paired, unsorted, no XM
+  RUnit::checkException(
+    preprocessBam(system.file("extdata", "test", "paired-pos.bam", package="epialleleR"), verbose=TRUE)
+  )
+  
+  # single-ended, unsorted, with XM
+  RUnit::checkException(
+    preprocessBam(system.file("extdata", "test", "single-pos-xm.bam", package="epialleleR"), verbose=TRUE)
+  )
+  
+  # single-ended, unsorted, no XM
+  RUnit::checkException(
+    preprocessBam(system.file("extdata", "test", "paired-pos.bam", package="epialleleR"), verbose=TRUE)
+  )
+  
+  ### Rsamtools if avail
   
   if (require(Rsamtools, quietly=TRUE)) {
     RUnit::checkException(
