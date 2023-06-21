@@ -22,11 +22,10 @@ generateBedEcdf(
 }
 \arguments{
 \item{bam}{BAM file location string OR preprocessed output of
-\code{\link{preprocessBam}} function. BAM file alignment records
-must derive from paired-end sequencing, be sorted
-by QNAME (instead of genomic position), contain XG tag (strand information
-for the reference genome) and methylation call strings. Read more about
-these requirements and BAM preprocessing at \code{\link{preprocessBam}}.}
+\code{\link[epialleleR]{preprocessBam}} function. BAM file alignment records
+must contain XG tag (strand information for the reference genome) and
+methylation call string (XM tag). Read more about these and other
+requirements and BAM preprocessing at \code{\link{preprocessBam}}.}
 
 \item{bed}{Browser Extensible Data (BED) file location string OR object of
 class \code{\linkS4class{GRanges}} holding genomic coordinates for

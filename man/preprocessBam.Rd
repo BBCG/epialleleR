@@ -51,7 +51,7 @@ an input for other `epialleleR` methods.
 `preprocessBam` automatically determines if BAM file is paired- or single-end
 and has all necessary tags (XM/XG) available. It is recommended to use
 `verbose` processing and check messages for correct identification of
-alignment endness.  As of this moment, function 
+alignment endness. As of this moment, function 
 accepts only BAM files that are derived from paired-end sequencing (this will
 be fixed soon). 
 
