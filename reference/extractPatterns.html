@@ -18,7 +18,7 @@ region of interest."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/a
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.9.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.9.2</span>
       </span>
     </div>
 
@@ -66,10 +66,7 @@ region of interest.</p>
 <span>  clip.patterns <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  strand.offset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>CG <span class="op">=</span> <span class="fl">1</span>, CHG <span class="op">=</span> <span class="fl">2</span>, CHH <span class="op">=</span> <span class="fl">0</span>, CxG <span class="op">=</span> <span class="fl">0</span>, CX <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">[</span><span class="va">extract.context</span><span class="op">]</span>,</span>
 <span>  highlight.positions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  min.mapq <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  min.baseq <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  skip.duplicates <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  nthreads <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  <span class="va">...</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -147,30 +144,10 @@ patterns. `highlight.positions` takes precedence if any of these positions
 overlap with within-the-context positions of methylation pattern.</p></dd>
 
 
-<dt>min.mapq</dt>
-<dd><p>non-negative integer threshold for minimum read mapping
-quality (default: 0). Option has no effect if preprocessed BAM data was
-supplied as an input.</p></dd>
-
-
-<dt>min.baseq</dt>
-<dd><p>non-negative integer threshold for minimum nucleotide base
-quality (default: 0). Option has no effect if preprocessed BAM data was
-supplied as an input.</p></dd>
-
-
-<dt>skip.duplicates</dt>
-<dd><p>boolean defining if duplicate aligned reads should be
-skipped (default: FALSE). Option has no effect if preprocessed BAM data was
-supplied as an input OR duplicate reads were not marked by alignment
-software.</p></dd>
-
-
-<dt>nthreads</dt>
-<dd><p>non-negative integer for the number of HTSlib threads to be
-used during BAM file decompression (default: 1). 2 threads make sense for the
-files larger than 100 MB. Option has no effect if preprocessed BAM data was
-supplied as an input.</p></dd>
+<dt>...</dt>
+<dd><p>other parameters to pass to the
+<code><a href="preprocessBam.html">preprocessBam</a></code> function.
+Options have no effect if preprocessed BAM data was supplied as an input.</p></dd>
 
 
 <dt>verbose</dt>
@@ -233,13 +210,13 @@ description of usage and sample data.</p></div>
 <span class="r-in"><span>  <span class="co"># let's get our patterns</span></span></span>
 <span class="r-in"><span>  <span class="va">patterns</span> <span class="op">&lt;-</span> <span class="fu">extractPatterns</span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>, bed<span class="op">=</span><span class="va">amplicon.bed</span>, bed.row<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.085s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.061s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.022s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.016s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting methylation patterns</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.060s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.039s]</span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">patterns</span><span class="op">)</span>  <span class="co"># read pairs overlap genomic region of interest</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 238</span>
 <span class="r-in"><span>  </span></span>
