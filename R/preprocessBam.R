@@ -69,8 +69,9 @@ preprocessBam <- function (bam.file,
                            verbose=TRUE)
 {
   if (is.character(bam.file)) {
+    paired <- .checkBam(bam.file=bam.file, verbose=verbose)
     bam.processed <- .readBam(
-      bam.file=bam.file, min.mapq=min.mapq, min.baseq=min.baseq,
+      bam.file=bam.file, paired=paired, min.mapq=min.mapq, min.baseq=min.baseq,
       skip.duplicates=skip.duplicates, nthreads=nthreads, verbose=verbose
     )
     return(bam.processed)

@@ -10,6 +10,17 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// rcpp_check_bam
+Rcpp::List rcpp_check_bam(std::string fn);
+RcppExport SEXP _epialleleR_rcpp_check_bam(SEXP fnSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type fn(fnSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_check_bam(fn));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_cx_report
 Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame& df, Rcpp::LogicalVector& pass, std::string ctx);
 RcppExport SEXP _epialleleR_rcpp_cx_report(SEXP dfSEXP, SEXP passSEXP, SEXP ctxSEXP) {
@@ -142,6 +153,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_epialleleR_rcpp_check_bam", (DL_FUNC) &_epialleleR_rcpp_check_bam, 1},
     {"_epialleleR_rcpp_cx_report", (DL_FUNC) &_epialleleR_rcpp_cx_report, 3},
     {"_epialleleR_rcpp_extract_patterns", (DL_FUNC) &_epialleleR_rcpp_extract_patterns, 10},
     {"_epialleleR_rcpp_fep", (DL_FUNC) &_epialleleR_rcpp_fep, 2},

@@ -68,22 +68,68 @@ utils::globalVariables(
 # Functions: reading/writing files
 ################################################################################
 
+# descr: check BAM file before reading (using HTSlib)
+# value: TRUE (for paired-end) or FALSE (for single-end) or error
+#        if BAM loading is not possible
+
+.checkBam <- function (bam.file,
+                       verbose)
+{
+  if (verbose) message("Checking BAM file: ", appendLF=FALSE)
+  
+  bam.file <- path.expand(bam.file)
+  check.out <- rcpp_check_bam(bam.file)
+  
+  # main logic
+  if (check.out$nrecs==0) {                             # no records
+    stop("Empty file provided! Exiting",
+         call.=FALSE)
+  } else if (check.out$nxm==0) {                        # no XMs
+    stop("No XM tags found! Was methylation called successfully?\n",
+         "epialleleR own methylation calling is under development. Exiting",
+         call.=FALSE)
+  } else if (check.out$ntempls*2 < check.out$npp -1) {  # not sorted by name
+    stop("BAM file is not sorted by name!\n",
+         "Please sort using 'samtools sort -n -o out.bam in.bam'. Exiting",
+         call.=FALSE)
+  } else if (check.out$npp < check.out$nrecs/2) {       # predominantly SE
+    paired <- FALSE
+    stop("BAM file seems to be predominantly single-end!\n",
+         "Single-end alignments are not supported yet. Exiting",
+         call.=FALSE)
+  } else paired <- TRUE
+  
+  if (verbose) message(ifelse(paired, "paired", "single"),
+                       "-end, name-sorted alignment detected", appendLF=TRUE)
+  return(paired)
+}
+
+################################################################################
+
 # descr: reads BAM files using HTSlib
 # value: data.table
 
 .readBam <- function (bam.file,
+                      paired,
                       min.mapq,
                       min.baseq,
                       skip.duplicates,
                       nthreads,
                       verbose)
 {
-  if (verbose) message("Reading BAM file", appendLF=FALSE)
+  if (verbose) message("Reading ", ifelse(paired, "paired", "single"), 
+                       "-end BAM file", appendLF=FALSE)
   tm <- proc.time()
   
   bam.file <- path.expand(bam.file)
-  bam.processed <- rcpp_read_bam_paired(bam.file, min.mapq, min.baseq, 
-                                        skip.duplicates, nthreads)
+  if (paired) {
+    bam.processed <- rcpp_read_bam_paired(bam.file, min.mapq, min.baseq, 
+                                          skip.duplicates, nthreads)
+  } else {
+    bam.processed <- rcpp_read_bam_single(bam.file, min.mapq, min.baseq, 
+                                          skip.duplicates, nthreads)
+  }
+  
   data.table::setDT(bam.processed)
   bam.processed[,templid:=c(0:(.N-1))]
   data.table::setorder(bam.processed, rname, start)
