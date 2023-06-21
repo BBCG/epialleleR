@@ -90,9 +90,6 @@ utils::globalVariables(
          call.=FALSE)
   } else if (check.out$npp < check.out$nrecs/2) {       # predominantly SE
     paired <- FALSE
-    stop("BAM file seems to be predominantly single-end!\n",
-         "Single-end alignments are not supported yet. Exiting",
-         call.=FALSE)
   } else {
     if (check.out$ntempls*2 < check.out$npp -1) {       # not sorted by name
       stop("BAM file seems to be paired-end but not sorted by name!\n",

@@ -112,20 +112,9 @@
 #' T). This option has no effect when read thresholding is disabled.
 #' @param report.context string defining cytosine methylation context to report
 #' (default: value of `threshold.context`).
-#' @param min.mapq non-negative integer threshold for minimum read mapping
-#' quality (default: 0). Option has no effect if preprocessed BAM data was
-#' supplied as an input.
-#' @param min.baseq non-negative integer threshold for minimum nucleotide base
-#' quality (default: 0). Option has no effect if preprocessed BAM data was
-#' supplied as an input.
-#' @param skip.duplicates boolean defining if duplicate aligned reads should be
-#' skipped (default: FALSE). Option has no effect if preprocessed BAM data was
-#' supplied as an input OR duplicate reads were not marked by alignment
-#' software.
-#' @param nthreads non-negative integer for the number of HTSlib threads to be
-#' used during BAM file decompression (default: 1). 2 threads make sense for the
-#' files larger than 100 MB. Option has no effect if preprocessed BAM data was
-#' supplied as an input.
+#' @param ... other parameters to pass to the
+#' \code{\link[epialleleR]{preprocessBam}} function.
+#' Options have no effect if preprocessed BAM data was supplied as an input.
 #' @param gzip boolean to compress the report (default: FALSE).
 #' @param verbose boolean to report progress and timings (default: TRUE).
 #' @return \code{\link[data.table]{data.table}} object containing cytosine
@@ -164,19 +153,14 @@ generateCytosineReport <- function (bam,
                                     min.context.beta=0.5,
                                     max.outofcontext.beta=0.1,
                                     report.context=threshold.context,
-                                    min.mapq=0,
-                                    min.baseq=0,
-                                    skip.duplicates=FALSE,
-                                    nthreads=1,
+                                    ...,
                                     gzip=FALSE,
                                     verbose=TRUE)
 {
   threshold.context <- match.arg(threshold.context, threshold.context)
   report.context    <- match.arg(report.context, report.context)
   
-  bam <- preprocessBam(bam.file=bam, min.mapq=min.mapq, min.baseq=min.baseq,
-                       skip.duplicates=skip.duplicates, nthreads=nthreads,
-                       verbose=verbose)
+  bam <- preprocessBam(bam.file=bam, ..., verbose=verbose)
   
   if (threshold.reads) {
     pass <- .thresholdReads(
