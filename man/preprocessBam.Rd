@@ -48,17 +48,29 @@ by means of HTSlib threads.
 This function is also called internally when BAM file location is supplied as
 an input for other `epialleleR` methods.
 
-`preprocessBam` currently accepts only BAM files that are derived from
-paired-end sequencing (create an issue if you need to process single-end BAM
-files). During preprocessing, paired reads are merged according to their base 
-quality: nucleotide base with the highest value in the QUAL string is taken,
-unless its quality is less than `min.baseq`, which results in no information
-for that particular position ("-"/"N"). These merged reads are then
-processed as a single entity in all `epialleleR` methods. Due to merging,
-overlapping bases in read pairs are counted only once, and the base with the
-highest quality is taken.
+`preprocessBam` automatically determines if BAM file is paired- or single-end
+and has all necessary tags (XM/XG) available. It is recommended to use
+`verbose` processing and check messages for correct identification of
+alignment endness.  As of this moment, function 
+accepts only BAM files that are derived from paired-end sequencing (this will
+be fixed soon). 
 
-It is also a requirement currently that BAM file is sorted by QNAME instead
+During preprocessing of paired-end alignments, paired reads are merged
+according to
+their base quality: nucleotide base with the highest value in the QUAL string
+is taken, unless its quality is less than `min.baseq`, which results in no
+information for that particular position ("-"/"N"). These merged reads are
+then processed as a single entity in all `epialleleR` methods. Due to
+merging, overlapping bases in read pairs are counted only once, and the base
+with the highest quality is taken.
+
+During preprocessing of single-end alignments (coming soon!), no merging is
+performed. Only bases with quality of at least `min.baseq` are considered.
+Lower base quality results in no information for that particular position
+("-"/"N").
+
+It is also a requirement currently that paired-end BAM file is sorted by
+QNAME instead
 of genomic location (i.e., "unsorted") to perform merging of paired-end
 reads. Error message is shown if it is sorted by genomic location, in this
 case please sort it by QNAME using 'samtools sort -n -o out.bam in.bam'.
@@ -66,7 +78,8 @@ case please sort it by QNAME using 'samtools sort -n -o out.bam in.bam'.
 Please also note that for all its methods, `epialleleR` requires genomic
 strand (XG tag) and a methylation call string (XM tag) to be present in a
 BAM file - i.e., methylation calling must be
-performed after read mapping/alignment by your software of choice.
+performed after read mapping/alignment by your software of choice. Own method
+for methylation calling is currently under development.
 }
 \examples{
   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")

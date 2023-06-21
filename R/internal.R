@@ -88,19 +88,22 @@ utils::globalVariables(
     stop("No XM tags found! Was methylation called successfully?\n",
          "epialleleR own methylation calling is under development. Exiting",
          call.=FALSE)
-  } else if (check.out$ntempls*2 < check.out$npp -1) {  # not sorted by name
-    stop("BAM file is not sorted by name!\n",
-         "Please sort using 'samtools sort -n -o out.bam in.bam'. Exiting",
-         call.=FALSE)
   } else if (check.out$npp < check.out$nrecs/2) {       # predominantly SE
     paired <- FALSE
     stop("BAM file seems to be predominantly single-end!\n",
          "Single-end alignments are not supported yet. Exiting",
          call.=FALSE)
-  } else paired <- TRUE
+  } else {
+    if (check.out$ntempls*2 < check.out$npp -1) {       # not sorted by name
+      stop("BAM file seems to be paired-end but not sorted by name!\n",
+           "Please sort using 'samtools sort -n -o out.bam in.bam'. Exiting",
+           call.=FALSE)
+    }
+    paired <- TRUE
+  }
   
-  if (verbose) message(ifelse(paired, "paired", "single"),
-                       "-end, name-sorted alignment detected", appendLF=TRUE)
+  if (verbose) message(ifelse(paired, "paired-end, name-sorted", "single-end"),
+                       " alignment detected", appendLF=TRUE)
   return(paired)
 }
 
