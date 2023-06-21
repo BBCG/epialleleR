@@ -18,7 +18,7 @@ per-read beta values of the sequencing reads."><!-- mathjax --><script src="http
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.9.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.9.1</span>
       </span>
     </div>
 
@@ -77,10 +77,9 @@ per-read beta values of the sequencing reads.</p>
     <dl><dt>bam</dt>
 <dd><p>BAM file location string OR preprocessed output of
 <code><a href="preprocessBam.html">preprocessBam</a></code> function. BAM file alignment records
-must derive from paired-end sequencing, be sorted
-by QNAME (instead of genomic position), contain XG tag (strand information
-for the reference genome) and methylation call strings. Read more about
-these requirements and BAM preprocessing at <code><a href="preprocessBam.html">preprocessBam</a></code>.</p></dd>
+must contain XG tag (strand information for the reference genome) and
+methylation call string (XM tag). Read more about these and other
+requirements and BAM preprocessing at <code><a href="preprocessBam.html">preprocessBam</a></code>.</p></dd>
 
 
 <dt>bed</dt>
@@ -223,11 +222,13 @@ usage and sample data.</p></div>
 <span class="r-in"><span>  <span class="va">amplicon.ecdfs</span> <span class="op">&lt;-</span> <span class="fu">generateBedEcdf</span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>, bed<span class="op">=</span><span class="va">amplicon.bed</span>,</span></span>
 <span class="r-in"><span>                                    bed.rows<span class="op">=</span><span class="cn">NULL</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.027s]</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BAM file</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.006s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.044s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> paired-end, name-sorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.010s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Computing ECDFs for within- and out-of-context per-read beta values</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.033s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>  [0.052s]</span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># there are 5 items in amplicon.ecdfs, let's plot them all</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
