@@ -1,13 +1,13 @@
 # Fast, epiallele-aware methylation reporter  <img align="right" src="inst/epialleleR_logo.svg">
 
 [![](https://github.com/BBCG/epialleleR/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/BBCG/epialleleR/actions)
-[![](https://codecov.io/gh/BBCG/epialleleR/branch/master/graph/badge.svg)](https://codecov.io/gh/BBCG/epialleleR)
+[![](https://codecov.io/gh/BBCG/epialleleR/branch/devel/graph/badge.svg)](https://codecov.io/gh/BBCG/epialleleR)
 [![](https://bioconductor.org/shields/years-in-bioc/epialleleR.svg)](https://bioconductor.org/packages/release/bioc/html/epialleleR.html)
 
 ## Introduction
 
 DISCLAIMER: This is a work in progress, however the package is already usable,
-and the obtained experimental results has been published. Main methods
+and the obtained experimental results have been published. Main methods
 (*`preprocessBam`*, *`generateCytosineReport`*, *`generateBedReport`*) won't
 change. The *`generateVcfReport`* method might at some point be improved to
 include variable-length sequence variations, while *`generateBedEcdf`* should
@@ -37,6 +37,10 @@ methylation status and base frequencies at particular genomic positions (SNPs).
 
 ### Recent improvements
 
+##### v1.10
+
+ * inputs both single-end and paired-end sequencing alignments
+ 
 ##### v1.4
 
  * significant speed-up
@@ -113,10 +117,12 @@ vcf.report <- generateVcfReport(bam=amplicon.bam, bed=amplicon.bed,
 -------
 
 ### Citing the *`epialleleR`* package
-Oleksii Nikolaienko, Per Eystein Lønning, Stian Knappskog, *epialleleR*: an R/BioC package for sensitive allele-specific methylation analysis in NGS data. bioRxiv 2022.06.30.498213, [https://www.biorxiv.org/content/10.1101/2022.06.30.498213v1](https://www.biorxiv.org/content/10.1101/2022.06.30.498213v1)
+Oleksii Nikolaienko, Per Eystein Lønning, Stian Knappskog, *epialleleR*: an R/BioC package for sensitive allele-specific methylation analysis in NGS data. *bioRxiv* 2022.06.30.498213. [https://www.biorxiv.org/content/10.1101/2022.06.30.498213](https://www.biorxiv.org/content/10.1101/2022.06.30.498213)
 
 ### The experimental data analysed using the package
-Per Eystein Lonning, Oleksii Nikolaienko, Kathy Pan, Allison W. Kurian, Hans Petter Petter Eikesdal, Mary Pettinger, Garnet L Anderson, Ross L Prentice, Rowan T. Chlebowski, and Stian Knappskog. Constitutional *BRCA1* methylation and risk of incident triple-negative breast cancer and high-grade serous ovarian cancer. JAMA Oncology 2022. [https://doi.org/10.1001/jamaoncol.2022.3846](https://doi.org/10.1001/jamaoncol.2022.3846)
+Per Eystein Lonning, Oleksii Nikolaienko, Kathy Pan, Allison W. Kurian, Hans Petter Petter Eikesdal, Mary Pettinger, Garnet L Anderson, Ross L Prentice, Rowan T. Chlebowski, and Stian Knappskog. Constitutional *BRCA1* methylation and risk of incident triple-negative breast cancer and high-grade serous ovarian cancer. *JAMA Oncology* 2022. [https://doi.org/10.1001/jamaoncol.2022.3846](https://doi.org/10.1001/jamaoncol.2022.3846)
+
+Oleksii Nikolaienko, Hans P. Eikesdal, Bjørnar Gilje, Steinar Lundgren, Egil S. Blix, Helge Espelid, Jürgen Geisler, Stephanie Geisler, Emiel A.M. Janssen, Synnøve Yndestad, Laura Minsaas, Beryl Leirvaag, Reidun Lillestøl, Stian Knappskog, Per E. Lønning. Prenatal BRCA1 epimutations contribute significantly to triple-negative breast cancer development. *medRxiv* 2023.05.14.23289949. [https://www.medrxiv.org/content/10.1101/2023.05.14.23289949](https://www.medrxiv.org/content/10.1101/2023.05.14.23289949)
 
 ### *`epialleleR`* at Bioconductor
 [release](https://bioconductor.org/packages/release/bioc/html/epialleleR.html), 
