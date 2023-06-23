@@ -120,6 +120,6 @@ test_generateVcfReport <- function () {
   
   RUnit::checkEquals(
     sum(quality.report$SumRef, na.rm=TRUE),
-    5150
+    5164
   )
 }

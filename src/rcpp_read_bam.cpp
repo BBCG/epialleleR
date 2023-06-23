@@ -24,6 +24,7 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   // constants
   int max_qname_width = 1024;                                                   // max QNAME length, not expanded yet, ever error-prone?
   int max_templ_width = 8192;                                                   // max insert size, expanded if necessary
+  min_baseq = min_baseq - (min_baseq>0);                                        // decrease base quality by one to include bases with QUAL==min_baseq
   
   // file IO
   htsFile *bam_fp = hts_open(fn.c_str(), "r");                                  // try open file
@@ -54,7 +55,6 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   uint8_t *templ_xm_rs   = (uint8_t*) malloc(max_templ_width * sizeof(uint8_t));// template XM array
   int templ_rname = 0, templ_start = 0, templ_strand = 0, templ_width = 0;      // template RNAME, POS, STRAND, ISIZE
   
-  // # define unsorted (ntempls==0) || (nrecs/(ntempls>>1) < 3)                     /* TRUE if no templates OR fraction of two-read templates is <67% */
   #define push_template {               /* pushing template data to vectors */ \
     rname.push_back(templ_rname + 1);                            /* RNAME+1 */ \
     strand.push_back(templ_strand);                               /* STRAND */ \
@@ -67,10 +67,8 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   // process alignments
   while( sam_read1(bam_fp, bam_hdr, bam_rec) > 0 ) {                            // rec by rec
     nrecs++;                                                                    // BAM alignment records ++
-    if ((nrecs & 0xFFFFF) == 0) {                                               // every ~1M reads
-      Rcpp::checkUserInterrupt();                                               // checking for the interrupt
-      // if (unsorted) break;                                                      // break out if seemingly unsorted
-    }
+    if ((nrecs & 0xFFFFF) == 0) Rcpp::checkUserInterrupt();                     // every ~1M reads check for the interrupt
+    
     if ((bam_rec->core.qual < min_mapq) ||                                      // skip if mapping quality < min.mapq
         (!(bam_rec->core.flag & BAM_FPROPER_PAIR)) ||                           // or if not a proper pair
         (skip_duplicates && (bam_rec->core.flag & BAM_FDUP))) continue;         // or if record is an optical/PCR duplicate
@@ -90,9 +88,6 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
       templ_start = bam_rec->core.pos < bam_rec->core.mpos ?                    // smallest of POS,MPOS is a start
         bam_rec->core.pos : bam_rec->core.mpos;
       templ_width = abs(bam_rec->core.isize);                                   // template ISIZE
-      // char *rec_strand = (char*) bam_aux_get(bam_rec, "XG");                    // genome strand
-      // if (rec_strand==NULL)                                                     // fall back if absent
-      //   Rcpp::stop("Genome strand is missing for BAM record #%i", nrecs);
       templ_strand = ( rec_strand[1] == 'C' ) ? 1 : 2 ;                         // STRAND is 1 if "ZCT"/"+", 2 if "ZGA"/"-"
       
       // resize containers if necessary
@@ -115,9 +110,6 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
     // add another read to the template
     // source containers
     uint8_t *rec_qual = bam_get_qual(bam_rec);                                  // quality string (Phred scale with no +33 offset)
-    // char *rec_xm = (char*) bam_aux_get(bam_rec, "XM");                          // methylation string
-    // if (rec_xm==NULL)                                                           // fall back if absent 
-    //   Rcpp::stop("Methylation string is missing for BAM record #%i", nrecs); 
     rec_xm++;                                                                   // remove leading 'Z' from XM string
     uint8_t *rec_pseq = bam_get_seq(bam_rec);                                   // packed sequence string (4 bit per base)
     
@@ -161,10 +153,6 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
       }
     }
   }
-  
-  // stop if single-end or seemingly unsorted
-  // if (unsorted)
-  //   Rcpp::stop("BAM seems to be predominantly single-end or not sorted by QNAME. Single-end alignments are not supported yet. If paired-end, please sort using 'samtools sort -n -o out.bam in.bam'");
   
   // push last, yet unsaved template (no empty files enter this function)
   push_template;
@@ -253,9 +241,8 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
   // process alignments
   while( sam_read1(bam_fp, bam_hdr, bam_rec) > 0 ) {                            // rec by rec
     nrecs++;                                                                    // BAM alignment records ++
-    if ((nrecs & 0xFFFFF) == 0) {                                               // every ~1M reads
-      Rcpp::checkUserInterrupt();                                               // checking for the interrupt
-    }
+    if ((nrecs & 0xFFFFF) == 0) Rcpp::checkUserInterrupt();                     // every ~1M reads check for the interrupt
+
     if ((bam_rec->core.qual < min_mapq) ||                                      // skip if mapping quality < min.mapq
         (skip_duplicates && (bam_rec->core.flag & BAM_FDUP))) continue;         // or if record is an optical/PCR duplicate
     

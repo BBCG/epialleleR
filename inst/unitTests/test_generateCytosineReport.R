@@ -55,37 +55,37 @@ test_generateCytosineReport <- function () {
   
   RUnit::checkEquals(
     dim(cg.quality),
-    c(15182,6)
+    c(15197,6)
   )
   
   RUnit::checkEquals(
     dim(cx.quality),
-    c(95990,6)
+    c(96151,6)
   )
   
   RUnit::checkEquals(
     as.numeric(table(cx.quality$context)[c("CHH", "CHG", "CG")]),
-    c(57565, 23243, 15182)
+    c(57687, 23267, 15197)
   )
   
   RUnit::checkEquals(
     sum(cg.quality$meth),
-    4829
+    4830
   )
   
   RUnit::checkEquals(
     sum(cg.quality$unmeth),
-    15040
+    15062
   )
   
   RUnit::checkEquals(
     sum(cx.quality$meth),
-    5866
+    5873
   )
   
   RUnit::checkEquals(
     sum(cx.quality$unmeth),
-    124057
+    124333
   )
   
   
