@@ -1,5 +1,6 @@
 #include <Rcpp.h>
 #include <boost/container/flat_map.hpp>
+#include "epialleleR.h"
 // using namespace Rcpp;
 
 // Scans trough reads and extracts methylation patterns from the reads that
@@ -8,7 +9,10 @@
 // 1) pattern id (FNV hash)
 // 2) just read the epialleleR::extractPatterns() manual...
 
-// ctx_to_idx conversion is described in the rcpp_cx_report.cpp
+// described in epialleleR.h file:
+//   ctx_to_idx conversion
+//   FNV-1a hashing
+//
 // Here's the nt_to_idx conversion for the SEQ string:
 // nt   bin      >>1&3  dec              idx
 // -    00101101    10    2  not in ctx_map!
@@ -40,19 +44,11 @@ Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame &df,                      
   
   Rcpp::XPtr<std::vector<std::string>> xm((SEXP)df.attr("xm_xptr"));            // merged refspaced template XMs, as a pointer to std::vector<std::string>
   Rcpp::XPtr<std::vector<std::string>> seq((SEXP)df.attr("seq_xptr"));          // merged refspaced template SEQ, as a pointer to std::vector<std::string>
-  
-// http://www.isthe.com/chongo/tech/comp/fnv/
-#define fnv_add(hash, pointer, size) {     /* hash starts with offset_basis */ \
-  for (unsigned int idx=0; idx<size; idx++) {        /* cycle through bytes */ \
-    hash ^= *(pointer+idx);                       /* hash xor octet_of_data */ \
-    hash *= 1099511628211u;                             /* hash * FNV_prime */ \
-  }                                                                            \
-}
-#define ctx_to_idx(c) ((c+2)>>2) & 15
+
 #define nt_to_idx(c) base_map[(c>>1) & 3]
   
   // consts, vars, typedefs
-  const uint64_t offset_basis = 14695981039346656037u;                          // FNV-1a offset basis
+  const uint64_t offset_basis = FNV1a_OFFSET_BASIS;                             // FNV-1a offset basis
   const unsigned int base_map[] = {3, 4, 11, 12};                               // see comments on base conversion at the top
   unsigned int npat = 0;                                                        // pattern counter
   typedef int T_key;                                                            // map key
