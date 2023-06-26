@@ -171,6 +171,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// genometest
+int genometest();
+RcppExport SEXP _epialleleR_genometest() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(genometest());
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_threshold_reads
 std::vector<bool> rcpp_threshold_reads(Rcpp::DataFrame& df, std::string ctx_meth, std::string ctx_unmeth, std::string ooctx_meth, std::string ooctx_unmeth, unsigned int min_n_ctx, double min_ctx_meth_frac, double max_ooctx_meth_frac);
 RcppExport SEXP _epialleleR_rcpp_threshold_reads(SEXP dfSEXP, SEXP ctx_methSEXP, SEXP ctx_unmethSEXP, SEXP ooctx_methSEXP, SEXP ooctx_unmethSEXP, SEXP min_n_ctxSEXP, SEXP min_ctx_meth_fracSEXP, SEXP max_ooctx_meth_fracSEXP) {
@@ -203,6 +213,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_epialleleR_rcpp_read_bam_paired", (DL_FUNC) &_epialleleR_rcpp_read_bam_paired, 5},
     {"_epialleleR_rcpp_read_bam_single", (DL_FUNC) &_epialleleR_rcpp_read_bam_single, 5},
     {"_epialleleR_rcpp_read_genome", (DL_FUNC) &_epialleleR_rcpp_read_genome, 1},
+    {"_epialleleR_genometest", (DL_FUNC) &_epialleleR_genometest, 0},
     {"_epialleleR_rcpp_threshold_reads", (DL_FUNC) &_epialleleR_rcpp_threshold_reads, 8},
     {NULL, NULL, 0}
 };
