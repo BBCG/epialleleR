@@ -25,8 +25,6 @@
 // Cytosine context is encoded as follows:
 //   .=0, h=1, x=2, z=3 
 
-// genomic sequence-to-context lookup index
-#define triad_to_idx(t) ( (t[0]&7)<<6 + (t[1]&7)<<3 + (t[2]&7) )
 
 // genomic sequence-to-context lookup tables
 const unsigned char triad_forward_context[512] = {
@@ -66,37 +64,61 @@ const unsigned char triad_forward_context[512] = {
 const unsigned char triad_reverse_context[512] = {
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
-    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  65,   0, 
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  65,   0,
-   16,   0,  32, 128,   0, 240,  65,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
-   16,   0,  32, 128,   0, 240,  65,   0,  16,   0,  32, 128,   0, 240,  67,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  67,   0,
+   16,   0,  32, 128,   0, 240,  65,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+   16,   0,  32, 128,   0, 240,  65,   0,  16,   0,  32, 128,   0, 240,  65,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  66,   0, 
     0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  66,   0,
-   16,   0,  32, 128,   0, 240,  66,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
-   16,   0,  32, 128,   0, 240,  66,   0,  16,   0,  32, 128,   0, 240,  67,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  67,   0,
+   16,   0,  32, 128,   0, 240,  66,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+   16,   0,  32, 128,   0, 240,  66,   0,  16,   0,  32, 128,   0, 240,  66,   0,
     0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  65,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  65,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  67,   0,
    16,   0,  32, 128,   0, 240,  65,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-   16,   0,  32, 128,   0, 240,  65,   0,  16,   0,  32, 128,   0, 240,  67,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
+   16,   0,  32, 128,   0, 240,  65,   0,  16,   0,  32, 128,   0, 240,  65,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  65,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  65,   0, 
-   16,   0,  32, 128,   0, 240,  65,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
-   16,   0,  32, 128,   0, 240,  65,   0,  16,   0,  32, 128,   0, 240,  67,   0, 
-    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  65,   0,
-    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  65,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  67,   0,
    16,   0,  32, 128,   0, 240,  65,   0,   0,   0,   0,   0,   0,   0,   0,   0,
-   16,   0,  32, 128,   0, 240,  65,   0,  16,   0,  32, 128,   0, 240,  67,   0
+   16,   0,  32, 128,   0, 240,  65,   0,  16,   0,  32, 128,   0, 240,  65,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  65,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  67,   0,
+   16,   0,  32, 128,   0, 240,  65,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+   16,   0,  32, 128,   0, 240,  65,   0,  16,   0,  32, 128,   0, 240,  65,   0
 };
+
+
+
+// temp sub to see the seq and context
+int decodeContext (const char *p, size_t s) {
+  char ctx_map[] = ".hxz";
+  const size_t buf_size = 1024;
+  char seq[buf_size];
+  char Fctx[buf_size];
+  char Rctx[buf_size];
+  for (size_t i=0; i<std::min(s, buf_size); i++) {
+    seq[i]  = seq_nt16_str[((unsigned char) (p[i] & 0b11110000)) >> 4];
+    Fctx[i] = ctx_map[((unsigned char) (p[i] & 0b00001100)) >> 2];
+    Rctx[i] = ctx_map[((unsigned char) (p[i] & 0b00000011)) ];
+  }
+  
+  Rcpp::Rcout << " Seq:" << std::string(seq,  std::min(s, buf_size)) << std::endl;
+  Rcpp::Rcout << "Fctx:" << std::string(Fctx, std::min(s, buf_size)) << std::endl;
+  Rcpp::Rcout << "Rctx:" << std::string(Rctx, std::min(s, buf_size)) << std::endl;
+  
+  return 0;
+}
+
+
 
 // Encodes sequence and cytosine context using a simple loop
 // Try rewrite this using lookup table or SIMD intrinsics
@@ -150,49 +172,39 @@ inline int encodeContextLookup (char *source, size_t size)
   const size_t buf_overlap = 4;
   char seq[buf_size];
   char out[buf_size];
+  unsigned int idx;
   
   memset(seq, 'N', 2);
   // read first batch
   std::memcpy(seq+2, source, buf_size-2);
   // batch by batch
   for (size_t b=1; b <= size/(buf_size-buf_overlap); b++) {
+    Rcpp::Rcout << " SEQ:" << std::string(seq, sizeof seq) << std::endl;
+    
     // clean out
     memset(out, 0, sizeof out);
     // one-pass encode
     for (size_t i=0; i<buf_size-2; i++) {
-      out[i] = out[i] | triad_forward_context[triad_to_idx(seq+i)];
-      out[i+2] = out[i+2] | triad_reverse_context[triad_to_idx(seq+i)];
+      idx = ((seq[i]&7)<<6) | ((seq[i+1]&7)<<3) | (seq[i+2]&7);                 // genomic sequence-to-context lookup index
+      out[i] = out[i] | triad_forward_context[idx];
+      //out[i+2] = out[i+2] | triad_reverse_context[idx];
+      Rcpp::Rcout << idx << "=" << out[i] << ",";
     }
-    // copy to destination
-    std::memcpy(source+(b-1)*(buf_size-buf_overlap), out+2, buf_size-buf_overlap);
+    
+    decodeContext(out, sizeof out);
+    
+    // // copy to destination
+    // std::memcpy(source+(b-1)*(buf_size-buf_overlap), out+2, buf_size-buf_overlap);
     // read another chunk
     std::memcpy(seq, source+b*(buf_size-buf_overlap)-2, buf_size);
+    
+    // Rcpp::Rcout << " OUT:" << std::string(out, sizeof out) << std::endl;
   }
   // number of bases processed
   return (size/(buf_size-buf_overlap))*(buf_size-buf_overlap);
 }
 
 
-
-// temp sub to see the seq and context
-int decodeContext (const char *p, size_t s) {
-  char ctx_map[] = ".hxz";
-  const size_t buf_size = 1024;
-  char seq[buf_size];
-  char Fctx[buf_size];
-  char Rctx[buf_size];
-  for (size_t i=0; i<std::min(s, buf_size); i++) {
-    seq[i]  = seq_nt16_str[(unsigned char) (p[i] & 0b11110000) >> 4];
-    Fctx[i] = ctx_map[(unsigned char) (p[i] & 0b00001100) >> 2];
-    Rctx[i] = ctx_map[(unsigned char) (p[i] & 0b00000011) ];
-  }
-  
-  Rcpp::Rcout << " Seq:" << std::string(seq,  std::min(s, buf_size)) << std::endl;
-  Rcpp::Rcout << "Fctx:" << std::string(Fctx, std::min(s, buf_size)) << std::endl;
-  Rcpp::Rcout << "Rctx:" << std::string(Rctx, std::min(s, buf_size)) << std::endl;
-  
-  return 0;
-}
 
 
 // [[Rcpp::export]]
@@ -279,17 +291,34 @@ int genometest ()
   Rcpp::Rcout << "Fctx:" << std::string(corrFctx, sizeof corrFctx) << std::endl;
   Rcpp::Rcout << "Rctx:" << std::string(corrRctx, sizeof corrRctx) << std::endl;
   
+  // // Loop
+  // char tail[24];
+  // memset(tail+20, 'N', 4);
+  // memcpy(tail, full_seq + sizeof_full_seq - 20, 20);
+  // Rcpp::Rcout << "Tail:" << std::string(tail, sizeof tail) << std::endl;
+  // 
+  // int n = encodeContextLoop(full_seq, sizeof_full_seq);
+  // Rcpp::Rcout << "n=" << n << std::endl;
+  // 
+  // decodeContext(full_seq, sizeof_full_seq);
+  // 
+  // encodeContextLoop(tail, sizeof tail);
+  // memcpy(full_seq + sizeof_full_seq - 16, tail+4, 16);
+  // 
+  // decodeContext(full_seq, sizeof_full_seq);
+  
+  // Lookup
   char tail[24];
   memset(tail+20, 'N', 4);
   memcpy(tail, full_seq + sizeof_full_seq - 20, 20);
   Rcpp::Rcout << "Tail:" << std::string(tail, sizeof tail) << std::endl;
   
-  int n = encodeContextLoop(full_seq, sizeof_full_seq);
+  int n = encodeContextLookup(full_seq, sizeof_full_seq);
   Rcpp::Rcout << "n=" << n << std::endl;
   
   decodeContext(full_seq, sizeof_full_seq);
   
-  encodeContextLoop(tail, sizeof tail);
+  encodeContextLookup(tail, sizeof tail);
   memcpy(full_seq + sizeof_full_seq - 16, tail+4, 16);
   
   decodeContext(full_seq, sizeof_full_seq);
