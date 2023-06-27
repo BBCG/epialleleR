@@ -25,8 +25,58 @@
 // Cytosine context is encoded as follows:
 //   .=0, h=1, x=2, z=3 
 
+
+// Encodes sequence and cytosine context using a simple loop
+inline int encodeContextLoop (char *source, size_t size)
+{
+  const size_t buf_size = 16;
+  const size_t buf_overlap = 4;
+  char seq[buf_size];
+  char isC[buf_size];
+  char isG[buf_size];
+  char Fctx[buf_size];
+  char Rctx[buf_size];
+  
+  memset(seq, 'N', 2);
+  // read first batch
+  std::memcpy(seq+2, source, buf_size-2);
+  // batch by batch
+  for (size_t b=1; b <= size/(buf_size-buf_overlap); b++) {
+    // IUPAC encode
+    for (size_t i=0; i<buf_size; i++) {
+      seq[i] = seq_nt16_table[ (unsigned char) seq[i] ];
+    }
+    // check if Cs or Gs
+    for (size_t i=0; i<buf_size; i++) {
+      isC[i] = seq[i]==seq_nt16_table['C'];                                     // is C?
+      isG[i] = seq[i]==seq_nt16_table['G'];                                     // is G?
+    }
+    // calculate context
+    for (size_t i=0; i<buf_size-2; i++) {
+      Fctx[i] = ( isC[i] << (isG[i+1] | isG[i+2]) ) | (isC[i] & isG[i+1]);
+      Rctx[i+2] = ( isG[i+2] << (isC[i] | isC[i+1]) ) | (isC[i+1] & isG[i+2]);
+    }
+    // pack sequence and context
+    for (size_t i=buf_overlap/2; i<buf_size-buf_overlap/2; i++) {
+      seq[i] = (seq[i]<<4) | (Fctx[i]<<2) | (Rctx[i]);
+    }
+    // copy to destination
+    std::memcpy(source+(b-1)*(buf_size-buf_overlap), seq+2, buf_size-buf_overlap);
+    // read another chunk
+    std::memcpy(seq, source+b*(buf_size-buf_overlap)-2, buf_size);
+  }
+  // number of bases processed
+  return (size/(buf_size-buf_overlap))*(buf_size-buf_overlap);
+}
+
+
+
+
+
+
+
 // [[Rcpp::export]]
-Rcpp::List rcpp_read_genome (std::string fn)                                    // input (optionally [b]gzipped and/or indexed) FASTA file name
+Rcpp::List rcpp_read_genome (std::string fn)                                    // input: a name of (optionally bgzipped and/or indexed) FASTA file 
 {
   // containers
   std::vector<uint64_t> rid;                                                    // numeric ids of reference sequences
@@ -57,43 +107,15 @@ Rcpp::List rcpp_read_genome (std::string fn)                                    
     if (length!=flen) Rcpp::stop("Corrupted FASTA index. Delete and try again");// if fetched bytes differ from expected
     // Rcpp::Rcout << "Fetched " << flen << std::endl;
     
-    // convert to IUPAC
-    for (size_t j=0; j<length; j++) {
-      sequence[j] = seq_nt16_table[ (unsigned char) sequence[j] ] << 4 ;
-    }
-    
-    // // "-" strand context of first two bases
-    // C0 = (sequence[0] == 0b00100000);                                           // IUPAC 'C' << 4
-    // C1 = (sequence[1] == 0b00100000);
-    // G0 = (sequence[0] == 0b01000000);                                           // IUPAC 'G' << 4
-    // G1 = (sequence[1] == 0b01000000);
-    
-    // // get context
-    // for (size_t j=0; j<length-2; j++) {
-    //   C0 = (sequence[j]   == 0b00100000);                                       // IUPAC 'C' << 4
-    //   C1 = (sequence[j+1] == 0b00100000);
-    //   G1 = (sequence[j+1] == 0b01000000);                                       // IUPAC 'G' << 4
-    //   G2 = (sequence[j+2] == 0b01000000);
-    //   ctx_plus  = ( C0 << (G1 | G2) ) | (C0 & G1) ;
-    //   ctx_minus = ( G2 << (C0 | C1) ) | (G2 & C1) ;
-    //   sequence[j] = sequence[j]   | ( (unsigned char) ctx_plus << 2 );
-    //   sequence[j] = sequence[j+2] | ( (unsigned char) ctx_minus );
-    // }
-    
-    // get context (conditions)
-    for (size_t j=0; j<length-2; j++) {
-      if (sequence[j]   == 0b00100000) {                                        // IUPAC 'C' << 4 in position 0
-        if (sequence[j+1] == 0b01000000) {                                      // IUPAC 'G' << 4 in position 1
-          sequence[j]   = sequence[j]   & 0b11111100;
-          sequence[j+1] = sequence[j+1] & 0b11110011;
-          j++;
-        } else if (sequence[j+2] == 0b01000000) {                               // IUPAC 'G' << 4 in position 2
-          sequence[j] = sequence[j] & 0b11111000;;
-        } else {
-          sequence[j] = sequence[j] | (1<<2);
-        }
-      }
-    }
+    // save the tail
+    char tail[24];
+    memset(tail+20, 'N', 4);
+    memcpy(tail, sequence + length - 20, 20);
+
+    // encode context
+    encodeContextLoop(sequence, length);                                        // sequence first
+    encodeContextLoop(tail, sizeof tail);                                       // then tail
+    memcpy(sequence+length-16, tail+4, 16);                                     // put 16 last at their place
     
     rseq->emplace_back((const char*) sequence, length);
     free(sequence);
@@ -117,21 +139,21 @@ Rcpp::List rcpp_read_genome (std::string fn)                                    
 
 
 
-int decodeContext (char *p) {
+int decodeContext (const char *p, size_t s) {
   char ctx_map[] = ".hxz";
-  const size_t buf_size = 100;
+  const size_t buf_size = 1024;
   char seq[buf_size];
   char Fctx[buf_size];
   char Rctx[buf_size];
-  for (size_t i=0; i<buf_size; i++) {
-    seq[i] = seq_nt16_str[ (unsigned char) p[i] & 0b00001111];
-    Fctx[i] = ctx_map[(unsigned char) (p[i] & 0b11000000) >> 6];
-    Rctx[i] = ctx_map[(unsigned char) (p[i] & 0b00110000) >> 4];
+  for (size_t i=0; i<std::min(s, buf_size); i++) {
+    seq[i]  = seq_nt16_str[(unsigned char) (p[i] & 0b11110000) >> 4];
+    Fctx[i] = ctx_map[(unsigned char) (p[i] & 0b00001100) >> 2];
+    Rctx[i] = ctx_map[(unsigned char) (p[i] & 0b00000011) ];
   }
   
-  Rcpp::Rcout << " Seq:" << std::string(seq,  sizeof seq)  << std::endl;
-  Rcpp::Rcout << "Fctx:" << std::string(Fctx, sizeof Fctx) << std::endl;
-  Rcpp::Rcout << "Rctx:" << std::string(Rctx, sizeof Rctx) << std::endl;
+  Rcpp::Rcout << " Seq:" << std::string(seq,  std::min(s, buf_size)) << std::endl;
+  Rcpp::Rcout << "Fctx:" << std::string(Fctx, std::min(s, buf_size)) << std::endl;
+  Rcpp::Rcout << "Rctx:" << std::string(Rctx, std::min(s, buf_size)) << std::endl;
   
   return 0;
 }
@@ -141,58 +163,30 @@ int decodeContext (char *p) {
 // [[Rcpp::export]]
 int genometest ()
 {
-  char full_seq[] = "GTGACAGCCGCCCTTGGGAGACGACGGCGTCTGCAACCAGCAGCCTCCAAAGGGTGCAGCCAGGAGGCTCAGCTTGTCCGCCTCCGGGGCTCGGGGCTAAG";
+  char full_seq[] = "GTGACAGCCGCCCTTGGGAGACGACGGCGTCTGCAACCAGCAGCCTCCAAAGGGTGCAGCCAGGAGGCTCAGCTTGTCCGCCTCCGGGGCTCGGGGCTAAG"; //ACTGACTGCCGGCCGGCCCGGGGCTCGGGGAG";
   char corrFctx[] = "....x..xz.hhh........z..z..z..x..h..hx..x..hh.hh........x..hx......h.x..h....xz.hh.xz....h.z....h....";
   char corrRctx[] = "h.h...x..z.....hhh.h..z..zx.z...x......x..x........hhh.h..x...xh.hh....x...x...z.....zxhh...zxhh....h";
-  char ctx_map[] = ".hxz";
-  const size_t buf_size = 16;
-  char seq[buf_size];
-  char isC[buf_size];
-  char isG[buf_size];
-  char Fctx[buf_size+2];
-  char Rctx[buf_size+2];
-  char packed[sizeof full_seq];
   
-  Rcpp::Rcout << " Seq:" << std::string(full_seq, sizeof full_seq) << std::endl;
+  size_t sizeof_full_seq = sizeof full_seq-1;
   
-  memset(seq, 'N', buf_size);
-  std::memcpy(seq+buf_size/2, full_seq, buf_size/2);
-  
-  for (size_t b=1; b < 2*(sizeof full_seq)/buf_size; b++) {
-    
-    std::memcpy(seq, seq+buf_size/2, buf_size/2);
-    std::memcpy(seq+buf_size/2, full_seq+b*buf_size/2, buf_size/2);
-    // Rcpp::Rcout << " seq:" << std::string(seq, sizeof seq) << std::endl;
-  
-    for (size_t i=0; i<buf_size; i++) {
-      isC[i] = seq[i]=='C';
-      isG[i] = seq[i]=='G';
-    }
-
-    for (size_t i=0; i<buf_size-2; i++) {
-      Fctx[i] = ( isC[i] << (isG[i+1] | isG[i+2]) ) | (isC[i] & isG[i+1]);
-      //Fctx[i] = ctx_map[Fctx[i]];
-      Rctx[i+2] = ( isG[i+2] << (isC[i] | isC[i+1]) ) | (isC[i+1] & isG[i+2]);
-      //Rctx[i+2] = ctx_map[Rctx[i+2]];
-    }
-    // Rcpp::Rcout << "Fctx:" << std::string(Fctx, sizeof Fctx - 2) << std::endl;
-    // Rcpp::Rcout << "Rctx:  " << std::string(Rctx+2, sizeof Rctx - 2) << std::endl;
-    
-    //std::memcpy(full_seq+(b-1)*buf_size/2+2, Rctx+2, buf_size-4);
-    
-    for (size_t i=0; i<buf_size-4; i++) {
-      packed[i] = seq_nt16_table[ (unsigned char) full_seq[(b-1)*buf_size/2+2 + i] ];
-      packed[i] = packed[i] | (Fctx[i+2]<<6) | (Rctx[i+2]<<4);
-    }
-    
-  }
-  
-  Rcpp::Rcout << " Res:" << std::string(full_seq, sizeof full_seq) << std::endl;
+  Rcpp::Rcout << "  In:" << std::string(full_seq, sizeof full_seq) << std::endl;
   Rcpp::Rcout << "Fctx:" << std::string(corrFctx, sizeof corrFctx) << std::endl;
   Rcpp::Rcout << "Rctx:" << std::string(corrRctx, sizeof corrRctx) << std::endl;
-  Rcpp::Rcout << " Pac:" << std::string(packed,   sizeof packed)   << std::endl;
   
-  decodeContext(packed);
+  char tail[24];
+  memset(tail+20, 'N', 4);
+  memcpy(tail, full_seq + sizeof_full_seq - 20, 20);
+  Rcpp::Rcout << "Tail:" << std::string(tail, sizeof tail) << std::endl;
+  
+  int n = encodeContextLoop(full_seq, sizeof_full_seq);
+  Rcpp::Rcout << "n=" << n << std::endl;
+  
+  decodeContext(full_seq, sizeof_full_seq);
+  
+  encodeContextLoop(tail, sizeof tail);
+  memcpy(full_seq + sizeof_full_seq - 16, tail+4, 16);
+  
+  decodeContext(full_seq, sizeof_full_seq);
   
   return 0;
 }
@@ -205,5 +199,6 @@ int genometest ()
 // #############################################################################
 // test code and sourcing don't work on OS X
 /*** R
+system.time(genome <- rcpp_read_genome("/scratch/ref/DRAGEN/hg38_plus_lambda_ChrY_PAR_masked.fa.gz"))
 */
 // #############################################################################
