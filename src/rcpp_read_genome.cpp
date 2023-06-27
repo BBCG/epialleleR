@@ -25,8 +25,81 @@
 // Cytosine context is encoded as follows:
 //   .=0, h=1, x=2, z=3 
 
+// genomic sequence-to-context lookup index
+#define triad_to_idx(t) ( (t[0]&7)<<6 + (t[1]&7)<<3 + (t[2]&7) )
+
+// genomic sequence-to-context lookup tables
+const unsigned char triad_forward_context[512] = {
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  16,  16,   0,  16,  16,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  16,  16,   0,  16,  16,   0,
+   16,   0,  16,  16,   0,  16,  16,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
+   16,   0,  16,  16,   0,  16,  16,   0,  16,   0,  16,  16,   0,  16,  16,   0, 
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   
+    0,   0,   0,   0,   0,   0,   0,   0,  36,   0,  36,  36,   0,  36,  40,   0,  
+    0,   0,   0,   0,   0,   0,   0,   0,  36,   0,  36,  36,   0,  36,  40,   0,  
+   36,   0,  36,  36,   0,  36,  40,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
+   36,   0,  36,  36,   0,  36,  40,   0,  44,   0,  44,  44,   0,  44,  44,   0,   
+    0,   0,   0,   0,   0,   0,   0,   0, 128,   0, 128, 128,   0, 128, 128,   0,   
+    0,   0,   0,   0,   0,   0,   0,   0, 128,   0, 128, 128,   0, 128, 128,   0, 
+  128,   0, 128, 128,   0, 128, 128,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+  128,   0, 128, 128,   0, 128, 128,   0, 128,   0, 128, 128,   0, 128, 128,   0,  
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,  
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
+    0,   0,   0,   0,   0,   0,   0,   0, 240,   0, 240, 240,   0, 240, 240,   0, 
+    0,   0,   0,   0,   0,   0,   0,   0, 240,   0, 240, 240,   0, 240, 240,   0, 
+  240,   0, 240, 240,   0, 240, 240,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+  240,   0, 240, 240,   0, 240, 240,   0, 240,   0, 240, 240,   0, 240, 240,   0, 
+    0,   0,   0,   0,   0,   0,   0,   0,  64,   0,  64,  64,   0,  64,  64,   0,  
+    0,   0,   0,   0,   0,   0,   0,   0,  64,   0,  64,  64,   0,  64,  64,   0,  
+   64,   0,  64,  64,   0,  64,  64,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
+   64,   0,  64,  64,   0,  64,  64,   0,  64,   0,  64,  64,   0,  64,  64,   0
+};
+const unsigned char triad_reverse_context[512] = {
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  65,   0, 
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  65,   0,
+   16,   0,  32, 128,   0, 240,  65,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
+   16,   0,  32, 128,   0, 240,  65,   0,  16,   0,  32, 128,   0, 240,  67,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  66,   0, 
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  66,   0,
+   16,   0,  32, 128,   0, 240,  66,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
+   16,   0,  32, 128,   0, 240,  66,   0,  16,   0,  32, 128,   0, 240,  67,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  65,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  65,   0,
+   16,   0,  32, 128,   0, 240,  65,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+   16,   0,  32, 128,   0, 240,  65,   0,  16,   0,  32, 128,   0, 240,  67,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  65,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  65,   0, 
+   16,   0,  32, 128,   0, 240,  65,   0,   0,   0,   0,   0,   0,   0,   0,   0, 
+   16,   0,  32, 128,   0, 240,  65,   0,  16,   0,  32, 128,   0, 240,  67,   0, 
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  65,   0,
+    0,   0,   0,   0,   0,   0,   0,   0,  16,   0,  32, 128,   0, 240,  65,   0,
+   16,   0,  32, 128,   0, 240,  65,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+   16,   0,  32, 128,   0, 240,  65,   0,  16,   0,  32, 128,   0, 240,  67,   0
+};
 
 // Encodes sequence and cytosine context using a simple loop
+// Try rewrite this using lookup table or SIMD intrinsics
 inline int encodeContextLoop (char *source, size_t size)
 {
   const size_t buf_size = 16;
@@ -70,9 +143,56 @@ inline int encodeContextLoop (char *source, size_t size)
 }
 
 
+// Encodes sequence and cytosine context using lookup tables
+inline int encodeContextLookup (char *source, size_t size)
+{
+  const size_t buf_size = 16;
+  const size_t buf_overlap = 4;
+  char seq[buf_size];
+  char out[buf_size];
+  
+  memset(seq, 'N', 2);
+  // read first batch
+  std::memcpy(seq+2, source, buf_size-2);
+  // batch by batch
+  for (size_t b=1; b <= size/(buf_size-buf_overlap); b++) {
+    // clean out
+    memset(out, 0, sizeof out);
+    // one-pass encode
+    for (size_t i=0; i<buf_size-2; i++) {
+      out[i] = out[i] | triad_forward_context[triad_to_idx(seq+i)];
+      out[i+2] = out[i+2] | triad_reverse_context[triad_to_idx(seq+i)];
+    }
+    // copy to destination
+    std::memcpy(source+(b-1)*(buf_size-buf_overlap), out+2, buf_size-buf_overlap);
+    // read another chunk
+    std::memcpy(seq, source+b*(buf_size-buf_overlap)-2, buf_size);
+  }
+  // number of bases processed
+  return (size/(buf_size-buf_overlap))*(buf_size-buf_overlap);
+}
 
 
 
+// temp sub to see the seq and context
+int decodeContext (const char *p, size_t s) {
+  char ctx_map[] = ".hxz";
+  const size_t buf_size = 1024;
+  char seq[buf_size];
+  char Fctx[buf_size];
+  char Rctx[buf_size];
+  for (size_t i=0; i<std::min(s, buf_size); i++) {
+    seq[i]  = seq_nt16_str[(unsigned char) (p[i] & 0b11110000) >> 4];
+    Fctx[i] = ctx_map[(unsigned char) (p[i] & 0b00001100) >> 2];
+    Rctx[i] = ctx_map[(unsigned char) (p[i] & 0b00000011) ];
+  }
+  
+  Rcpp::Rcout << " Seq:" << std::string(seq,  std::min(s, buf_size)) << std::endl;
+  Rcpp::Rcout << "Fctx:" << std::string(Fctx, std::min(s, buf_size)) << std::endl;
+  Rcpp::Rcout << "Rctx:" << std::string(Rctx, std::min(s, buf_size)) << std::endl;
+  
+  return 0;
+}
 
 
 // [[Rcpp::export]]
@@ -90,33 +210,39 @@ Rcpp::List rcpp_read_genome (std::string fn)                                    
   
   // vars
   int flen = 0;                                                                 // fetched sequence length
-  unsigned int C0 = 0, C1 = 0, G1 = 0, G2 = 0;                                  // main loop vars: C in position 0 and 1, G in position 1 and 2
-  unsigned int G0 = 0, C2 = 0;                                                  // post-loop vars: C in position 2, G in position 0
-  unsigned int ctx_plus = 0, ctx_minus = 0;                                     // cytosine contexts of 0+ and 2- bases
-  
+
   // fetch sequences
-  for (size_t i=0; i<faidx_nseq(faidx); i++) {
+  for (size_t i=0; i<(unsigned int)faidx_nseq(faidx); i++) {
     rid.push_back(i);
     const char *name = faidx_iseq(faidx, i);
-    uint64_t length = faidx_seq_len(faidx, name);
+    int64_t length = faidx_seq_len(faidx, name);
     
     rname.push_back(name);
     rlen.push_back(length);
     
     char *sequence = faidx_fetch_seq(faidx, name, 0, length-1, &flen);          // try fetch sequence
     if (length!=flen) Rcpp::stop("Corrupted FASTA index. Delete and try again");// if fetched bytes differ from expected
-    // Rcpp::Rcout << "Fetched " << flen << std::endl;
     
     // save the tail
     char tail[24];
     memset(tail+20, 'N', 4);
-    memcpy(tail, sequence + length - 20, 20);
+    memcpy(tail, sequence+length-20, 20);
+    
+    // // check before packing
+    // Rcpp::Rcout << "Fetched " << flen << std::endl;
+    // Rcpp::Rcout << " BGN:" << std::string(sequence, 64) << std::endl;
+    // Rcpp::Rcout << " END:" << std::string(sequence+length-64, 64) << std::endl;
 
     // encode context
     encodeContextLoop(sequence, length);                                        // sequence first
     encodeContextLoop(tail, sizeof tail);                                       // then tail
     memcpy(sequence+length-16, tail+4, 16);                                     // put 16 last at their place
     
+    // // check after packing
+    // decodeContext(sequence, 64);
+    // decodeContext(sequence+length-64, 64);
+    
+    // emplace
     rseq->emplace_back((const char*) sequence, length);
     free(sequence);
   }
@@ -139,27 +265,7 @@ Rcpp::List rcpp_read_genome (std::string fn)                                    
 
 
 
-int decodeContext (const char *p, size_t s) {
-  char ctx_map[] = ".hxz";
-  const size_t buf_size = 1024;
-  char seq[buf_size];
-  char Fctx[buf_size];
-  char Rctx[buf_size];
-  for (size_t i=0; i<std::min(s, buf_size); i++) {
-    seq[i]  = seq_nt16_str[(unsigned char) (p[i] & 0b11110000) >> 4];
-    Fctx[i] = ctx_map[(unsigned char) (p[i] & 0b00001100) >> 2];
-    Rctx[i] = ctx_map[(unsigned char) (p[i] & 0b00000011) ];
-  }
-  
-  Rcpp::Rcout << " Seq:" << std::string(seq,  std::min(s, buf_size)) << std::endl;
-  Rcpp::Rcout << "Fctx:" << std::string(Fctx, std::min(s, buf_size)) << std::endl;
-  Rcpp::Rcout << "Rctx:" << std::string(Rctx, std::min(s, buf_size)) << std::endl;
-  
-  return 0;
-}
-
-
-
+// temp sub to validate context conversion
 // [[Rcpp::export]]
 int genometest ()
 {
@@ -193,12 +299,24 @@ int genometest ()
 
 
 
+// temp sub to testread genome with Boost
+// [[Rcpp::export]]
+int boosttest ()
+{
+  return 0;
+}
+
+
 
 
 
 // #############################################################################
 // test code and sourcing don't work on OS X
 /*** R
+setwd("~/work/packages/epialleleR/")
+devtools::document()
+devtools::load_all()
+genometest()
 system.time(genome <- rcpp_read_genome("/scratch/ref/DRAGEN/hg38_plus_lambda_ChrY_PAR_masked.fa.gz"))
 */
 // #############################################################################
