@@ -37,9 +37,10 @@ methylation status and base frequencies at particular genomic positions (SNPs).
 
 ### Recent improvements
 
-##### v1.10
+##### v1.10 [October 2023]
 
- * inputs both single-end and paired-end sequencing alignments
+ * inputs both single-end and paired-end sequencing alignments [done]
+ * making methylation calls [in progress]
  
 ##### v1.4
 
