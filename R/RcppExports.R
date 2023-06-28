@@ -49,14 +49,6 @@ rcpp_read_genome <- function(fn) {
     .Call(`_epialleleR_rcpp_read_genome`, fn)
 }
 
-genometest <- function() {
-    .Call(`_epialleleR_genometest`)
-}
-
-boosttest <- function() {
-    .Call(`_epialleleR_boosttest`)
-}
-
 rcpp_threshold_reads <- function(df, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac) {
     .Call(`_epialleleR_rcpp_threshold_reads`, df, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac)
 }

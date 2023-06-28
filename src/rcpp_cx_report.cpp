@@ -77,7 +77,7 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
   max_pos=0;                                                                   \
   cx_map.clear();                                                              \
   hint = cx_map.end();                                                         \
-}
+};
 
   // array of contexts to print
   unsigned int ctx_map [16] = {0};
