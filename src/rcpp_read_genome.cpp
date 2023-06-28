@@ -2,6 +2,8 @@
 #include <htslib/hts.h>
 #include <htslib/sam.h>
 #include <htslib/faidx.h>
+#include <htslib/bgzf.h>
+#include <htslib/thread_pool.h>
 
 // [[Rcpp::plugins(cpp17)]]
 // [[Rcpp::depends(BH)]]
@@ -136,9 +138,12 @@ inline int encodeContextLookup (char *source, size_t size)
   return (size);                                                                // number of bases processed
 }
 
+
+
 // main sub that performs the reading
 // [[Rcpp::export]]
-Rcpp::List rcpp_read_genome (std::string fn)                                    // input: a name of (optionally bgzipped and/or indexed) FASTA file 
+Rcpp::List rcpp_read_genome (std::string fn,                                    // input: a name of (optionally bgzipped and/or indexed) FASTA file
+                             int nthreads)                                      // HTSlib threads, >0 for multiple
 {
   // containers
   std::vector<uint64_t> rid;                                                    // numeric ids of reference sequences
@@ -150,6 +155,12 @@ Rcpp::List rcpp_read_genome (std::string fn)                                    
   faidx_t *faidx = fai_load(fn.c_str());                                        // FASTA index
   if (faidx==NULL) Rcpp::stop("Unable to open FASTA index for reading");        // fall back if error
   
+  // hts_tpool *tpool = NULL;                                                      // thread pool not working yet
+  // if (nthreads>0) {
+  //   tpool = hts_tpool_init(nthreads);
+  //   bgzf_thread_pool(faidx->bgzf, tpool, 0);
+  // }
+  // 
   // vars
   int flen = 0;                                                                 // fetched sequence length
 
@@ -172,6 +183,7 @@ Rcpp::List rcpp_read_genome (std::string fn)                                    
   }
   
   fai_destroy(faidx);                                                           // free allocated
+  // if (tpool) hts_tpool_destroy(tpool);                                          // free thread pool which isn't working yet
   
   // wrap and return the results
   Rcpp::List res = Rcpp::List::create(                                          // final List

@@ -11,14 +11,15 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // rcpp_call_methylation_genome
-Rcpp::List rcpp_call_methylation_genome(std::string in_fn, std::string out_fn);
-RcppExport SEXP _epialleleR_rcpp_call_methylation_genome(SEXP in_fnSEXP, SEXP out_fnSEXP) {
+Rcpp::List rcpp_call_methylation_genome(std::string in_fn, std::string out_fn, Rcpp::List genome);
+RcppExport SEXP _epialleleR_rcpp_call_methylation_genome(SEXP in_fnSEXP, SEXP out_fnSEXP, SEXP genomeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type in_fn(in_fnSEXP);
     Rcpp::traits::input_parameter< std::string >::type out_fn(out_fnSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_call_methylation_genome(in_fn, out_fn));
+    Rcpp::traits::input_parameter< Rcpp::List >::type genome(genomeSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_call_methylation_genome(in_fn, out_fn, genome));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -161,13 +162,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_read_genome
-Rcpp::List rcpp_read_genome(std::string fn);
-RcppExport SEXP _epialleleR_rcpp_read_genome(SEXP fnSEXP) {
+Rcpp::List rcpp_read_genome(std::string fn, int nthreads);
+RcppExport SEXP _epialleleR_rcpp_read_genome(SEXP fnSEXP, SEXP nthreadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type fn(fnSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_read_genome(fn));
+    Rcpp::traits::input_parameter< int >::type nthreads(nthreadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_read_genome(fn, nthreads));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -191,7 +193,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_epialleleR_rcpp_call_methylation_genome", (DL_FUNC) &_epialleleR_rcpp_call_methylation_genome, 2},
+    {"_epialleleR_rcpp_call_methylation_genome", (DL_FUNC) &_epialleleR_rcpp_call_methylation_genome, 3},
     {"_epialleleR_rcpp_check_bam", (DL_FUNC) &_epialleleR_rcpp_check_bam, 1},
     {"_epialleleR_rcpp_cx_report", (DL_FUNC) &_epialleleR_rcpp_cx_report, 3},
     {"_epialleleR_rcpp_extract_patterns", (DL_FUNC) &_epialleleR_rcpp_extract_patterns, 10},
@@ -202,7 +204,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_epialleleR_rcpp_match_capture", (DL_FUNC) &_epialleleR_rcpp_match_capture, 3},
     {"_epialleleR_rcpp_read_bam_paired", (DL_FUNC) &_epialleleR_rcpp_read_bam_paired, 5},
     {"_epialleleR_rcpp_read_bam_single", (DL_FUNC) &_epialleleR_rcpp_read_bam_single, 5},
-    {"_epialleleR_rcpp_read_genome", (DL_FUNC) &_epialleleR_rcpp_read_genome, 1},
+    {"_epialleleR_rcpp_read_genome", (DL_FUNC) &_epialleleR_rcpp_read_genome, 2},
     {"_epialleleR_rcpp_threshold_reads", (DL_FUNC) &_epialleleR_rcpp_threshold_reads, 8},
     {NULL, NULL, 0}
 };
