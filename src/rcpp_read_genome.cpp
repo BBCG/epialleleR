@@ -118,22 +118,22 @@ inline int encodeContextLookup (char *source, size_t size)
 };
 
   memset(end, 'N', buf_size);                                                   // prepare tail buffer
-  std::memcpy(end, source+size-buf_size+2, buf_size-2);                         // read last chunk: "...NN"
+  memcpy(end, source+size-buf_size+2, buf_size-2);                              // read last chunk: "...NN"
   
   memset(seq, 'N', buf_size);                                                   // prepare seq buffer
-  std::memcpy(seq+2, source, buf_size-2);                                       // read first chunk: "NN..."
+  memcpy(seq+2, source, buf_size-2);                                            // read first chunk: "NN..."
   for (size_t b=1; b <= size/(buf_size-buf_overlap); b++) {                     // chunk by chunk
     memset(out, 0, sizeof out);                                                 // clean destination
     main_loop;                                                                  // one-pass encode
-    std::memcpy(seq, source+b*(buf_size-buf_overlap)-2, buf_size);              // read another chunk
-    std::memcpy(source+(b-1)*(buf_size-buf_overlap), out+2, buf_size-buf_overlap); // copy to source
+    memcpy(seq, source+b*(buf_size-buf_overlap)-2, buf_size);                   // read another chunk
+    memcpy(source+(b-1)*(buf_size-buf_overlap), out+2, buf_size-buf_overlap);   // copy to source
   }
   
   // now, the tail
   memset(out, 0, sizeof out);                                                   // clean destination
-  std::memcpy(seq, end, buf_size);                                              // copy tail to seq buffer
+  memcpy(seq, end, buf_size);                                                   // copy tail to seq buffer
   main_loop;                                                                    // one-pass encode
-  std::memcpy(source+size-buf_size+buf_overlap, out+2, buf_size-buf_overlap);   // copy to source
+  memcpy(source+size-buf_size+buf_overlap, out+2, buf_size-buf_overlap);        // copy to source
   
   return (size);                                                                // number of bases processed
 }
@@ -155,12 +155,12 @@ Rcpp::List rcpp_read_genome (std::string fn,                                    
   faidx_t *faidx = fai_load(fn.c_str());                                        // FASTA index
   if (faidx==NULL) Rcpp::stop("Unable to open FASTA index for reading");        // fall back if error
   
-  // hts_tpool *tpool = NULL;                                                      // thread pool not working yet
-  // if (nthreads>0) {
-  //   tpool = hts_tpool_init(nthreads);
-  //   bgzf_thread_pool(faidx->bgzf, tpool, 0);
-  // }
-  // 
+  hts_tpool *tpool = NULL;                                                      // thread pool not working yet
+  if (nthreads>0) {
+    tpool = hts_tpool_init(nthreads);
+    bgzf_thread_pool(*(BGZF **)faidx, tpool, 0);
+  }
+
   // vars
   int flen = 0;                                                                 // fetched sequence length
 
@@ -183,7 +183,7 @@ Rcpp::List rcpp_read_genome (std::string fn,                                    
   }
   
   fai_destroy(faidx);                                                           // free allocated
-  // if (tpool) hts_tpool_destroy(tpool);                                          // free thread pool which isn't working yet
+  if (tpool) hts_tpool_destroy(tpool);                                          // free thread pool which isn't working yet
   
   // wrap and return the results
   Rcpp::List res = Rcpp::List::create(                                          // final List
@@ -202,6 +202,6 @@ Rcpp::List rcpp_read_genome (std::string fn,                                    
 // #############################################################################
 // test code and sourcing don't work on OS X
 /*** R
-system.time(genome <- rcpp_read_genome("/scratch/ref/DRAGEN/hg38_plus_lambda_ChrY_PAR_masked.fa.gz"))
+system.time(genome <- rcpp_read_genome("/scratch/ref/DRAGEN/hg38_plus_lambda_ChrY_PAR_masked.fa.gz", 1))
 */
 // #############################################################################
