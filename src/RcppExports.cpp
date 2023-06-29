@@ -11,14 +11,14 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // rcpp_call_methylation_genome
-Rcpp::List rcpp_call_methylation_genome(std::string in_fn, std::string out_fn, Rcpp::List genome, int nthreads);
+Rcpp::List rcpp_call_methylation_genome(std::string in_fn, std::string out_fn, Rcpp::List& genome, int nthreads);
 RcppExport SEXP _epialleleR_rcpp_call_methylation_genome(SEXP in_fnSEXP, SEXP out_fnSEXP, SEXP genomeSEXP, SEXP nthreadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type in_fn(in_fnSEXP);
     Rcpp::traits::input_parameter< std::string >::type out_fn(out_fnSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type genome(genomeSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List& >::type genome(genomeSEXP);
     Rcpp::traits::input_parameter< int >::type nthreads(nthreadsSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_call_methylation_genome(in_fn, out_fn, genome, nthreads));
     return rcpp_result_gen;
