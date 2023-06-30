@@ -6,8 +6,10 @@
 
 // Checks BAM before reading for:
 // [+] being name-sorted
-// [+] having XM
-// [+] having MM
+// [+] having XM: Illumina/Bismark methylation calls
+// [+] having XG: Illumina/Bismark genome strand (CT or GA)
+// [+] having YC: bwa-meth genome strand (CT or GA)
+// [+] having MM: BAM base modification tag
 //
 // Returns list with simple counts (see *main counters* and *wrap and return*)
 
@@ -30,6 +32,8 @@ Rcpp::List rcpp_check_bam (std::string fn)                                      
     npp = 0,                                                                    // have BAM_FPROPER_PAIR flag
     ntempls = 0,                                                                // templates (consecutive pairs)
     nxm = 0,                                                                    // have XM tags
+    nxg = 0,                                                                    // have XG tags
+    nyc = 0,                                                                    // have YC tags
     nmm = 0;                                                                    // have MM tags
   
   // template holders
@@ -40,6 +44,8 @@ while( (sam_read1(bam_fp, bam_hdr, bam_rec) > 0) & (nrecs < max_recs) ) {      /
   nrecs++;                                                                      // BAM alignment records ++
   if (bam_rec->core.flag & BAM_FPROPER_PAIR) npp++;                             // if is BAM_FPROPER_PAIR
   if (bam_aux_get(bam_rec, "XM") != NULL) nxm++;                                // if has XM tag
+  if (bam_aux_get(bam_rec, "XG") != NULL) nxg++;                                // if has XG tag
+  if (bam_aux_get(bam_rec, "YC") != NULL) nyc++;                                // if has YC tag
   if (bam_aux_get(bam_rec, "MM") != NULL) nmm++;                                // if has MM tag
   
   // check if not the same template (QNAME)
@@ -59,6 +65,8 @@ Rcpp::List res = Rcpp::List::create(                                            
   Rcpp::Named("npp") = npp,                                                     // numeric for number of proper paired reads
   Rcpp::Named("ntempls") = ntempls,                                             // numeric for number of consecutively paired reads
   Rcpp::Named("nxm") = nxm,                                                     // numeric for number of reads with XM tags
+  Rcpp::Named("nxg") = nxg,                                                     // numeric for number of reads with XG tags
+  Rcpp::Named("nyc") = nyc,                                                     // numeric for number of reads with YC tags
   Rcpp::Named("nmm") = nmm                                                      // numeric for number of reads with MM tags
 );
 

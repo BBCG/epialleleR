@@ -11,16 +11,17 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // rcpp_call_methylation_genome
-Rcpp::List rcpp_call_methylation_genome(std::string in_fn, std::string out_fn, Rcpp::List& genome, int nthreads);
-RcppExport SEXP _epialleleR_rcpp_call_methylation_genome(SEXP in_fnSEXP, SEXP out_fnSEXP, SEXP genomeSEXP, SEXP nthreadsSEXP) {
+Rcpp::List rcpp_call_methylation_genome(std::string in_fn, std::string out_fn, Rcpp::List& genome, std::string tag, int nthreads);
+RcppExport SEXP _epialleleR_rcpp_call_methylation_genome(SEXP in_fnSEXP, SEXP out_fnSEXP, SEXP genomeSEXP, SEXP tagSEXP, SEXP nthreadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type in_fn(in_fnSEXP);
     Rcpp::traits::input_parameter< std::string >::type out_fn(out_fnSEXP);
     Rcpp::traits::input_parameter< Rcpp::List& >::type genome(genomeSEXP);
+    Rcpp::traits::input_parameter< std::string >::type tag(tagSEXP);
     Rcpp::traits::input_parameter< int >::type nthreads(nthreadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_call_methylation_genome(in_fn, out_fn, genome, nthreads));
+    rcpp_result_gen = Rcpp::wrap(rcpp_call_methylation_genome(in_fn, out_fn, genome, tag, nthreads));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -194,7 +195,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_epialleleR_rcpp_call_methylation_genome", (DL_FUNC) &_epialleleR_rcpp_call_methylation_genome, 4},
+    {"_epialleleR_rcpp_call_methylation_genome", (DL_FUNC) &_epialleleR_rcpp_call_methylation_genome, 5},
     {"_epialleleR_rcpp_check_bam", (DL_FUNC) &_epialleleR_rcpp_check_bam, 1},
     {"_epialleleR_rcpp_cx_report", (DL_FUNC) &_epialleleR_rcpp_cx_report, 3},
     {"_epialleleR_rcpp_extract_patterns", (DL_FUNC) &_epialleleR_rcpp_extract_patterns, 10},

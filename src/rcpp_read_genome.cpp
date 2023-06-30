@@ -155,10 +155,10 @@ Rcpp::List rcpp_read_genome (std::string fn,                                    
   faidx_t *faidx = fai_load(fn.c_str());                                        // FASTA index
   if (faidx==NULL) Rcpp::stop("Unable to open FASTA index for reading");        // fall back if error
   
-  hts_tpool *tpool = NULL;                                                      // thread pool not working yet
+  hts_tpool *tpool = NULL;                                                      // thread pool works using a dirty hack
   if (nthreads>0) {
     tpool = hts_tpool_init(nthreads);
-    bgzf_thread_pool(*(BGZF **)faidx, tpool, 0);
+    bgzf_thread_pool(*(BGZF **)faidx, tpool, 0);                                // conversion of faidx_t to BGZF because it's first in the struct
   }
 
   // vars
