@@ -11,19 +11,86 @@
 // Relies on the presence of XG (Illumina/Bismark) or YC (bwa-meth) genome
 // conversion tags.
 //
-// This calling is purely reference-based: if there's a substitution in
-// the query upstream/downstream of the context and if it changes the context,
-// then I don't recalculate the cytosine context based on the query.
-// E.g., if ACGT in the reference becomes ACAT, then my context will still
-// be .z../..z.
-// The Q is how other callers deal with more complicated cases when, say,
-// CG or CNG is inserted and bisulfite-treated query reads as TG or TNG.
-// I'll have to deal with it later...
+// This calling is read-based: the cytosine context of the reference sequence 
+// is calculated for every read in case there's a substitution in
+// the query upstream/downstream of the context and if it changes the context.
+// E.g., if ACGT in the reference becomes ACNT, then my context becomes .h..
+// This seems to be identical to Illumina DRAGEN. The only difference is that
+// I don't use Unknown context for CNN or NNG, I call them as h.. and ..h here.
 //
 // Returns simple statistics on records parsed and calls made.
 
-// table to decode context from packed genomic sequences
-const char ctx_map[] = {'.', 'h', 'x', 'z'};
+
+// genomic sequence-to-context lookup tables
+const unsigned char triad_forward_context[512] = {
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', 'h', '.', 'h', 'h', '.', 'h', 'x',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', 'h', '.', 'h', 'h', '.', 'h', 'x',
+  '.', 'h', '.', 'h', 'h', '.', 'h', 'x', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', 'h', '.', 'h', 'h', '.', 'h', 'x', '.', 'z', '.', 'z', 'z', '.', 'z', 'z',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'
+};
+const unsigned char triad_reverse_context[512] = {
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'h',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'z',
+  '.', '.', '.', '.', '.', '.', '.', 'h', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', 'h', '.', '.', '.', '.', '.', '.', '.', 'h',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'x',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'z',
+  '.', '.', '.', '.', '.', '.', '.', 'x', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', 'x', '.', '.', '.', '.', '.', '.', '.', 'x',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'h',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'z',
+  '.', '.', '.', '.', '.', '.', '.', 'h', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', 'h', '.', '.', '.', '.', '.', '.', '.', 'h',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'h',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'z',
+  '.', '.', '.', '.', '.', '.', '.', 'h', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', 'h', '.', '.', '.', '.', '.', '.', '.', 'h',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'h',
+  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'z',
+  '.', '.', '.', '.', '.', '.', '.', 'h', '.', '.', '.', '.', '.', '.', '.', '.',
+  '.', '.', '.', '.', '.', '.', '.', 'h', '.', '.', '.', '.', '.', '.', '.', 'h'
+};
+
 
 // this one makes calls based on genomic sequence in the absence of MM/ML tags
 // [[Rcpp::export]]
@@ -59,6 +126,7 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
   int nrecs = 0, ncalled = 0;                                                   // counters: BAM records, records with methylation called
   int max_query_width = 1024;                                                   // max query width, expanded if necessary
   int query_width = max_query_width;                                            // query width
+  char *rs = (char*) malloc((max_query_width+4) * sizeof(char));                // sequence of the reference plus 2x2nt on sides
   char *xm = (char*) malloc(max_query_width * sizeof(char));                    // XM array
   
   // compare (+remap?) reference sequences in the genome and in the BAM header
@@ -86,34 +154,35 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
       query_width = abs(in_rec->core.l_qseq);                                   // query width
       if (query_width > max_query_width) {                                      // if sequence is longer than XM holder
         max_query_width = query_width;                                          // new max
+        rs = (char *) realloc(rs, (max_query_width+4) * sizeof(char));          // expand rs holder
         xm = (char *) realloc(xm, max_query_width * sizeof(char));              // expand xm holder
-        if (xm==NULL) Rcpp::stop("No memory for BAM record #%i", nrecs);        // check memory allocation
+        if ((rs==NULL) || (xm==NULL)) Rcpp::stop("No memory for BAM record #%i", nrecs); // check memory allocation
       }
 
       // apply CIGAR to reference seq (convert from reference to query space)
-      const char *refseq = rseq->at(in_rec->core.tid).c_str() + in_rec->core.pos; // packed reference sequence and context
+      const char *refseq = rseq->at(in_rec->core.tid).c_str() + in_rec->core.pos; // reference sequence
       uint32_t n_cigar = in_rec->core.n_cigar;                                  // number of CIGAR operations
       uint32_t *record_cigar = bam_get_cigar(in_rec);                           // CIGAR array
       uint32_t ref_pos = 0;                                                     // starting position in reference array
-      uint32_t dest_pos = 0;                                                    // starting position in destination (query space) array
+      uint32_t dest_pos = 2;                                                    // starting position in destination (query space) array
       for (size_t i=0; i<n_cigar; i++) {                                        // op by op
         uint32_t cigar_op = bam_cigar_op(record_cigar[i]);                      // CIGAR operation
         uint32_t cigar_oplen = bam_cigar_oplen(record_cigar[i]);                // CIGAR operation length
         switch(cigar_op) {
         case BAM_CMATCH :                                                       // 'M', 0, consumes both query and reference
         case BAM_CEQUAL :                                                       // '=', 7, consumes both query and reference
-          memcpy(xm+dest_pos, refseq+ref_pos, cigar_oplen);                     // will be unpacked later
+          memcpy(rs+dest_pos, refseq+ref_pos, cigar_oplen);                     // will be turned into a context later
           ref_pos += cigar_oplen;
           dest_pos += cigar_oplen;
           break;
         case BAM_CDIFF :                                                        // 'X', 8, consumes both query and reference
-          memset(xm+dest_pos, 0, cigar_oplen);                                  // don't make meaningful methylation calls
+          memset(rs+dest_pos, 'N', cigar_oplen);                                // we don't actually know what was inserted
           ref_pos += cigar_oplen;
           dest_pos += cigar_oplen;
           break;
         case BAM_CINS :                                                         // 'I', 1, consumes query only
         case BAM_CSOFT_CLIP :                                                   // 'S', 4, consumes query only
-          memset(xm+dest_pos, 0, cigar_oplen);                                  // don't make meaningful methylation calls
+          memset(rs+dest_pos, 'N', cigar_oplen);                                // we don't actually know what was inserted
           dest_pos += cigar_oplen;
           break;
         case BAM_CDEL :                                                         // 'D', 2, consumes reference only
@@ -129,11 +198,20 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
                      bam_get_qname(in_rec));
         }
       }
+      rs[0] = in_rec->core.pos>=2 ? refseq[-2] : 'N';                           // -2 base of reference sequence in front of query
+      rs[1] = in_rec->core.pos>=1 ? refseq[-1] : 'N';                           // -1 base of reference sequence in front of query
+      int bases_left = rseq->at(in_rec->core.tid).size() - in_rec->core.pos - ref_pos; // bases from the last reference position till its end
+      rs[query_width+2] = bases_left >= 1 ? refseq[ref_pos+0] : 'N';            // 1st next base of reference sequence beyond query
+      rs[query_width+3] = bases_left >= 2 ? refseq[ref_pos+1] : 'N';            // 2st next base of reference sequence beyond query
       
       uint8_t *record_pseq = bam_get_seq(in_rec);                               // packed sequence string (4 bit per base)
-      int context_shift = (record_strand[1] == 'C') ? 2 : 0;                    // right shift genomic context during decoding by 2 for fwd strand
+      int context_shift = (record_strand[1] == 'C') ? 2 : 0;                    // start making genomic context from 2nd base for fwd strand, and 0th base for reverse
+      const unsigned char* context_map = context_shift ? triad_forward_context : triad_reverse_context; // lookup table to use
       for (int i=0; i<query_width; i++) {
-        xm[i] = ctx_map[(xm[i] >> context_shift ) & 0b00000011];                // unpack context
+        unsigned int idx = ((rs[i+context_shift] &7) << 6) |                    // last 3 bits of the first base << 6
+                           ((rs[i+1+context_shift] &7) << 3) |                  // last 3 bits of the second base << 3
+                           (rs[i+2+context_shift] &7);                          // last 3 bits of the third base
+        xm[i] = context_map[idx];                                               // look up context
         
         // *** the actual methylation calling starts here ***
         if (xm[i]!='.') {                                                       // if it's a hxz
@@ -148,11 +226,13 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
       }
       
       // if ((record_xm!=NULL) && (memcmp(xm, record_xm+1, query_width)!=0)) {     // check differences with available XM
-      //   Rcpp::Rcout << nrecs << ": R|" << std::string(record_xm+1, query_width) << std::endl;
-      //   Rcpp::Rcout << nrecs << ": C|" << std::string(xm, query_width) << std::endl;
+      //   Rcpp::Rcout << nrecs << ": S|" << std::string(rs, query_width+4) << std::endl;
+      //   Rcpp::Rcout << nrecs << ": R|  " << std::string(record_xm+1, query_width) << std::endl;
+      //   Rcpp::Rcout << nrecs << ": C|  " << std::string(xm, query_width) << std::endl;
       // }
       
-      bam_aux_append(in_rec, "XM", 'Z', query_width, (const uint8_t*)xm);       // since XM tag is absent, add it
+      // if (record_xm==NULL)
+      bam_aux_update_str(in_rec, "XM", query_width, xm);                        // since XM tag is absent, add it
       ncalled++;                                                                // successfully called
     }
     
@@ -167,7 +247,8 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
   hts_close(in_fp);                                                             // close input BAM file
   hts_close(out_fp);                                                            // close output BAM file
   if (thread_pool.pool) hts_tpool_destroy(thread_pool.pool);                    // free thread pool
-  free(xm);                                                                     // and free manually allocated memory
+  free(rs);                                                                     // and free manually allocated memory
+  free(xm);
   
   // wrap and return the results
   Rcpp::List res = Rcpp::List::create(                                          // final List
@@ -188,7 +269,7 @@ devtools::load_all()
 system.time(genome <- rcpp_read_genome("/scratch/ref/DRAGEN/hg38_plus_lambda_ChrY_PAR_masked.fa.gz", 1))
 system.time(genome <- rcpp_read_genome("/Users/oleksii.nikolaienko/work/data/hg38/hg38_plus_lambda_ChrY_PAR_masked.fa.gz", 1))
 inout <- c(system.file("extdata", "test", "paired-name-xm.bam", package="epialleleR"), "/tmp/out.bam")
-rcpp_call_methylation_genome(inout[1], inout[2], genome, "XG", 0)
+rcpp_call_methylation_genome(inout[1], inout[2], genome, "XG", 8)
 sapply(inout, file.size)
 */
 // #############################################################################
