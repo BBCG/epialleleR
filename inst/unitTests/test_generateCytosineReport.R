@@ -92,23 +92,23 @@ test_generateCytosineReport <- function () {
   ### single-end
   
   cx.single <- generateCytosineReport(
-    system.file("extdata", "test", "single-name-xm.bam", package="epialleleR"),
+    system.file("extdata", "test", "dragen-se-unsort-xg-xm.bam", package="epialleleR"),
     threshold.reads=FALSE, report.context="CX", verbose=TRUE
   )
   
   RUnit::checkEquals(
     dim(cx.single),
-    c(1928, 6)
+    c(3236, 6)
   )
   
   RUnit::checkEquals(
     as.numeric(table(cx.single$context)[c("CHH", "CHG", "CG")]),
-    c(1164, 487, 277)
+    c(2165, 802, 269)
   )
   
   RUnit::checkEquals(
     c(sum(cx.single$meth), sum(cx.single$unmeth)),
-    c(94, 2242)
+    c(355, 3599)
   )
   
 }

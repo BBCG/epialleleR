@@ -84,17 +84,21 @@ utils::globalVariables(
   if (check.out$nrecs==0) {                             # no records
     stop("Empty file provided! Exiting",
          call.=FALSE)
-  } else if (check.out$nxm==0) {                        # no XMs
+  } else if (check.out$nxg==0 & check.out$nyc>0) {      # YCs but no XGs
+    stop("No XG tags found (though YC tags are there)! BWA-meth alignment?\n",
+         "If so, make methylation calls using epialleleR::callMethylation.\n",
+         "Exiting", call.=FALSE)
+  } else if (check.out$nxm==0 & check.out$nxg>0) {      # XGs but no XMs
     stop("No XM tags found! Was methylation called successfully?\n",
-         "epialleleR own methylation calling is under development. Exiting",
-         call.=FALSE)
+         "If not, make methylation calls using epialleleR::callMethylation.\n",
+         "Exiting", call.=FALSE)
   } else if (check.out$npp < check.out$nrecs/2) {       # predominantly SE
     paired <- FALSE
   } else {
     if (check.out$ntempls*2 < check.out$npp -1) {       # not sorted by name
       stop("BAM file seems to be paired-end but not sorted by name!\n",
-           "Please sort using 'samtools sort -n -o out.bam in.bam'. Exiting",
-           call.=FALSE)
+           "Please sort using 'samtools sort -n -o out.bam in.bam'.\n",
+           "Exiting", call.=FALSE)
     }
     paired <- TRUE
   }
@@ -102,6 +106,25 @@ utils::globalVariables(
   if (verbose) message(ifelse(paired, "paired-end, name-sorted", "single-end"),
                        " alignment detected", appendLF=TRUE)
   return(paired)
+}
+
+################################################################################
+
+# descr: reads genomic (bgzipped) FASTA files using HTSlib
+# value: list
+
+.readGenome <- function (genome.file,
+                         nthreads,
+                         verbose)
+{
+  if (verbose) message("Reading reference genome file ", appendLF=FALSE)
+  tm <- proc.time()
+  
+  genome.file <- path.expand(genome.file)
+  genome.processed <- rcpp_read_genome(genome.file, nthreads)
+  
+  if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+  return(genome.processed)
 }
 
 ################################################################################
@@ -118,7 +141,7 @@ utils::globalVariables(
                       verbose)
 {
   if (verbose) message("Reading ", ifelse(paired, "paired", "single"), 
-                       "-end BAM file", appendLF=FALSE)
+                       "-end BAM file ", appendLF=FALSE)
   tm <- proc.time()
   
   bam.file <- path.expand(bam.file)
@@ -134,7 +157,7 @@ utils::globalVariables(
   bam.processed[,templid:=c(0:(.N-1))]
   data.table::setorder(bam.processed, rname, start)
   
-  if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+  if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(bam.processed)
 }
 
@@ -147,7 +170,7 @@ utils::globalVariables(
                       zero.based.bed,
                       verbose)
 {
-  if (verbose) message("Reading BED file", appendLF=FALSE)
+  if (verbose) message("Reading BED file ", appendLF=FALSE)
   tm <- proc.time()
   
   bed.df <- data.table::fread(file=bed.file, sep="\t", blank.lines.skip=TRUE,
@@ -158,7 +181,7 @@ utils::globalVariables(
     starts.in.df.are.0based=zero.based.bed
   )
   
-  if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+  if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(bed)
 }
 
@@ -172,7 +195,7 @@ utils::globalVariables(
                       bed,
                       verbose)
 {
-  if (verbose) message("Reading VCF file", appendLF=FALSE)
+  if (verbose) message("Reading VCF file ", appendLF=FALSE)
   tm <- proc.time()
   
   vcf.genome <- "unknown"
@@ -202,7 +225,7 @@ utils::globalVariables(
     SummarizedExperiment::rowRanges(vcf) <- vcf.ranges
   }
   
-  if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+  if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(vcf)
 }
 
@@ -216,18 +239,50 @@ utils::globalVariables(
                           gzip,
                           verbose)
 {
-  if (verbose) message("Writing the report", appendLF=FALSE)
+  if (verbose) message("Writing the report ", appendLF=FALSE)
   tm <- proc.time()
   
   data.table::fwrite(report, file=report.file, quote=FALSE, sep="\t",
                      row.names=FALSE, col.names=TRUE,
                      compress=if (gzip) "gzip" else "none")
   
-  if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+  if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
 }
 
 ################################################################################
 # Functions: processing
+################################################################################
+
+# descr: calling methylation (writing XG/XM)
+# value: simple statistics and output BAM
+
+.callMethylation <- function (input.bam.file, output.bam.file,
+                              genome, nthreads, verbose)
+{
+  if (verbose) message("Making methylation calls ", appendLF=FALSE)
+  tm <- proc.time()
+  
+  input.bam.file <- path.expand(input.bam.file)
+  output.bam.file <- path.expand(output.bam.file)
+  check.out <- rcpp_check_bam(input.bam.file)
+  
+  if (check.out$nrecs==0) {                             # no records
+    stop("Empty file provided! Exiting", call.=FALSE)
+  } else if (check.out$nxg>0) {
+    tag <- "XG"
+  } else if (check.out$nyc>0) {
+    tag <- "YC"
+  } else stop("Unable to call methylation: neither XG nor YC tag is present",
+              " (genome strand unknown).\nExiting", call.=FALSE)
+  
+  result <- rcpp_call_methylation_genome(
+    input.bam.file, output.bam.file, genome, tag, nthreads
+  )
+  
+  if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+  return(result)
+}
+
 ################################################################################
 
 # descr: apply thresholding criteria to processed BAM reads
@@ -238,7 +293,7 @@ utils::globalVariables(
                              min.context.sites, min.context.beta,
                              max.outofcontext.beta, verbose)
 {
-  if (verbose) message("Thresholding reads", appendLF=FALSE)
+  if (verbose) message("Thresholding reads ", appendLF=FALSE)
   tm <- proc.time()
   
   # fast thresholding, vectorised
@@ -248,7 +303,7 @@ utils::globalVariables(
     min.context.sites, min.context.beta, max.outofcontext.beta
   )
   
-  if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+  if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(pass)
 }
 
@@ -285,14 +340,14 @@ utils::globalVariables(
                                 ctx,
                                 verbose)
 {
-  if (verbose) message("Preparing cytosine report", appendLF=FALSE)
+  if (verbose) message("Preparing cytosine report ", appendLF=FALSE)
   tm <- proc.time()
   
   # must be ordered
   cx.report <- rcpp_cx_report(bam.processed, pass, ctx)
   data.table::setDT(cx.report)
 
-  if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+  if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(cx.report)
 }
 
@@ -305,7 +360,7 @@ utils::globalVariables(
                            match.tolerance, match.min.overlap,
                            verbose)
 {
-  if (verbose) message("Preparing ", bed.type, " report", appendLF=FALSE)
+  if (verbose) message("Preparing ", bed.type, " report ", appendLF=FALSE)
   tm <- proc.time()
   
   bam.subset <- data.table::data.table(
@@ -329,7 +384,7 @@ utils::globalVariables(
   bed.report <- data.table::merge.data.table(bed.dt, bam.dt, by="bedmatch",
                                              all=TRUE)[order(bedmatch)]
   
-  if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+  if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(bed.report[,setdiff(names(bed.report),
                              c("bedmatch","FALSE+","FALSE-","TRUE+","TRUE-")),
                     with=FALSE])
@@ -346,7 +401,7 @@ utils::globalVariables(
                          verbose)
 {
   if (verbose) message("Computing ECDFs for within- and out-of-context",
-                       " per-read beta values", appendLF=FALSE)
+                       " per-read beta values ", appendLF=FALSE)
   tm <- proc.time()
   
   bed.match <- .matchTarget(bam.processed=bam.processed, bed=bed,
@@ -374,7 +429,7 @@ utils::globalVariables(
   })
   names(bed.ecdf) <- as.character(as.character(bed)[bed.rows])
  
-  if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+  if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(bed.ecdf)
 }
 
@@ -386,7 +441,7 @@ utils::globalVariables(
 .getBaseFreqReport <- function (bam.processed, pass, vcf,
                                 verbose)
 {
-  if (verbose) message("Extracting base frequences", appendLF=FALSE)
+  if (verbose) message("Extracting base frequences ", appendLF=FALSE)
   tm <- proc.time()
   
   vcf.ranges <- BiocGenerics::sort(SummarizedExperiment::rowRanges(vcf))
@@ -446,7 +501,7 @@ utils::globalVariables(
   bf.report[, `:=` (`FEp+`=rcpp_fep(bf.report, c("M+Ref","U+Ref","M+Alt","U+Alt")),
                     `FEp-`=rcpp_fep(bf.report, c("M-Ref","U-Ref","M-Alt","U-Alt")))]
   
-  if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+  if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(bf.report)
 }
 
@@ -460,7 +515,7 @@ utils::globalVariables(
                           clip.patterns, strand.offset, highlight.positions,
                           verbose)
 {
-  if (verbose) message("Extracting methylation patterns", appendLF=FALSE)
+  if (verbose) message("Extracting methylation patterns ", appendLF=FALSE)
   tm <- proc.time()
   
   bed.dt <- data.table::as.data.table(bed)[bed.row]
@@ -482,6 +537,6 @@ utils::globalVariables(
   data.table::setDT(patterns)
   colnames(patterns) <- sub("^X([0-9]+)$", "\\1", colnames(patterns))
   
-  if (verbose) message(sprintf(" [%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+  if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(patterns)
 }

@@ -24,6 +24,8 @@ methylation status and base frequencies at particular genomic positions (SNPs).
 
 ### Current Features
 
+ * calling cytosine methylation and saving calls in BAM file
+ (*`callMethylation`*)
  * conventional reporting of cytosine methylation (*`generateCytosineReport`*)
  * calling the hypermethylated variant epiallele frequency (VEF) at the
  level of genomic regions (*`generate[Bed|Amplicon|Capture]Report`*) or
@@ -37,17 +39,17 @@ methylation status and base frequencies at particular genomic positions (SNPs).
 
 ### Recent improvements
 
-##### v1.10 [October 2023]
+##### v1.10 [BioC 3.18]
 
- * inputs both single-end and paired-end sequencing alignments [done]
- * making methylation calls [in progress]
+ * inputs both single-end and paired-end sequencing alignments
+ * makes and stores methylation calls
  
-##### v1.4
+##### v1.4 [BioC 3.15]
 
  * significant speed-up
  * method to visualize methylation patterns
 
-##### v1.2
+##### v1.2 [BioC 3.14]
 
  * even faster and more memory-efficient BAM loading (by means of HTSlib)
  * min.baseq parameter to reduce the effect of low quality bases on 
@@ -90,6 +92,13 @@ Very brief synopsis:
 
 ```r
 library(epialleleR)
+
+# make methylation calls if necessary
+callMethylation(
+  input.bam.file=system.file("extdata", "test", "dragen-se-unsort-xg.bam", package="epialleleR"),
+  output.bam.file=tempfile(pattern="output-", fileext=".bam"),
+  genome=system.file("extdata", "test", "reference.fasta.gz", package="epialleleR")
+)
 
 # external files
 amplicon.bam <- system.file("extdata", "amplicon010meth.bam",

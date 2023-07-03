@@ -215,6 +215,9 @@ sequencing), larger methylation capture panels, or even whole-genome approaches.
 
 ## Current Features
 
+ * If methylation call strings are not present in BAM file, *`epialleleR`* can
+ make and store such calls in output BAM (similar to Bismark or Illumina's
+ mapping/alignment solutions)
  * In addition to conventional reporting of cytosine DNA methylation levels
  (beta values), *`epialleleR`* can call variant epiallele frequencies (VEF) of
  hypermethylated alleles at the level of individual cytosines
@@ -229,12 +232,19 @@ sequencing), larger methylation capture panels, or even whole-genome approaches.
 
 ## Processing speed
 
-Currently *`epialleleR`* runs in a single-thread mode only. Loading the BAM
+Currently *`epialleleR`* runs in a single-thread mode only. Reading/writing
+of BAM and FASTA
 data is now done by means of *`HTSlib`*, therefore it is possible to speed
-it up using additional decompression threads (*`nthreads`* option in
-*`preprocessBam`*). All operations are performed using optimised C++ functions,
-and usually take reasonable time.
-Running time for complete task "BAM on disk -> CX report on disk" depends on the
+it up significantly using additional decompression threads (*`nthreads`* option
+in *`epialleleR`* methods). All operations are performed using optimised
+C++ functions, and usually take reasonable time.
+
+During methylation calling, human genome (hg38) loading usually takes 5-15
+seconds. Using preloaded reference genome, the calling itself is performed
+at the speed of 200-300 thousand reads per second (30-50 MB/s of BAM data).
+
+During methylation reporting,
+running time for complete task "BAM on disk -> CX report on disk" depends on the
 size of the BAM file, and the speed is usually within the range of 30-50 MB/s
 (or 250-400 thousand reads per second) for a single core of a relatively
 modern CPU (Intel(R) Core(TM) i7-7700).
@@ -286,12 +296,26 @@ related files are:
 
 # Typical workflow
 
+## Requirements
+
 As mentioned earlier, *`epialleleR`* uses data stored in Binary Alignment Map
 (BAM) files as its input. It is a prerequisite that records in the BAM file
 contain an XG tag with a genomic strand they map to, and an XM tag with the
 methylation call string &#8212; such files are
-produced by virtually any software tool for mapping and alignment of bisulfite
-sequencing reads (such as Bismark, BSMAP or Illumina DRAGEN Bio-IT Platform).
+produced by mapping and alignment tools such as Bismark Bisulfite Read Mapper
+and Methylation Caller or state-of-the-art Illumina solutions: Illumina DRAGEN
+Bio-IT Platform, Illumina Cloud analysis solutions, as well as contemporary
+Illumina sequencing instruments
+with on-board read mapping/alignment (NextSeq 1000/2000, NovaSeq X). Such BAM
+files will contain all the necessary information and can be analysed without
+additional steps.
+
+If BAM files were produced by other mapping/alignment tools (e.g., bwa-meth)
+and lack XG/XM data, it is possible to call methylation using
+*`callMethylation`* method. This method will add absent XG/XM tags
+and save all data in the output BAM file that can be further analysed by 
+*`epialleleR`*.
+
 For paired-end alignments, BAM file must be also sorted by read name
 (and not genomic location).
 
@@ -333,6 +357,31 @@ library(epialleleR)
 capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
 bam.data    <- preprocessBam(capture.bam)
 ```
+
+## Optional calling of cytosine methylation
+
+If BAM file lacks XG/XM tags (e.g., is an output of bwa-meth), preprocessing
+will fail with the message that cytosine methylation calling must be performed.
+This can be done as follows:
+
+```{r}
+# bwa-meth sample output
+input.bam <- system.file("extdata", "test", "bwameth-se-unsort-yc.bam", package="epialleleR")
+
+# resulting BAM with XG/XM tags
+output.bam <- tempfile(pattern="output-", fileext=".bam")
+
+# sample reference genome
+genome <- preprocessGenome(system.file("extdata", "test", "reference.fasta.gz", package="epialleleR"))
+
+# calls cytosine methylation and stores it in the output BAM
+# Input BAM has 100 records of which 73 are mapped to the genome
+callMethylation(input.bam, output.bam, genome)
+
+# process this data further
+# bam.data <- preprocessBam(output.bam)
+```
+
 
 ## Making cytosine reports
 
