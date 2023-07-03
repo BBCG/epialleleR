@@ -16,6 +16,9 @@
     <loc>/index.html</loc>
   </url>
   <url>
+    <loc>/reference/callMethylation.html</loc>
+  </url>
+  <url>
     <loc>/reference/extractPatterns.html</loc>
   </url>
   <url>
@@ -35,5 +38,8 @@
   </url>
   <url>
     <loc>/reference/preprocessBam.html</loc>
+  </url>
+  <url>
+    <loc>/reference/preprocessGenome.html</loc>
   </url>
 </urlset>
