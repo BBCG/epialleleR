@@ -43,6 +43,7 @@ methylation status and base frequencies at particular genomic positions (SNPs).
 
  * inputs both single-end and paired-end sequencing alignments
  * makes and stores methylation calls
+
  
 ##### v1.4 [BioC 3.15]
 
