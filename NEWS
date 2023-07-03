@@ -63,3 +63,6 @@ Changes in version 1.3.6 (2022-02-16)
 
 Changes in version 1.9.2 (2023-06-21)
 + both paired-end and single-end alignments
+
+Changes in version 1.9.4 (2023-07-03)
++ methylation calls for bwa-meth, etc

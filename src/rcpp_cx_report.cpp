@@ -1,6 +1,7 @@
 #include <Rcpp.h>
 #include <array>
 #include <boost/container/flat_map.hpp>
+#include "epialleleR.h"
 
 // Was using C++17 for std::map::try_emplace
 // Very much required for boost::container::flat_map - 10x speed gain
@@ -27,19 +28,7 @@
 // 2) when gap in reads or another chr - spit map to res, clear map
 // 3) spit if within context and same context in more than 50% of the reads
 // 
-// Here's the ctx_to_idx conversion:
-// ctx  bin       +2        >>2&15  idx
-// +    00101011  00101101  1011    11
-// -    00101101  00101111  1011    11
-// .    00101110  00110000  1100    12
-// H    01001000  01001010  0010    2
-// U    01010101  01010111  0101    5
-// X    01011000  01011010  0110    6
-// Z    01011010  01011100  0111    7
-// h    01101000  01101010  1010    10
-// u    01110101  01110111  1101    13
-// x    01111000  01111010  1110    14
-// z    01111010  01111100  1111    15
+// ctx_to_idx conversion is described in epialleleR.h file
 // 
 // [[Rcpp::export("rcpp_cx_report")]]
 Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             // data frame with BAM data
@@ -64,7 +53,6 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
   typedef boost::container::flat_map<T_key, T_val> T_cx_fmap;                   // attaboy
   
 // macros
-#define ctx_to_idx(c) ((c+2)>>2) & 15
 #define spit_results {                           /* save aggregated counts  */ \
   for (T_cx_fmap::iterator it=cx_map.begin(); it!=cx_map.end(); it++) {        \
     it->second[9] /= 2;                               /* halve the coverage */ \
@@ -89,7 +77,7 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
   max_pos=0;                                                                   \
   cx_map.clear();                                                              \
   hint = cx_map.end();                                                         \
-}
+};
 
   // array of contexts to print
   unsigned int ctx_map [16] = {0};

@@ -255,16 +255,18 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
     std::memset(record_xm_rs,  '-', record_width);
     
     // start with new record
-    record_width = abs(bam_rec->core.isize);                                    // template ISIZE
+    record_width = abs(bam_rec->core.isize);                                    // template ISIZE, but can be 0 for single-ended!
     
-    // resize containers if necessary
-    if (record_width > max_record_width) {
-      max_record_width = record_width;                                          // expand template holders
-      record_seq_rs  = (uint8_t *) realloc(record_seq_rs, max_record_width);
-      record_xm_rs   = (uint8_t *) realloc(record_xm_rs,  max_record_width);
-      if (record_seq_rs==NULL || record_xm_rs==NULL)                            // check memory allocation
-        Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs);
-    }
+    // // Proper resize should be based on sum of cigar_oplen if bam_rec->core.isize is 0
+    // // I'll disable resize for now, see if it ever causes troubles
+    // // resize containers if necessary
+    // if (record_width > max_record_width) {
+    //   max_record_width = record_width;                                          // expand template holders
+    //   record_seq_rs  = (uint8_t *) realloc(record_seq_rs, max_record_width);
+    //   record_xm_rs   = (uint8_t *) realloc(record_xm_rs,  max_record_width);
+    //   if (record_seq_rs==NULL || record_xm_rs==NULL)                            // check memory allocation
+    //     Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs);
+    // }
     
     // get record sequence, XM, quality string
     uint8_t *record_qual = bam_get_qual(bam_rec);                               // quality string (Phred scale with no +33 offset)
@@ -314,10 +316,11 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
     rname.push_back(bam_rec->core.tid + 1);                                     // RNAME+1 
     strand.push_back(( record_strand[1] == 'C' ) ? 1 : 2);                      // STRAND is 1 if "ZCT"/"+", 2 if "ZGA"/"-"
     start.push_back(bam_rec->core.pos + 1);                                     // POS+1 
-    seq->emplace_back((const char*) record_seq_rs, record_width);               // SEQ 
-    xm->emplace_back( (const char*) record_xm_rs,  record_width);               // XM 
+    seq->emplace_back((const char*) record_seq_rs, dest_pos);                   // SEQ 
+    xm->emplace_back( (const char*) record_xm_rs,  dest_pos);                   // XM 
     npushed++;                                                                  // +1 
     
+    record_width = dest_pos;                                                    // because bam_rec->core.isize can be 0 for single-end
   }
   
   // cleaning

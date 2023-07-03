@@ -7,12 +7,26 @@
 #' The function loads and preprocesses BAM file, saving time when multiple
 #' analyses are to be performed on large input files. Currently, HTSlib
 #' is used to read the data, therefore it is possible to speed up the loading
-#' by means of HTSlib threads.
+#' by means of HTSlib decompression threads.
 #' 
 #' This function is also called internally when BAM file location is supplied as
 #' an input for other `epialleleR` methods.
 #' 
-#' `preprocessBam` always tests if BAM file is paired- or single-end
+#' Please note that for BAM preprocessing as well as all its reporting methods,
+#' `epialleleR` requires genomic
+#' strand (XG tag) and a methylation call string (XM tag) to be present in a
+#' BAM file - i.e., methylation calling must be performed after read
+#' mapping/alignment by your software of choice. It is the case for BAM files
+#' produced by Bismark Bisulfite Read Mapper and Methylation Caller,
+#' Illumina DRAGEN, Illumina Cloud analysis solutions, as well as
+#' contemporary Illumina sequencing instruments
+#' with on-board read mapping/alignment (NextSeq 1000/2000, NovaSeq X),
+#' therefore such files can be analysed without additional steps.
+#' For alignments produced by other tools, e.g., BWA-meth, methylation calling
+#' must be performed prior to BAM loading / reporting, by means of
+#' \code{\link[epialleleR]{callMethylation}}.
+#' 
+#' `preprocessBam` always tests if BAM file is paired- or single-ended
 #' and has all necessary tags (XM/XG) available. It is recommended to use
 #' `verbose` processing and check messages for correct identification of
 #' alignment endness. Otherwise, if the `paired` parameter is set explicitly,
@@ -38,11 +52,6 @@
 #' reads. Error message is shown if it is sorted by genomic location, in this
 #' case please sort it by QNAME using 'samtools sort -n -o out.bam in.bam'.
 #' 
-#' Please also note that for all its methods, `epialleleR` requires genomic
-#' strand (XG tag) and a methylation call string (XM tag) to be present in a
-#' BAM file - i.e., methylation calling must be
-#' performed after read mapping/alignment by your software of choice. Own method
-#' for methylation calling is currently under development.
 #'
 #' @param bam.file BAM file location string.
 #' @param paired boolean for expected alignment endness: `TRUE` for paired-end,
