@@ -97,6 +97,9 @@ case please sort it by QNAME using 'samtools sort -n -o out.bam in.bam'.
   bam.data    <- preprocessBam(capture.bam)
 }
 \seealso{
+\code{\link{preprocessGenome}} for preloading reference
+sequences and \code{\link{callMethylation}} for methylation calling.
+
 \code{\link{generateCytosineReport}} for methylation statistics at
 the level of individual cytosines, \code{\link{generateBedReport}} for
 genomic region-based statistics, \code{\link{generateVcfReport}} for

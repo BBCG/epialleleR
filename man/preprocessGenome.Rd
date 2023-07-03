@@ -50,5 +50,5 @@ calling cytosine methylation by \code{\link{callMethylation}} method.
 \code{\link{callMethylation}} for methylation calling,
 and `epialleleR` vignettes for the description of usage and sample data.
 
-Block compression/decompression utility \href{http://www.htslib.org/doc/bgzip.html}{bgzip},
+Block compression/decompression utility \href{http://www.htslib.org/doc/bgzip.html}{bgzip}.
 }

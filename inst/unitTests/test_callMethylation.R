@@ -61,6 +61,13 @@ test_callMethylation <- function () {
   
   RUnit::checkException(
     callMethylation(
+      input.bam.file=system.file("extdata", "test", "bwameth-se-unsort.bam", package="epialleleR"),
+      output.bam.file="", genome=genome, nthreads=0, verbose=FALSE
+    )
+  )
+  
+  RUnit::checkException(
+    callMethylation(
       input.bam.file="", output.bam.file=output.bam, genome=genome
     )
   )

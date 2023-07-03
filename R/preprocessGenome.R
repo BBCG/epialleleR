@@ -33,7 +33,7 @@
 #' @seealso \code{\link{callMethylation}} for methylation calling,
 #' and `epialleleR` vignettes for the description of usage and sample data.
 #' 
-#' Block compression/decompression utility \href{http://www.htslib.org/doc/bgzip.html}{bgzip},
+#' Block compression/decompression utility \href{http://www.htslib.org/doc/bgzip.html}{bgzip}.
 #' @examples
 #'   genome.file <- system.file("extdata", "test", "reference.fasta.gz", package="epialleleR")
 #'   genome.data <- preprocessGenome(genome.file)

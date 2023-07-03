@@ -69,9 +69,14 @@ test_preprocessBam <- function () {
   # single-ended, unsorted, with XM
   RUnit::checkTrue(
     methods::is(
-      preprocessBam(system.file("extdata", "test", "dragen-se-unsort-xg-xm.bam", package="epialleleR"), verbose=TRUE),
+      preprocessBam(system.file("extdata", "test", "dragen-se-unsort-xg-xm.bam", package="epialleleR"), verbose=TRUE, skip.duplicates=TRUE),
       "data.table"
     )
+  )
+  
+  # single-ended, unsorted, no XG
+  RUnit::checkException(
+    preprocessBam(system.file("extdata", "test", "bwameth-se-unsort-yc.bam", package="epialleleR"), verbose=TRUE)
   )
   
   # single-ended, unsorted, no XM
@@ -88,5 +93,11 @@ test_preprocessBam <- function () {
   RUnit::checkException(
     preprocessBam(system.file("extdata", "test", "dragen-se-unsort-xg-xm.bam", package="epialleleR"), paired=TRUE, verbose=TRUE)
   )
-  
+ 
+  # internal coverage
+  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon000meth.bam", package="epialleleR"), 5, 5, TRUE, 1)
+  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon010meth.bam", package="epialleleR"), 5, 5, TRUE, 1)
+  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon100meth.bam", package="epialleleR"), 5, 5, TRUE, 1)
+  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "capture.bam", package="epialleleR"), 5, 5, TRUE, 1)
+
 }

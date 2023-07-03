@@ -22,7 +22,7 @@
 #' to the forward strand of reference sequence "ACaaGT" with the CIGAR string
 #' "2M2D2M" (2 bases match,
 #' 2 reference bases are deleted, 2 bases match), then methylation call string
-#' will be ".Z.." (in contrast to the reference's one of ".H...."). This likely
+#' will be ".Z.." (in contrast to the reference's one of ".H...."). This
 #' makes cytosine calls nearly identical to ones produced by Bismark Bisulfite
 #' Read Mapper and Methylation Caller or Illumina DRAGEN Bio IT Platform,
 #' however with one important distinction: `epialleleR` reports sequence context
@@ -33,7 +33,7 @@
 #' context of "CNG" -> "..X", reverse strand context of "NCG" -> "..Z".
 #' 
 #' As the reference sequence, the function expects either location of
-#' (optionally and preferably `bgzip`ped) FASTA file or an object obtained by
+#' (preferably `bgzip`ped) FASTA file or an object obtained by
 #' \code{\link{preprocessGenome}}. The latter is preferred if methylation
 #' calling is performed on multiple BAM files.
 #' 
@@ -59,14 +59,14 @@
 #' @param verbose boolean to report progress and timings (default: TRUE).
 #' @return list object with simple statistics of processed ("nrecs") records
 #' and calls made ("ncalled"). Even though "ncalled" can be less than "nrecs"
-#' (e.g., because not all reads are mapped), all records from input BAM are
+#' (e.g., because not all reads are mapped), all records from the input BAM are
 #' written to the output bam.
-#' @seealso \code{\link{preprocessGenome}} for preloading of reference sequences
+#' @seealso \code{\link{preprocessGenome}} for preloading reference sequences
 #' and `epialleleR` vignettes for the description of usage and sample data.
 #' 
 #' \href{https://www.bioinformatics.babraham.ac.uk/projects/bismark/}{Bismark} Bisulfite Read Mapper and Methylation Caller,
-#' Fast and accurate alignment of long bisulfite-seq reads with \href{https://arxiv.org/abs/1401.1129}{bwa-meth},
-#' or info on \href{https://support.illumina.com/content/dam/illumina-support/help/Illumina_DRAGEN_Bio_IT_Platform_v3_7_1000000141465/Content/SW/Informatics/Dragen/DuplicateMarking_fDG.htm}{Illumina DRAGEN Bio IT Platform}.
+#' \href{https://arxiv.org/abs/1401.1129}{bwa-meth} for fast and accurate alignment of long bisulfite-seq reads,
+#' or info on \href{https://support-docs.illumina.com/SW/dragen_v42/Content/SW/DRAGEN/MPipelineMeth_fDG.htm}{Illumina DRAGEN Bio IT Platform}.
 #' @examples
 #'   callMethylation(
 #'     input.bam.file=system.file("extdata", "test", "dragen-se-unsort-xg.bam", package="epialleleR"),

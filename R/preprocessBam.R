@@ -69,7 +69,10 @@
 #' @param verbose boolean to report progress and timings (default: TRUE).
 #' @return \code{\link[data.table]{data.table}} object containing preprocessed
 #' BAM data.
-#' @seealso \code{\link{generateCytosineReport}} for methylation statistics at
+#' @seealso \code{\link{preprocessGenome}} for preloading reference
+#' sequences and \code{\link{callMethylation}} for methylation calling.
+#' 
+#' \code{\link{generateCytosineReport}} for methylation statistics at
 #' the level of individual cytosines, \code{\link{generateBedReport}} for
 #' genomic region-based statistics, \code{\link{generateVcfReport}} for
 #' evaluating epiallele-SNV associations, \code{\link{extractPatterns}} for

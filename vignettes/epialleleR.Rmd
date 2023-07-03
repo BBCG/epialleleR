@@ -300,13 +300,13 @@ related files are:
 
 As mentioned earlier, *`epialleleR`* uses data stored in Binary Alignment Map
 (BAM) files as its input. It is a prerequisite that records in the BAM file
-contain an XG tag with a genomic strand they map to, and an XM tag with the
-methylation call string &#8212; such files are
+contain an XG tag with a genomic strand they map to ("CT" or "GA"), and an XM
+tag with the methylation call string &#8212; such files are
 produced by mapping and alignment tools such as Bismark Bisulfite Read Mapper
 and Methylation Caller or state-of-the-art Illumina solutions: Illumina DRAGEN
 Bio-IT Platform, Illumina Cloud analysis solutions, as well as contemporary
 Illumina sequencing instruments
-with on-board read mapping/alignment (NextSeq 1000/2000, NovaSeq X). Such BAM
+with on-board read mapping/alignment (NextSeq 1000/2000, NovaSeq X). These BAM
 files will contain all the necessary information and can be analysed without
 additional steps.
 
@@ -316,11 +316,12 @@ and lack XG/XM data, it is possible to call methylation using
 and save all data in the output BAM file that can be further analysed by 
 *`epialleleR`*.
 
-For paired-end alignments, BAM file must be also sorted by read name
-(and not genomic location).
+For paired-end alignments, BAM file must be sorted by read name
+(and not genomic location). Arbitrary sorting is allowed for single-end
+sequencing alignments.
 
 Please use the function help files for a full description of available
-parameters, as well as explanation of the function's logic and output values.
+parameters, as well as explanation of the functions' logic and output values.
 
 ## Reading the data
 
