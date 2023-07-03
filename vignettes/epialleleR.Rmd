@@ -111,7 +111,7 @@ options(width=100)
 
 # Introduction
 
-The cytosine DNA methylation is an important epigenetic mechanism for regulation
+Cytosine DNA methylation is an important epigenetic mechanism for regulation
 of gene expression. Abnormal methylation is linked to several diseases, being 
 for example the most common molecular lesion in cancer cell.[^1] Multiple
 studies suggest that alterations in DNA methylation, despite occurring at a low
