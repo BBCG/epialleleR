@@ -92,7 +92,7 @@ threads to be used during file decompression (default: 1).</p></dd>
 
 <p>list object with simple statistics of processed ("nrecs") records
 and calls made ("ncalled"). Even though "ncalled" can be less than "nrecs"
-(e.g., because not all reads are mapped), all records from input BAM are
+(e.g., because not all reads are mapped), all records from the input BAM are
 written to the output bam.</p>
     </div>
     <div id="details">
@@ -113,7 +113,7 @@ actual (observed) sequence of the read. E.g., if read "ACGT" was aligned
 to the forward strand of reference sequence "ACaaGT" with the CIGAR string
 "2M2D2M" (2 bases match,
 2 reference bases are deleted, 2 bases match), then methylation call string
-will be ".Z.." (in contrast to the reference's one of ".H...."). This likely
+will be ".Z.." (in contrast to the reference's one of ".H...."). This
 makes cytosine calls nearly identical to ones produced by Bismark Bisulfite
 Read Mapper and Methylation Caller or Illumina DRAGEN Bio IT Platform,
 however with one important distinction: `epialleleR` reports sequence context
@@ -123,7 +123,7 @@ forward strand context of "CNG" is reported as "X..", forward strand context
 of "CGN" -&gt; "Z..", reverse strand context of "NNG" -&gt; "..H", reverse strand
 context of "CNG" -&gt; "..X", reverse strand context of "NCG" -&gt; "..Z".</p>
 <p>As the reference sequence, the function expects either location of
-(optionally and preferably `bgzip`ped) FASTA file or an object obtained by
+(preferably `bgzip`ped) FASTA file or an object obtained by
 <code><a href="preprocessGenome.html">preprocessGenome</a></code>. The latter is preferred if methylation
 calling is performed on multiple BAM files.</p>
 <p>The alignment records of the output BAM file will contain additional XM tag
@@ -140,11 +140,11 @@ of names and lengths of reference sequences).</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code><a href="preprocessGenome.html">preprocessGenome</a></code> for preloading of reference sequences
+    <div class="dont-index"><p><code><a href="preprocessGenome.html">preprocessGenome</a></code> for preloading reference sequences
 and `epialleleR` vignettes for the description of usage and sample data.</p>
 <p><a href="https://www.bioinformatics.babraham.ac.uk/projects/bismark/" class="external-link">Bismark</a> Bisulfite Read Mapper and Methylation Caller,
-Fast and accurate alignment of long bisulfite-seq reads with <a href="https://arxiv.org/abs/1401.1129" class="external-link">bwa-meth</a>,
-or info on <a href="https://support.illumina.com/content/dam/illumina-support/help/Illumina_DRAGEN_Bio_IT_Platform_v3_7_1000000141465/Content/SW/Informatics/Dragen/DuplicateMarking_fDG.htm" class="external-link">Illumina DRAGEN Bio IT Platform</a>.</p></div>
+<a href="https://arxiv.org/abs/1401.1129" class="external-link">bwa-meth</a> for fast and accurate alignment of long bisulfite-seq reads,
+or info on <a href="https://support-docs.illumina.com/SW/dragen_v42/Content/SW/DRAGEN/MPipelineMeth_fDG.htm" class="external-link">Illumina DRAGEN Bio IT Platform</a>.</p></div>
     </div>
 
     <div id="ref-examples">
@@ -157,7 +157,7 @@ or info on <a href="https://support.illumina.com/content/dam/illumina-support/he
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading reference genome file </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Making methylation calls </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.023s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.022s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $nrecs</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
