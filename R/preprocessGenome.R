@@ -21,6 +21,10 @@
 #' samtools/HTSlib). When FASTA file is compressed, faster loading can be
 #' achieved using (typically one) additional HTSlib decompression thread.
 #' 
+#' During loading, both lowercase and uppercase ACGTN symbols are allowed and
+#' correctly recognised, however all the other symbols (e.g., extended IUPAC
+#' symbols, MRSVWYHKDB) within sequences are converted to N.
+#' 
 #' Please also note that for the purpose of methylation calling, the very same
 #' reference genome must be used for both alignment (when BAM is produced) and
 #' calling cytosine methylation by \code{\link{callMethylation}} method.

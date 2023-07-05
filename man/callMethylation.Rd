@@ -62,8 +62,11 @@ of cytosines followed by unknown bases ("CNN") as "H.." instead of "U.."
 forward strand context of "CNG" is reported as "X..", forward strand context
 of "CGN" -> "Z..", reverse strand context of "NNG" -> "..H", reverse strand
 context of "CNG" -> "..X", reverse strand context of "NCG" -> "..Z".
+Both lowercase and uppercase ACGTN symbols in reference sequence are allowed
+and correctly recognised, however all the other symbols (e.g., extended IUPAC
+symbols, MRSVWYHKDB) within sequences are converted to N.
 
-As the reference sequence, the function expects either location of
+As a reference sequence, the function expects either location of
 (preferably `bgzip`ped) FASTA file or an object obtained by
 \code{\link{preprocessGenome}}. The latter is preferred if methylation
 calling is performed on multiple BAM files.

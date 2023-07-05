@@ -239,9 +239,9 @@ it up significantly using additional decompression threads (*`nthreads`* option
 in *`epialleleR`* methods). All operations are performed using optimised
 C++ functions, and usually take reasonable time.
 
-During methylation calling, human genome (hg38) loading usually takes 5-15
+During methylation calling, human genome (hg38) loading usually takes 10-20
 seconds. Using preloaded reference genome, the calling itself is performed
-at the speed of 200-300 thousand reads per second (30-50 MB/s of BAM data).
+at the speed of 200-300 thousand reads per second (25-40 MB/s of BAM data).
 
 During methylation reporting,
 running time for complete task "BAM on disk -> CX report on disk" depends on the
