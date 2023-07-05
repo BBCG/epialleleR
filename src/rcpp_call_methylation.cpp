@@ -133,7 +133,7 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
   // I don't do remap atm, let's see if order of reference sequences in genome
   // and BAM is ever different...
   for (int i=0; i<in_hdr->n_targets; i++) {                                     // for all BAM header refseqs
-    if ((in_hdr->target_len[i] != rlen[i]) |                                    // if any of length
+    if ((in_hdr->target_len[i] != rlen[i]) ||                                   // if any of length
         (rname[i].compare(in_hdr->target_name[i])!=0))                          // or name are different
       Rcpp::stop("BAM reference sequence doesn't match the provided genome sequence"); // freak out
   }
