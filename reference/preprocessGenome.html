@@ -18,7 +18,7 @@ reference sequences."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.9.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.9.5</span>
       </span>
     </div>
 
@@ -94,6 +94,9 @@ it automatically. It is possible and recommended to use compressed FASTA
 file as an input, but the file must be compressed by `bgzip` (part of
 samtools/HTSlib). When FASTA file is compressed, faster loading can be
 achieved using (typically one) additional HTSlib decompression thread.</p>
+<p>During loading, both lowercase and uppercase ACGTN symbols are allowed and
+correctly recognised, however all the other symbols (e.g., extended IUPAC
+symbols, MRSVWYHKDB) within sequences are converted to N.</p>
 <p>Please also note that for the purpose of methylation calling, the very same
 reference genome must be used for both alignment (when BAM is produced) and
 calling cytosine methylation by <code><a href="callMethylation.html">callMethylation</a></code> method.</p>
@@ -110,7 +113,7 @@ and `epialleleR` vignettes for the description of usage and sample data.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="va">genome.file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"test"</span>, <span class="st">"reference.fasta.gz"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">genome.data</span> <span class="op">&lt;-</span> <span class="fu">preprocessGenome</span><span class="op">(</span><span class="va">genome.file</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading reference genome file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 </code></pre></div>
     </div>
   </div>

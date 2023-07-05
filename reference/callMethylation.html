@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.9.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.9.5</span>
       </span>
     </div>
 
@@ -121,8 +121,11 @@ of cytosines followed by unknown bases ("CNN") as "H.." instead of "U.."
 (unknown; as for example Illumina DRAGEN Bio IT Platform does). Similarly,
 forward strand context of "CNG" is reported as "X..", forward strand context
 of "CGN" -&gt; "Z..", reverse strand context of "NNG" -&gt; "..H", reverse strand
-context of "CNG" -&gt; "..X", reverse strand context of "NCG" -&gt; "..Z".</p>
-<p>As the reference sequence, the function expects either location of
+context of "CNG" -&gt; "..X", reverse strand context of "NCG" -&gt; "..Z".
+Both lowercase and uppercase ACGTN symbols in reference sequence are allowed
+and correctly recognised, however all the other symbols (e.g., extended IUPAC
+symbols, MRSVWYHKDB) within sequences are converted to N.</p>
+<p>As a reference sequence, the function expects either location of
 (preferably `bgzip`ped) FASTA file or an object obtained by
 <code><a href="preprocessGenome.html">preprocessGenome</a></code>. The latter is preferred if methylation
 calling is performed on multiple BAM files.</p>
@@ -157,7 +160,7 @@ or info on <a href="https://support-docs.illumina.com/SW/dragen_v42/Content/SW/D
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading reference genome file </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Making methylation calls </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.022s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.023s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $nrecs</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
