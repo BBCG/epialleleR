@@ -139,8 +139,6 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     const char* xm_x = xm->at(templid[x]).c_str();                              // xm->at(templid[x]) is a reference to a corresponding XM string
     const unsigned int size_x = xm->at(templid[x]).size();                      // length of the current read
     
-    // Rcpp::Rcout << start_x << ":" <<xm->at(templid[x]) << std::endl;
-    
     // first, prefill MHL numerator buffer in first pass of XM
     if (num_buf_len < size_x) {
       num_buf_len = size_x;                                                     // new size
@@ -159,20 +157,17 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
           mh_end = i;                                                           // store end position of methylated stretch
           mh_size++;                                                            // methylated stretch size++
         } else if (mh_size) {                                                   // if lowercase and after non-0-length methylated stretch
-          // Rcpp::Rcout << mh_start << "->" << mh_end << ":" << mh_size << "=" << mhl_lookup[mh_size] << std::endl;
-          std::fill(num_buf + mh_start, num_buf + mh_end, mhl_lookup[mh_size]); // set values to Sk(mh_size, k) within methylated stretch
+          std::fill(num_buf+mh_start, num_buf+mh_end+1, mhl_lookup[mh_size]);   // set values to Sk(mh_size, k) within methylated stretch
           mh_sum += mhl_lookup[mh_size];                                        // sum of numerators
           mh_size = 0;                                                          // reset the size
         }
       }
     }
     if (mh_size) {                                                              // save last non-0-length methylated stretch
-      // Rcpp::Rcout << mh_start << "->" << mh_end << ":" << mh_size << "=" << mhl_lookup[mh_size] << std::endl;
-      std::fill(num_buf + mh_start, num_buf + mh_end, mh_size);
+      std::fill(num_buf+mh_start, num_buf+mh_end+1, mhl_lookup[mh_size]);
       mh_sum += mhl_lookup[mh_size];                                            // sum of numerators
     }
-    if (!discont) std::fill(num_buf, num_buf + size_x - 1, mh_sum);             // fill entire buffer if continuous MHL (same MHL value for entire read pair)
-    // Rcpp::Rcout << "total:" << h_size << "=" << mhl_lookup[h_size] << std::endl << std::endl;
+    if (!discont) std::fill_n(num_buf, size_x, mh_sum);                         // fill entire buffer if continuous MHL (same MHL value for entire read pair)
     
     for (unsigned int i=0; i<size_x; i++) {                                     // char by char - it's faster this way than using std::string in the cycle
       const unsigned int idx_to_increase = ctx_to_idx(xm_x[i]);                 // index of context; see the table in epialleleR.h
@@ -182,8 +177,8 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
       hint = mhl_map.try_emplace(hint, map_key, map_val);
       hint->second[idx_to_increase]++;
       hint->second[9]++;                                                        // total coverage
-      hint->second[3]+=num_buf[i];                                              // MHL numerator
-      hint->second[4]+=mhl_lookup[h_size];                                      // MHL denominator
+      hint->second[3] += num_buf[i];                                            // MHL numerator
+      hint->second[4] += mhl_lookup[h_size];                                    // MHL denominator
     }
     if (max_pos<map_val[1]) max_pos=map_val[1];                                 // last position of C in mhl_map
   }
