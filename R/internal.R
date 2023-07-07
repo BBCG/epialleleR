@@ -346,9 +346,30 @@ utils::globalVariables(
   # must be ordered
   cx.report <- rcpp_cx_report(bam.processed, pass, ctx)
   data.table::setDT(cx.report)
-
+  
   if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(cx.report)
+}
+
+
+################################################################################
+
+# descr: prepare WTF report for processed reads
+# value: data.table with WTF report
+
+.getWtfReport <- function (bam.processed,
+                           ctx, discont, maxl,
+                           verbose)
+{
+  if (verbose) message("Preparing WTF report ", appendLF=FALSE)
+  tm <- proc.time()
+  
+  # must be ordered
+  wtf.report <- rcpp_wtf_report(bam.processed, ctx, discont, maxl)
+  data.table::setDT(wtf.report)
+  
+  if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+  return(wtf.report)
 }
 
 

@@ -6,14 +6,14 @@
 // [[Rcpp::plugins(cpp17)]]
 // [[Rcpp::depends(BH)]]
 
-// Methylated Haplotype Load report
+// WTF report
 // PRE-SORTED DATASET IS A REQUIREMENT.
 // 
-// Parses XM tags and calculates MHL. Outputs only if most frequent context
+// Parses XM tags and calculates WTF. Outputs only if most frequent context
 // is observed in more than 50% of reads (not including +-) and is within ctx
 // string parameter.
 // Output report is a data.frame with six columns and rows for every cytosine:
-// rname (factor), strand (factor), pos, ctx (char), cov, mhl
+// rname (factor), strand (factor), pos, ctx, cov, wtf
 // 
 // 1) all XM positions counted in int[16]: index is equal to char+2>>2&00001111
 // 2) when gap in reads or another chr - spit map to res, clear map
@@ -22,20 +22,22 @@
 // ctx_to_idx conversion is described in epialleleR.h file
 // 
 
-// MHL numerator and denominator lookup tables are precomputed using Sk(n, k)
+// WTF numerator and denominator lookup tables are precomputed using Sk(n, k)
+//
 // Triangular sequence, nth element
 uint64_t T(uint64_t n) {
   return n*(n+1)/2;
 }
-// MHL numerator or denominator, sum S of all possible MHL combinations
+// WTF numerator or denominator, sum S of all possible WTF combinations
 // of length i from 1 to n, times i
 uint64_t S(uint64_t n)
 {
   if (n<2) return n;
   return S(n-1) + T(n);
 }
-// MHL numerator or denominator, sum S of all possible MHL combinations
+// WTF numerator or denominator, sum S of all possible WTF combinations
 // of length i from 1 to k (where k<n), times i
+// [[Rcpp::export]]
 uint64_t Sk(uint64_t n, uint64_t k) {
   if (n<=k) return S(n);
   return S(k) + (n-k)*T(k);
@@ -43,15 +45,15 @@ uint64_t Sk(uint64_t n, uint64_t k) {
 
 
 // [[Rcpp::export]]
-Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            // data frame with BAM data
+Rcpp::DataFrame rcpp_wtf_report(Rcpp::DataFrame &df,                            // data frame with BAM data
                                 std::string ctx,                                // context string for bases to report,
-                                bool discont,                                   // if MHL calculation shoul be discontinuous
-                                int k)                                          // maximum nr of ...
+                                bool discont,                                   // if WTF calculation should be discontinuous
+                                int k)                                          // limit for l in WTF formula
 {
   // walking trough bunch of reads <- filling the map
   // pos<<2|strand -> {0: rname,  1: pos,       2: 'H',  3: numer,  4: denom, 5: 'U',  6: 'X',  7: 'Z',
   //                   8: strand, 9: coverage, 10: 'h', 11: '+-',  12: '.',  13: 'u', 14: 'x', 15: 'z'}
-  // boost::container::flat_map<uint64_t, std::array<int,16>>
+  // boost::container::flat_map<uint64_t, std::array<uint64_t,16>>
   
   Rcpp::IntegerVector rname   = df["rname"];                                    // template rname
   Rcpp::IntegerVector strand  = df["strand"];                                   // template strand
@@ -62,12 +64,12 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
   
   // main typedefs
   typedef uint64_t T_key;                                                       // {62bit:pos, 2bit:strand}
-  typedef std::array<uint64_t,16> T_val;                                        // {0:rname, 1:pos, 8:strand, 9:coverage, 3:numerator, 4:denominator, and 10 more for 11 valid chars}
-  typedef boost::container::flat_map<T_key, T_val> T_mhl_map;                   // attaboy
+  typedef std::array<uint64_t, 16> T_val;                                       // {0:rname, 1:pos, 8:strand, 9:coverage, 3:numerator, 4:denominator, and 10 more for 11 valid chars}
+  typedef boost::container::flat_map<T_key, T_val> T_wtf_map;                   // attaboy
   
 // macros
 #define spit_results {                            /* save aggregated counts */ \
-  for (T_mhl_map::iterator it=mhl_map.begin(); it!=mhl_map.end(); it++) {      \
+  for (T_wtf_map::iterator it=wtf_map.begin(); it!=wtf_map.end(); it++) {      \
     it->second[9] /= 2;                               /* halve the coverage */ \
     if (it->second[12] > it->second[9]) continue;     /* skip if most are . */ \
     else if ((it->second[2] + it->second[10]) > it->second[9])                 \
@@ -83,13 +85,13 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
       res_ctx.push_back(max_freq_idx);                           /* context */ \
       res_cov.push_back(it->second[max_freq_idx] +                  /* meth */ \
                         it->second[max_freq_idx | 8]);            /* unmeth */ \
-      res_mhl.push_back((double)it->second[3]/it->second[4]);        /* MHL */ \
+      res_wtf.push_back((double)it->second[3]/it->second[4]);        /* WTF */ \
     }                                                                          \
   }                                                                            \
   res_rname.resize(res_strand.size(), map_val[0]);           /* same rname! */ \
   max_pos=0;                                                                   \
-  mhl_map.clear();                                                             \
-  hint = mhl_map.end();                                                        \
+  wtf_map.clear();                                                             \
+  hint = wtf_map.end();                                                        \
 };
 
   // array of contexts to print
@@ -98,34 +100,34 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     ctx_map[ctx_to_idx(c)]=1;
   });
   
-  // precomputed MHL numerator lookup table
-  const size_t mhl_lookup_len = 1024;
-  uint64_t mhl_lookup[mhl_lookup_len] = {0};
-  if (k<=0) k=mhl_lookup_len;
-  for (size_t i=0; i<mhl_lookup_len; i++) {
-    mhl_lookup[i] = Sk(i, k);                                                   // filling the MHL values for faster computations
+  // precomputed WTF numerator lookup table
+  const size_t wtf_lookup_len = 65536;
+  uint64_t wtf_lookup[wtf_lookup_len] = {0};
+  if (k<=0) k=wtf_lookup_len;
+  for (size_t n=0; n<wtf_lookup_len; n++) {
+    wtf_lookup[n] = Sk(n, k);                                                   // filling the WTF values for faster computations
   }
   
-  // MHL numerator buffer for current XM
+  // WTF numerator buffer for current XM
   size_t num_buf_len = 8192;                                                    // maximum, though expandable length of numerator buffer
   uint64_t *num_buf  = (uint64_t*) malloc(num_buf_len * sizeof(uint64_t));      // numerator buffer
 
   // result
   std::vector<int> res_rname, res_strand, res_pos, res_ctx, res_cov;
-  std::vector<double> res_mhl;
+  std::vector<double> res_wtf;
   size_t nitems = std::min(rname.size()*pow(ctx.size()<<2,2), 3e+9);
   res_rname.reserve(nitems); res_strand.reserve(nitems);
   res_pos.reserve(nitems); res_ctx.reserve(nitems);
-  res_cov.reserve(nitems); res_mhl.reserve(nitems);
+  res_cov.reserve(nitems); res_wtf.reserve(nitems);
   
   // iterating over XM vector, saving the results when necessary
-  T_mhl_map mhl_map;
-  T_mhl_map::iterator hint;
+  T_wtf_map wtf_map;
+  T_wtf_map::iterator hint;
   T_val map_val = {0};
   int max_pos = 0;
   unsigned int max_freq_idx;
   
-  mhl_map.reserve(100000);                                                      // reserving helps?
+  wtf_map.reserve(100000);                                                      // reserving helps?
   for (unsigned int x=0; x<rname.size(); x++) {
     // checking for the interrupt
     if ((x & 0xFFFF) == 0) Rcpp::checkUserInterrupt();                          // every ~65k reads
@@ -139,7 +141,7 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     const char* xm_x = xm->at(templid[x]).c_str();                              // xm->at(templid[x]) is a reference to a corresponding XM string
     const unsigned int size_x = xm->at(templid[x]).size();                      // length of the current read
     
-    // first, prefill MHL numerator buffer in first pass of XM
+    // first, prefill WTF numerator buffer in first pass of XM
     if (num_buf_len < size_x) {
       num_buf_len = size_x;                                                     // new size
       num_buf  = (uint64_t*) realloc(num_buf, num_buf_len * sizeof(uint64_t));  // expand numerator buffer
@@ -147,8 +149,8 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     }
     std::memset(num_buf,  0, size_x * sizeof(uint64_t));                        // clean the buffer
     size_t mh_start = 0, mh_end = 0, mh_size = 0, h_size = 0;                   // start, end and size of the current methylated stretch (number of ctx bases); total size of haplotype
-    uint64_t mh_sum = 0;                                                        // sum of MHL numerators for all methylated stretches, used to calculate continuous MHL that spans entire read pair
-    for (unsigned int i=0; i<size_x; i++) {                                     // first pass to compute local MHL values, char by char
+    uint64_t mh_sum = 0;                                                        // sum of WTF numerators for all methylated stretches, used to calculate continuous WTF that spans entire read pair
+    for (unsigned int i=0; i<size_x; i++) {                                     // first pass to compute local WTF values, char by char
       const unsigned int base_idx = ctx_to_idx(xm_x[i]);                        // index of current base context; see the table in epialleleR.h
       if (ctx_map[base_idx]) {                                                  // if within context
         h_size++;                                                               // haplotype size++
@@ -157,30 +159,31 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
           mh_end = i;                                                           // store end position of methylated stretch
           mh_size++;                                                            // methylated stretch size++
         } else if (mh_size) {                                                   // if lowercase and after non-0-length methylated stretch
-          std::fill(num_buf+mh_start, num_buf+mh_end+1, mhl_lookup[mh_size]);   // set values to Sk(mh_size, k) within methylated stretch
-          mh_sum += mhl_lookup[mh_size];                                        // sum of numerators
+          std::fill(num_buf+mh_start, num_buf+mh_end+1, wtf_lookup[mh_size]);   // set values to Sk(mh_size, k) within methylated stretch
+          mh_sum += wtf_lookup[mh_size];                                        // sum of numerators
           mh_size = 0;                                                          // reset the size
         }
       }
     }
     if (mh_size) {                                                              // save last non-0-length methylated stretch
-      std::fill(num_buf+mh_start, num_buf+mh_end+1, mhl_lookup[mh_size]);
-      mh_sum += mhl_lookup[mh_size];                                            // sum of numerators
+      std::fill(num_buf+mh_start, num_buf+mh_end+1, wtf_lookup[mh_size]);
+      mh_sum += wtf_lookup[mh_size];                                            // sum of numerators
     }
-    if (!discont) std::fill_n(num_buf, size_x, mh_sum);                         // fill entire buffer if continuous MHL (same MHL value for entire read pair)
+    if (!discont) std::fill_n(num_buf, size_x, mh_sum);                         // fill entire buffer if continuous WTF (same WTF value for entire read pair)
     
+    // second, walk through XM once again, filling the map
     for (unsigned int i=0; i<size_x; i++) {                                     // char by char - it's faster this way than using std::string in the cycle
       const unsigned int idx_to_increase = ctx_to_idx(xm_x[i]);                 // index of context; see the table in epialleleR.h
       if (idx_to_increase==11) continue;                                        // skip +-
       map_val[1] = start_x+i;                                                   // current position
       const T_key map_key = ((T_key)map_val[1] << 2) | map_val[8];
-      hint = mhl_map.try_emplace(hint, map_key, map_val);
+      hint = wtf_map.try_emplace(hint, map_key, map_val);
       hint->second[idx_to_increase]++;
       hint->second[9]++;                                                        // total coverage
-      hint->second[3] += num_buf[i];                                            // MHL numerator
-      hint->second[4] += mhl_lookup[h_size];                                    // MHL denominator
+      hint->second[3] += num_buf[i];                                            // WTF numerator
+      hint->second[4] += wtf_lookup[h_size];                                    // WTF denominator
     }
-    if (max_pos<map_val[1]) max_pos=map_val[1];                                 // last position of C in mhl_map
+    if (max_pos<map_val[1]) max_pos=map_val[1];                                 // last position of C in wtf_map
   }
   spit_results;
   
@@ -190,7 +193,7 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     Rcpp::Named("pos") = res_pos,                                               // position of cytosine
     Rcpp::Named("context") = res_ctx,                                           // cytosine context
     Rcpp::Named("coverage") = res_cov,                                          // cytosine context
-    Rcpp::Named("mhl") = res_mhl                                                // number of unmethylated
+    Rcpp::Named("wtf") = res_wtf                                                // number of unmethylated
   );
   
   Rcpp::IntegerVector col_rname = res["rname"];                                 // making rname a factor
@@ -218,8 +221,8 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
 //
 
 /*** R
-### MHL calculations for stretch of n CpGs over a window of k
-# for mCpG stretches of length n, sum S of all possible MHL combinations
+### WTF calculations for a stretch of n mCpGs over a window of k
+# for mCpG stretches of length n, sum S of all possible WTF combinations
 # (of length i from 1 to n, times i) equals to:
 # n   S   T
 # 1   1   1
@@ -241,7 +244,7 @@ S <- function (n) {
 }
 sapply(1:10, S)
 ###
-# for mCpG stretches of length n, sum S of all possible MHL combinations
+# for mCpG stretches of length n, sum S of all possible WTF combinations
 # (of length i from 1 to k [where k<n], times i) equals to:
 #   k=2 k=3 k=4 k=5 k=6 k=7 k=8
 # n   S   S   S   S   S   S   S
@@ -265,4 +268,4 @@ matrix(sapply(1:10, function (k) lapply(1:10, Sk, k=k)),
 */
 
 // Sourcing:
-// Rcpp::sourceCpp("rcpp_mhl_report.cpp")
+// Rcpp::sourceCpp("rcpp_wtf_report.cpp")
