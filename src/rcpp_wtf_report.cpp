@@ -133,7 +133,7 @@ Rcpp::DataFrame rcpp_wtf_report(Rcpp::DataFrame &df,                            
     if ((x & 0xFFFF) == 0) Rcpp::checkUserInterrupt();                          // every ~65k reads
     
     const int start_x = start[x];                                               // start of the current read
-    if ((start_x>max_pos) || (rname[x]!=map_val[0])) {                          // if current position is further downstream or another reference
+    if ((start_x>max_pos) || ((uint64_t)rname[x]!=map_val[0])) {                // if current position is further downstream or another reference
       spit_results;
       map_val[0] = rname[x];
     }
@@ -183,7 +183,7 @@ Rcpp::DataFrame rcpp_wtf_report(Rcpp::DataFrame &df,                            
       hint->second[3] += num_buf[i];                                            // WTF numerator
       hint->second[4] += wtf_lookup[h_size];                                    // WTF denominator
     }
-    if (max_pos<map_val[1]) max_pos=map_val[1];                                 // last position of C in wtf_map
+    if ((uint64_t)max_pos<map_val[1]) max_pos=map_val[1];                       // last position of C in wtf_map
   }
   spit_results;
   
