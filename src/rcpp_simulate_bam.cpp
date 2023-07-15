@@ -120,7 +120,9 @@ rcpp_simulate_bam(
   ),
   file)
 
-generateCytosineReport(file, threshold.reads=FALSE)
-extractPatterns(file, as("seq1:1-13", "GRanges"))
+bam <- preprocessBam(file)
+generateCytosineReport(bam, threshold.reads=FALSE)
+extractPatterns(bam, as("seq1:1-13", "GRanges"))
+rcpp_wtf_report(bam, "zZ", TRUE, 0)
 */
 // #############################################################################

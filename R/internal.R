@@ -1,5 +1,6 @@
 #' @importFrom data.table fread
 #' @importFrom data.table fwrite
+#' @importFrom data.table data.table
 #' @importFrom data.table as.data.table
 #' @importFrom data.table dcast
 #' @importFrom data.table merge.data.table
@@ -7,7 +8,6 @@
 #' @importFrom data.table setkey
 #' @importFrom data.table setDT
 #' @importFrom data.table setattr
-#' @importFrom stringi stri_length
 #' @importFrom GenomicRanges makeGRangesFromDataFrame
 #' @importFrom GenomicRanges seqnames
 #' @importFrom GenomicRanges reduce
@@ -22,6 +22,7 @@
 #' @importFrom stats setNames
 #' @importFrom methods is
 #' @importFrom utils globalVariables
+#' @importFrom utils packageVersion
 #' @importFrom Rcpp evalCpp
 #' @useDynLib epialleleR, .registration=TRUE
 
@@ -253,6 +254,70 @@ utils::globalVariables(
 # Functions: processing
 ################################################################################
 
+# descr: writing out sample BAM
+# value: number of records written
+
+.simulateBam <- function (output.bam.file, qname, flag, rname,
+                          pos, mapq, cigar, rnext,
+                          pnext, tlen, seq, qual, ...,
+                          verbose)
+{
+  # if (verbose) message("Writing sample BAM ", appendLF=FALSE)
+  tm <- proc.time()
+  
+  output.bam.file <- path.expand(output.bam.file)
+  tags <- list(...)
+  nrecs <- max(
+    sapply(c(as.list(environment()), tags), length)[names(match.call())],
+    1, na.rm=TRUE
+  )
+  nbases <- max(
+    ifelse(is.null(seq),  0, nchar(seq)),
+    ifelse(is.null(qual), 0, nchar(qual)),
+    ifelse("XM" %in% names(tags), nchar(tags$XM), 0),
+    ifelse(is.null(tlen), 0, tlen)
+  )
+  if (nbases==0) nbases <- 10
+  
+  if(is.null(qname)) qname <- sprintf("q%.04i", seq_len(nrecs))
+  if(is.null(flag))  flag  <- rep_len(0, nrecs)
+  if(is.null(rname)) rname <- factor(rep_len("chrS", nrecs))
+  else               rname <- factor(rname)
+  if(is.null(pos))   pos   <- rep_len(1, nrecs)
+  if(is.null(mapq))  mapq  <- rep_len(60, nrecs)
+  if(is.null(seq))   seq   <- rep_len(
+    paste(sample(c("A","C","T","G"), nbases, replace=TRUE), collapse=""), nrecs
+  )
+  if(is.null(cigar)) cigar <- rep_len(paste0(nbases, "M"), nrecs)
+  if(is.null(rnext)) rnext <- factor(rep_len("chrS", nrecs))
+  else               rnext <- factor(rnext)
+  if(is.null(pnext)) pnext <- rep_len(1, nrecs)
+  if(is.null(tlen))  tlen  <- rep_len(nbases, nrecs)
+  if(is.null(qual))  qual  <- rep_len(
+    paste(rep_len("F", nbases), collapse=""), nrecs
+  )
+  
+  header <- c(
+    sprintf("@SQ\tSN:%s\tLN:%i", levels(rname), max(nbases)+max(tlen)),
+    sprintf("@PG\tID:epialleleR\tPN:epialleleR\tVN:%s\tCL:rcpp_simulate_bam()",
+            utils::packageVersion("epialleleR"))
+  )
+  fields <- data.table::data.table(
+    qname=qname, flag=flag, tid=as.integer(rname)-1, pos=pos-1, mapq=mapq,
+    cigar=cigar, mtid=as.integer(rnext)-1, mpos=pnext-1,
+    isize=tlen, seq=seq, qual=qual
+  )
+  i_tags <- data.table::as.data.table(tags[sapply(tags, is.integer)])
+  s_tags <- data.table::as.data.table(tags[sapply(tags, is.character)])
+  
+  result <- rcpp_simulate_bam(header, fields, i_tags, s_tags, output.bam.file)
+  
+  if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
+  return(result)
+}
+
+################################################################################
+
 # descr: calling methylation (writing XG/XM)
 # value: simple statistics and output BAM
 
@@ -468,7 +533,7 @@ utils::globalVariables(
   vcf.ranges <- BiocGenerics::sort(SummarizedExperiment::rowRanges(vcf))
   vcf.ranges <- vcf.ranges[BiocGenerics::width(vcf.ranges)==1 &
                            vapply(as.character(vcf.ranges$ALT),
-                                  stringi::stri_length,
+                                  nchar,
                                   FUN.VALUE=numeric(1), USE.NAMES=FALSE)==1]
   # GenomeInfoDb::seqlevels(vcf.ranges, pruning.mode="coarse") <-
   #   levels(bam.processed$rname)

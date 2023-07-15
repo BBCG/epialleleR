@@ -1,6 +1,6 @@
 Package: epialleleR
 Title: Fast, Epiallele-Aware Methylation Reporter
-Version: 1.9.5
+Version: 1.9.7
 Authors@R: 
   person(given = "Oleksii",
     family = "Nikolaienko",
@@ -30,7 +30,6 @@ Imports:
   GenomeInfoDb,
   SummarizedExperiment,
   VariantAnnotation,
-  stringi,
   data.table,
   Rcpp
 LinkingTo:
