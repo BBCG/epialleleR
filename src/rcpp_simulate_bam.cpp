@@ -55,6 +55,8 @@ int rcpp_simulate_bam (std::vector<std::string> header,                         
     call_res = sam_parse_cigar(cigar[i].c_str(), NULL, &cigar_mem, &n_cigar);   // fill CIGAR array
     if (call_res<0) Rcpp::stop("Unable to fill CIGAR array");                   // fall back on error
     
+    for (char *q=(char*)qual[i].c_str(); *q!='\0'; q++) *q -= 33;               // remove offset from QUAL string
+      
     call_res = bam_set1(                                                        // set all mandatory fields
       out_rec, qname[i].size(), qname[i].c_str(),
       flag[i], tid[i], pos[i], mapq[i],

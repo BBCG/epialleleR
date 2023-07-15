@@ -254,7 +254,7 @@ utils::globalVariables(
 # Functions: processing
 ################################################################################
 
-# descr: writing out sample BAM
+# descr: writing out example BAM
 # value: number of records written
 
 .simulateBam <- function (output.bam.file, qname, flag, rname,
@@ -262,7 +262,7 @@ utils::globalVariables(
                           pnext, tlen, seq, qual, ...,
                           verbose)
 {
-  # if (verbose) message("Writing sample BAM ", appendLF=FALSE)
+  if (verbose) message("Writing sample BAM ", appendLF=FALSE)
   tm <- proc.time()
   
   output.bam.file <- path.expand(output.bam.file)
@@ -308,7 +308,9 @@ utils::globalVariables(
     isize=tlen, seq=seq, qual=qual
   )
   i_tags <- data.table::as.data.table(tags[sapply(tags, is.integer)])
+  i_tags <- i_tags[rep_len(seq_len(nrow(i_tags)), nrecs)]
   s_tags <- data.table::as.data.table(tags[sapply(tags, is.character)])
+  s_tags <- s_tags[rep_len(seq_len(nrow(s_tags)), nrecs)]
   
   result <- rcpp_simulate_bam(header, fields, i_tags, s_tags, output.bam.file)
   
