@@ -5,7 +5,7 @@
 \title{simulateBam}
 \usage{
 simulateBam(
-  output.bam.file,
+  output.bam.file = NULL,
   qname = NULL,
   flag = NULL,
   rname = NULL,
@@ -22,20 +22,22 @@ simulateBam(
 )
 }
 \arguments{
-\item{output.bam.file}{output BAM file location string.}
+\item{output.bam.file}{output BAM file location string. If NULL (default),
+records are not written to BAM but returned as a
+\code{\link[data.table]{data.table}} object for review.}
 
 \item{qname}{character vector of query names. When default (NULL), names
 like "q0001".."qnnnn" will be assigned.}
 
 \item{flag}{integer vector of bitwise flags (a combination of the BAM_F*
-constants). When default (NULL), zero (unique, valid, single-end, aligned
-read) is assigned for every record.}
+constants). When default (NULL), zero (i.e., unique, valid, single-end,
+aligned read) is assigned for every record.}
 
 \item{rname}{character vector of chromosome (reference) names. When default
 (NULL), "chrS" is assigned for every record.}
 
-\item{pos}{integer vector of 1-based leftmost coordinates of the querys.
-When default (NULL), zero is assigned for every record.}
+\item{pos}{integer vector of 1-based leftmost coordinates of the queries.
+When default (NULL), 1 is assigned for every record.}
 
 \item{mapq}{integer vector of mapping qualities. When default (NULL),
 60 is assigned for every record.}
@@ -48,22 +50,23 @@ When default (NULL), zero is assigned for every record.}
 in template. When default (NULL), "chrS" is assigned for every record.}
 
 \item{pnext}{integer vector of 1-based leftmost coordinates of next read in
-template. When default (NULL), zero is assigned for every record.}
+template. When default (NULL), 1 is assigned for every record.}
 
 \item{tlen}{integer vector of observed template lengths. When default
 (NULL), the length of the corresponding query (`seq`)
 is assigned for every record.}
 
-\item{seq}{character vector of query sequence. When default (NULL),
+\item{seq}{character vector of query sequences. When default (NULL),
 random sequence is assigned.
-The length of this random sequence equals to the `tlen` parameter
-(if defined), or the length of the `XM` optional parameter (if supplied).
+The lengths of these random sequences equal to the lengths of
+methylation call strings from the `XM` optional parameter (if supplied),
+or to the `tlen` parameter (if defined).
 If none of these parameters is supplied, length of every `seq` will equal 10.}
 
-\item{qual}{query sequence quality string (ASCII of base QUALity plus 33).
+\item{qual}{query sequence quality strings (ASCII of base QUALity plus 33).
 When default (NULL), quality of every base is assigned to "F" (QUALity
-of 47 + 33). The length of this quality string equals to the length of the
-corresponding query (`seq`) for every record.}
+of 47 + 33). The lengths of these quality strings equal to the length of the
+corresponding query sequences (`seq`) for every record.}
 
 \item{...}{optional tags to add to the records, in the form `tag=value`.
 Can be either integer vector (e.g., for "NM" tag),
@@ -73,7 +76,10 @@ or character vector (e.g., "XM" tag for methylation call string,
 \item{verbose}{boolean to report progress and timings (default: TRUE).}
 }
 \value{
-number of records written to the output BAM.
+number of BAM records written (if `output.bam.file` is not NULL) or
+\code{\link[data.table]{data.table}} object containing final records
+prepared for writing. NB: this object has 0-based coordinates and
+numerically encoded reference names.
 }
 \description{
 This function creates sample BAM files given mandatory and optional BAM
@@ -91,6 +97,11 @@ supplied (nondefault) parameter or 1 if no parameters were supplied.
 If lengths of supplied parameters differ,
 shorter vectors will be recycled (a whole number of times or with remainder
 if necessary).
+
+Please note that function performs almost no validity checks for supplied
+fields. In particular, be extra careful constructing paired-end BAM
+alignments, and if necessary use `samtools` to perform validity check or
+manual editing after BAM->SAM conversion.
 }
 \examples{
   out.bam <- tempfile(pattern="simulated", fileext=".bam")

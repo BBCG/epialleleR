@@ -101,7 +101,7 @@ Rcpp::DataFrame rcpp_wtf_report(Rcpp::DataFrame &df,                            
   });
   
   // precomputed WTF numerator lookup table
-  const size_t wtf_lookup_len = 65536;
+  const size_t wtf_lookup_len = 4096;
   uint64_t wtf_lookup[wtf_lookup_len] = {0};
   if (k<=0) k=wtf_lookup_len;
   for (size_t n=0; n<wtf_lookup_len; n++) {

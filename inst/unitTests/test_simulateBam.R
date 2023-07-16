@@ -2,6 +2,22 @@ test_simulateBam <- function () {
   
   out.bam <- tempfile(pattern="simulated", fileext=".bam")
   simulateBam(
+    qname="a",
+    flag=2,
+    rname="chrQ",
+    pos=c(1,3),
+    mapq=45,
+    cigar="5M",
+    rnext="chrQ",
+    pnext=c(3,1),
+    tlen=8,
+    seq=c("CCCC", "TTTTTTTT"),
+    qual=c("FFFF", "DDDDDDDD"),
+    verbose=FALSE,
+    XM=c("zzZZ", "ZZzzZZzz")
+  )
+  
+  simulateBam(
     output.bam.file=out.bam,
     pos=1:6,
     XM=c("ZZZzzZZZ", "ZZzzzzZZ"),
@@ -65,9 +81,9 @@ test_simulateBam <- function () {
   simulateBam(
     output.bam.file=out.call,
     pos=1,
-    cigar=c("1X2449M1H"),
+    cigar=c("1X4899M1H"),
     rname=c("ChrA", "ChrB", "ChrC"),
-    tlen=2450,
+    tlen=4900,
     XG=c("CT")
   )
   callMethylation(

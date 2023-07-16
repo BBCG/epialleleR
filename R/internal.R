@@ -257,7 +257,8 @@ utils::globalVariables(
 # descr: writing out example BAM
 # value: number of records written
 
-.simulateBam <- function (output.bam.file, qname, flag, rname,
+.simulateBam <- function (output.bam.file,
+                          qname, flag, rname,
                           pos, mapq, cigar, rnext,
                           pnext, tlen, seq, qual, ...,
                           verbose)
@@ -265,40 +266,45 @@ utils::globalVariables(
   if (verbose) message("Writing sample BAM ", appendLF=FALSE)
   tm <- proc.time()
   
-  output.bam.file <- path.expand(output.bam.file)
+  if (!is.null(output.bam.file)) output.bam.file <- path.expand(output.bam.file)
   tags <- list(...)
   nrecs <- max(
     sapply(c(as.list(environment()), tags), length)[names(match.call())],
     1, na.rm=TRUE
   )
-  nbases <- max(
-    ifelse(is.null(seq),  0, nchar(seq)),
-    ifelse(is.null(qual), 0, nchar(qual)),
-    ifelse("XM" %in% names(tags), nchar(tags$XM), 0),
-    ifelse(is.null(tlen), 0, abs(tlen))
-  )
-  if (nbases==0) nbases <- 10
   
-  if(is.null(qname)) qname <- sprintf("q%.04i", seq_len(nrecs))
-  if(is.null(flag))  flag  <- rep_len(0, nrecs)
-  if(is.null(rname)) rname <- factor(rep_len("chrS", nrecs))
-  else               rname <- factor(rname)
-  if(is.null(pos))   pos   <- rep_len(1, nrecs)
-  if(is.null(mapq))  mapq  <- rep_len(60, nrecs)
-  if(is.null(seq))   seq   <- rep_len(
-    paste(sample(c("A","C","T","G"), nbases, replace=TRUE), collapse=""), nrecs
-  )
-  if(is.null(cigar)) cigar <- rep_len(paste0(nbases, "M"), nrecs)
-  if(is.null(rnext)) rnext <- factor(rep_len("chrS", nrecs))
-  else               rnext <- factor(rnext)
-  if(is.null(pnext)) pnext <- rep_len(1, nrecs)
-  if(is.null(tlen))  tlen  <- rep_len(nbases, nrecs)
-  if(is.null(qual))  qual  <- rep_len(
-    paste(rep_len("F", nbases), collapse=""), nrecs
-  )
+  if (is.null(qname)) qname <- sprintf("q%.04i", seq_len(nrecs))
+  else                qname <- rep_len(qname, nrecs)
+  if (is.null(flag))  flag  <- rep_len(0, nrecs)
+  else                flag  <- rep_len(flag, nrecs)
+  if (is.null(rname)) rname <- factor(rep_len("chrS", nrecs))
+  else                rname <- factor(rep_len(rname, nrecs))
+  if (is.null(pos))   pos   <- rep_len(1, nrecs)
+  else                pos   <- rep_len(pos, nrecs)
+  if (is.null(mapq))  mapq  <- rep_len(60, nrecs)
+  else                mapq  <- rep_len(mapq, nrecs)
+  if (is.null(seq)) {
+    if ("XM" %in% names(tags)) {nbases <- nchar(tags$XM)}
+    else if (!is.null(tlen))   {nbases <- tlen}
+    else                       {nbases <- 10}
+    seq <- sapply(nbases, function (l) {
+      paste(sample(c("A","C","T","G"), l, replace=TRUE), collapse="")
+    })
+  }
+                      seq   <- rep_len(seq, nrecs)
+  if (is.null(cigar)) cigar <- paste0(nchar(seq), "M")
+  else                cigar <- rep_len(cigar, nrecs)
+  if (is.null(rnext)) rnext <- factor(rep_len("chrS", nrecs))
+  else                rnext <- factor(rep_len(rnext, nrecs))
+  if (is.null(pnext)) pnext <- rep_len(1, nrecs)
+  else                pnext <- rep_len(pnext, nrecs)
+  if (is.null(tlen))  tlen  <- nchar(seq)
+  else                tlen  <- rep_len(tlen, nrecs)
+  if (is.null(qual))  qual  <- sapply(lapply(nchar(seq), rep_len, x="F"), paste, collapse="")
+  else                qual  <- rep_len(qual, nrecs)
   
   header <- c(
-    sprintf("@SQ\tSN:%s\tLN:%i", levels(rname), max(nbases)+max(tlen)),
+    sprintf("@SQ\tSN:%s\tLN:%i", levels(rname), max(pos, pnext)+max(tlen)-1),
     sprintf("@PG\tID:epialleleR\tPN:epialleleR\tVN:%s\tCL:rcpp_simulate_bam()",
             utils::packageVersion("epialleleR"))
   )
@@ -312,7 +318,10 @@ utils::globalVariables(
   s_tags <- data.table::as.data.table(tags[sapply(tags, is.character)])
   s_tags <- s_tags[rep_len(seq_len(nrow(s_tags)), nrecs)]
   
-  result <- rcpp_simulate_bam(header, fields, i_tags, s_tags, output.bam.file)
+  if (!is.null(output.bam.file))
+    result <- rcpp_simulate_bam(header, fields, i_tags, s_tags, output.bam.file)
+  else
+    result <- cbind(fields, i_tags, s_tags)
   
   if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(result)
