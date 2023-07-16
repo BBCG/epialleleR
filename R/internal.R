@@ -275,7 +275,7 @@ utils::globalVariables(
     ifelse(is.null(seq),  0, nchar(seq)),
     ifelse(is.null(qual), 0, nchar(qual)),
     ifelse("XM" %in% names(tags), nchar(tags$XM), 0),
-    ifelse(is.null(tlen), 0, tlen)
+    ifelse(is.null(tlen), 0, abs(tlen))
   )
   if (nbases==0) nbases <- 10
   

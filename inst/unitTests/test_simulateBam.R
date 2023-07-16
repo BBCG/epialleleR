@@ -53,14 +53,9 @@ test_simulateBam <- function () {
     qname="q1",
     flag=c(99, 147),
     cigar=c("10000M1H"),
-    pos=c(1, 100),
-    pnext=c(100, 1),
-    tlen=c(10100, -10100),
     XM=c(
-      paste(sample(c("Z",rep("z", 9)), 1000, replace=TRUE), collapse=""),
-      paste(sample(c("Z",rep("z", 9)), 1000, replace=TRUE), collapse=""),
-      paste(sample(c("Z",rep("z", 9)), 1000, replace=TRUE), collapse=""),
-      paste(sample(c("Z",rep("z", 9)), 1000, replace=TRUE), collapse="")
+      paste(sample(c("Z",rep("z", 9)), 10000, replace=TRUE), collapse=""),
+      paste(sample(c("Z",rep("z", 9)), 10000, replace=TRUE), collapse="")
     ),
     XG=c("CT")
   )
