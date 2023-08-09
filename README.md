@@ -14,13 +14,11 @@ include variable-length sequence variations, while *`generateBedEcdf`* should
 be considered somewhat experimental and may undergo significant changes or be
 substituted with some other method in the future.
 
-*`epialleleR`* is an R package for calling hypermethylated variant epiallele
-frequencies (VEF) at the level of genomic regions or individual cytosines
+*`epialleleR`* is an R package for calling and reporting cytosine methylation
+and hypermethylated variant epiallele frequencies (VEF) at the level of
+genomic regions or individual cytosines
 in next-generation sequencing data using binary alignment map (BAM) files as
-an input. Other functionality includes extracting methylation patterns,
-computing the empirical cumulative distribution function for per-read beta
-values, and testing the significance of the association between epiallele
-methylation status and base frequencies at particular genomic positions (SNPs).
+an input. See below for additional functionality.
 
 ### Current Features
 
@@ -36,6 +34,8 @@ methylation status and base frequencies at particular genomic positions (SNPs).
  interest (*`generateBedEcdf`*)
  * testing for the association between epiallele methylation
  status and sequence variations (*`generateVcfReport`*)
+ * creating sample BAM files given mandatory and optional BAM fields
+ (*`simulateBam`*)
 
 ### Recent improvements
 
@@ -43,8 +43,8 @@ methylation status and base frequencies at particular genomic positions (SNPs).
 
  * inputs both single-end and paired-end sequencing alignments
  * makes and stores methylation calls
+ * creates sample BAM files
 
- 
 ##### v1.4 [BioC 3.15]
 
  * significant speed-up
@@ -101,7 +101,7 @@ callMethylation(
   genome=system.file("extdata", "test", "reference.fasta.gz", package="epialleleR")
 )
 
-# simulating a sample BAM file
+# making a sample BAM file from scratch
 simulateBam(output.bam.file=tempfile(pattern="simulated-", fileext=".bam"),
             pos=c(1, 2), XM=c("ZZZzzZZZ", "ZZzzzzZZ"), XG=c("CT", "AG"))
 

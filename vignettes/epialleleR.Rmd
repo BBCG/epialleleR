@@ -230,8 +230,10 @@ sequencing), larger methylation capture panels, or even whole-genome approaches.
  using *`extractPatterns`*
  * Potential bimodality of methylation for genomic regions of interest can be
  assessed using *`generateBedEcdf`* method
- * The association of single-nucleotide variations with the epiallelic status
- can be tested using *`generateVcfReport`*
+ * The association of methylation with single-nucleotide variations within
+ epialleles can be tested using *`generateVcfReport`*
+ * *`epialleleR`* can create and store sample BAM files for testing purposes by
+ means of *`simulateBam`* method
 
 ## Processing speed
 
@@ -294,6 +296,10 @@ related files are:
 | capture.bed | BED | genomic&nbsp;coordinates&nbsp;of&nbsp;capture&nbsp;target&nbsp;regions |
 | capture.vcf.gz | VCF | a relevant subset of sequence variations |
 | capture.vcf.gz.tbi | tabix | tabix file for the capture.vcf.gz |
+
+### Manually creating sample BAM files
+
+
 
 *****
 
@@ -720,6 +726,7 @@ if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
     labs(x="position", y="count", title="BRIP1", color="base")
 }
 ```
+
 
 *****
 
