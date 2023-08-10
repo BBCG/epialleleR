@@ -101,17 +101,17 @@ callMethylation(
   genome=system.file("extdata", "test", "reference.fasta.gz", package="epialleleR")
 )
 
-# making a sample BAM file from scratch
+# make a sample BAM file from scratch
 simulateBam(output.bam.file=tempfile(pattern="simulated-", fileext=".bam"),
             pos=c(1, 2), XM=c("ZZZzzZZZ", "ZZzzzzZZ"), XG=c("CT", "AG"))
 
-# or using external files
+# or use external files
 amplicon.bam <- system.file("extdata", "amplicon010meth.bam",
                             package="epialleleR")
 amplicon.bed <- system.file("extdata", "amplicon.bed", package="epialleleR")
 amplicon.vcf <- system.file("extdata", "amplicon.vcf.gz", package="epialleleR")
 
-# preloading the data
+# preload the data
 bam.data <- preprocessBam(amplicon.bam)
 
 # methylation patterns, check vignettes or method description for plotting them

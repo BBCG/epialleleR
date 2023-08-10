@@ -149,6 +149,8 @@ $VEF = \frac{C^a}{C+T}$, clearly separate these cases and are thought to be
 more useful in detection and quantification of concordant methylation events.
 
 ```{r, echo=FALSE, fig.width=10, fig.height=6, out.width="100%", out.height="100%"}
+library(epialleleR)
+
 data.beta <- data.table::data.table(
   pattern=rep(letters[1:10], each=10),
   pos=rep(10*c(1:10), 10),
@@ -299,7 +301,22 @@ related files are:
 
 ### Manually creating sample BAM files
 
+For the purposes of testing *`epialleleR`* or other tools for methylation
+calling and/or reporting, the package provides a convenient way to manually
+create sample BAM files by specifying mandatory and optional BAM file tags.
+The following code will create a small BAM file that contains methylation calls
+and can be used for methylation reporting as described later:
 
+```{r}
+bam.file <- tempfile(pattern="simulated", fileext=".bam")
+simulateBam(output.bam.file=bam.file, XM=c("ZZzZZ", "zzZzz"), XG="CT")
+# one can view the resulting file using `samtools view -h <bam.file>`
+# or, if desired, file can be converted to SAM using `samtools view`,
+# manually corrected and converted back to BAM
+```
+
+Check *`simulateBam`* method help page for more information on parameters and
+their default values.
 
 *****
 

@@ -9,12 +9,12 @@ Authors@R:
     comment = c(ORCID = "0000-0002-5910-4934"))
 CommentMaintainer: Oleksii Nikolaienko <oleksii.nikolaienko@gmail.com>
 Description: Epialleles are specific DNA methylation patterns that are
-  mitotically and/or meiotically inherited. This package calls hypermethylated
+  mitotically and/or meiotically inherited. This package calls cytosine
+  methylation as well as hypermethylated
   epiallele frequencies at the level of genomic regions or individual cytosines
   in next-generation sequencing data using binary alignment map (BAM) files as
-  an input. Other functionality includes extracting methylation patterns,
-  computing the empirical cumulative distribution function for per-read beta
-  values, and testing the significance of the association between epiallele
+  an input. Other functionality includes extracting methylation patterns 
+  and testing the significance of the association between epiallele
   methylation status and base frequencies at particular genomic positions
   (SNPs).
 SystemRequirements: C++17, GNU make
