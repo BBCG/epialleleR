@@ -37,6 +37,14 @@ rcpp_match_capture <- function(df, bed, min_overlap) {
     .Call(`_epialleleR_rcpp_match_capture`, df, bed, min_overlap)
 }
 
+Sk <- function(n, k) {
+    .Call(`_epialleleR_Sk`, n, k)
+}
+
+rcpp_mhl_report <- function(df, ctx, discont, k) {
+    .Call(`_epialleleR_rcpp_mhl_report`, df, ctx, discont, k)
+}
+
 rcpp_read_bam_paired <- function(fn, min_mapq, min_baseq, skip_duplicates, nthreads) {
     .Call(`_epialleleR_rcpp_read_bam_paired`, fn, min_mapq, min_baseq, skip_duplicates, nthreads)
 }
@@ -55,13 +63,5 @@ rcpp_simulate_bam <- function(header, fields, i_tags, s_tags, out_fn) {
 
 rcpp_threshold_reads <- function(df, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac) {
     .Call(`_epialleleR_rcpp_threshold_reads`, df, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac)
-}
-
-Sk <- function(n, k) {
-    .Call(`_epialleleR_Sk`, n, k)
-}
-
-rcpp_wtf_report <- function(df, ctx, discont, k) {
-    .Call(`_epialleleR_rcpp_wtf_report`, df, ctx, discont, k)
 }
 

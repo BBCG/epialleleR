@@ -301,11 +301,11 @@ related files are:
 
 ### Manually creating sample BAM files
 
-For the purposes of testing *`epialleleR`* or other tools for methylation
-calling and/or reporting, the package provides a convenient way to manually
-create sample BAM files by specifying mandatory and optional BAM file tags.
-The following code will create a small BAM file that contains methylation calls
-and can be used for methylation reporting as described later:
+For the purposes of testing this package's methods or other tools for
+methylation calling and/or reporting, *`epialleleR`* provides a convenient way
+to manually create sample BAM files by specifying mandatory and optional BAM
+file tags. The following code will create a small BAM file that contains
+methylation calls and can be used for methylation reporting as described later:
 
 ```{r}
 bam.file <- tempfile(pattern="simulated", fileext=".bam")
