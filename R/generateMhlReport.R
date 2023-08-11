@@ -1,22 +1,22 @@
 #' generateMhlReport
 #'
 #' @description
-#' This function computes \emph{linearized} methylated haplotype load
+#' This function computes \emph{Linearised} Methylated Haplotype Load
 #' (\eqn{lMHL}) per genomic position.
 #'
 #' @details
-#' The function reports \emph{linearized} methylated haplotype load
+#' The function reports \emph{Linearised} Methylated Haplotype Load
 #' (\eqn{lMHL}) at the level of individual cytosines using BAM file or data as
 #' an input. Function uses the following formula:
 #' 
 #' \deqn{lMHL=\frac{\sum_{i=1}^{l} w_{i} \times MH_{i}}{\sum_{i=1}^{l} w_{i} \times H_{i}}}
 #' 
-#' where \eqn{MH_{i}} is a number of fully successive methylated bases
-#' with \eqn{i} loci, \eqn{H_{i}} is a number of fully successive bases
+#' where \eqn{MH_{i}} is a number of fully successive methylated stretches
+#' with \eqn{i} loci, \eqn{H_{i}} is a number of fully successive stretches
 #' with \eqn{i} loci, \eqn{w_{i}} is a weight for \eqn{i}-locus haplotype
 #' (\eqn{w_{i}=i})
 #' 
-#' This formula is a linearized modification of the original 
+#' This formula is a linearised modification of the original 
 #' Methylated Haplotype Load (MHL) formula that was 
 #' first described by Guo et al., 2017
 #' (doi: \href{https://doi.org/10.1038/ng.3805}{10.1038/ng.3805}): 
@@ -28,10 +28,15 @@
 #' of fully successive methylated bases with \eqn{i} loci, and weight for
 #' \eqn{i}-locus haplotype \eqn{w_{i}=i}.
 #' 
-#' The modifications to original formula are meant to:
+#' The modifications to original formula are made in order to:
 #' \itemize{
-#'   \item reduce the complexity of MHL calculation for data of high breadth
-#'   and depth --- numerator and denominator 
+#'   \item \bold{reduce the complexity of MHL calculation} for data of high
+#'   breadth and depth --- \eqn{lMHL} values for all genomic positions can be
+#'   calculated using a single pass (cycling through reads just once) as
+#'   the linearised calculations of numerator and denominator for
+#'   \eqn{lMHL} do not require prior knowledge on how many reads cover
+#'   a particular position
+#'   \item \bold{optimise for long-read seq}
 #' }
 #' 
 #' However, this function introduces \bold{two optional parameters} that define
