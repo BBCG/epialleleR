@@ -72,6 +72,10 @@ values are 40/70 and 70/70, respectively. Non-zero `max.l` values therefore
 provide more granularity in MHL calculations and may help nivellate the
 effect of sequencing errors for long reads. For thorough
 explanation and more examples, see Details section and vignette.}
+
+\item{min.L}{non-negative integer for minimum length of a haplotype
+(default: 0). Reads (read pairs) with fewer than `min.L` cytosines
+within the `haplotype.context` are skipped.}
 }
 \value{
 \code{\link[data.table]{data.table}} object containing cytosine
@@ -87,38 +91,56 @@ report columns are:
 }
 }
 \description{
-This function computes \emph{linearized} methylated haplotype load
+This function computes \emph{Linearised} Methylated Haplotype Load
 (\eqn{lMHL}) per genomic position.
 }
 \details{
-The function reports \emph{linearized} methylated haplotype load
+The function reports \emph{Linearised} Methylated Haplotype Load
 (\eqn{lMHL}) at the level of individual cytosines using BAM file or data as
 an input. Function uses the following formula:
 
 \deqn{lMHL=\frac{\sum_{i=1}^{l} w_{i} \times MH_{i}}{\sum_{i=1}^{l} w_{i} \times H_{i}}}
 
-where \eqn{MH_{i}} is a number of fully successive methylated bases
-with \eqn{i} loci, \eqn{H_{i}} is a number of fully successive bases
-with \eqn{i} loci, \eqn{w_{i}} is a weight for \eqn{i}-locus haplotype
-(\eqn{w_{i}=i})
+where \eqn{l} is the length of a calculation window
+(e.g., number of CpGs; \eqn{l \le L},
+where \eqn{L} is the length of a haplotype covering current genomic
+position),
+\eqn{MH_{i}} is a number of fully successive methylated stretches
+with \eqn{i} loci within fully successive methylated stretches that overlap
+current genomic position,
+\eqn{H_{i}} is a number of fully successive stretches with \eqn{i} loci,
+\eqn{w_{i}} is a weight for \eqn{i}-locus haplotype (\eqn{w_{i}=i}).
 
-This formula is a linearized modification of the original 
+This formula is a modification of the original 
 Methylated Haplotype Load (MHL) formula that was 
 first described by Guo et al., 2017
 (doi: \href{https://doi.org/10.1038/ng.3805}{10.1038/ng.3805}): 
 
-\deqn{MHL=\frac{\sum_{i=1}^{l} w_{i} \times P(MH_{i})}{\sum_{i=1}^{l} w_{i}}}
+\deqn{MHL=\frac{\sum_{i=1}^{L} w_{i} \times P(MH_{i})}{\sum_{i=1}^{L} w_{i}}}
 
-where \eqn{l} is the length of a haplotype,
-\eqn{P(MH_{i})=\frac{MH_{i}}{H_{i}}} is the fraction
-of fully successive methylated bases with \eqn{i} loci, and weight for
-\eqn{i}-locus haplotype \eqn{w_{i}=i}.
+where \eqn{L} is the length of a longest haplotype covering current genomic
+position, \eqn{P(MH_{i})=\frac{MH_{i}}{H_{i}}} is the fraction
+of fully successive methylated stretches with \eqn{i} loci, \eqn{w_{i}} is
+a weight for \eqn{i}-locus haplotype (\eqn{w_{i}=i}).
 
-The modifications to original formula are meant to:
+The modifications to original formula are made in order to:
 \itemize{
-  \item reduce the complexity of MHL calculation for data of high breadth
-  and depth --- numerator and denominator 
+  \item \bold{reduce the complexity of MHL calculation} for data of high
+  breadth and depth --- \eqn{lMHL} values for all genomic positions can be
+  calculated using a single pass (cycling through reads just once) as
+  the linearised calculations of numerator and denominator for
+  \eqn{lMHL} do not require prior knowledge on how many reads cover
+  a particular position. This is achieved by moving \eqn{H_{i}}
+  to the denominator of the \eqn{lMHL} formula.
+  \item \bold{provide granularity of calculations/values?} --- the original MHL
+  formula gives the same MHL value for every cytosine of a partially
+  methylated haplotype (e.g., MHL=0.358 for each cytosine within a read with
+  methylation call string "zZZZ"). 
+  \item \bold{enable calculations for long-read seq}
 }
+
+These modifications do not affect ... but rather increase its value and
+applicability for analysis of various sequencing data
 
 However, this function introduces \bold{two optional parameters} that define
 how \eqn{lMHL} formula is applied. These parameters are sought to make

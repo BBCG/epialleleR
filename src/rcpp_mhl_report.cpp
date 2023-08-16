@@ -26,7 +26,7 @@
 //
 // Triangular sequence, nth element
 uint64_t T(uint64_t n) {
-  return n*(n+1)/2;
+  return (n*(n+1))/2;
 }
 // lMHL numerator or denominator, sum S of all possible lMHL combinations
 // of length i from 1 to n, times i
@@ -42,9 +42,15 @@ uint64_t Sk(uint64_t n, uint64_t k) {
   if (n<=k) return S(n);
   return S(k) + (n-k)*T(k);
 }
-// But Sk can be simplified to a non-recursive version
+// Both S and Sk can be simplified to non-recursive versions
+uint64_t nrS(uint64_t n)
+{
+  if (n<2) return n;
+  return (n*(n+1)*(n+2))/6;
+}
 uint64_t nrSk(uint64_t n, uint64_t k) {
-  return 1;
+  if (n<=k) return nrS(n);
+  return nrS(k) + (n-k)*T(k);
 }
 
 // [[Rcpp::export]]
@@ -104,11 +110,11 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
   });
   
   // precomputed lMHL numerator lookup table
-  const size_t mhl_lookup_len = 4096;
+  const size_t mhl_lookup_len = 65536;
   uint64_t mhl_lookup[mhl_lookup_len] = {0};
   if (k<=0) k=mhl_lookup_len;
   for (size_t n=0; n<mhl_lookup_len; n++) {
-    mhl_lookup[n] = Sk(n, k);                                                   // filling the lMHL values for faster computations
+    mhl_lookup[n] = nrSk(n, k);                                                 // filling the lMHL values for faster computations
   }
   
   // lMHL numerator buffer for current XM
@@ -245,7 +251,12 @@ S <- function (n) {
   if (n<2) n
   else S(n-1) + T(n)
 }
-sapply(1:10, S)
+nrS <- function (n) {
+  if (n<2) n
+  else n*(n+1)*(n+2)/6
+}
+sapply(1:30, S)
+sapply(1:30, nrS)
 ###
 # for mCpG stretches of length n, sum S of all possible lMHL combinations
 # (of length i from 1 to k [where k<n], times i) equals to:
@@ -264,7 +275,13 @@ Sk <- function (n, k) {
   if (n<=k) S(n)
   else S(k) + (n-k)*T(k)
 }
+nrSk <- function (n, k) {
+  if (n<=k) nrS(n)
+  else nrS(k) + (n-k)*T(k)
+}
 matrix(sapply(1:10, function (k) lapply(1:10, Sk, k=k)),
+       nrow=10, dimnames=list(n=1:10, k=1:10))
+matrix(sapply(1:10, function (k) lapply(1:10, nrSk, k=k)),
        nrow=10, dimnames=list(n=1:10, k=1:10))
 ###
 #
