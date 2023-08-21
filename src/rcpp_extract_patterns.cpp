@@ -1,5 +1,9 @@
+#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS
+#endif
 #include <Rcpp.h>
 #include <boost/container/flat_map.hpp>
+#include <cinttypes>
 #include "epialleleR.h"
 // using namespace Rcpp;
 
