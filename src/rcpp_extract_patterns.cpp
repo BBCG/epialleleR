@@ -1,5 +1,6 @@
 #include <Rcpp.h>
 #include <boost/container/flat_map.hpp>
+#include <cinttypes>
 #include "epialleleR.h"
 // using namespace Rcpp;
 
