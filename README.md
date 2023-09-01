@@ -7,14 +7,6 @@
 
 ## Introduction
 
-DISCLAIMER: This is a work in progress, however the package is already usable,
-and the obtained experimental results have been published. Main methods
-(*`preprocessBam`*, *`generateCytosineReport`*, *`generateBedReport`*) won't
-change. The *`generateVcfReport`* method might at some point be improved to
-include variable-length sequence variations, while *`generateBedEcdf`* should
-be considered somewhat experimental and may undergo significant changes or be
-substituted with some other method in the future.
-
 *`epialleleR`* is an R package for calling and reporting cytosine methylation
 and hypermethylated variant epiallele frequencies (VEF) at the level of
 genomic regions or individual cytosines
