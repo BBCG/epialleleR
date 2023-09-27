@@ -22,7 +22,7 @@
 // ctx_to_idx conversion is described in epialleleR.h file
 // 
 
-// lMHL numerator and denominator lookup tables are precomputed using nrSk(n, k)
+// lMHL numerator and denominator lookup tables are precomputed using nrS(n)
 //
 // Triangular sequence, nth element
 uint64_t T(uint64_t n) {
@@ -35,29 +35,17 @@ uint64_t S(uint64_t n)
   if (n<2) return n;
   return S(n-1) + T(n);
 }
-// lMHL numerator or denominator, sum S of all possible lMHL combinations
-// of length i from 1 to k (where k<n), times i
-// [[Rcpp::export]]
-uint64_t Sk(uint64_t n, uint64_t k) {
-  if (n<=k) return S(n);
-  return S(k) + (n-k)*T(k);
-}
-// Both S and Sk can be simplified to non-recursive versions
+// S can be simplified to non-recursive versions
 uint64_t nrS(uint64_t n)
 {
   if (n<2) return n;
   return (n*(n+1)*(n+2))/6;
 }
-uint64_t nrSk(uint64_t n, uint64_t k) {
-  if (n<=k) return nrS(n);
-  return nrS(k) + (n-k)*T(k);
-}
 
 // [[Rcpp::export]]
 Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            // data frame with BAM data
                                 std::string ctx,                                // context string for bases to report,
-                                bool discont,                                   // if lMHL calculation should be discontinuous
-                                int k)                                          // limit for l in lMHL formula
+                                int max.n)                                      // limit for l in lMHL formula
 {
   // walking trough bunch of reads <- filling the map
   // pos<<2|strand -> {0: rname,  1: pos,       2: 'H',  3: numer,  4: denom, 5: 'U',  6: 'X',  7: 'Z',
@@ -112,10 +100,14 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
   // precomputed lMHL numerator lookup table
   const size_t mhl_lookup_len = 65536;
   uint64_t mhl_lookup[mhl_lookup_len] = {0};
-  if (k<=0) k=mhl_lookup_len;
-  for (size_t n=0; n<mhl_lookup_len; n++) {
-    mhl_lookup[n] = nrSk(n, k);                                                 // filling the lMHL values for faster computations
+  max.n = (max.n>0) ? std::min(max.n, mhl_lookup_len) : mhl_lookup_len ;        // number of context bases is always in range [1; mhl_lookup_len]
+  for (size_t n=0; n<max.n; n++) {
+    mhl_lookup[n] = nrS(n);                                                     // filling the lMHL values for faster computations
   }
+  std::fill_n(mhl_lookup+max.n, mhl_lookup_len-max.n, nrS(max.n));              // if max.n < mhl_lookup_len - fill the rest of the lookup table with it
+  
+  // // define largest distance between context bases
+  // max.d = (max.d>0) ? std::min(max.d, INT_MAX) : INT_MAX ;                      // max distance always in range [1; INT_MAX]
   
   // lMHL numerator buffer for current XM
   size_t num_buf_len = 8192;                                                    // maximum, though expandable length of numerator buffer
@@ -158,7 +150,7 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     }
     std::memset(num_buf,  0, size_x * sizeof(uint64_t));                        // clean the buffer
     size_t mh_start = 0, mh_end = 0, mh_size = 0, h_size = 0;                   // start, end and size of the current methylated stretch (number of ctx bases); total size of haplotype
-    uint64_t mh_sum = 0;                                                        // sum of lMHL numerators for all methylated stretches, used to calculate continuous lMHL that spans entire read pair
+    // uint64_t mh_sum = 0;                                                        // sum of lMHL numerators for all methylated stretches, used to calculate continuous lMHL that spans entire read pair
     for (unsigned int i=0; i<size_x; i++) {                                     // first pass to compute local lMHL values, char by char
       const unsigned int base_idx = ctx_to_idx(xm_x[i]);                        // index of current base context; see the table in epialleleR.h
       if (ctx_map[base_idx]) {                                                  // if within context
@@ -168,17 +160,17 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
           mh_end = i;                                                           // store end position of methylated stretch
           mh_size++;                                                            // methylated stretch size++
         } else if (mh_size) {                                                   // if lowercase and after non-0-length methylated stretch
-          std::fill(num_buf+mh_start, num_buf+mh_end+1, mhl_lookup[mh_size]);   // set values to nrSk(mh_size, k) within methylated stretch
-          mh_sum += mhl_lookup[mh_size];                                        // sum of numerators
+          std::fill(num_buf+mh_start, num_buf+mh_end+1, mhl_lookup[mh_size]);   // set values to nrS(mh_size) within methylated stretch
+          // mh_sum += mhl_lookup[mh_size];                                        // sum of numerators
           mh_size = 0;                                                          // reset the size
         }
       }
     }
     if (mh_size) {                                                              // save last non-0-length methylated stretch
       std::fill(num_buf+mh_start, num_buf+mh_end+1, mhl_lookup[mh_size]);
-      mh_sum += mhl_lookup[mh_size];                                            // sum of numerators
+      // mh_sum += mhl_lookup[mh_size];                                            // sum of numerators
     }
-    if (!discont) std::fill_n(num_buf, size_x, mh_sum);                         // fill entire buffer if continuous lMHL (same lMHL value for entire read pair)
+    // if (!discont) std::fill_n(num_buf, size_x, mh_sum);                         // fill entire buffer if continuous lMHL (same lMHL value for entire read pair)
     
     // second, walk through XM once again, filling the map
     for (unsigned int i=0; i<size_x; i++) {                                     // char by char - it's faster this way than using std::string in the cycle
@@ -257,7 +249,11 @@ nrS <- function (n) {
 }
 sapply(1:30, S)
 sapply(1:30, nrS)
-###
+microbenchmark::microbenchmark(sapply(1:200, S), sapply(1:200, nrS))
+
+### The following is not used, as it doesn't provide proper granularity for
+### long-range sequencing
+#
 # for mCpG stretches of length n, sum S of all possible lMHL combinations
 # (of length i from 1 to k [where k<n], times i) equals to:
 #   k=2 k=3 k=4 k=5 k=6 k=7 k=8
