@@ -37,12 +37,8 @@ rcpp_match_capture <- function(df, bed, min_overlap) {
     .Call(`_epialleleR_rcpp_match_capture`, df, bed, min_overlap)
 }
 
-Sk <- function(n, k) {
-    .Call(`_epialleleR_Sk`, n, k)
-}
-
-rcpp_mhl_report <- function(df, ctx, discont, k) {
-    .Call(`_epialleleR_rcpp_mhl_report`, df, ctx, discont, k)
+rcpp_mhl_report <- function(df, ctx, hmax) {
+    .Call(`_epialleleR_rcpp_mhl_report`, df, ctx, hmax)
 }
 
 rcpp_read_bam_paired <- function(fn, min_mapq, min_baseq, skip_duplicates, nthreads) {

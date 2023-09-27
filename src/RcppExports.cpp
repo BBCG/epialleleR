@@ -133,29 +133,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// Sk
-uint64_t Sk(uint64_t n, uint64_t k);
-RcppExport SEXP _epialleleR_Sk(SEXP nSEXP, SEXP kSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< uint64_t >::type n(nSEXP);
-    Rcpp::traits::input_parameter< uint64_t >::type k(kSEXP);
-    rcpp_result_gen = Rcpp::wrap(Sk(n, k));
-    return rcpp_result_gen;
-END_RCPP
-}
 // rcpp_mhl_report
-Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame& df, std::string ctx, bool discont, int k);
-RcppExport SEXP _epialleleR_rcpp_mhl_report(SEXP dfSEXP, SEXP ctxSEXP, SEXP discontSEXP, SEXP kSEXP) {
+Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame& df, std::string ctx, int hmax);
+RcppExport SEXP _epialleleR_rcpp_mhl_report(SEXP dfSEXP, SEXP ctxSEXP, SEXP hmaxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
     Rcpp::traits::input_parameter< std::string >::type ctx(ctxSEXP);
-    Rcpp::traits::input_parameter< bool >::type discont(discontSEXP);
-    Rcpp::traits::input_parameter< int >::type k(kSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_mhl_report(df, ctx, discont, k));
+    Rcpp::traits::input_parameter< int >::type hmax(hmaxSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_mhl_report(df, ctx, hmax));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -245,8 +232,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_epialleleR_rcpp_get_xm_beta", (DL_FUNC) &_epialleleR_rcpp_get_xm_beta, 3},
     {"_epialleleR_rcpp_match_amplicon", (DL_FUNC) &_epialleleR_rcpp_match_amplicon, 3},
     {"_epialleleR_rcpp_match_capture", (DL_FUNC) &_epialleleR_rcpp_match_capture, 3},
-    {"_epialleleR_Sk", (DL_FUNC) &_epialleleR_Sk, 2},
-    {"_epialleleR_rcpp_mhl_report", (DL_FUNC) &_epialleleR_rcpp_mhl_report, 4},
+    {"_epialleleR_rcpp_mhl_report", (DL_FUNC) &_epialleleR_rcpp_mhl_report, 3},
     {"_epialleleR_rcpp_read_bam_paired", (DL_FUNC) &_epialleleR_rcpp_read_bam_paired, 5},
     {"_epialleleR_rcpp_read_bam_single", (DL_FUNC) &_epialleleR_rcpp_read_bam_single, 5},
     {"_epialleleR_rcpp_read_genome", (DL_FUNC) &_epialleleR_rcpp_read_genome, 2},

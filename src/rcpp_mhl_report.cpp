@@ -45,7 +45,7 @@ uint64_t nrS(uint64_t n)
 // [[Rcpp::export]]
 Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            // data frame with BAM data
                                 std::string ctx,                                // context string for bases to report,
-                                int max.n)                                      // limit for l in lMHL formula
+                                int hmax)                                       // maximum length of a haplotype (limit for l in lMHL formula)
 {
   // walking trough bunch of reads <- filling the map
   // pos<<2|strand -> {0: rname,  1: pos,       2: 'H',  3: numer,  4: denom, 5: 'U',  6: 'X',  7: 'Z',
@@ -100,11 +100,11 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
   // precomputed lMHL numerator lookup table
   const size_t mhl_lookup_len = 65536;
   uint64_t mhl_lookup[mhl_lookup_len] = {0};
-  max.n = (max.n>0) ? std::min(max.n, mhl_lookup_len) : mhl_lookup_len ;        // number of context bases is always in range [1; mhl_lookup_len]
-  for (size_t n=0; n<max.n; n++) {
+  hmax = (hmax>0) ? std::min((size_t)hmax, mhl_lookup_len) : mhl_lookup_len ;   // number of context bases is always in range [1; mhl_lookup_len]
+  for (size_t n=0; n<(size_t)hmax; n++) {
     mhl_lookup[n] = nrS(n);                                                     // filling the lMHL values for faster computations
   }
-  std::fill_n(mhl_lookup+max.n, mhl_lookup_len-max.n, nrS(max.n));              // if max.n < mhl_lookup_len - fill the rest of the lookup table with it
+  std::fill_n(mhl_lookup+hmax, mhl_lookup_len-hmax, nrS(hmax));                 // if hmax < mhl_lookup_len - fill the rest of the lookup table with it
   
   // // define largest distance between context bases
   // max.d = (max.d>0) ? std::min(max.d, INT_MAX) : INT_MAX ;                      // max distance always in range [1; INT_MAX]
