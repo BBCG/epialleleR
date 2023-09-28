@@ -6,17 +6,17 @@
 #'
 #' @details
 #' The function reports \emph{Linearised} Methylated Haplotype Load
-#' (\eqn{lMHL}) at the level of individual cytosines using BAM file or data as
-#' an input. Function uses the following formula:
+#' (\eqn{lMHL}) at the level of individual cytosines using BAM file location
+#' or preprocessed data as an input. Function uses the following formula:
 #' 
-#' \deqn{lMHL=\frac{\sum_{i=1}^{l} w_{i} \times MH_{i}}{\sum_{i=1}^{l} w_{i} \times H_{i}}}
+#' \deqn{lMHL=\frac{\sum_{i=1}^{L'} w_{i} \times MH_{i}}{\sum_{i=1}^{L'} w_{i} \times H_{i}}}
 #' 
-#' where \eqn{l} is the length of a calculation window
-#' (e.g., number of CpGs; \eqn{l \le L},
+#' where \eqn{L'} is the length of a calculation window
+#' (e.g., number of CpGs; \eqn{L' \le L},
 #' where \eqn{L} is the length of a haplotype covering current genomic
 #' position),
 #' \eqn{MH_{i}} is a number of fully successive methylated stretches
-#' with \eqn{i} loci within fully successive methylated stretches that overlap
+#' with \eqn{i} loci within a methylated stretch that overlaps
 #' current genomic position,
 #' \eqn{H_{i}} is a number of fully successive stretches with \eqn{i} loci,
 #' \eqn{w_{i}} is a weight for \eqn{i}-locus haplotype (\eqn{w_{i}=i}).
@@ -26,10 +26,10 @@
 #' first described by Guo et al., 2017
 #' (doi: \href{https://doi.org/10.1038/ng.3805}{10.1038/ng.3805}): 
 #' 
-#' \deqn{MHL=\frac{\sum_{i=1}^{L} w_{i} \times P(MH_{i})}{\sum_{i=1}^{L} w_{i}}}
+#' \deqn{MHL=\frac{\sum_{i=1}^{L} w_{i} \times \frac{MH_{i}}{H_{i}}}{\sum_{i=1}^{L} w_{i}}}
 #' 
 #' where \eqn{L} is the length of a longest haplotype covering current genomic
-#' position, \eqn{P(MH_{i})=\frac{MH_{i}}{H_{i}}} is the fraction
+#' position, \eqn{\frac{MH_{i}}{H_{i}}=P(MH_{i})} is the fraction
 #' of fully successive methylated stretches with \eqn{i} loci, \eqn{w_{i}} is
 #' a weight for \eqn{i}-locus haplotype (\eqn{w_{i}=i}).
 #' 
@@ -40,7 +40,7 @@
 #'   calculated using a single pass (cycling through reads just once) as
 #'   the linearised calculations of numerator and denominator for
 #'   \eqn{lMHL} do not require prior knowledge on how many reads cover
-#'   a particular position. This is achieved by moving \eqn{H_{i}}
+#'   a particular position. This is achieved by moving \eqn{H_{i}} multiplier
 #'   to the denominator of the \eqn{lMHL} formula.
 #'   \item \bold{provide granularity of calculations/values?} --- the original MHL
 #'   formula gives the same MHL value for every cytosine of a partially

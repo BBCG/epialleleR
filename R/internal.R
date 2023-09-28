@@ -430,22 +430,22 @@ utils::globalVariables(
 
 ################################################################################
 
-# descr: prepare WTF report for processed reads
-# value: data.table with WTF report
+# descr: prepare lMHL report for processed reads
+# value: data.table with lMHL report
 
-.getWtfReport <- function (bam.processed,
-                           ctx, discont, maxl,
+.getMhlReport <- function (bam.processed,
+                           ctx, max.n, min.length,
                            verbose)
 {
-  if (verbose) message("Preparing WTF report ", appendLF=FALSE)
+  if (verbose) message("Preparing lMHL report ", appendLF=FALSE)
   tm <- proc.time()
   
   # must be ordered
-  wtf.report <- rcpp_wtf_report(bam.processed, ctx, discont, maxl)
-  data.table::setDT(wtf.report)
+  mhl.report <- rcpp_mhl_report(bam.processed, ctx, max.n, min.length)
+  data.table::setDT(mhl.report)
   
   if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
-  return(wtf.report)
+  return(mhl.report)
 }
 
 

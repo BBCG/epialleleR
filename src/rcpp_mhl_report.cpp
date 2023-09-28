@@ -62,7 +62,7 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
   
   // main typedefs
   typedef uint64_t T_key;                                                       // {62bit:pos, 2bit:strand}
-  typedef std::array<uint64_t, 16> T_val;                                       // {0:rname, 1:pos, 8:strand, 9:coverage, 3:numerator, 4:denominator, and 10 more for 11 valid chars}
+  typedef std::array<uint64_t, 16> T_val;                                       // {0:h_size, 1:pos, 8:strand, 9:coverage, 3:numerator, 4:denominator, and 10 more for 11 valid chars}
   typedef boost::container::flat_map<T_key, T_val> T_mhl_map;                   // attaboy
   
 // macros
