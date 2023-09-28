@@ -12,8 +12,8 @@
 // Parses XM tags and calculates linearized MHL (lMHL). Outputs only if the most
 // frequent context is observed in more than 50% of reads (not including +-)
 // and is within ctx string parameter.
-// Output report is a data.frame with six columns and rows for every cytosine:
-// rname (factor), strand (factor), pos, ctx, cov, mhl
+// Output report is a data.frame with seven columns and rows for every cytosine:
+// rname (factor), strand (factor), pos, ctx, cov, hlen, mhl
 // 
 // 1) all XM positions counted in int[16]: index is equal to char+2>>2&00001111
 // 2) when gap in reads or another chr - spit map to res, clear map
@@ -45,10 +45,11 @@ uint64_t nrS(uint64_t n)
 // [[Rcpp::export]]
 Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            // data frame with BAM data
                                 std::string ctx,                                // context string for bases to report,
-                                int hmax)                                       // maximum length of a haplotype (limit for l in lMHL formula)
+                                int hmax,                                       // maximum length of a haplotype (limit for l in lMHL formula)
+                                int hmin)                                       // ignore haplotypes smaller than hmin
 {
   // walking trough bunch of reads <- filling the map
-  // pos<<2|strand -> {0: rname,  1: pos,       2: 'H',  3: numer,  4: denom, 5: 'U',  6: 'X',  7: 'Z',
+  // pos<<2|strand -> {0: h_size, 1: pos,       2: 'H',  3: numer,  4: denom, 5: 'U',  6: 'X',  7: 'Z',
   //                   8: strand, 9: coverage, 10: 'h', 11: '+-',  12: '.',  13: 'u', 14: 'x', 15: 'z'}
   // boost::container::flat_map<uint64_t, std::array<uint64_t,16>>
   
@@ -80,12 +81,13 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
       res_strand.push_back(it->second[8]);                        /* strand */ \
       res_pos.push_back(it->second[1]);                              /* pos */ \
       res_ctx.push_back(max_freq_idx);                           /* context */ \
-      res_cov.push_back(it->second[max_freq_idx] +                  /* meth */ \
-                        it->second[max_freq_idx | 8]);            /* unmeth */ \
+      const int cov = it->second[max_freq_idx] + it->second[max_freq_idx | 8]; \
+      res_cov.push_back(cov);                              /* meth + unmeth */ \
+      res_hlen.push_back((double)it->second[0]/cov);    /* average hap size */ \
       res_mhl.push_back((double)it->second[3]/it->second[4]);       /* lMHL */ \
     }                                                                          \
   }                                                                            \
-  res_rname.resize(res_strand.size(), map_val[0]);           /* same rname! */ \
+  res_rname.resize(res_strand.size(), cur_rname);            /* same rname! */ \
   max_pos=0;                                                                   \
   mhl_map.clear();                                                             \
   hint = mhl_map.end();                                                        \
@@ -115,17 +117,17 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
 
   // result
   std::vector<int> res_rname, res_strand, res_pos, res_ctx, res_cov;
-  std::vector<double> res_mhl;
+  std::vector<double> res_hlen, res_mhl;
   size_t nitems = std::min(rname.size()*pow(ctx.size()<<2,2), 3e+9);
   res_rname.reserve(nitems); res_strand.reserve(nitems);
   res_pos.reserve(nitems); res_ctx.reserve(nitems);
-  res_cov.reserve(nitems); res_mhl.reserve(nitems);
+  res_cov.reserve(nitems); res_hlen.reserve(nitems); res_mhl.reserve(nitems);
   
   // iterating over XM vector, saving the results when necessary
   T_mhl_map mhl_map;
   T_mhl_map::iterator hint;
   T_val map_val = {0};
-  int max_pos = 0;
+  int max_pos = 0, cur_rname = 0;
   unsigned int max_freq_idx;
   
   mhl_map.reserve(100000);                                                      // reserving helps?
@@ -134,9 +136,9 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     if ((x & 0xFFFF) == 0) Rcpp::checkUserInterrupt();                          // every ~65k reads
     
     const int start_x = start[x];                                               // start of the current read
-    if ((start_x>max_pos) || ((uint64_t)rname[x]!=map_val[0])) {                // if current position is further downstream or another reference
+    if ((start_x>max_pos) || (rname[x]!=cur_rname)) {                           // if current position is further downstream or another reference
       spit_results;
-      map_val[0] = rname[x];
+      cur_rname = rname[x];
     }
     map_val[8] = strand[x];
     const char* xm_x = xm->at(templid[x]).c_str();                              // xm->at(templid[x]) is a reference to a corresponding XM string
@@ -166,6 +168,7 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
         }
       }
     }
+    if ((int)h_size<hmin) continue;                                             // skip read if haplotype is smaller than hmin
     if (mh_size) {                                                              // save last non-0-length methylated stretch
       std::fill(num_buf+mh_start, num_buf+mh_end+1, mhl_lookup[mh_size]);
       // mh_sum += mhl_lookup[mh_size];                                            // sum of numerators
@@ -181,6 +184,7 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
       hint = mhl_map.try_emplace(hint, map_key, map_val);
       hint->second[idx_to_increase]++;
       hint->second[9]++;                                                        // total coverage
+      hint->second[0] += h_size;                                                // sum haplotype sizes
       hint->second[3] += num_buf[i];                                            // lMHL numerator
       hint->second[4] += mhl_lookup[h_size];                                    // lMHL denominator
     }
@@ -194,6 +198,7 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     Rcpp::Named("pos") = res_pos,                                               // position of cytosine
     Rcpp::Named("context") = res_ctx,                                           // cytosine context
     Rcpp::Named("coverage") = res_cov,                                          // cytosine context
+    Rcpp::Named("hlen") = res_hlen,                                             // average haplotype length
     Rcpp::Named("mhl") = res_mhl                                                // number of unmethylated
   );
   

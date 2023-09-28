@@ -134,15 +134,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_mhl_report
-Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame& df, std::string ctx, int hmax);
-RcppExport SEXP _epialleleR_rcpp_mhl_report(SEXP dfSEXP, SEXP ctxSEXP, SEXP hmaxSEXP) {
+Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame& df, std::string ctx, int hmax, int hmin);
+RcppExport SEXP _epialleleR_rcpp_mhl_report(SEXP dfSEXP, SEXP ctxSEXP, SEXP hmaxSEXP, SEXP hminSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
     Rcpp::traits::input_parameter< std::string >::type ctx(ctxSEXP);
     Rcpp::traits::input_parameter< int >::type hmax(hmaxSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_mhl_report(df, ctx, hmax));
+    Rcpp::traits::input_parameter< int >::type hmin(hminSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_mhl_report(df, ctx, hmax, hmin));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -232,7 +233,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_epialleleR_rcpp_get_xm_beta", (DL_FUNC) &_epialleleR_rcpp_get_xm_beta, 3},
     {"_epialleleR_rcpp_match_amplicon", (DL_FUNC) &_epialleleR_rcpp_match_amplicon, 3},
     {"_epialleleR_rcpp_match_capture", (DL_FUNC) &_epialleleR_rcpp_match_capture, 3},
-    {"_epialleleR_rcpp_mhl_report", (DL_FUNC) &_epialleleR_rcpp_mhl_report, 3},
+    {"_epialleleR_rcpp_mhl_report", (DL_FUNC) &_epialleleR_rcpp_mhl_report, 4},
     {"_epialleleR_rcpp_read_bam_paired", (DL_FUNC) &_epialleleR_rcpp_read_bam_paired, 5},
     {"_epialleleR_rcpp_read_bam_single", (DL_FUNC) &_epialleleR_rcpp_read_bam_single, 5},
     {"_epialleleR_rcpp_read_genome", (DL_FUNC) &_epialleleR_rcpp_read_genome, 2},
