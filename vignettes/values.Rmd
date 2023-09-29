@@ -1,0 +1,298 @@
+---
+title: "The epialleleR output values"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+abstract: |
+  A comparison and visualisation of epialleleR output values for various input
+  files
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{values}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  width = 100
+)
+options(width=100)
+```
+
+# Introduction
+
+The best possible explanation on VEF and lMHL values is given in help files for
+*`generateCytosineReport`* and *`generateMhlReport`* methods, respectively.
+Here we try to show some simplified and real situations,
+i.e., different methylation patterns that may exist, and provide a visual
+summary of *`epialleleR`* output.
+
+The readers are welcome to try their own real and simulated data. If it might
+be of interest to others, please create an issue and these examples might get
+included in this vignette.
+
+NB: the `plotMetrics` function used below is a piece of spaghetti code, hence
+hidden. If you still want to use it or see what it does - browse a
+[source code](https://github.com/BBCG/epialleleR/blob/devel/vignettes/values.Rmd)
+of this vignette online.
+
+
+```{r, echo=FALSE, results='hide'}
+require("data.table", quietly=TRUE)
+require("GenomicRanges", quietly=TRUE)
+require("ggplot2", quietly=TRUE)
+require("gridExtra", quietly=TRUE)
+require("epialleleR", quietly=TRUE)
+  
+plotMetrics <- function (bam.file, range, min.n=0, title="epialleles") {
+  bam <- preprocessBam(bam.file=bam.file, verbose=FALSE)
+  cg.beta <- generateCytosineReport(bam, threshold.reads=FALSE, verbose=FALSE)
+  cg.vef  <- generateCytosineReport(bam, threshold.reads=TRUE, verbose=FALSE)
+  cg.mhl  <- generateMhlReport(bam, max.haplotype.window=20, verbose=FALSE)
+  range.strand <- as.character(strand(range))
+  if (range.strand=="*") range.strand <- c("+", "-")
+  metrics <- cbind(
+    cg.beta[rname==as.character(seqnames(range)) & pos>=start(range) & pos<=end(range) & strand %in% range.strand,
+            .(pos=factor(pos), beta=meth/(meth+unmeth))],
+    cg.vef[rname==as.character(seqnames(range)) & pos>=start(range) & pos<=end(range)  & strand %in% range.strand,
+           .(VEF=meth/(meth+unmeth))],
+    cg.mhl[rname==as.character(seqnames(range)) & pos>=start(range) & pos<=end(range)  & strand %in% range.strand,
+           .(lMHL=lmhl)]
+  )
+
+  metrics.melt <- melt.data.table(metrics, id.vars="pos")
+  metrics.melt[value<0.00001, value:=0]
+  # metrics.melt[, class:=ifelse(variable %like% "gMHL", 1, 0.5)]
+  
+  patterns <- extractPatterns(bam, range, verbose=FALSE)[strand %in% range.strand]
+  
+  base.positions <- grep("^[0-9]+$", colnames(patterns), value=TRUE)
+  patterns.summary <- patterns[, c(lapply(.SD, unique), .N),
+                               by=.(pattern, beta), .SDcols=base.positions]
+  plot.data <- data.table::melt.data.table(patterns.summary,
+                                           measure.vars=base.positions, variable.name="pos", value.name="base")
+  plot.data <- na.omit(plot.data)[N>=min.n]
+  
+  base.positions <- as.numeric(as.character(base.positions))
+  plot.data[, pos:=as.numeric(as.character(pos))]
+  metrics.melt[, pos:=as.numeric(as.character(pos))]
+  
+  # upset-like plot of all patterns, categorical positions, sorted by counts
+  if (require("ggplot2", quietly=TRUE) & require("gridExtra", quietly=TRUE)){
+    epialleles <- ggplot(plot.data,
+                         aes(x=pos, y=reorder(pattern,N),
+                             color=factor(base, levels=c("z","Z")))) +
+      geom_line(color="grey") +
+      geom_point() +
+      scale_colour_grey(start=0.8, end=0) +
+      theme_light() +
+      # scale_x_continuous(breaks=base.positions[c(1, length(base.positions))]) +
+      theme(axis.text.y=element_blank(), legend.position="none") +
+      labs(x="position", y=NULL, title=title, color="base")
+    
+    bars <- ggplot(unique(plot.data[, .(pattern, N, beta)]),
+                   aes(x=N+0.5, y=reorder(pattern,N), alpha=beta, label=N)) +
+      geom_col(alpha=pmin(unique(plot.data[, .(pattern, N, beta)])$beta+0.1, 1)) +
+      geom_text(alpha=0.5, hjust=0, nudge_x=0.25, size=3) +
+      scale_x_log10(expand = expansion(mult=c(0, 0.3))) +
+      theme_minimal() +
+      theme(axis.text.y=element_blank(), legend.position="none") +
+      labs(x="count", y=NULL, title="")
+    
+    values <- ggplot(metrics.melt,
+                     aes(x=pos, y=value, color=variable, group=variable)) +
+      geom_line(alpha=0.5, linewidth=1) + #metrics.melt$class) +
+      scale_color_brewer(palette="Set1") +
+      # scale_x_discrete(breaks=base.positions[c(1, length(base.positions))]) +
+      scale_y_continuous(trans="log10", limits=c(0.00001,1), breaks=10**-c(0:5)) +
+      theme_light() +
+      theme(legend.position="bottom")
+    
+    epi.grob <- ggplotGrob(epialleles)
+    bar.grob <- ggplotGrob(bars)
+    val.grob <- ggplotGrob(values)
+    max.widths <- do.call(grid::unit.pmax, lapply(list(epi.grob, val.grob), `[[`, "widths"))
+    epi.grob$widths[2:5] <- max.widths[2:5]
+    grid.arrange(
+      epi.grob, bar.grob, val.grob, NULL,
+      ncol=2, widths=c(0.85, 0.15), heights=c(3, 2)
+    )
+  }
+}
+
+```
+
+
+```{r, fig.width=10, fig.height=8, out.width="100%", out.height="100%", warning=FALSE}
+out.bam <- tempfile(pattern="simulated", fileext=".bam")
+
+# no epimutations
+simulateBam(
+  output.bam.file=out.bam,
+  XM=c(
+    sapply(
+      lapply(1:1000, function (x) sample(c("Z",rep("z", 9)), 10)),
+      paste, collapse=""
+    )
+  ),
+  XG="CT"
+)
+plotMetrics(out.bam, as("chrS:1-10", "GRanges"), 0, title="no epimutations")
+
+# one complete epimutation
+simulateBam(
+  output.bam.file=out.bam,
+  XM=c(
+    paste(rep("Z", 10), collapse=""),
+    sapply(
+      lapply(1:999, function (x) sample(c("Z",rep("z", 9)), 10)),
+      paste, collapse=""
+    )
+  ),
+  XG="CT"
+)
+plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="one complete epimutation")
+
+# one partial epimutation
+simulateBam(
+  output.bam.file=out.bam,
+  XM=c(
+    paste(c(rep("Z", 4), "z", "z", rep("Z", 4)), collapse=""),
+    sapply(
+      lapply(1:999, function (x) sample(c("Z",rep("z", 9)), 10)),
+      paste, collapse=""
+    )
+  ),
+  XG="CT"
+)
+plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="one partial epimutation")
+
+# another partial epimutation
+simulateBam(
+  output.bam.file=out.bam,
+  XM=c(
+    "zZZZZZZZzz",
+    sapply(
+      lapply(1:999, function (x) sample(c("Z",rep("z", 9)), 10)),
+      paste, collapse=""
+    )
+  ),
+  XG="CT"
+)
+plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="another partial epimutation")
+
+# several partial epimutations
+simulateBam(
+  output.bam.file=out.bam,
+  XM=c(
+    sapply(
+      lapply(1:10, function (x) c(rep("Z", 6), rep("z", 4))),
+      paste, collapse=""
+    ),
+    sapply(
+      lapply(1:999, function (x) sample(c("Z",rep("z", 9)), 10)),
+      paste, collapse=""
+    )
+  ),
+  XG="CT"
+)
+plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="several partial epimutations")
+
+# several short partial epimutations
+simulateBam(
+  output.bam.file=out.bam,
+  XM=c(
+    sapply(
+      lapply(1:10, function (x) c(rep("Z", 4), rep("z", 6))),
+      paste, collapse=""
+    ),
+    sapply(
+      lapply(1:999, function (x) sample(c("Z",rep("z", 9)), 10)),
+      paste, collapse=""
+    )
+  ),
+  XG="CT"
+)
+plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="several short partial epimutations")
+
+# several overlapping partial epimutations
+simulateBam(
+  output.bam.file=out.bam,
+  pos=1:10,
+  XM=c(
+    "ZZZZZZZZZZ", "ZZZZZZZZZz", "ZZZZZZZZzz", "ZZZZZZZzzz", "ZZZZZZzzzz",
+    sapply(
+      lapply(1:15, function (x) sample(c("Z",rep("z", 9)), 10)),
+      paste, collapse=""
+    )
+  ),
+  XG="CT"
+)
+plotMetrics(out.bam, as("chrS:1-20", "GRanges"), title="several overlapping partial epimutations")
+
+# amplicon 0%
+plotMetrics(
+  system.file("extdata", "amplicon000meth.bam", package="epialleleR"),
+  as("chr17:43124861-43126026", "GRanges"), title="amplicon, 0%"
+)
+
+# amplicon 10%
+plotMetrics(
+  system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
+  as("chr17:43124861-43126026", "GRanges"), title="amplicon, 10%"
+)
+
+# sample capture, BMP7
+plotMetrics(
+  system.file("extdata", "capture.bam", package="epialleleR"),
+  as("chr20:57266125-57268185:+", "GRanges"), title="sample capture, BMP7, + strand"
+)
+
+# sample capture, BMP7
+plotMetrics(
+  system.file("extdata", "capture.bam", package="epialleleR"),
+  as("chr20:57266125-57268185:-", "GRanges"), title="sample capture, BMP7, - strand"
+)
+
+# sample capture, RAD51C
+plotMetrics(
+  system.file("extdata", "capture.bam", package="epialleleR"),
+  as("chr17:58691673-58693108:+", "GRanges"), title="sample capture, RAD51C, + strand"
+)
+
+# sample capture, RAD51C
+plotMetrics(
+  system.file("extdata", "capture.bam", package="epialleleR"),
+  as("chr17:58691673-58693108:-", "GRanges"), title="sample capture, RAD51C, - strand"
+)
+
+# long-range sequencing, low methylation
+getXM <- function (p) {sample(x=c("z", "Z"), size=1, prob=c(p, 1-p))}
+probs <- (sin(seq(-2*pi, +1*pi, by = pi/125))+2)/3
+simulateBam(
+  output.bam.file=out.bam,
+  pos=1:10,
+  XM=sapply(1:10, function (i) {paste(sapply(probs, getXM), collapse="")}),
+  XG="CT"
+)
+plotMetrics(out.bam, as("chrS:1-1000", "GRanges"), title="long-range sequencing, low methylation")
+
+# long-range sequencing, high methylation
+simulateBam(
+  output.bam.file=out.bam,
+  pos=1:10,
+  XM=sapply(1:10, function (i) {paste(sapply(1-probs, getXM), collapse="")}),
+  XG="CT"
+)
+plotMetrics(out.bam, as("chrS:1-1000", "GRanges"), title="long-range sequencing, high methylation")
+
+```
+
+
+## Session Info
+
+```{r session}
+sessionInfo()
+```
+

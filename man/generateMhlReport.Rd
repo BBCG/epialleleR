@@ -7,12 +7,9 @@
 generateMhlReport(
   bam,
   report.file = NULL,
-  threshold.reads = TRUE,
-  threshold.context = c("CG", "CHG", "CHH", "CxG", "CX"),
-  min.context.sites = 2,
-  min.context.beta = 0.5,
-  max.outofcontext.beta = 0.1,
-  report.context = threshold.context,
+  haplotype.context = c("CG", "CHG", "CHH", "CxG", "CX"),
+  max.haplotype.window = 0,
+  min.haplotype.length = 0,
   ...,
   gzip = FALSE,
   verbose = TRUE
@@ -25,17 +22,9 @@ must contain XG tag (strand information for the reference genome) and
 methylation call string (XM tag). Read more about these and other
 requirements and BAM preprocessing at \code{\link{preprocessBam}}.}
 
-\item{report.file}{file location string to write the cytosine report. If NULL
-(the default) then report is returned as a
+\item{report.file}{file location string to write the \eqn{lMHL} report.
+If NULL (the default) then report is returned as a
 \code{\link[data.table]{data.table}} object.}
-
-\item{...}{other parameters to pass to the
-\code{\link[epialleleR]{preprocessBam}} function.
-Options have no effect if preprocessed BAM data was supplied as an input.}
-
-\item{gzip}{boolean to compress the report (default: FALSE).}
-
-\item{verbose}{boolean to report progress and timings (default: TRUE).}
 
 \item{haplotype.context}{string for a cytosine context that defines
 a haplotype:
@@ -44,50 +33,60 @@ a haplotype:
   \item "CHG" -- CHG cytosines only (xX)
   \item "CHH" -- CHH cytosines only (hH)
   \item "CxG" -- CG and CHG cytosines (zZxX)
-  \item "CX" -- all cytosines; this, as well as other non-CG contexts, may
-  have little sense but still included for consistency
-}}
+  \item "CX" -- all cytosines; this, as well as the other non-CG contexts,
+  may have little sense but still included for consistency
+}
+If \eqn{lMHL} calculations are needed for all three possible cytosine
+contexts \emph{independently}, one has to run this function for
+each required `haplotype.context` separately, because
+`haplotype.context`=="CX" assumes that \emph{any} cytosine context
+is allowed within the same haplotype. This behaviour may change in the
+future.}
 
-\item{discontinuous}{boolean for discontinuous MHL calculation.
-If FALSE (the default), classical MHL formula is used and MHL value for all
-cytosines within read pair is the same (e.g., would equal 5/35 for each
-cytosine of the read pair with methylation call string of "zZZzZ").
-When TRUE, numerator of MHL equation varies according to the length of
-fully methylated stretch the current cytosine belongs to (e.g., methylation
-call string "zZZzZ" will produce the following MHL values per cytosine: 0/35, 
-4/35, 4/35, 0/35, 1/35). Discontinuous MHL calculations provide granularity
-for reads / read pairs with span longer than expected haplotype blocks
-(long-range sequencing) or for those that despite being short overlap with
-more than one distinct haplotype block (amplicon sequencing). For thorough
+\item{max.haplotype.window}{non-negative integer for maximum value of
+\eqn{L'} in \eqn{lMHL} formula.
+When 0 (the default), calculations are performed for the full haplotype
+length (\eqn{L'=L}, although the maximum value is currently limited to
+65535). Having no length restrictions make sense for short-read sequencing
+when the
+length of the read is comparable to the length of a typical methylated block,
+the depth of coverage is high and the lengths of all reads are roughly equal.
+However, calculations using non-restricted haplotype length are meaningless
+for long-read sequencing --- when the same read may
+cover a number of regions with very different methylation properties, and
+reads themselves can be of a very different length. In the latter case it is
+advised to limit the `max.haplotype.window` to a number of cytosines in a
+typical hypermethylated region. For thorough
 explanation and more examples, see Details section and vignette.}
 
-\item{max.l}{non-negative integer for maximum value of `l` in MHL formula.
-When 0 (the default), MHL is calculated using classical formula where `l`
-equals to the length of haplotype (number of CpG cytosines). When `max.l`>0,
-`max.l` is used instead of `l` in MHL calculations. E.g., for two similar
-read pairs
-with methylation call strings of "ZZZZzZZZZ" and "ZZZZZZZZZ", classical MHL
-values are 40/165 and 165/165, respectively. When calculated with `max.l`=4,
-values are 40/70 and 70/70, respectively. Non-zero `max.l` values therefore
-provide more granularity in MHL calculations and may help nivellate the
-effect of sequencing errors for long reads. For thorough
-explanation and more examples, see Details section and vignette.}
-
-\item{min.L}{non-negative integer for minimum length of a haplotype
-(default: 0). Reads (read pairs) with fewer than `min.L` cytosines
+\item{min.haplotype.length}{non-negative integer for minimum length of a
+haplotype (default: 0 will include haplotypes of any length).
+When `min.haplotype.length`>0, reads
+(read pairs) with fewer than `min.haplotype.length` cytosines
 within the `haplotype.context` are skipped.}
+
+\item{...}{other parameters to pass to the
+\code{\link[epialleleR]{preprocessBam}} function.
+Options have no effect if preprocessed BAM data was supplied as an input.}
+
+\item{gzip}{boolean to compress the report (default: FALSE).}
+
+\item{verbose}{boolean to report progress and timings (default: TRUE).}
 }
 \value{
-\code{\link[data.table]{data.table}} object containing cytosine
-report in Bismark-like format or NULL if report.file was specified. The
+\code{\link[data.table]{data.table}} object containing \eqn{lMHL}
+report or NULL if report.file was specified. The
 report columns are:
 \itemize{
   \item rname -- reference sequence name (as in BAM)
   \item strand -- strand
   \item pos -- cytosine position
   \item context -- methylation context
-  \item meth -- number of methylated cytosines
-  \item unmeth -- number of unmethylated cytosines
+  \item coverage -- number of reads (read pairs) that include this position
+  \item length -- average length of a haplotype, i.e.,
+  average number of cytosines within `haplotype.context` for
+  reads (read pairs) that include this position
+  \item lmhl -- \eqn{lMHL} value
 }
 }
 \description{
@@ -125,6 +124,17 @@ a weight for \eqn{i}-locus haplotype (\eqn{w_{i}=i}).
 
 The modifications to original formula are made in order to:
 \itemize{
+  \item \bold{provide granularity of values} --- the original MHL
+  formula gives the same MHL value for every cytosine of a partially
+  methylated haplotype (e.g., MHL=0.358 for each cytosine within a read with
+  methylation call string "zZZZ"). In contrast, \eqn{lMHL}==0 for the
+  non-methylated cytosines (e.g., \eqn{lMHL}==c(0, 0.5, 0.5, 0.5) for
+  cytosines within a read with methylation call string "zZZZ").
+  \item \bold{enable calculations for long-read sequencing alignments} ---
+  \eqn{lMHL}
+  calculation window can be limited to a particular number of cytosines.
+  This allows to use the formula for very long haplotypes as well as
+  to compare values for sequencing data of varying read length.
   \item \bold{reduce the complexity of MHL calculation} for data of high
   breadth and depth --- \eqn{lMHL} values for all genomic positions can be
   calculated using a single pass (cycling through reads just once) as
@@ -132,108 +142,53 @@ The modifications to original formula are made in order to:
   \eqn{lMHL} do not require prior knowledge on how many reads cover
   a particular position. This is achieved by moving \eqn{H_{i}} multiplier
   to the denominator of the \eqn{lMHL} formula.
-  \item \bold{provide granularity of calculations/values?} --- the original MHL
-  formula gives the same MHL value for every cytosine of a partially
-  methylated haplotype (e.g., MHL=0.358 for each cytosine within a read with
-  methylation call string "zZZZ"). 
-  \item \bold{enable calculations for long-read seq}
 }
 
-These modifications do not affect ... but rather increase its value and
-applicability for analysis of various sequencing data
+These modifications make \eqn{lMHL} calculation similar though
+\emph{non-equivalent} to the original MHL.
+However, the most important property of MHL --- emphasis on
+hypermethylated blocks --- is retained. And in return, \eqn{lMHL} gets better
+applicability for analysis of sequencing data of varying depth and read
+length.
 
-However, this function introduces \bold{two optional parameters} that define
-how \eqn{lMHL} formula is applied. These parameters are sought to make
-\eqn{lMHL} calculations more flexible for various use case scenarios. These
-parameters and scenarios are described below.
-
-\bold{Case 1:}
-
-
-
-
-
-In contrast to the other currently available software, reads
-(for paired-end sequencing alignment files - read
-pairs as a single entity) can be thresholded by their average
-methylation level before counting methylated bases, effectively resulting in
-hypermethylated variant epiallele frequency (VEF) being reported instead of
-beta value. The function's logic is explained below.
-
-Let's suppose we have a BAM file with four reads, all mapped to the "+"
-strand of chromosome 1, positions 1-16. Assuming the default values
-for the thresholding parameters (threshold.reads = TRUE,
-threshold.context = "CG", min.context.sites = 2, min.context.beta = 0.5,
-max.outofcontext.beta = 0.1), the input and results will look as following:
-
-\tabular{llll}{
-  methylation string \tab threshold \tab explained \tab methylation reported \cr
-  ...Z..x+.h..x..h. \tab below \tab min.context.sites < 2 (only one zZ base) \tab all cytosines unmethylated \cr
-  ...Z..z.h..x..h.  \tab above \tab pass all criteria \tab only C4 (Z at position 4) is methylated \cr
-  ...Z..z.h..X..h.  \tab below \tab max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) \tab all cytosines unmethylated \cr
-  ...Z..z.h..z-.h.  \tab below \tab min.context.beta < 0.5 (1Z / 3zZ = 0.33) \tab all cytosines unmethylated
-}
-
-Only the second read will satisfy all of the thresholding criteria, leading
-to the following CX report (given that all reads map to chr1:+:1-16):
-
-\tabular{llllll}{
-  rname \tab strand \tab pos \tab context \tab meth \tab unmeth \cr
-  chr1 \tab + \tab 4 \tab CG \tab 1 \tab 3 \cr
-  chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \cr
-  chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \cr
-  chr1 \tab + \tab 12 \tab CHG \tab 0 \tab 3 \cr
-  chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 
-}
-
-With the thresholding disabled (threshold.reads = FALSE) all methylated bases
-will retain their status, so the CX report will be similar to the reports
-produced by other methylation callers (such as Bismark or Illumina DRAGEN Bio
-IT Platform):
-
-\tabular{llllll}{
-  rname \tab strand \tab pos \tab context \tab meth \tab unmeth \cr
-  chr1 \tab + \tab 4 \tab CG \tab 4 \tab 0 \cr
-  chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \cr
-  chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \cr
-  chr1 \tab + \tab 12 \tab CHG \tab 1 \tab 2 \cr
-  chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 
-}
-
-Other notes:
+Other notes on function's behaviour:
 
 Methylation string bases in unknown context ("uU") are simply ignored, which,
 to the best of our knowledge, is consistent with the behaviour of other
 tools.
 
-In order to mitigate the effect of sequencing errors (leading to rare
-variations in the methylation context, as in reads 1 and 4 above), the
-context present in more than 50\% of the reads is assumed to be correct,
-while all bases at the same position but having other methylation context
-are simply ignored. This allows reports to be prepared without using the
-reference genome sequence.
-
-The downside of not using the reference genome sequence is the inability to
-determine the actual sequence of triplet for every base in the cytosine 
-report. Therefore this sequence is not reported, and this won't change
-until such information will be considered as worth adding.
+Cytosine context present in more than 50\% of the reads is assumed
+to be correct, while all bases at the same position but having other
+methylation context are simply ignored. This allows reports to be prepared
+without using the reference genome sequence.
 }
 \examples{
   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
   
-  # CpG report with thresholding
-  cg.report <- generateCytosineReport(capture.bam)
+  # lMHL report
+  mhl.report <- generateMhlReport(capture.bam)
   
-  # CX report without thresholding
-  cx.report <- generateCytosineReport(capture.bam, threshold.reads=FALSE,
-               report.context="CX")
+  # lMHL report with a `max.haplotype.window` of 1 is identical to a
+  # conventional cytosine report (or nearly identical when sequencing errors
+  # are present)
+  mhl.report <- generateMhlReport(capture.bam, max.haplotype.window=1)
+  cg.report  <- generateCytosineReport(capture.bam, threshold.reads=FALSE)
+  identical(
+    mhl.report[, .(rname, strand, pos, context, value=lmhl)],
+    cg.report[ , .(rname, strand, pos, context, value=meth/(meth+unmeth))]
+  )
 }
 \seealso{
+`values` vignette for a comparison and visualisation of epialleleR
+output values for various input files. `epialleleR` vignette for the
+description of usage and sample data.
+
 \code{\link{preprocessBam}} for preloading BAM data,
+\code{\link{generateCytosineReport}} for other methylation statistics at the
+level of individual cytosines,
 \code{\link{generateBedReport}} for genomic region-based statistics,
 \code{\link{generateVcfReport}} for evaluating epiallele-SNV associations,
 \code{\link{extractPatterns}} for exploring methylation patterns,
 \code{\link{generateBedEcdf}} for analysing the distribution of per-read
-beta values, and `epialleleR` vignettes for the description of usage and
-sample data.
+beta values.
 }

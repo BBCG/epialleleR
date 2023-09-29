@@ -66,7 +66,8 @@
 #' prepared for writing. NB: this object has 0-based coordinates and
 #' numerically encoded reference names.
 #' @seealso \code{\link{generateCytosineReport}} and
-#' \code{\link{generateWtfReport}} for methylation reports, as well as
+#' \code{\link{generateMhlReport}} for methylation reports at the level of
+#' individual cytosines, as well as
 #' `epialleleR` vignettes for the description of usage and sample data.
 #' 
 #' \href{https://www.htslib.org/}{Samtools} for viewing BAM files.

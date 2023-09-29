@@ -13,7 +13,7 @@
 // frequent context is observed in more than 50% of reads (not including +-)
 // and is within ctx string parameter.
 // Output report is a data.frame with seven columns and rows for every cytosine:
-// rname (factor), strand (factor), pos, ctx, cov, hlen, mhl
+// rname (factor), strand (factor), pos, ctx (factor), cov, hlen, mhl
 // 
 // 1) all XM positions counted in int[16]: index is equal to char+2>>2&00001111
 // 2) when gap in reads or another chr - spit map to res, clear map
@@ -45,7 +45,7 @@ uint64_t nrS(uint64_t n)
 // [[Rcpp::export]]
 Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            // data frame with BAM data
                                 std::string ctx,                                // context string for bases to report,
-                                int hmax,                                       // maximum length of a haplotype (limit for l in lMHL formula)
+                                int hmax,                                       // maximum length of a computation window (limit for l in lMHL formula)
                                 int hmin)                                       // ignore haplotypes smaller than hmin
 {
   // walking trough bunch of reads <- filling the map
@@ -108,9 +108,6 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
   }
   std::fill_n(mhl_lookup+hmax, mhl_lookup_len-hmax, nrS(hmax));                 // if hmax < mhl_lookup_len - fill the rest of the lookup table with it
   
-  // // define largest distance between context bases
-  // max.d = (max.d>0) ? std::min(max.d, INT_MAX) : INT_MAX ;                      // max distance always in range [1; INT_MAX]
-  
   // lMHL numerator buffer for current XM
   size_t num_buf_len = 8192;                                                    // maximum, though expandable length of numerator buffer
   uint64_t *num_buf  = (uint64_t*) malloc(num_buf_len * sizeof(uint64_t));      // numerator buffer
@@ -152,7 +149,6 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     }
     std::memset(num_buf,  0, size_x * sizeof(uint64_t));                        // clean the buffer
     size_t mh_start = 0, mh_end = 0, mh_size = 0, h_size = 0;                   // start, end and size of the current methylated stretch (number of ctx bases); total size of haplotype
-    // uint64_t mh_sum = 0;                                                        // sum of lMHL numerators for all methylated stretches, used to calculate continuous lMHL that spans entire read pair
     for (unsigned int i=0; i<size_x; i++) {                                     // first pass to compute local lMHL values, char by char
       const unsigned int base_idx = ctx_to_idx(xm_x[i]);                        // index of current base context; see the table in epialleleR.h
       if (ctx_map[base_idx]) {                                                  // if within context
@@ -163,7 +159,6 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
           mh_size++;                                                            // methylated stretch size++
         } else if (mh_size) {                                                   // if lowercase and after non-0-length methylated stretch
           std::fill(num_buf+mh_start, num_buf+mh_end+1, mhl_lookup[mh_size]);   // set values to nrS(mh_size) within methylated stretch
-          // mh_sum += mhl_lookup[mh_size];                                        // sum of numerators
           mh_size = 0;                                                          // reset the size
         }
       }
@@ -171,9 +166,7 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     if ((int)h_size<hmin) continue;                                             // skip read if haplotype is smaller than hmin
     if (mh_size) {                                                              // save last non-0-length methylated stretch
       std::fill(num_buf+mh_start, num_buf+mh_end+1, mhl_lookup[mh_size]);
-      // mh_sum += mhl_lookup[mh_size];                                            // sum of numerators
     }
-    // if (!discont) std::fill_n(num_buf, size_x, mh_sum);                         // fill entire buffer if continuous lMHL (same lMHL value for entire read pair)
     
     // second, walk through XM once again, filling the map
     for (unsigned int i=0; i<size_x; i++) {                                     // char by char - it's faster this way than using std::string in the cycle
@@ -197,9 +190,9 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     Rcpp::Named("strand") = res_strand,                                         // numeric ids (factor) for reference strands
     Rcpp::Named("pos") = res_pos,                                               // position of cytosine
     Rcpp::Named("context") = res_ctx,                                           // cytosine context
-    Rcpp::Named("coverage") = res_cov,                                          // cytosine context
-    Rcpp::Named("hlen") = res_hlen,                                             // average haplotype length
-    Rcpp::Named("mhl") = res_mhl                                                // number of unmethylated
+    Rcpp::Named("coverage") = res_cov,                                          // cytosine coverage
+    Rcpp::Named("length") = res_hlen,                                           // average haplotype length
+    Rcpp::Named("lmhl") = res_mhl                                               // lMHL value
   );
   
   Rcpp::IntegerVector col_rname = res["rname"];                                 // making rname a factor
@@ -227,7 +220,7 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
 //
 
 /*** R
-### lMHL calculations for a stretch of n mCpGs over a window of k
+### lMHL calculations for a stretch of n mCpGs
 # for mCpG stretches of length n, sum S of all possible lMHL combinations
 # (of length i from 1 to n, times i) equals to:
 # n   S   T
@@ -256,6 +249,7 @@ sapply(1:30, S)
 sapply(1:30, nrS)
 microbenchmark::microbenchmark(sapply(1:200, S), sapply(1:200, nrS))
 
+### lMHL calculations for a stretch of n mCpGs over a window of k.
 ### The following is not used, as it doesn't provide proper granularity for
 ### long-range sequencing
 #
