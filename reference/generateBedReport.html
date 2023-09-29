@@ -20,7 +20,7 @@ threshold."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.9.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.9.8</span>
       </span>
     </div>
 
@@ -31,6 +31,16 @@ threshold."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/values.html">The epialleleR output values</a>
+    </li>
+  </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/BBCG/epialleleR/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
@@ -293,15 +303,15 @@ the seqlevels style.</p></div>
 <span class="r-in"><span>  <span class="va">amplicon.report</span> <span class="op">&lt;-</span> <span class="fu">generateAmpliconReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>,</span></span>
 <span class="r-in"><span>                                            bed<span class="op">=</span><span class="va">amplicon.bed</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.015s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.010s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.008s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing amplicon report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.025s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.023s]</span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># capture NGS</span></span></span>
 <span class="r-in"><span>  <span class="va">capture.bam</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>,</span></span>
@@ -314,26 +324,26 @@ the seqlevels style.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.020s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.017s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing capture report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.027s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.023s]</span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># generateAmpliconReport and generateCaptureReport are just aliases</span></span></span>
 <span class="r-in"><span>  <span class="co"># of the generateBedReport</span></span></span>
 <span class="r-in"><span>  <span class="va">bed.report</span> <span class="op">&lt;-</span> <span class="fu">generateBedReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span>,</span></span>
 <span class="r-in"><span>                                  bed.type<span class="op">=</span><span class="st">"capture"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.015s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.021s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.016s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing capture report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.032s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.023s]</span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">capture.report</span>, <span class="va">bed.report</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 </code></pre></div>

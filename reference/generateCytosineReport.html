@@ -18,7 +18,7 @@ account average methylation level of the entire sequence read."><!-- mathjax -->
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.9.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.9.8</span>
       </span>
     </div>
 
@@ -29,6 +29,16 @@ account average methylation level of the entire sequence read."><!-- mathjax -->
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/values.html">The epialleleR output values</a>
+    </li>
+  </ul></li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/BBCG/epialleleR/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
@@ -96,13 +106,13 @@ Platform.</p></dd>
 
 <dt>threshold.context</dt>
 <dd><p>string defining cytosine methylation context used
-for thresholding the reads:</p><ul><li><p>"CG" (the default) -- within-the-context: CpG cytosines (called as
+for thresholding the reads:</p><ul><li><p>"CG" (the default) --- within-the-context: CpG cytosines (called as
   zZ), out-of-context: all the other cytosines (hHxX)</p></li>
-<li><p>"CHG" -- within-the-context: CHG cytosines (xX), out-of-context: hHzZ</p></li>
-<li><p>"CHH" -- within-the-context: CHH cytosines (hH), out-of-context: xXzZ</p></li>
-<li><p>"CxG" -- within-the-context: CG and CHG cytosines (zZxX),
+<li><p>"CHG" --- within-the-context: CHG cytosines (xX), out-of-context: hHzZ</p></li>
+<li><p>"CHH" --- within-the-context: CHH cytosines (hH), out-of-context: xXzZ</p></li>
+<li><p>"CxG" --- within-the-context: CG and CHG cytosines (zZxX),
   out-of-context: CHH cytosines (hH)</p></li>
-<li><p>"CX" -- all cytosines are considered within-the-context, this
+<li><p>"CX" --- all cytosines are considered within-the-context, this
   effectively results in no thresholding</p></li>
 </ul><p>This option has no effect when read thresholding is disabled.</p></dd>
 
@@ -154,12 +164,12 @@ Options have no effect if preprocessed BAM data was supplied as an input.</p></d
 
 <p><code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object containing cytosine
 report in Bismark-like format or NULL if report.file was specified. The
-report columns are:</p><ul><li><p>rname -- reference sequence name (as in BAM)</p></li>
-<li><p>strand -- strand</p></li>
-<li><p>pos -- cytosine position</p></li>
-<li><p>context -- methylation context</p></li>
-<li><p>meth -- number of methylated cytosines</p></li>
-<li><p>unmeth -- number of unmethylated cytosines</p></li>
+report columns are:</p><ul><li><p>rname --- reference sequence name (as in BAM)</p></li>
+<li><p>strand --- strand</p></li>
+<li><p>pos --- cytosine position</p></li>
+<li><p>context --- methylation context</p></li>
+<li><p>meth --- number of methylated cytosines</p></li>
+<li><p>unmeth --- number of unmethylated cytosines</p></li>
 </ul></div>
     <div id="details">
     <h2>Details</h2>
@@ -198,13 +208,15 @@ until such information will be considered as worth adding.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code><a href="preprocessBam.html">preprocessBam</a></code> for preloading BAM data,
+    <div class="dont-index"><p>`values` vignette for a comparison and visualisation of epialleleR
+output values for various input files. `epialleleR` vignette for the
+description of usage and sample data.</p>
+<p><code><a href="preprocessBam.html">preprocessBam</a></code> for preloading BAM data,
 <code><a href="generateBedReport.html">generateBedReport</a></code> for genomic region-based statistics,
 <code><a href="generateVcfReport.html">generateVcfReport</a></code> for evaluating epiallele-SNV associations,
 <code><a href="extractPatterns.html">extractPatterns</a></code> for exploring methylation patterns,
 <code><a href="generateBedEcdf.html">generateBedEcdf</a></code> for analysing the distribution of per-read
-beta values, and `epialleleR` vignettes for the description of usage and
-sample data.</p></div>
+beta values.</p></div>
     </div>
 
     <div id="ref-examples">
@@ -216,11 +228,11 @@ sample data.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.020s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.016s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing cytosine report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.028s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.024s]</span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># CX report without thresholding</span></span></span>
 <span class="r-in"><span>  <span class="va">cx.report</span> <span class="op">&lt;-</span> <span class="fu">generateCytosineReport</span><span class="op">(</span><span class="va">capture.bam</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span>,</span></span>
@@ -228,9 +240,9 @@ sample data.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.022s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.017s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing cytosine report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.030s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.027s]</span>
 </code></pre></div>
     </div>
   </div>

@@ -10,6 +10,9 @@
     <loc>/articles/index.html</loc>
   </url>
   <url>
+    <loc>/articles/values.html</loc>
+  </url>
+  <url>
     <loc>/authors.html</loc>
   </url>
   <url>
@@ -31,6 +34,9 @@
     <loc>/reference/generateCytosineReport.html</loc>
   </url>
   <url>
+    <loc>/reference/generateMhlReport.html</loc>
+  </url>
+  <url>
     <loc>/reference/generateVcfReport.html</loc>
   </url>
   <url>
@@ -41,5 +47,8 @@
   </url>
   <url>
     <loc>/reference/preprocessGenome.html</loc>
+  </url>
+  <url>
+    <loc>/reference/simulateBam.html</loc>
   </url>
 </urlset>
