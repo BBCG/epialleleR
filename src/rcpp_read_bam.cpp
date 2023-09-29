@@ -255,27 +255,26 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
     std::memset(record_xm_rs,  '-', record_width);
     
     // start with new record
-    record_width = abs(bam_rec->core.isize);                                    // template ISIZE, but can be 0 for single-ended!
-    
-    // // Proper resize should be based on sum of cigar_oplen if bam_rec->core.isize is 0
-    // // I'll disable resize for now, see if it ever causes troubles
-    // // resize containers if necessary
-    // if (record_width > max_record_width) {
-    //   max_record_width = record_width;                                          // expand template holders
-    //   record_seq_rs  = (uint8_t *) realloc(record_seq_rs, max_record_width);
-    //   record_xm_rs   = (uint8_t *) realloc(record_xm_rs,  max_record_width);
-    //   if (record_seq_rs==NULL || record_xm_rs==NULL)                            // check memory allocation
-    //     Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs);
-    // }
-    
     // get record sequence, XM, quality string
     uint8_t *record_qual = bam_get_qual(bam_rec);                               // quality string (Phred scale with no +33 offset)
     record_xm++;                                                                // remove leading 'Z' from XM string
     uint8_t *record_pseq = bam_get_seq(bam_rec);                                // packed sequence string (4 bit per base)
     
-    // apply CIGAR
+    // get CIGAR
     uint32_t n_cigar = bam_rec->core.n_cigar;                                   // number of CIGAR operations
     uint32_t *record_cigar = bam_get_cigar(bam_rec);                            // CIGAR array
+    record_width = bam_cigar2rlen(n_cigar, record_cigar);                       // reference length for the current query
+    
+    // resize containers if necessary
+    if (record_width > max_record_width) {
+      max_record_width = record_width;                                          // expand template holders
+      record_seq_rs  = (uint8_t *) realloc(record_seq_rs, record_width * sizeof(uint8_t));
+      record_xm_rs   = (uint8_t *) realloc(record_xm_rs,  record_width * sizeof(uint8_t));
+      if (record_seq_rs==NULL || record_xm_rs==NULL)                            // check memory allocation
+        Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs);
+    }
+    
+    // apply CIGAR
     uint32_t query_pos = 0;                                                     // starting position in query array
     uint32_t dest_pos = 0;                                                      // starting position in destination array
     for (size_t i=0; i<n_cigar; i++) {                                          // op by op

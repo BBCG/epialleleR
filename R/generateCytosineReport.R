@@ -87,13 +87,13 @@
 #' @param threshold.context string defining cytosine methylation context used
 #' for thresholding the reads:
 #' \itemize{
-#'   \item "CG" (the default) -- within-the-context: CpG cytosines (called as
+#'   \item "CG" (the default) --- within-the-context: CpG cytosines (called as
 #'   zZ), out-of-context: all the other cytosines (hHxX)
-#'   \item "CHG" -- within-the-context: CHG cytosines (xX), out-of-context: hHzZ
-#'   \item "CHH" -- within-the-context: CHH cytosines (hH), out-of-context: xXzZ
-#'   \item "CxG" -- within-the-context: CG and CHG cytosines (zZxX),
+#'   \item "CHG" --- within-the-context: CHG cytosines (xX), out-of-context: hHzZ
+#'   \item "CHH" --- within-the-context: CHH cytosines (hH), out-of-context: xXzZ
+#'   \item "CxG" --- within-the-context: CG and CHG cytosines (zZxX),
 #'   out-of-context: CHH cytosines (hH)
-#'   \item "CX" -- all cytosines are considered within-the-context, this
+#'   \item "CX" --- all cytosines are considered within-the-context, this
 #'   effectively results in no thresholding
 #' }
 #' This option has no effect when read thresholding is disabled.
@@ -121,20 +121,23 @@
 #' report in Bismark-like format or NULL if report.file was specified. The
 #' report columns are:
 #' \itemize{
-#'   \item rname -- reference sequence name (as in BAM)
-#'   \item strand -- strand
-#'   \item pos -- cytosine position
-#'   \item context -- methylation context
-#'   \item meth -- number of methylated cytosines
-#'   \item unmeth -- number of unmethylated cytosines
+#'   \item rname --- reference sequence name (as in BAM)
+#'   \item strand --- strand
+#'   \item pos --- cytosine position
+#'   \item context --- methylation context
+#'   \item meth --- number of methylated cytosines
+#'   \item unmeth --- number of unmethylated cytosines
 #' }
-#' @seealso \code{\link{preprocessBam}} for preloading BAM data,
+#' @seealso `values` vignette for a comparison and visualisation of epialleleR
+#' output values for various input files. `epialleleR` vignette for the
+#' description of usage and sample data.
+#' 
+#' \code{\link{preprocessBam}} for preloading BAM data,
 #' \code{\link{generateBedReport}} for genomic region-based statistics,
 #' \code{\link{generateVcfReport}} for evaluating epiallele-SNV associations,
 #' \code{\link{extractPatterns}} for exploring methylation patterns,
 #' \code{\link{generateBedEcdf}} for analysing the distribution of per-read
-#' beta values, and `epialleleR` vignettes for the description of usage and
-#' sample data.
+#' beta values.
 #' @examples
 #'   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
 #'   

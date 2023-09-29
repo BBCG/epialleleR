@@ -1,7 +1,7 @@
 #' callMethylation
 #'
 #' @description
-#' This function calls cytosine methylation in BAM files.
+#' This function calls cytosine methylation and stores calls in BAM files.
 #'
 #' @details
 #' The function makes cytosine methylation calls for input BAM file and writes
@@ -53,8 +53,8 @@
 #' reference sequence data provided (this matching is performed on the basis
 #' of names and lengths of reference sequences).
 #'
-#' @param input.bam.file input BAM file location string
-#' @param output.bam.file output BAM file location string
+#' @param input.bam.file input BAM file location string.
+#' @param output.bam.file output BAM file location string.
 #' @param genome reference (genomic) sequences file location string or an
 #' output of \code{\link{preprocessGenome}}.
 #' @param nthreads non-negative integer for the number of additional HTSlib
@@ -63,7 +63,7 @@
 #' @return list object with simple statistics of processed ("nrecs") records
 #' and calls made ("ncalled"). Even though "ncalled" can be less than "nrecs"
 #' (e.g., because not all reads are mapped), all records from the input BAM are
-#' written to the output bam.
+#' written to the output BAM.
 #' @seealso \code{\link{preprocessGenome}} for preloading reference sequences
 #' and `epialleleR` vignettes for the description of usage and sample data.
 #' 

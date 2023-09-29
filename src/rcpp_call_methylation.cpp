@@ -108,7 +108,7 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
   // file IO
   htsFile *in_fp = hts_open(in_fn.c_str(), "r");                                // try open input file
   if (in_fp==NULL) Rcpp::stop("Unable to open input BAM file for reading");     // fall back if error
-  htsFile *out_fp = hts_open(out_fn.c_str(), "wb");                             // try open input file
+  htsFile *out_fp = hts_open(out_fn.c_str(), "wb");                             // try open output file
   if (out_fp==NULL) Rcpp::stop("Unable to open output BAM file for writing");   // fall back if error
   // shared thread pool
   htsThreadPool thread_pool = {NULL, 0};                                        // thread pool cuts time by 30%

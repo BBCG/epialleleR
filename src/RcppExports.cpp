@@ -133,6 +133,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_mhl_report
+Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame& df, std::string ctx, int hmax, int hmin);
+RcppExport SEXP _epialleleR_rcpp_mhl_report(SEXP dfSEXP, SEXP ctxSEXP, SEXP hmaxSEXP, SEXP hminSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
+    Rcpp::traits::input_parameter< std::string >::type ctx(ctxSEXP);
+    Rcpp::traits::input_parameter< int >::type hmax(hmaxSEXP);
+    Rcpp::traits::input_parameter< int >::type hmin(hminSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_mhl_report(df, ctx, hmax, hmin));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_read_bam_paired
 Rcpp::DataFrame rcpp_read_bam_paired(std::string fn, int min_mapq, int min_baseq, bool skip_duplicates, int nthreads);
 RcppExport SEXP _epialleleR_rcpp_read_bam_paired(SEXP fnSEXP, SEXP min_mapqSEXP, SEXP min_baseqSEXP, SEXP skip_duplicatesSEXP, SEXP nthreadsSEXP) {
@@ -175,6 +189,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rcpp_simulate_bam
+int rcpp_simulate_bam(std::vector<std::string> header, Rcpp::DataFrame& fields, Rcpp::DataFrame& i_tags, Rcpp::DataFrame& s_tags, std::string out_fn);
+RcppExport SEXP _epialleleR_rcpp_simulate_bam(SEXP headerSEXP, SEXP fieldsSEXP, SEXP i_tagsSEXP, SEXP s_tagsSEXP, SEXP out_fnSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::vector<std::string> >::type header(headerSEXP);
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type fields(fieldsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type i_tags(i_tagsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type s_tags(s_tagsSEXP);
+    Rcpp::traits::input_parameter< std::string >::type out_fn(out_fnSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_simulate_bam(header, fields, i_tags, s_tags, out_fn));
+    return rcpp_result_gen;
+END_RCPP
+}
 // rcpp_threshold_reads
 std::vector<bool> rcpp_threshold_reads(Rcpp::DataFrame& df, std::string ctx_meth, std::string ctx_unmeth, std::string ooctx_meth, std::string ooctx_unmeth, unsigned int min_n_ctx, double min_ctx_meth_frac, double max_ooctx_meth_frac);
 RcppExport SEXP _epialleleR_rcpp_threshold_reads(SEXP dfSEXP, SEXP ctx_methSEXP, SEXP ctx_unmethSEXP, SEXP ooctx_methSEXP, SEXP ooctx_unmethSEXP, SEXP min_n_ctxSEXP, SEXP min_ctx_meth_fracSEXP, SEXP max_ooctx_meth_fracSEXP) {
@@ -204,9 +233,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_epialleleR_rcpp_get_xm_beta", (DL_FUNC) &_epialleleR_rcpp_get_xm_beta, 3},
     {"_epialleleR_rcpp_match_amplicon", (DL_FUNC) &_epialleleR_rcpp_match_amplicon, 3},
     {"_epialleleR_rcpp_match_capture", (DL_FUNC) &_epialleleR_rcpp_match_capture, 3},
+    {"_epialleleR_rcpp_mhl_report", (DL_FUNC) &_epialleleR_rcpp_mhl_report, 4},
     {"_epialleleR_rcpp_read_bam_paired", (DL_FUNC) &_epialleleR_rcpp_read_bam_paired, 5},
     {"_epialleleR_rcpp_read_bam_single", (DL_FUNC) &_epialleleR_rcpp_read_bam_single, 5},
     {"_epialleleR_rcpp_read_genome", (DL_FUNC) &_epialleleR_rcpp_read_genome, 2},
+    {"_epialleleR_rcpp_simulate_bam", (DL_FUNC) &_epialleleR_rcpp_simulate_bam, 5},
     {"_epialleleR_rcpp_threshold_reads", (DL_FUNC) &_epialleleR_rcpp_threshold_reads, 8},
     {NULL, NULL, 0}
 };
