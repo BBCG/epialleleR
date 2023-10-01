@@ -2,8 +2,8 @@
 title: "The epialleleR User's Guide"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 abstract: |
-  A comprehensive guide to using the epialleleR package for calling the
-  hypermethylated epiallele frequencies from next-generation sequencing data
+  A comprehensive guide to using the epialleleR package for analysis of
+  next-generation sequencing data
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{epialleleR}
@@ -133,7 +133,9 @@ epialleles becomes nearly impossible. In order to increase the sensitivity of
 DNA methylation analysis we have developed *`epialleleR`* &#8212; an R package
 for calling hypermethylated variant epiallele frequencies (VEF).
 
-Two edge cases epialleleR was designed to distinguish are presented below.
+Two edge cases epialleleR was designed to distinguish are presented below
+(more examples can be found
+[here](https://bbcg.github.io/epialleleR/articles/values.html)).
 While these are simplified and entirely artificial, they still give an idea of
 two different methylation patterns that may exist in real life, be characterised
 by very similar quantitative metrics (beta value, the ratio of methylated
@@ -222,19 +224,22 @@ sequencing), larger methylation capture panels, or even whole-genome approaches.
  * If methylation call strings are not present in BAM file, *`epialleleR`* can
  make and store such calls in output BAM (similar to Bismark or Illumina's
  mapping/alignment solutions)
+ * *`epialleleR`* can create and store sample BAM files for testing purposes by
+ means of *`simulateBam`* method
  * In addition to conventional reporting of cytosine DNA methylation levels
  (beta values), *`epialleleR`* can call variant epiallele frequencies (VEF) of
  hypermethylated alleles at the level of individual cytosines
  (*`generateCytosineReport`*) or supplied genomic regions
  (*`generateBedReport`*)
+ * Linearised Methylated Haplotype Load (lMHL, 
+ *`generateMhlReport`*) can be used instead of VEF when thresholding is not
+ recommended (long-read sequencing)
  * DNA methylation patterns of genomic region of interest can be explored
  using *`extractPatterns`*
- * Potential bimodality of methylation for genomic regions of interest can be
- assessed using *`generateBedEcdf`* method
  * The association of methylation with single-nucleotide variations within
  epialleles can be tested using *`generateVcfReport`*
- * *`epialleleR`* can create and store sample BAM files for testing purposes by
- means of *`simulateBam`* method
+ * Potential bimodality of methylation for genomic regions of interest can be
+ assessed using *`generateBedEcdf`* method
 
 ## Processing speed
 
@@ -245,7 +250,7 @@ it up significantly using additional decompression threads (*`nthreads`* option
 in *`epialleleR`* methods). All operations are performed using optimised
 C++ functions, and usually take reasonable time.
 
-During methylation calling, human genome (hg38) loading usually takes 10-20
+During methylation calling, human genome (hg38) loading usually takes 10-15
 seconds. Using preloaded reference genome, the calling itself is performed
 at the speed of 200-300 thousand reads per second (25-40 MB/s of BAM data).
 
@@ -482,14 +487,14 @@ VEF values are extremely useful for detection of mosaic epimutations. However,
 default thresholding parameters might not fit with the nature of regions of
 interest. In this case, it is advised to learn the characteristics of these
 regions with *`extractPatterns`* and *`generateBedEcdf`* methods as described
-below. Alternatively, *`epialleleR`* provides the *`generateMhlReport`* method
+below. Alternatively, *`epialleleR`* provides a method
 to calculate a 
 metric that is similar to VEF in its ability to highlight hypermethylated
 regions but does not require thresholding &#8212;
 linearised Methylated Haplotype Load (lMHL).
 
 lMHL is a modified version of MHL (MHL was first described by
-[Guo et al., 2017](https://doi.org/10.1038/ng.3805}{10.1038/ng.3805), sought to
+[Guo et al., 2017](https://doi.org/10.1038/ng.3805}{10.1038/ng.3805)), sought to
 be faster and applicable for a wider range of sequencing data. More information
 on this is given in the help page for the *`generateMhlReport`* as well as in
 the `values` vignette.
@@ -784,7 +789,7 @@ NCBI GEO dataset GSE201690: "Methylation analysis of promoter regions for select
 ## Our experimental studies that use the package
 Per Eystein Lonning, Oleksii Nikolaienko, Kathy Pan, Allison W. Kurian, Hans Petter Petter Eikesdal, Mary Pettinger, Garnet L Anderson, Ross L Prentice, Rowan T. Chlebowski, and Stian Knappskog. Constitutional *BRCA1* methylation and risk of incident triple-negative breast cancer and high-grade serous ovarian cancer. *JAMA Oncology* 2022. [https://doi.org/10.1001/jamaoncol.2022.3846](https://doi.org/10.1001/jamaoncol.2022.3846)
 
-Oleksii Nikolaienko, Hans P. Eikesdal, Bjørnar Gilje, Steinar Lundgren, Egil S. Blix, Helge Espelid, Jürgen Geisler, Stephanie Geisler, Emiel A.M. Janssen, Synnøve Yndestad, Laura Minsaas, Beryl Leirvaag, Reidun Lillestøl, Stian Knappskog, Per E. Lønning. Prenatal *BRCA1* epimutations contribute significantly to triple-negative breast cancer development. *medRxiv* 2023.05.14.23289949. [https://www.medrxiv.org/content/10.1101/2023.05.14.23289949](https://www.medrxiv.org/content/10.1101/2023.05.14.23289949)
+Oleksii Nikolaienko, Hans P. Eikesdal, Bjørnar Gilje, Steinar Lundgren, Egil S. Blix, Helge Espelid, Jürgen Geisler, Stephanie Geisler, Emiel A.M. Janssen, Synnøve Yndestad, Laura Minsaas, Beryl Leirvaag, Reidun Lillestøl, Stian Knappskog, Per E. Lønning. Prenatal *BRCA1* epimutations contribute significantly to triple-negative breast cancer development. *medRxiv* 2023.05.14.23289949. [https://www.medrxiv.org/content/10.1101/2023.05.14.23289949](https://www.medrxiv.org/content/10.1101/2023.05.14.23289949).
 Data: [GSE243966](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE243966)
 
 

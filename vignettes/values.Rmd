@@ -38,7 +38,7 @@ hidden. If you still want to use it or see what it does - browse a
 of this vignette online.
 
 
-```{r, echo=FALSE, results='hide'}
+```{r, echo=FALSE, include=FALSE}
 require("data.table", quietly=TRUE)
 require("GenomicRanges", quietly=TRUE)
 require("ggplot2", quietly=TRUE)
@@ -267,7 +267,7 @@ plotMetrics(
   as("chr17:58691673-58693108:-", "GRanges"), title="sample capture, RAD51C, - strand"
 )
 
-# long-range sequencing, low methylation
+# long-read sequencing, low methylation
 getXM <- function (p) {sample(x=c("z", "Z"), size=1, prob=c(p, 1-p))}
 probs <- (sin(seq(-2*pi, +1*pi, by = pi/125))+2)/3
 simulateBam(
@@ -276,16 +276,16 @@ simulateBam(
   XM=sapply(1:10, function (i) {paste(sapply(probs, getXM), collapse="")}),
   XG="CT"
 )
-plotMetrics(out.bam, as("chrS:1-1000", "GRanges"), title="long-range sequencing, low methylation")
+plotMetrics(out.bam, as("chrS:1-1000", "GRanges"), title="long-read sequencing, low methylation")
 
-# long-range sequencing, high methylation
+# long-read sequencing, high methylation
 simulateBam(
   output.bam.file=out.bam,
   pos=1:10,
   XM=sapply(1:10, function (i) {paste(sapply(1-probs, getXM), collapse="")}),
   XG="CT"
 )
-plotMetrics(out.bam, as("chrS:1-1000", "GRanges"), title="long-range sequencing, high methylation")
+plotMetrics(out.bam, as("chrS:1-1000", "GRanges"), title="long-read sequencing, high methylation")
 
 ```
 

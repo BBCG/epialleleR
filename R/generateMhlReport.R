@@ -104,7 +104,8 @@
 #' 65535). Having no length restrictions make sense for short-read sequencing
 #' when the
 #' length of the read is comparable to the length of a typical methylated block,
-#' the depth of coverage is high and the lengths of all reads are roughly equal.
+#' the depth of coverage is high, and the lengths of all reads are roughly
+#' equal.
 #' However, calculations using non-restricted haplotype length are meaningless
 #' for long-read sequencing --- when the same read may
 #' cover a number of regions with very different methylation properties, and

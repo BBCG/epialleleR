@@ -89,7 +89,7 @@ fields.
 The function creates sample alignment records and saves them in BAM file.
 Output can be used to test epialleleR methods as well as other
 tools for methylation analysis. This method can significantly simplify
-calculation of methylation metrics on example data (beta, VEF, and WTF
+calculation of methylation metrics on example data (beta, VEF, and lMHL
 values of epialleleR; methylation heterogeneity metrics of other tools).
 
 The number of records written will be equal to the largest length of any
