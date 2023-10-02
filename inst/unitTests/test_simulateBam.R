@@ -2,6 +2,13 @@ test_simulateBam <- function () {
   
   out.bam <- tempfile(pattern="simulated", fileext=".bam")
   simulateBam(
+    output.bam.file=out.bam,
+    pos=1:6,
+    XG=c("CT", "AG"),
+    NM=1:12
+  )
+  
+  simulateBam(
     qname="a",
     flag=2,
     rname="chrQ",

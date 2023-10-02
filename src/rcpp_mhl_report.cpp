@@ -25,16 +25,16 @@
 // lMHL numerator and denominator lookup tables are precomputed using nrS(n)
 //
 // Triangular sequence, nth element
-uint64_t T(uint64_t n) {
-  return (n*(n+1))/2;
-}
+// uint64_t T(uint64_t n) {
+//   return (n*(n+1))/2;
+// }
 // lMHL numerator or denominator, sum S of all possible lMHL combinations
 // of length i from 1 to n, times i
-uint64_t S(uint64_t n)
-{
-  if (n<2) return n;
-  return S(n-1) + T(n);
-}
+// uint64_t S(uint64_t n)
+// {
+//   if (n<2) return n;
+//   return S(n-1) + T(n);
+// }
 // S can be simplified to non-recursive versions
 uint64_t nrS(uint64_t n)
 {
