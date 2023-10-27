@@ -9,6 +9,8 @@ vignette: >
   %\VignetteIndexEntry{epialleleR}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+resource_files:
+  - vignettes/epialleleR_logo.svg
 ---
 
 ```{r, include = FALSE}
