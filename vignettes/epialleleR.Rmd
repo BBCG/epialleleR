@@ -638,7 +638,7 @@ caused by misalignments. Remember to increase `min.baseq`
 (`samtools mplieup -Q` default value is 13) to obtain results of a higher
 quality.
 
-```{r}
+```{r, fig.width=10, fig.height=6, out.width="100%", out.height="100%"}
 # VCF report
 vcf.report <- generateVcfReport(
   bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),

@@ -1,4 +1,4 @@
-# Fast, epiallele-aware methylation <img style="float: right;" width="25%" src="inst/epialleleR_logo.svg"> caller and reporter
+# Fast, epiallele-aware methylation <img style="float: right;" width="25%" src="inst/epialleleR_logo.svg"><br> caller and reporter
 
 [![](https://github.com/BBCG/epialleleR/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/BBCG/epialleleR/actions)
 [![](https://codecov.io/gh/BBCG/epialleleR/branch/devel/graph/badge.svg)](https://codecov.io/gh/BBCG/epialleleR)
