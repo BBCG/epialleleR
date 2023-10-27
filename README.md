@@ -2,7 +2,7 @@
 <h1><div style="display:block;"> <div style="display:block;"> <div style="display:inline-block;">
 Fast, epiallele-aware methylation<br> caller and reporter
 </div> <div style="display:inline-block; float:right;">
-<img src="vignettes/epialleleR_logo.svg" />
+<img style="float:right;" src="vignettes/epialleleR_logo.svg" />
 </div> </div> </div></h1>
 
 [![](https://github.com/BBCG/epialleleR/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/BBCG/epialleleR/actions)
