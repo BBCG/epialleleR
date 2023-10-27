@@ -1,5 +1,5 @@
 <p style="display:inline-block; width:100%">
-<h1>Fast, epiallele-aware methylation <img style="float:right; align:top;" src="vignettes/epialleleR_logo.svg"> <br> caller and reporter</h1>
+<h1>Fast, epiallele-aware methylation <img style="float:right; vertical-align:text-top;" src="vignettes/epialleleR_logo.svg"> <br> caller and reporter</h1>
 </p>
 
 [![](https://github.com/BBCG/epialleleR/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/BBCG/epialleleR/actions)
