@@ -1,6 +1,6 @@
 <div style="position:relative; width:100%">
-<img style="float: right;" src="vignettes/epialleleR_logo.svg">
 <div style="position:absolute; top:0%; left:0%;"><h1>Fast, epiallele-aware methylation<br> caller and reporter</h1></div>
+<img style="float: right;" src="vignettes/epialleleR_logo.svg">
 </div>
 
 
