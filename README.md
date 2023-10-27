@@ -1,6 +1,8 @@
-<p style="display:inline-block; width:100%">
-<h1>Fast, epiallele-aware methylation <img style="float:right; vertical-align:text-top;" src="vignettes/epialleleR_logo.svg"> <br> caller and reporter</h1>
-</p>
+<div style="display:block;"> <div style="display:inline-block;">
+<h1>Fast, epiallele-aware methylation<br> caller and reporter</h1>
+</div> <div style="display:inline-block; float:right;">
+<img src="vignettes/epialleleR_logo.svg" />
+</div> </div>
 
 [![](https://github.com/BBCG/epialleleR/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/BBCG/epialleleR/actions)
 [![](https://codecov.io/gh/BBCG/epialleleR/branch/devel/graph/badge.svg)](https://codecov.io/gh/BBCG/epialleleR)
