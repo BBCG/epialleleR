@@ -135,7 +135,7 @@ mhl.report <- generateMhlReport(bam=amplicon.bam)
 -------
 
 ### Citing the *`epialleleR`* package
-Oleksii Nikolaienko, Per Eystein Lønning, Stian Knappskog, *epialleleR*: an R/Bioconductor package for sensitive allele-specific methylation analysis in NGS data. *bioRxiv* 2022.06.30.498213. [https://www.biorxiv.org/content/10.1101/2022.06.30.498213](https://www.biorxiv.org/content/10.1101/2022.06.30.498213)
+Oleksii Nikolaienko, Per Eystein Lønning, Stian Knappskog, *epialleleR*: an R/Bioconductor package for sensitive allele-specific methylation analysis in NGS data. *GigaScience*, Volume 12, 2023, giad087, [https://doi.org/10.1093/gigascience/giad087](https://doi.org/10.1093/gigascience/giad087).
 Data: [GSE201690](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE201690)
 
 ### Our experimental studies that use the package

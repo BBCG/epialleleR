@@ -696,7 +696,7 @@ for (f in bam.files) {
 # Other information
 
 ## Citing the *`epialleleR`* package
-Oleksii Nikolaienko, Per Eystein Lønning, Stian Knappskog, *epialleleR*: an R/Bioconductor package for sensitive allele-specific methylation analysis in NGS data. bioRxiv 2022.06.30.498213, [https://www.biorxiv.org/content/10.1101/2022.06.30.498213](https://www.biorxiv.org/content/10.1101/2022.06.30.498213)
+Oleksii Nikolaienko, Per Eystein Lønning, Stian Knappskog, *epialleleR*: an R/Bioconductor package for sensitive allele-specific methylation analysis in NGS data. *GigaScience*, Volume 12, 2023, giad087, [https://doi.org/10.1093/gigascience/giad087](https://doi.org/10.1093/gigascience/giad087)
 
 ## The data underlying *`epialleleR`* manuscript
 Replication Data for: "epialleleR: an R/BioC package for quantifying and analysing low-frequency DNA methylation", [https://doi.org/10.18710/2BQTJP](https://doi.org/10.18710/2BQTJP)
