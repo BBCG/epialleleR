@@ -1,5 +1,5 @@
 ---
-title: "The epialleleR User's Guide"
+title: "The epialleleR User's Guide <img style=\"float: right;\" src=\"epialleleR_logo.svg\" />"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 abstract: |
   A comprehensive guide to using the epialleleR package for analysis of
@@ -23,10 +23,6 @@ options(width=100)
 ```
 
 *****
-
-<div align="right" width="25%">
-<img style="float: right;" src="epialleleR_logo.svg" />
-</div>
 
 # Introduction
 
