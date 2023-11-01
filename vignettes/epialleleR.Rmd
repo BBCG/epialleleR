@@ -10,7 +10,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 resource_files:
-  - vignettes/epialleleR_logo.svg
+  - epialleleR_logo.svg
 ---
 
 ```{r, include = FALSE}
@@ -25,7 +25,7 @@ options(width=100)
 *****
 
 <div align="right" width="25%">
-<img style="float: right;" src="vignettes/epialleleR_logo.svg" />
+<img style="float: right;" src="epialleleR_logo.svg" />
 </div>
 
 # Introduction
