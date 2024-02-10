@@ -82,21 +82,21 @@ utils::globalVariables(
   check.out <- rcpp_check_bam(bam.file)
   
   # main logic
-  if (check.out$nrecs==0) {                             # no records
+  if (check.out$nrecs==0) {                                     # no records
     stop("Empty file provided! Exiting",
          call.=FALSE)
-  } else if (check.out$nxg==0 & check.out$nyc>0) {      # YCs but no XGs
+  } else if (is.null(check.out$XG) & !is.null(check.out$YC)) {  # YCs but no XGs
     stop("No XG tags found (though YC tags are there)! BWA-meth alignment?\n",
          "If so, make methylation calls using epialleleR::callMethylation.\n",
          "Exiting", call.=FALSE)
-  } else if (check.out$nxm==0 & check.out$nxg>0) {      # XGs but no XMs
+  } else if (is.null(check.out$XM) & !is.null(check.out$XG)) {  # XGs but no XMs
     stop("No XM tags found! Was methylation called successfully?\n",
          "If not, make methylation calls using epialleleR::callMethylation.\n",
          "Exiting", call.=FALSE)
-  } else if (check.out$npp < check.out$nrecs/2) {       # predominantly SE
+  } else if (check.out$npaired < check.out$nrecs/2) {       # predominantly SE
     paired <- FALSE
   } else {
-    if (check.out$ntempls*2 < check.out$npp -1) {       # not sorted by name
+    if (check.out$ntempls*2 < check.out$npaired - 1) {      # not sorted by name
       stop("BAM file seems to be paired-end but not sorted by name!\n",
            "Please sort using 'samtools sort -n -o out.bam in.bam'.\n",
            "Exiting", call.=FALSE)
@@ -344,9 +344,9 @@ utils::globalVariables(
   
   if (check.out$nrecs==0) {                             # no records
     stop("Empty file provided! Exiting", call.=FALSE)
-  } else if (check.out$nxg>0) {
+  } else if (!is.null(check.out$XG)) {
     tag <- "XG"
-  } else if (check.out$nyc>0) {
+  } else if (!is.null(check.out$YC)) {
     tag <- "YC"
   } else stop("Unable to call methylation: neither XG nor YC tag is present",
               " (genome strand unknown).\nExiting", call.=FALSE)
