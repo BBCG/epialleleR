@@ -1,6 +1,6 @@
 Package: epialleleR
 Title: Fast, Epiallele-Aware Methylation Caller and Reporter
-Version: 1.11.2
+Version: 1.11.3
 Authors@R: 
   person(given = "Oleksii",
     family = "Nikolaienko",
