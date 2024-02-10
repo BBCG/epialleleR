@@ -18,7 +18,7 @@ tests their association with the methylation status of the sequencing reads."><!
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.3</span>
       </span>
     </div>
 
@@ -122,7 +122,7 @@ must match the style of seqlevels of the BAM file/object used.</p></dd>
 <dt>report.file</dt>
 <dd><p>file location string to write the VCF report. If NULL
 (the default) then report is returned as a
-<code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object.</p></dd>
+<code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object.</p></dd>
 
 
 <dt>zero.based.bed</dt>
@@ -194,7 +194,7 @@ Options have no effect if preprocessed BAM data was supplied as an input.</p></d
     <h2>Value</h2>
     
 
-<p><code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object containing VCF report or
+<p><code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object containing VCF report or
 NULL if report.file was specified. The report columns are:</p><ul><li><p>name -- variation identifier (e.g. "rs123456789")</p></li>
 <li><p>seqnames -- reference sequence name</p></li>
 <li><p>range -- genomic coordinates of the variation</p></li>
@@ -271,17 +271,17 @@ the seqlevels style.</p></div>
 <span class="r-in"><span>  <span class="va">vcf.report</span> <span class="op">&lt;-</span> <span class="fu">generateVcfReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span>,</span></span>
 <span class="r-in"><span>                                  vcf<span class="op">=</span><span class="va">capture.vcf</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.009s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.008s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading VCF file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [5.047s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [4.438s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.013s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting base frequences </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.106s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.111s]</span>
 </code></pre></div>
     </div>
   </div>
@@ -296,7 +296,7 @@ the seqlevels style.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.9000.</p>
 </div>
 
       </footer></div>

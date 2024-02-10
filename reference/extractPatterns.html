@@ -18,7 +18,7 @@ region of interest."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/a
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.3</span>
       </span>
     </div>
 
@@ -168,7 +168,7 @@ Options have no effect if preprocessed BAM data was supplied as an input.</p></d
     <h2>Value</h2>
     
 
-<p><code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object containing
+<p><code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object containing
 per-read (pair) base methylation information for the genomic region of
 interest. The report columns are:</p><ul><li><p>seqnames -- read (pair) reference sequence name</p></li>
 <li><p>strand -- read (pair) strand</p></li>
@@ -220,13 +220,13 @@ description of usage and sample data.</p></div>
 <span class="r-in"><span>  <span class="co"># let's get our patterns</span></span></span>
 <span class="r-in"><span>  <span class="va">patterns</span> <span class="op">&lt;-</span> <span class="fu">extractPatterns</span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>, bed<span class="op">=</span><span class="va">amplicon.bed</span>, bed.row<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.042s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.043s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.010s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting methylation patterns </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.024s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.030s]</span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">patterns</span><span class="op">)</span>  <span class="co"># read pairs overlap genomic region of interest</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 238</span>
 <span class="r-in"><span>  </span></span>
@@ -240,7 +240,7 @@ description of usage and sample data.</p></div>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 45</span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># let's melt and plot them</span></span></span>
-<span class="r-in"><span>  <span class="va">plot.data</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/melt.data.table.html" class="external-link">melt.data.table</a></span><span class="op">(</span><span class="va">patterns.summary</span>,</span></span>
+<span class="r-in"><span>  <span class="va">plot.data</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/melt.data.table.html" class="external-link">melt.data.table</a></span><span class="op">(</span><span class="va">patterns.summary</span>,</span></span>
 <span class="r-in"><span>    measure.vars<span class="op">=</span><span class="va">base.positions</span>, variable.name<span class="op">=</span><span class="st">"pos"</span>, value.name<span class="op">=</span><span class="st">"base"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># continuous positions, nonunique patterns according to their counts</span></span></span>
@@ -304,7 +304,7 @@ description of usage and sample data.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.9000.</p>
 </div>
 
       </footer></div>
