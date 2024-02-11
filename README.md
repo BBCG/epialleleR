@@ -141,7 +141,7 @@ Data: [GSE201690](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE201690)
 ### Our experimental studies that use the package
 Per Eystein Lonning, Oleksii Nikolaienko, Kathy Pan, Allison W. Kurian, Hans Petter Petter Eikesdal, Mary Pettinger, Garnet L Anderson, Ross L Prentice, Rowan T. Chlebowski, and Stian Knappskog. Constitutional *BRCA1* methylation and risk of incident triple-negative breast cancer and high-grade serous ovarian cancer. *JAMA Oncology* 2022. [https://doi.org/10.1001/jamaoncol.2022.3846](https://doi.org/10.1001/jamaoncol.2022.3846)
 
-Oleksii Nikolaienko, Hans P. Eikesdal, Bjørnar Gilje, Steinar Lundgren, Egil S. Blix, Helge Espelid, Jürgen Geisler, Stephanie Geisler, Emiel A.M. Janssen, Synnøve Yndestad, Laura Minsaas, Beryl Leirvaag, Reidun Lillestøl, Stian Knappskog, Per E. Lønning. Prenatal *BRCA1* epimutations contribute significantly to triple-negative breast cancer development. *medRxiv* 2023.05.14.23289949. [https://www.medrxiv.org/content/10.1101/2023.05.14.23289949](https://www.medrxiv.org/content/10.1101/2023.05.14.23289949).
+Oleksii Nikolaienko, Hans P. Eikesdal, Elisabet Ognedal, Bjørnar Gilje, Steinar Lundgren, Egil S. Blix, Helge Espelid, Jürgen Geisler, Stephanie Geisler, Emiel A.M. Janssen, Synnøve Yndestad, Laura Minsaas, Beryl Leirvaag, Reidun Lillestøl, Stian Knappskog, Per E. Lønning. Prenatal *BRCA1* epimutations contribute significantly to triple-negative breast cancer development. *Genome Medicine* 2023. [https://doi.org/10.1186/s13073-023-01262-8](https://doi.org/10.1186/s13073-023-01262-8).
 Data: [GSE243966](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE243966)
 
 ### *`epialleleR`* at Bioconductor
