@@ -8,7 +8,7 @@
 
 // Makes methylation calls using either genomic sequence [done] or MM/ML tags
 // [pending] and writes them in XM tag.
-// Relies on the presence of XG (Illumina/Bismark) or YC (bwa-meth) or
+// Relies on the presence of XG (Illumina/Bismark) or YD (bwa-meth) or
 // ZS (bsmap) genome conversion tags.
 //
 // This calling is read-based: the cytosine context of the reference sequence 
