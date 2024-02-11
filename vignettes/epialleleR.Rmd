@@ -304,9 +304,9 @@ bam.data    <- preprocessBam(capture.bam)
 
 ## Optional calling of cytosine methylation
 
-If BAM file lacks XG/XM tags (e.g., is an output of bwa-meth), preprocessing
-will fail with the message that cytosine methylation calling must be performed.
-This can be done as follows:
+If BAM file lacks XG/XM tags (e.g., is an output of bwa-meth or BSMAP),
+preprocessing will fail with the message that cytosine methylation calling
+must be performed. This can be done as follows:
 
 ```{r}
 # bwa-meth sample output

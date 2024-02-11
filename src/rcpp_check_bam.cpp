@@ -19,8 +19,8 @@
 Rcpp::List rcpp_check_bam (std::string fn)                                      // file name
 {
   // constants
-  int max_recs = 1024;                                                          // max number of reads to check
-  int max_qname_width = 1024;                                                   // max QNAME length, not expanded yet, ever error-prone?
+  const unsigned int max_recs = 1024;                                           // max number of reads to check
+  const unsigned int max_qname_width = 1024;                                    // max QNAME length, not expanded yet, ever error-prone?
 
   // file IO
   htsFile *bam_fp = hts_open(fn.c_str(), "r");                                  // try open file
@@ -40,7 +40,7 @@ Rcpp::List rcpp_check_bam (std::string fn)                                      
   while( (sam_read1(bam_fp, bam_hdr, bam_rec) > 0) && (aux_map["nrecs"] < max_recs) ) { // rec by rec until max_recs or EOF
     aux_map["nrecs"]++;                                                         // BAM alignment records ++
     if (bam_rec->core.flag & BAM_FPROPER_PAIR) aux_map["npaired"]++;            // if is BAM_FPROPER_PAIR
-    for (uint8_t *aux = bam_aux_first(bam_rec); aux != NULL; aux = bam_aux_next(bam_rec, aux)) { // cycle through all AUX fields
+    for (uint8_t *aux = bam_aux_first(bam_rec); aux; aux = bam_aux_next(bam_rec, aux)) { // cycle through all AUX fields
       aux_map[std::string(bam_aux_tag(aux), 2)]++;                              // try increment/emplace current tag
     }
     

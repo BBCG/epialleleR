@@ -70,3 +70,6 @@ Changes in version 1.9.4 (2023-07-03)
 Changes in version 1.9.8 (2023-09-29)
 + creates sample BAMs
 + linearized MHL
+
+Changes in version 1.11.4 (2024-02-11)
++ methylation calls for bsmap

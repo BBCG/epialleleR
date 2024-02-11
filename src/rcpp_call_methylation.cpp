@@ -8,8 +8,8 @@
 
 // Makes methylation calls using either genomic sequence [done] or MM/ML tags
 // [pending] and writes them in XM tag.
-// Relies on the presence of XG (Illumina/Bismark) or YC (bwa-meth) genome
-// conversion tags.
+// Relies on the presence of XG (Illumina/Bismark) or YC (bwa-meth) or
+// ZS (bsmap) genome conversion tags.
 //
 // This calling is read-based: the cytosine context of the reference sequence 
 // is calculated for every read in case there's a substitution in
@@ -151,6 +151,15 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
       goto writeout;                                                            // don't do anything, just write out
     
     {
+      if (tag!="XG") {                                                          // appending XG tag if not present
+        bam_aux_append(in_rec, "XG", 'Z', 3, (const uint8_t *) "CT");           // add default XG=="ZCT\0"
+        if ((tag=="YD" && record_strand[1]=='r') ||                             // if YD=='Zr' (not 'Zf')
+            (tag=="ZS" && record_strand[1]=='-')) {                             // if ZS=='Z-+' or 'Z--' (not 'Z++' or 'Z+-')
+          bam_aux_update_str(in_rec, "XG", 3, "GA");                            // make XG=="ZGA\0"
+        }
+        record_strand = (char*) bam_aux_get(in_rec, "XG");                      // use XG tag as genome strand from now on ("ZCT" or "ZGA")
+      }
+      
       query_width = abs(in_rec->core.l_qseq);                                   // query width
       if (query_width > max_query_width) {                                      // if sequence is longer than XM holder
         max_query_width = query_width;                                          // new max
@@ -237,8 +246,6 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
     }
     
     writeout:
-    if ((tag!="XG") && (record_strand!=NULL))                                   // if XG tag is absent but genome strand is known
-      bam_aux_append(in_rec, "XG", 'Z', 2, (const uint8_t*)record_strand+1);    // add it
     if (sam_write1(out_fp, in_hdr, in_rec) < 0) Rcpp::stop("Unable to write BAM"); // write record
   }
 
