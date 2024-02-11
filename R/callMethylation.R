@@ -13,7 +13,8 @@
 #' 
 #' Methylation calling is only possible if genomic strand the read was aligned
 #' to is known. This information is typically stored in XG tag of
-#' Bismark/Illumina BAM files, or in YC tag of BWA-meth alignment files.
+#' Bismark/Illumina BAM files, or in YD tag of BWA-meth alignment files, or in
+#' ZS tag of BSMAP alignment files.
 #' `epialleleR` is aware of that and will use the whichever tag is available.
 #' 
 #' The sequence context of cytosines (h/H for "CHH", x/X for "CHG",

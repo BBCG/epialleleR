@@ -85,8 +85,12 @@ utils::globalVariables(
   if (check.out$nrecs==0) {                                     # no records
     stop("Empty file provided! Exiting",
          call.=FALSE)
-  } else if (is.null(check.out$XG) & !is.null(check.out$YC)) {  # YCs but no XGs
-    stop("No XG tags found (though YC tags are there)! BWA-meth alignment?\n",
+  } else if (is.null(check.out$XG) & !is.null(check.out$YD)) {  # YDs but no XGs
+    stop("No XG tags found (though YD tags are there)! BWA-meth alignment?\n",
+         "If so, make methylation calls using epialleleR::callMethylation.\n",
+         "Exiting", call.=FALSE)
+  } else if (is.null(check.out$XG) & !is.null(check.out$ZS)) {  # ZSs but no XGs
+    stop("No XG tags found (though ZS tags are there)! BSMAP alignment?\n",
          "If so, make methylation calls using epialleleR::callMethylation.\n",
          "Exiting", call.=FALSE)
   } else if (is.null(check.out$XM) & !is.null(check.out$XG)) {  # XGs but no XMs
@@ -346,9 +350,11 @@ utils::globalVariables(
     stop("Empty file provided! Exiting", call.=FALSE)
   } else if (!is.null(check.out$XG)) {
     tag <- "XG"
-  } else if (!is.null(check.out$YC)) {
-    tag <- "YC"
-  } else stop("Unable to call methylation: neither XG nor YC tag is present",
+  } else if (!is.null(check.out$YD)) {
+    tag <- "YD"
+  } else if (!is.null(check.out$ZS)) {
+    tag <- "ZS"
+  } else stop("Unable to call methylation: neither of XG/YD/ZS tags is present",
               " (genome strand unknown).\nExiting", call.=FALSE)
   
   result <- rcpp_call_methylation_genome(

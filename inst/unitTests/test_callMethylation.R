@@ -6,6 +6,22 @@ test_callMethylation <- function () {
   
   RUnit::checkEquals(
     callMethylation(
+      input.bam.file=system.file("extdata", "test", "dragen-pe-namesort-xg-xm.bam", package="epialleleR"),
+      output.bam.file=output.bam, genome=genome, nthreads=0, verbose=FALSE
+    ),
+    list(nrecs=200, ncalled=0)
+  )
+  
+  RUnit::checkEquals(
+    callMethylation(
+      input.bam.file=system.file("extdata", "test", "dragen-se-unsort-xg.bam", package="epialleleR"),
+      output.bam.file=output.bam, genome=genome
+    ),
+    list(nrecs=100, ncalled=100)
+  )
+  
+  RUnit::checkEquals(
+    callMethylation(
       input.bam.file=system.file("extdata", "test", "bwameth-pe-namesort-yc.bam", package="epialleleR"),
       output.bam.file=output.bam, genome=genome, nthreads=0, verbose=FALSE
     ),
@@ -22,15 +38,15 @@ test_callMethylation <- function () {
   
   RUnit::checkEquals(
     callMethylation(
-      input.bam.file=system.file("extdata", "test", "dragen-pe-namesort-xg-xm.bam", package="epialleleR"),
+      input.bam.file=system.file("extdata", "test", "bsmap-pe-namesort-zs.bam", package="epialleleR"),
       output.bam.file=output.bam, genome=genome, nthreads=0, verbose=FALSE
     ),
-    list(nrecs=200, ncalled=0)
+    list(nrecs=200, ncalled=200)
   )
   
   RUnit::checkEquals(
     callMethylation(
-      input.bam.file=system.file("extdata", "test", "dragen-se-unsort-xg.bam", package="epialleleR"),
+      input.bam.file=system.file("extdata", "test", "bsmap-se-unsort-zs.bam", package="epialleleR"),
       output.bam.file=output.bam, genome=genome
     ),
     list(nrecs=100, ncalled=100)
@@ -107,4 +123,49 @@ test_callMethylation <- function () {
     identical(cx.ref, cx.call)
   )
   
+  # bwa-meth and DRAGEN: neither SE nor PE are identical
+  callMethylation(
+    input.bam.file=system.file("extdata", "test", "bwameth-se-unsort-yc.bam", package="epialleleR"),
+    output.bam.file=output.bam, genome=genome, nthreads=1, verbose=FALSE
+  )
+  cx.ref  <- generateCytosineReport(system.file("extdata", "test", "dragen-se-unsort-xg-xm.bam", package="epialleleR"),
+                                    threshold.reads=FALSE, report.context="CX") 
+  cx.call <- generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX") 
+  RUnit::checkTrue(
+    ! identical(cx.ref, cx.call)
+  )
+  
+  callMethylation(
+    input.bam.file=system.file("extdata", "test", "bwameth-pe-namesort-yc.bam", package="epialleleR"),
+    output.bam.file=output.bam, genome=genome, nthreads=1, verbose=FALSE
+  )
+  cx.ref  <- generateCytosineReport(system.file("extdata", "test", "dragen-pe-namesort-xg-xm.bam", package="epialleleR"),
+                                    threshold.reads=FALSE, report.context="CX") 
+  cx.call <- generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX") 
+  RUnit::checkTrue(
+    ! identical(cx.ref, cx.call)
+  )
+  
+  # BSMAP and DRAGEN: SE is identical, PE is not
+  callMethylation(
+    input.bam.file=system.file("extdata", "test", "bsmap-se-unsort-zs.bam", package="epialleleR"),
+    output.bam.file=output.bam, genome=genome, nthreads=1, verbose=FALSE
+  )
+  cx.ref  <- generateCytosineReport(system.file("extdata", "test", "dragen-se-unsort-xg-xm.bam", package="epialleleR"),
+                                    threshold.reads=FALSE, report.context="CX") 
+  cx.call <- generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX") 
+  RUnit::checkTrue(
+    identical(cx.ref, cx.call)
+  )
+
+  callMethylation(
+    input.bam.file=system.file("extdata", "test", "bsmap-pe-namesort-zs.bam", package="epialleleR"),
+    output.bam.file=output.bam, genome=genome, nthreads=1, verbose=FALSE
+  )
+  cx.ref  <- generateCytosineReport(system.file("extdata", "test", "dragen-pe-namesort-xg-xm.bam", package="epialleleR"),
+                                    threshold.reads=FALSE, report.context="CX") 
+  cx.call <- generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX") 
+  RUnit::checkTrue(
+    ! identical(cx.ref, cx.call)
+  )
 }
