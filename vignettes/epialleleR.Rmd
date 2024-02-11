@@ -310,7 +310,7 @@ must be performed. This can be done as follows:
 
 ```{r}
 # bwa-meth sample output
-input.bam <- system.file("extdata", "test", "bwameth-se-unsort-yc.bam", package="epialleleR")
+input.bam <- system.file("extdata", "test", "bwameth-se-unsort-yd.bam", package="epialleleR")
 
 # resulting BAM with XG/XM tags
 output.bam <- tempfile(pattern="output-", fileext=".bam")

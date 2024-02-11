@@ -74,9 +74,14 @@ test_preprocessBam <- function () {
     )
   )
   
-  # single-ended, unsorted, no XG
+  # single-ended, unsorted, no XG but there's YC
   RUnit::checkException(
-    preprocessBam(system.file("extdata", "test", "bwameth-se-unsort-yc.bam", package="epialleleR"), verbose=TRUE)
+    preprocessBam(system.file("extdata", "test", "bwameth-se-unsort-yd.bam", package="epialleleR"), verbose=TRUE)
+  )
+  
+  # single-ended, unsorted, no XG but there's ZS
+  RUnit::checkException(
+    preprocessBam(system.file("extdata", "test", "bsmap-se-unsort-zs.bam", package="epialleleR"), verbose=TRUE)
   )
   
   # single-ended, unsorted, no XM

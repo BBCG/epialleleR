@@ -22,7 +22,7 @@ test_callMethylation <- function () {
   
   RUnit::checkEquals(
     callMethylation(
-      input.bam.file=system.file("extdata", "test", "bwameth-pe-namesort-yc.bam", package="epialleleR"),
+      input.bam.file=system.file("extdata", "test", "bwameth-pe-namesort-yd.bam", package="epialleleR"),
       output.bam.file=output.bam, genome=genome, nthreads=0, verbose=FALSE
     ),
     list(nrecs=200, ncalled=170)
@@ -30,7 +30,7 @@ test_callMethylation <- function () {
   
   RUnit::checkEquals(
     callMethylation(
-      input.bam.file=system.file("extdata", "test", "bwameth-se-unsort-yc.bam", package="epialleleR"),
+      input.bam.file=system.file("extdata", "test", "bwameth-se-unsort-yd.bam", package="epialleleR"),
       output.bam.file=output.bam, genome=genome
     ),
     list(nrecs=100, ncalled=73)
@@ -72,6 +72,13 @@ test_callMethylation <- function () {
     callMethylation(
       input.bam.file=system.file("extdata", "test", "dragen-se-unsort-xg.bam", package="epialleleR"),
       output.bam.file="", genome=genome, nthreads=0, verbose=FALSE
+    )
+  )
+  
+  RUnit::checkException(
+    callMethylation(
+      input.bam.file=system.file("extdata", "test", "bwameth-se-unsort.bam", package="epialleleR"),
+      output.bam.file=output.bam, genome=genome, nthreads=0, verbose=FALSE
     )
   )
   
@@ -125,7 +132,7 @@ test_callMethylation <- function () {
   
   # bwa-meth and DRAGEN: neither SE nor PE are identical
   callMethylation(
-    input.bam.file=system.file("extdata", "test", "bwameth-se-unsort-yc.bam", package="epialleleR"),
+    input.bam.file=system.file("extdata", "test", "bwameth-se-unsort-yd.bam", package="epialleleR"),
     output.bam.file=output.bam, genome=genome, nthreads=1, verbose=FALSE
   )
   cx.ref  <- generateCytosineReport(system.file("extdata", "test", "dragen-se-unsort-xg-xm.bam", package="epialleleR"),
@@ -136,7 +143,7 @@ test_callMethylation <- function () {
   )
   
   callMethylation(
-    input.bam.file=system.file("extdata", "test", "bwameth-pe-namesort-yc.bam", package="epialleleR"),
+    input.bam.file=system.file("extdata", "test", "bwameth-pe-namesort-yd.bam", package="epialleleR"),
     output.bam.file=output.bam, genome=genome, nthreads=1, verbose=FALSE
   )
   cx.ref  <- generateCytosineReport(system.file("extdata", "test", "dragen-pe-namesort-xg-xm.bam", package="epialleleR"),
