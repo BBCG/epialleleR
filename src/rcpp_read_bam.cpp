@@ -19,6 +19,8 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
                                       int min_mapq,                             // min read mapping quality
                                       int min_baseq,                            // min base quality
                                       bool skip_duplicates,                     // skip marked duplicates
+                                      int trim5,                                // trim bases from 5'
+                                      int trim3,                                // trim bases from 3'
                                       int nthreads)                             // HTSlib threads, >0 for multiple
 {
   // constants
@@ -55,13 +57,13 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   uint8_t *templ_xm_rs   = (uint8_t*) malloc(max_templ_width * sizeof(uint8_t));// template XM array
   int templ_rname = 0, templ_start = 0, templ_strand = 0, templ_width = 0;      // template RNAME, POS, STRAND, ISIZE
   
-  #define push_template {               /* pushing template data to vectors */ \
-    rname.push_back(templ_rname + 1);                            /* RNAME+1 */ \
-    strand.push_back(templ_strand);                               /* STRAND */ \
-    start.push_back(templ_start + 1);                              /* POS+1 */ \
-    seq->emplace_back((const char*) templ_seq_rs, templ_width);      /* SEQ */ \
-    xm->emplace_back( (const char*) templ_xm_rs,  templ_width);       /* XM */ \
-    ntempls++;                                                        /* +1 */ \
+  #define push_template {                                       /* pushing template data to vectors */ \
+    rname.push_back(templ_rname + 1);                                                    /* RNAME+1 */ \
+    strand.push_back(templ_strand);                                                       /* STRAND */ \
+    start.push_back(templ_start + trim5 + 1);                                              /* POS+1 */ \
+    seq->emplace_back((const char*) templ_seq_rs + trim5, templ_width - (trim5+trim3));      /* SEQ */ \
+    xm->emplace_back( (const char*) templ_xm_rs  + trim5, templ_width - (trim5+trim3));       /* XM */ \
+    ntempls++;                                                                                /* +1 */ \
   }
   
   // process alignments
@@ -206,6 +208,8 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
                                       int min_mapq,                             // min read mapping quality
                                       int min_baseq,                            // min base quality
                                       bool skip_duplicates,                     // skip marked duplicates
+                                      int trim5,                                // trim bases from 5'
+                                      int trim3,                                // trim bases from 3'
                                       int nthreads)                             // HTSlib threads, >0 for multiple
 {
   // constants
@@ -314,9 +318,9 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
     // pushing record data to vectors
     rname.push_back(bam_rec->core.tid + 1);                                     // RNAME+1 
     strand.push_back(( record_strand[1] == 'C' ) ? 1 : 2);                      // STRAND is 1 if "ZCT"/"+", 2 if "ZGA"/"-"
-    start.push_back(bam_rec->core.pos + 1);                                     // POS+1 
-    seq->emplace_back((const char*) record_seq_rs, dest_pos);                   // SEQ 
-    xm->emplace_back( (const char*) record_xm_rs,  dest_pos);                   // XM 
+    start.push_back(bam_rec->core.pos + trim5 +1);                              // POS+1 
+    seq->emplace_back((const char*) record_seq_rs + trim5, dest_pos - (trim5+trim3)); // SEQ 
+    xm->emplace_back( (const char*) record_xm_rs + trim5,  dest_pos - (trim5+trim3)); // XM 
     npushed++;                                                                  // +1 
     
     record_width = dest_pos;                                                    // because bam_rec->core.isize can be 0 for single-end

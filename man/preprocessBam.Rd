@@ -10,6 +10,7 @@ preprocessBam(
   min.mapq = 0,
   min.baseq = 0,
   skip.duplicates = FALSE,
+  trim = 0,
   nthreads = 1,
   verbose = TRUE
 )
@@ -29,6 +30,13 @@ quality (default: 0).}
 \item{skip.duplicates}{boolean defining if duplicate aligned reads should be
 skipped (default: FALSE). Option has no effect if duplicate reads were not
 marked by alignment software.}
+
+\item{trim}{non-negative integer or vector of length 2 for the number of
+nucleotide bases to be trimmed from 5' and 3' ends of a template (i.e., 
+read pair for paired-end BAM or read for single-end BAM).
+Default: 0 for no trimming. Specifying `trim=1` will result in removing of
+a single base from both ends, while specifying `trim=c(1,2)` will
+result in removing of a single base from 5' end and 2 bases from 3' end.}
 
 \item{nthreads}{non-negative integer for the number of additional HTSlib
 threads to be used during BAM file decompression (default: 1). Two threads
@@ -85,6 +93,14 @@ During preprocessing of single-end alignments, no read merging is
 performed. Only bases with quality of at least `min.baseq` are considered.
 Lower base quality results in no information for that particular position
 ("-"/"N").
+
+For RRBS-like protocols, it is possible to trim alignments from one or both
+ends. Trimming is performed during BAM loading and will therefore influence
+results of all downstream `epialleleR` methods. Internally, trimming is
+performed at the level of a template (i.e., read pair for paired-end BAM or
+individual read for single-end BAM). This ensures that only necessary parts
+(real ends of sequenced fragment) are removed for paired-end sequencing
+reads.
 
 It is also a requirement currently that paired-end BAM file must be sorted by
 QNAME instead

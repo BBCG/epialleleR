@@ -46,6 +46,27 @@ test_generateCytosineReport <- function () {
   
   generateCytosineReport(capture.bam, report.file=tempfile())
   
+  cx.trim <- generateCytosineReport(capture.bam, threshold.reads=FALSE,
+                                    trim=3, report.context="CX", verbose=FALSE)
+  cx.notrim <- generateCytosineReport(capture.bam, threshold.reads=FALSE,
+                                    trim=0, report.context="CX", verbose=FALSE)
+  RUnit::checkTrue(
+    ! identical(cx.trim, cx.notrim)
+  )
+  
+  RUnit::checkTrue(
+    identical(
+      data.table::merge.data.table(
+        cx.trim[, .(rname, strand, pos, context)],
+        cx.trim[, .(rname, strand, pos, context)]
+      ),
+      data.table::merge.data.table(
+        cx.trim[,   .(rname, strand, pos, context)],
+        cx.notrim[, .(rname, strand, pos, context)]
+      )
+    )
+  )
+  
   
   cg.quality  <- generateCytosineReport(capture.bam, verbose=TRUE,
                                         min.mapq=30, min.baseq=20)
@@ -109,6 +130,32 @@ test_generateCytosineReport <- function () {
   RUnit::checkEquals(
     c(sum(cx.single$meth), sum(cx.single$unmeth)),
     c(355, 3599)
+  )
+  
+  cx.trim <- generateCytosineReport(
+    system.file("extdata", "test", "dragen-se-unsort-xg-xm.bam", package="epialleleR"),
+    threshold.reads=FALSE, trim=1, report.context="CX", verbose=FALSE
+  )
+  cx.notrim <- generateCytosineReport(
+    system.file("extdata", "test", "dragen-se-unsort-xg-xm.bam", package="epialleleR"),
+    threshold.reads=FALSE, trim=0, report.context="CX", verbose=FALSE
+  )
+  
+  RUnit::checkTrue(
+    ! identical(cx.trim, cx.notrim)
+  )
+  
+  RUnit::checkTrue(
+    identical(
+      data.table::merge.data.table(
+        cx.trim[, .(rname, strand, pos, context)],
+        cx.trim[, .(rname, strand, pos, context)]
+      ),
+      data.table::merge.data.table(
+        cx.trim[,   .(rname, strand, pos, context)],
+        cx.notrim[, .(rname, strand, pos, context)]
+      )
+    )
   )
   
 }

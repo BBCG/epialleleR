@@ -41,12 +41,12 @@ rcpp_mhl_report <- function(df, ctx, hmax, hmin) {
     .Call(`_epialleleR_rcpp_mhl_report`, df, ctx, hmax, hmin)
 }
 
-rcpp_read_bam_paired <- function(fn, min_mapq, min_baseq, skip_duplicates, nthreads) {
-    .Call(`_epialleleR_rcpp_read_bam_paired`, fn, min_mapq, min_baseq, skip_duplicates, nthreads)
+rcpp_read_bam_paired <- function(fn, min_mapq, min_baseq, skip_duplicates, trim5, trim3, nthreads) {
+    .Call(`_epialleleR_rcpp_read_bam_paired`, fn, min_mapq, min_baseq, skip_duplicates, trim5, trim3, nthreads)
 }
 
-rcpp_read_bam_single <- function(fn, min_mapq, min_baseq, skip_duplicates, nthreads) {
-    .Call(`_epialleleR_rcpp_read_bam_single`, fn, min_mapq, min_baseq, skip_duplicates, nthreads)
+rcpp_read_bam_single <- function(fn, min_mapq, min_baseq, skip_duplicates, trim5, trim3, nthreads) {
+    .Call(`_epialleleR_rcpp_read_bam_single`, fn, min_mapq, min_baseq, skip_duplicates, trim5, trim3, nthreads)
 }
 
 rcpp_read_genome <- function(fn, nthreads) {

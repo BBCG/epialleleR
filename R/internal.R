@@ -23,6 +23,7 @@
 #' @importFrom methods is
 #' @importFrom utils globalVariables
 #' @importFrom utils packageVersion
+#' @importFrom utils head
 #' @importFrom Rcpp evalCpp
 #' @useDynLib epialleleR, .registration=TRUE
 
@@ -142,6 +143,7 @@ utils::globalVariables(
                       min.mapq,
                       min.baseq,
                       skip.duplicates,
+                      trim,
                       nthreads,
                       verbose)
 {
@@ -152,10 +154,12 @@ utils::globalVariables(
   bam.file <- path.expand(bam.file)
   if (paired) {
     bam.processed <- rcpp_read_bam_paired(bam.file, min.mapq, min.baseq, 
-                                          skip.duplicates, nthreads)
+                                          skip.duplicates, trim[1], trim[2],
+                                          nthreads)
   } else {
     bam.processed <- rcpp_read_bam_single(bam.file, min.mapq, min.baseq, 
-                                          skip.duplicates, nthreads)
+                                          skip.duplicates, trim[1], trim[2],
+                                          nthreads)
   }
   
   data.table::setDT(bam.processed)

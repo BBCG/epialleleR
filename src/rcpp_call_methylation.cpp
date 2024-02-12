@@ -97,7 +97,7 @@ const unsigned char triad_reverse_context[512] = {
 Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     // input BAM file name
                                          std::string out_fn,                    // output BAM file name
                                          Rcpp::List &genome,                    // genome object (list+XPtr)
-                                         std::string tag,                       // what tag to read genome strand from (XG/YC)
+                                         std::string tag,                       // what tag to read genome strand from (XG/YD/ZS)
                                          int nthreads)                          // HTSlib threads, >0 for multiple
 {
   // genome data

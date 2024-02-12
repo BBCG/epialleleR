@@ -46,6 +46,14 @@
 #' Lower base quality results in no information for that particular position
 #' ("-"/"N").
 #' 
+#' For RRBS-like protocols, it is possible to trim alignments from one or both
+#' ends. Trimming is performed during BAM loading and will therefore influence
+#' results of all downstream `epialleleR` methods. Internally, trimming is
+#' performed at the level of a template (i.e., read pair for paired-end BAM or
+#' individual read for single-end BAM). This ensures that only necessary parts
+#' (real ends of sequenced fragment) are removed for paired-end sequencing
+#' reads.
+#' 
 #' It is also a requirement currently that paired-end BAM file must be sorted by
 #' QNAME instead
 #' of genomic location (i.e., "unsorted") to perform merging of paired-end
@@ -63,6 +71,12 @@
 #' @param skip.duplicates boolean defining if duplicate aligned reads should be
 #' skipped (default: FALSE). Option has no effect if duplicate reads were not
 #' marked by alignment software.
+#' @param trim non-negative integer or vector of length 2 for the number of
+#' nucleotide bases to be trimmed from 5' and 3' ends of a template (i.e., 
+#' read pair for paired-end BAM or read for single-end BAM).
+#' Default: 0 for no trimming. Specifying `trim=1` will result in removing of
+#' a single base from both ends, while specifying `trim=c(1,2)` will
+#' result in removing of a single base from 5' end and 2 bases from 3' end.
 #' @param nthreads non-negative integer for the number of additional HTSlib
 #' threads to be used during BAM file decompression (default: 1). Two threads
 #' (and usually no more than two) make sense for the files larger than 100 MB.
@@ -92,6 +106,7 @@ preprocessBam <- function (bam.file,
                            min.mapq=0,
                            min.baseq=0,
                            skip.duplicates=FALSE,
+                           trim=0,
                            nthreads=1,
                            verbose=TRUE)
 {
@@ -100,15 +115,18 @@ preprocessBam <- function (bam.file,
     if (!is.null(paired))
       if (paired.check!=paired)
         stop("Expected endness is different from detected! Exiting",call.=FALSE)
+    trim <- utils::head(rep.int(trim, times=2), 2)
     bam.processed <- .readBam(
       bam.file=bam.file, paired=paired.check,
       min.mapq=min.mapq, min.baseq=min.baseq,
-      skip.duplicates=skip.duplicates, nthreads=nthreads, verbose=verbose
+      skip.duplicates=skip.duplicates, trim=trim,
+      nthreads=nthreads, verbose=verbose
     )
     return(bam.processed)
   } else {
-    if (verbose & !all(missing(paired), missing(min.mapq), missing(min.baseq),
-                       missing(skip.duplicates), missing(nthreads))) 
+    if (verbose &
+        !all(missing(paired), missing(min.mapq), missing(min.baseq),
+             missing(skip.duplicates), missing(trim), missing(nthreads))) 
       message("Already preprocessed BAM supplied as an input. Explicitly set",
               " 'preprocessBam' options will have no effect.")
     return(bam.file)
