@@ -9,7 +9,7 @@
 // [+] counting all AUX tags, with special interest in:
 //     [+] XM: Illumina/Bismark methylation calls
 //     [+] XG: Illumina/Bismark genome strand (CT or GA)
-//     [+] YC: bwa-meth genome strand (CT or GA)
+//     [+] YD: bwa-meth genome strand (CT or GA)
 //     [+] ZS: bsmap genome strand (++, +-, -+, -- as <reference><read>)
 //     [+] MM: BAM base modification tag
 //

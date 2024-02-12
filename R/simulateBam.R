@@ -59,7 +59,7 @@
 #' @param ... optional tags to add to the records, in the form `tag=value`.
 #' Can be either integer vector (e.g., for "NM" tag),
 #' or character vector (e.g., "XM" tag for methylation call string,
-#' "XG"/"YC" tag for reference strand read was aligned to).
+#' "XG"/"YD"/"ZS" tag for reference strand read was aligned to).
 #' @param verbose boolean to report progress and timings (default: TRUE).
 #' @return number of BAM records written (if `output.bam.file` is not NULL) or
 #' \code{\link[data.table]{data.table}} object containing final records
