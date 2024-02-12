@@ -69,6 +69,7 @@
 <span>  min.mapq <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  min.baseq <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  skip.duplicates <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  trim <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  nthreads <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -99,6 +100,15 @@ quality (default: 0).</p></dd>
 <dd><p>boolean defining if duplicate aligned reads should be
 skipped (default: FALSE). Option has no effect if duplicate reads were not
 marked by alignment software.</p></dd>
+
+
+<dt>trim</dt>
+<dd><p>non-negative integer or vector of length 2 for the number of
+nucleotide bases to be trimmed from 5' and 3' ends of a template (i.e., 
+read pair for paired-end BAM or read for single-end BAM).
+Default: 0 for no trimming. Specifying `trim=1` will result in removing of
+a single base from both ends, while specifying `trim=c(1,2)` will
+result in removing of a single base from 5' end and 2 bases from 3' end.</p></dd>
 
 
 <dt>nthreads</dt>
@@ -156,6 +166,13 @@ with the highest quality is taken.</p>
 performed. Only bases with quality of at least `min.baseq` are considered.
 Lower base quality results in no information for that particular position
 ("-"/"N").</p>
+<p>For RRBS-like protocols, it is possible to trim alignments from one or both
+ends. Trimming is performed during BAM loading and will therefore influence
+results of all downstream `epialleleR` methods. Internally, trimming is
+performed at the level of a template (i.e., read pair for paired-end BAM or
+individual read for single-end BAM). This ensures that only necessary parts
+(real ends of sequenced fragment) are removed for paired-end sequencing
+reads.</p>
 <p>It is also a requirement currently that paired-end BAM file must be sorted by
 QNAME instead
 of genomic location (i.e., "unsorted") to perform merging of paired-end
