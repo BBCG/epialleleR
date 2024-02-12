@@ -9,6 +9,10 @@ test_preprocessBam <- function () {
     c(2968,4)
   )
   
+  nil <- preprocessBam(capture.data, verbose=TRUE)
+  nil <- preprocessBam(capture.data, verbose=TRUE, min.mapq=10)
+  nil <- preprocessBam(capture.data, verbose=TRUE, nthreads=2)
+  
   RUnit::checkEquals(
     preprocessBam(capture.data, verbose=TRUE),
     capture.data

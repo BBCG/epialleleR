@@ -107,7 +107,8 @@ preprocessBam <- function (bam.file,
     )
     return(bam.processed)
   } else {
-    if (verbose) 
+    if (verbose & !all(missing(paired), missing(min.mapq), missing(min.baseq),
+                       missing(skip.duplicates), missing(nthreads))) 
       message("Already preprocessed BAM supplied as an input. Explicitly set",
               " 'preprocessBam' options will have no effect.")
     return(bam.file)

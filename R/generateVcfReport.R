@@ -182,7 +182,7 @@ generateVcfReport <- function (bam,
     vcf <- .readVcf(vcf.file=vcf, vcf.style=vcf.style,
                     bed=bed, verbose=verbose)
   } else {
-    if (verbose)
+    if (verbose & !all(missing(bed), missing(zero.based.bed)))
       message("Already preprocessed VCF supplied as an input. Options",
               " 'bed' and 'zero.based.bed' will have no effect.")
   }
