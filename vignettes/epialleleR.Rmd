@@ -295,6 +295,14 @@ performed. Only bases with quality of at least *`min.baseq`* are considered.
 Lower base quality results in no information for that particular position
 ("-"/"N").
 
+For RRBS-like protocols, it is possible to trim alignments from one or both
+ends. Trimming is performed during BAM loading and will therefore influence
+results of all downstream *`epialleleR`* methods. Internally, trimming is
+performed at the level of a template (i.e., read pair for paired-end BAM or
+individual read for single-end BAM). This ensures that only necessary parts
+(real ends of sequenced fragment) are removed for paired-end sequencing
+reads.
+
 ```{r}
 library(epialleleR)
 

@@ -148,8 +148,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_read_bam_paired
-Rcpp::DataFrame rcpp_read_bam_paired(std::string fn, int min_mapq, int min_baseq, bool skip_duplicates, int nthreads);
-RcppExport SEXP _epialleleR_rcpp_read_bam_paired(SEXP fnSEXP, SEXP min_mapqSEXP, SEXP min_baseqSEXP, SEXP skip_duplicatesSEXP, SEXP nthreadsSEXP) {
+Rcpp::DataFrame rcpp_read_bam_paired(std::string fn, int min_mapq, int min_baseq, bool skip_duplicates, int trim5, int trim3, int nthreads);
+RcppExport SEXP _epialleleR_rcpp_read_bam_paired(SEXP fnSEXP, SEXP min_mapqSEXP, SEXP min_baseqSEXP, SEXP skip_duplicatesSEXP, SEXP trim5SEXP, SEXP trim3SEXP, SEXP nthreadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -157,14 +157,16 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type min_mapq(min_mapqSEXP);
     Rcpp::traits::input_parameter< int >::type min_baseq(min_baseqSEXP);
     Rcpp::traits::input_parameter< bool >::type skip_duplicates(skip_duplicatesSEXP);
+    Rcpp::traits::input_parameter< int >::type trim5(trim5SEXP);
+    Rcpp::traits::input_parameter< int >::type trim3(trim3SEXP);
     Rcpp::traits::input_parameter< int >::type nthreads(nthreadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_read_bam_paired(fn, min_mapq, min_baseq, skip_duplicates, nthreads));
+    rcpp_result_gen = Rcpp::wrap(rcpp_read_bam_paired(fn, min_mapq, min_baseq, skip_duplicates, trim5, trim3, nthreads));
     return rcpp_result_gen;
 END_RCPP
 }
 // rcpp_read_bam_single
-Rcpp::DataFrame rcpp_read_bam_single(std::string fn, int min_mapq, int min_baseq, bool skip_duplicates, int nthreads);
-RcppExport SEXP _epialleleR_rcpp_read_bam_single(SEXP fnSEXP, SEXP min_mapqSEXP, SEXP min_baseqSEXP, SEXP skip_duplicatesSEXP, SEXP nthreadsSEXP) {
+Rcpp::DataFrame rcpp_read_bam_single(std::string fn, int min_mapq, int min_baseq, bool skip_duplicates, int trim5, int trim3, int nthreads);
+RcppExport SEXP _epialleleR_rcpp_read_bam_single(SEXP fnSEXP, SEXP min_mapqSEXP, SEXP min_baseqSEXP, SEXP skip_duplicatesSEXP, SEXP trim5SEXP, SEXP trim3SEXP, SEXP nthreadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -172,8 +174,10 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type min_mapq(min_mapqSEXP);
     Rcpp::traits::input_parameter< int >::type min_baseq(min_baseqSEXP);
     Rcpp::traits::input_parameter< bool >::type skip_duplicates(skip_duplicatesSEXP);
+    Rcpp::traits::input_parameter< int >::type trim5(trim5SEXP);
+    Rcpp::traits::input_parameter< int >::type trim3(trim3SEXP);
     Rcpp::traits::input_parameter< int >::type nthreads(nthreadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_read_bam_single(fn, min_mapq, min_baseq, skip_duplicates, nthreads));
+    rcpp_result_gen = Rcpp::wrap(rcpp_read_bam_single(fn, min_mapq, min_baseq, skip_duplicates, trim5, trim3, nthreads));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -234,8 +238,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_epialleleR_rcpp_match_amplicon", (DL_FUNC) &_epialleleR_rcpp_match_amplicon, 3},
     {"_epialleleR_rcpp_match_capture", (DL_FUNC) &_epialleleR_rcpp_match_capture, 3},
     {"_epialleleR_rcpp_mhl_report", (DL_FUNC) &_epialleleR_rcpp_mhl_report, 4},
-    {"_epialleleR_rcpp_read_bam_paired", (DL_FUNC) &_epialleleR_rcpp_read_bam_paired, 5},
-    {"_epialleleR_rcpp_read_bam_single", (DL_FUNC) &_epialleleR_rcpp_read_bam_single, 5},
+    {"_epialleleR_rcpp_read_bam_paired", (DL_FUNC) &_epialleleR_rcpp_read_bam_paired, 7},
+    {"_epialleleR_rcpp_read_bam_single", (DL_FUNC) &_epialleleR_rcpp_read_bam_single, 7},
     {"_epialleleR_rcpp_read_genome", (DL_FUNC) &_epialleleR_rcpp_read_genome, 2},
     {"_epialleleR_rcpp_simulate_bam", (DL_FUNC) &_epialleleR_rcpp_simulate_bam, 5},
     {"_epialleleR_rcpp_threshold_reads", (DL_FUNC) &_epialleleR_rcpp_threshold_reads, 8},

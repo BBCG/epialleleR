@@ -78,7 +78,7 @@ test_preprocessBam <- function () {
     )
   )
   
-  # single-ended, unsorted, no XG but there's YC
+  # single-ended, unsorted, no XG but there's YD
   RUnit::checkException(
     preprocessBam(system.file("extdata", "test", "bwameth-se-unsort-yd.bam", package="epialleleR"), verbose=TRUE)
   )
@@ -104,9 +104,9 @@ test_preprocessBam <- function () {
   )
  
   # internal coverage
-  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon000meth.bam", package="epialleleR"), 5, 5, TRUE, 1)
-  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon010meth.bam", package="epialleleR"), 5, 5, TRUE, 1)
-  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon100meth.bam", package="epialleleR"), 5, 5, TRUE, 1)
-  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "capture.bam", package="epialleleR"), 5, 5, TRUE, 1)
+  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon000meth.bam", package="epialleleR"), 5, 5, TRUE, 0, 0, 1)
+  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon010meth.bam", package="epialleleR"), 5, 5, TRUE, 1, 1, 1)
+  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon100meth.bam", package="epialleleR"), 5, 5, TRUE, 2, 2, 1)
+  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "capture.bam", package="epialleleR"), 5, 5, TRUE, 4, 4, 1)
 
 }
