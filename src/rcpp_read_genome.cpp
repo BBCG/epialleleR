@@ -51,7 +51,7 @@ Rcpp::List rcpp_read_genome (std::string fn,                                    
   
   // file IO
   faidx_t *faidx = fai_load(fn.c_str());                                        // FASTA index
-  if (faidx==NULL) Rcpp::stop("Unable to open FASTA index for reading");        // fall back if error
+  if (!faidx) Rcpp::stop("Unable to open FASTA index for reading");             // fall back if error
   
   hts_tpool *tpool = NULL;                                                      // thread pool works correctly
   if (nthreads>0) {

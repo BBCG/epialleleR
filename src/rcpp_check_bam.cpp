@@ -24,9 +24,9 @@ Rcpp::List rcpp_check_bam (std::string fn)                                      
 
   // file IO
   htsFile *bam_fp = hts_open(fn.c_str(), "r");                                  // try open file
-  if (bam_fp==NULL) Rcpp::stop("Unable to open BAM file for reading");          // fall back if error
+  if (!bam_fp) Rcpp::stop("Unable to open BAM file for reading");               // fall back if error
   bam_hdr_t *bam_hdr = sam_hdr_read(bam_fp);                                    // try read file header
-  if (bam_hdr==NULL) Rcpp::stop("Unable to read BAM header");                   // fall back if error  
+  if (!bam_hdr) Rcpp::stop("Unable to read BAM header");                        // fall back if error  
   bam1_t *bam_rec = bam_init1();                                                // create BAM alignment structure
   
   // main counters

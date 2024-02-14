@@ -107,9 +107,9 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
   
   // file IO
   htsFile *in_fp = hts_open(in_fn.c_str(), "r");                                // try open input file
-  if (in_fp==NULL) Rcpp::stop("Unable to open input BAM file for reading");     // fall back if error
+  if (!in_fp) Rcpp::stop("Unable to open input BAM file for reading");          // fall back if error
   htsFile *out_fp = hts_open(out_fn.c_str(), "wb");                             // try open output file
-  if (out_fp==NULL) Rcpp::stop("Unable to open output BAM file for writing");   // fall back if error
+  if (!out_fp) Rcpp::stop("Unable to open output BAM file for writing");        // fall back if error
   // shared thread pool
   htsThreadPool thread_pool = {NULL, 0};                                        // thread pool cuts time by 30%
   if (nthreads>0) {
@@ -119,7 +119,7 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
   }
   
   bam_hdr_t *in_hdr = sam_hdr_read(in_fp);                                      // try read input file header
-  if (in_hdr==NULL) Rcpp::stop("Unable to read input BAM header");              // fall back if error
+  if (!in_hdr) Rcpp::stop("Unable to read input BAM header");                   // fall back if error
   if (sam_hdr_write(out_fp, in_hdr) < 0) Rcpp::stop("Unable to write header");  // try write output file header
   
   // vars
@@ -146,8 +146,8 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
     char *record_strand = (char*) bam_aux_get(in_rec, tag.c_str());             // genome strand ("ZCT" or "ZGA")
     char *record_xm = (char*) bam_aux_get(in_rec, "XM");                        // methylation string (XM)
     if ((in_rec->core.flag & BAM_FUNMAP) ||                                     // if unmapped
-        (record_strand==NULL) ||                                                // or genome strand is unknown
-        (record_xm!=NULL))                                                      // or XM is already present
+        (!record_strand) ||                                                     // or genome strand is unknown
+        (record_xm))                                                            // or XM is already present
       goto writeout;                                                            // don't do anything, just write out
     
     {
@@ -165,7 +165,7 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
         max_query_width = query_width;                                          // new max
         rs = (char *) realloc(rs, (max_query_width+4) * sizeof(char));          // expand rs holder
         xm = (char *) realloc(xm, max_query_width * sizeof(char));              // expand xm holder
-        if ((rs==NULL) || (xm==NULL)) Rcpp::stop("No memory for BAM record #%i", nrecs); // check memory allocation
+        if (!rs || !xm) Rcpp::stop("No memory for BAM record #%i", nrecs);      // check memory allocation
       }
 
       // apply CIGAR to reference seq (convert from reference to query space)
@@ -234,13 +234,13 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
         
       }
       
-      // if ((record_xm!=NULL) && (memcmp(xm, record_xm+1, query_width)!=0)) {     // check differences with available XM
+      // if ((record_xm) && (memcmp(xm, record_xm+1, query_width)!=0)) {     // check differences with available XM
       //   Rcpp::Rcout << nrecs << ": S|" << std::string(rs, query_width+4) << std::endl;
       //   Rcpp::Rcout << nrecs << ": R|  " << std::string(record_xm+1, query_width) << std::endl;
       //   Rcpp::Rcout << nrecs << ": C|  " << std::string(xm, query_width) << std::endl;
       // }
       
-      // if (record_xm==NULL)
+      // if (!record_xm)
       bam_aux_update_str(in_rec, "XM", query_width, xm);                        // since XM tag is absent, add it
       ncalled++;                                                                // successfully called
     }

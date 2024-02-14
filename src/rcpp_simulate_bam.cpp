@@ -36,11 +36,11 @@ int rcpp_simulate_bam (std::vector<std::string> header,                         
   
   // file IO
   htsFile *out_fp = hts_open(out_fn.c_str(), "wb");                             // try open output file
-  if (out_fp==NULL) Rcpp::stop("Unable to open output BAM file for writing");   // fall back if error
+  if (!out_fp) Rcpp::stop("Unable to open output BAM file for writing");        // fall back if error
   
   // header
   bam_hdr_t *out_hdr = sam_hdr_init();                                          // try init file header
-  if (out_hdr==NULL) Rcpp::stop("Unable to init BAM header");                   // fall back if error
+  if (!out_hdr) Rcpp::stop("Unable to init BAM header");                        // fall back if error
   for (size_t i=0; i<header.size(); i++)
     sam_hdr_add_lines(out_hdr, header[i].c_str(), 0);                           // fill the header
   if (sam_hdr_write(out_fp, out_hdr) < 0) Rcpp::stop("Unable to write header"); // try write output file header
