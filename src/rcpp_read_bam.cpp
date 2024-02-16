@@ -13,7 +13,7 @@
 // [?] reverse QNAME
 // [ ] free resources on interrupt
 
-// PAIRED-END BAM
+// SHORT-READ PAIRED-END BAM
 
 // [[Rcpp::export]]
 Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           // file name
@@ -201,7 +201,7 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
 
 // #############################################################################
 
-// SINGLE-END BAM
+// SHORT-READ SINGLE-END BAM
 
 // [[Rcpp::export]]
 Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           // file name
@@ -254,11 +254,6 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
     char *record_xm = (char*) bam_aux_get(bam_rec, "XM");                       // methylation string
     if (!record_strand || !record_xm) continue;                                 // skip if no XM/XG tags (no methylation info available)
     
-    // clean after old record
-    std::memset(record_seq_rs, 'N', record_width);
-    std::memset(record_xm_rs,  '-', record_width);
-    
-    // start with new record
     // get record sequence, XM, quality string
     uint8_t *record_qual = bam_get_qual(bam_rec);                               // quality string (Phred scale with no +33 offset)
     record_xm++;                                                                // remove leading 'Z' from XM string
@@ -276,6 +271,10 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
       record_xm_rs   = (uint8_t *) realloc(record_xm_rs,  record_width * sizeof(uint8_t));
       if (!record_seq_rs || !record_xm_rs) Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs); // check memory allocation
     }
+    
+    // prepare for the new record
+    std::memset(record_seq_rs, 'N', record_width);
+    std::memset(record_xm_rs,  '-', record_width);
     
     // apply CIGAR
     uint32_t query_pos = 0;                                                     // starting position in query array
@@ -321,8 +320,6 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
     seq->emplace_back((const char*) record_seq_rs + trim5, dest_pos - (trim5+trim3)); // SEQ 
     xm->emplace_back( (const char*) record_xm_rs + trim5,  dest_pos - (trim5+trim3)); // XM 
     npushed++;                                                                  // +1 
-    
-    record_width = dest_pos;                                                    // because bam_rec->core.isize can be 0 for single-end
   }
   
   // cleaning
@@ -366,7 +363,7 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
 
 // #############################################################################
 
-// LONG-READ SEQUENCING BAM
+// LONG-READ BAM
 // https://samtools.github.io/hts-specs/SAMv1.pdf
 // https://samtools.github.io/hts-specs/SAMtags.pdf
 
@@ -426,15 +423,11 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
         (skip_duplicates && (bam_rec->core.flag & BAM_FDUP))) continue;         // or if record is an optical/PCR duplicate
 
     int record_strand = ! ( bam_rec->core.flag & BAM_FREVERSE );                // genome strand, 0 if forward, 1 if reverse
-    char *record_mm = (char*) bam_aux_get(bam_rec, "MM");                       // MM base modification tag
-    // add ML tag parsing later; it might be quite complex
-    if (!record_mm) continue;                                                   // skip if no MM tag (no base modification info available)
+    
+    // char *record_mm = (char*) bam_aux_get(bam_rec, "MM");                       // MM base modification tag
+    // // add ML tag parsing later; it might be quite complex
+    // if (!record_mm) continue;                                                   // skip if no MM tag (no base modification info available)
 
-    // clean after old record
-    std::memset(record_seq_rs, 'N', record_width);
-    std::memset(record_xm_rs,  '-', record_width);
-
-    // start with new record
     // get record sequence, quality string
     uint8_t *record_qual = bam_get_qual(bam_rec);                               // quality string (Phred scale with no +33 offset)
     uint8_t *record_pseq = bam_get_seq(bam_rec);                                // packed sequence string (4 bit per base)
@@ -460,6 +453,10 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
       if (!record_seq_rs || !record_xm_rs) Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs); // check memory allocation
     }
 
+    // prepare for the new record
+    std::memset(record_seq_rs, 'N', record_width);
+    std::memset(record_xm_rs,  '-', record_width);
+    
     // unpack the sequence string
     for (int i=0; i<query_width; i++) {
       record_seq[i+2] = seq_nt16_str[bam_seqi(record_pseq,i)];
@@ -519,7 +516,9 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
     xm->emplace_back( (const char*) record_xm_rs + trim5,  dest_pos - (trim5+trim3)); // XM
     npushed++;                                                                  // +1
 
-    record_width = dest_pos;                                                    // because bam_rec->core.isize can be 0 for single-end
+    Rcpp::Rcout << "dest_pos:" << dest_pos << ", record_width:" << record_width << ", query_width:" << query_width << ", strand:" << strand.back() << "\n";
+    Rcpp::Rcout << seq->back().substr(0, std::min(record_width, 100)) << "\n";
+    Rcpp::Rcout << xm->back().substr(0, std::min(record_width, 100)) << "\n\n";
   }
 
   // cleaning
