@@ -468,7 +468,7 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
     std::memset(record_seq+query_width, 'N', 2);
 
     // create a non-refspaced context string
-    int context_shift = record_strand ? 2 : 0;                                  // start making genomic context from 2nd base for fwd strand, and 0th base for reverse
+    int context_shift = record_strand ? 0 : 2;                                  // start making genomic context from 2nd base for fwd strand, and 0th base for reverse
     const unsigned char* context_map = context_shift ? triad_forward_context : triad_reverse_context; // lookup table to use
     for (int i=0; i<query_width; i++) {
       record_xm[i] = triad_to_ctx((record_seq+context_shift+i), context_map);   // look up context
