@@ -49,6 +49,10 @@ rcpp_read_bam_single <- function(fn, min_mapq, min_baseq, skip_duplicates, trim5
     .Call(`_epialleleR_rcpp_read_bam_single`, fn, min_mapq, min_baseq, skip_duplicates, trim5, trim3, nthreads)
 }
 
+rcpp_read_bam_mm <- function(fn, min_mapq, min_baseq, skip_duplicates, trim5, trim3, nthreads) {
+    .Call(`_epialleleR_rcpp_read_bam_mm`, fn, min_mapq, min_baseq, skip_duplicates, trim5, trim3, nthreads)
+}
+
 rcpp_read_genome <- function(fn, nthreads) {
     .Call(`_epialleleR_rcpp_read_genome`, fn, nthreads)
 }

@@ -69,8 +69,8 @@ symbols, MRSVWYHKDB) within sequences are converted to N.
 
 As a reference sequence, the function expects either location of
 (preferably `bgzip`ped) FASTA file or an object obtained by
-\code{\link{preprocessGenome}}. The latter is preferred if methylation
-calling is performed on multiple BAM files.
+\code{\link{preprocessGenome}}. The latter is recommended if methylation
+calling is to be performed on multiple BAM files.
 
 The alignment records of the output BAM file will contain additional XM tag
 with the methylation
