@@ -411,8 +411,8 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
 
   // read holders
   int query_width = max_query_width;                                            // NON-refspaced query length
-  uint8_t *record_seq = (uint8_t*) malloc((query_width+2) * sizeof(uint8_t));   // NON-refspaced query SEQ array, plus NN at the end
-  uint8_t *record_xm  = (uint8_t*) malloc((query_width+2) * sizeof(uint8_t));   // NON-refspaced query XM array, also +2 bases
+  uint8_t *record_seq = (uint8_t*) malloc((query_width+4) * sizeof(uint8_t));   // NON-refspaced query SEQ array, plus NN at the end
+  uint8_t *record_xm  = (uint8_t*) malloc( query_width    * sizeof(uint8_t));   // NON-refspaced query XM array
   int record_width = max_record_width;                                          // refspaced record ISIZE/TLEN
   uint8_t *record_seq_rs  = (uint8_t*) malloc(record_width * sizeof(uint8_t));  // refspaced record SEQ array
   uint8_t *record_xm_rs   = (uint8_t*) malloc(record_width * sizeof(uint8_t));  // refspaced record XM array
@@ -442,14 +442,14 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
     // get CIGAR
     uint32_t n_cigar = bam_rec->core.n_cigar;                                   // number of CIGAR operations
     uint32_t *record_cigar = bam_get_cigar(bam_rec);                            // CIGAR array
-    query_width = abs(in_rec->core.l_qseq);                                     // NON-refspaced query width
+    query_width = abs(bam_rec->core.l_qseq);                                    // NON-refspaced query width
     record_width = bam_cigar2rlen(n_cigar, record_cigar);                       // reference length for the current query (refspaced)
 
     // resize containers if necessary
     if (query_width > max_query_width) {
       max_query_width = query_width;                                            // expand template holders
-      record_seq = (uint8_t *) realloc(record_seq, (query_width+2) * sizeof(uint8_t));
-      record_xm  = (uint8_t *) realloc(record_xm,  (query_width+2) * sizeof(uint8_t));
+      record_seq = (uint8_t *) realloc(record_seq, (query_width+4) * sizeof(uint8_t));
+      record_xm  = (uint8_t *) realloc(record_xm,   query_width    * sizeof(uint8_t));
       if (!record_seq || !record_xm) Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs); // check memory allocation
 
     }
@@ -462,13 +462,16 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
 
     // unpack the sequence string
     for (int i=0; i<query_width; i++) {
-      record_seq[i] = seq_nt16_str[bam_seqi(record_pseq,i)];
+      record_seq[i+2] = seq_nt16_str[bam_seqi(record_pseq,i)];
     }
+    std::memset(record_seq, 'N', 2);
     std::memset(record_seq+query_width, 'N', 2);
 
-     // create a non-refspaced context string
+    // create a non-refspaced context string
+    int context_shift = record_strand ? 2 : 0;                                  // start making genomic context from 2nd base for fwd strand, and 0th base for reverse
+    const unsigned char* context_map = context_shift ? triad_forward_context : triad_reverse_context; // lookup table to use
     for (int i=0; i<query_width; i++) {
-      record_xm[i] = triad_to_ctx((record_seq+i), triad_forward_context);       // look up context
+      record_xm[i] = triad_to_ctx((record_seq+context_shift+i), context_map);   // look up context
     }
 
     // apply CIGAR
@@ -483,7 +486,7 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
       case BAM_CDIFF :                                                          // 'X', 8
         for (size_t j=0; j<cigar_oplen; j++) {
           if (record_qual[query_pos+j] >= min_baseq) {
-            record_seq_rs[dest_pos+j] = seq_nt16_str[bam_seqi(record_pseq,query_pos+j)];
+            record_seq_rs[dest_pos+j] = record_seq[query_pos+2+j];
             record_xm_rs[dest_pos+j] = record_xm[query_pos+j];
           }
         }
@@ -510,8 +513,8 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
 
     // pushing record data to vectors
     rname.push_back(bam_rec->core.tid + 1);                                     // RNAME+1
-    strand.push_back(record_strand);                                            // STRAND is 1 if "CT"/"+", 2 if "GA"/"-"
-    start.push_back(bam_rec->core.pos + trim5 +1);                              // POS+1
+    strand.push_back(record_strand + 1);                                        // STRAND is 1 if "CT"/"+", 2 if "GA"/"-"
+    start.push_back(bam_rec->core.pos + trim5 + 1);                             // POS+1
     seq->emplace_back((const char*) record_seq_rs + trim5, dest_pos - (trim5+trim3)); // SEQ
     xm->emplace_back( (const char*) record_xm_rs + trim5,  dest_pos - (trim5+trim3)); // XM
     npushed++;                                                                  // +1
@@ -525,6 +528,8 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
   if (thread_pool.pool) hts_tpool_destroy(thread_pool.pool);                    // free thread pool
   free(record_seq_rs);                                                          // and free manually allocated memory
   free(record_xm_rs);
+  free(record_seq);
+  free(record_xm);
 
   // wrap and return the results
   Rcpp::DataFrame res = Rcpp::DataFrame::create(                                // final DF
