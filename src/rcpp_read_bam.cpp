@@ -363,7 +363,7 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
 
 // #############################################################################
 
-// LONG-READ BAM
+// LONG-READ SINGLE-END BAM
 // https://samtools.github.io/hts-specs/SAMv1.pdf
 // https://samtools.github.io/hts-specs/SAMtags.pdf
 
@@ -383,6 +383,7 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
   // constants
   int max_query_width   = 1024;                                                 // max NON-refspaced query width, expanded if necessary
   int max_record_width  = 1024;                                                 // max refspaced record width, expanded if necessary
+  const int max_nmods   = 16;                                                   // allow MAX 16 modifications per base
 
   // file IO
   htsFile *bam_fp = hts_open(fn.c_str(), "r");                                  // try open file
@@ -395,6 +396,11 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
   bam_hdr_t *bam_hdr = sam_hdr_read(bam_fp);                                    // try read file header
   if (!bam_hdr) Rcpp::stop("Unable to read BAM header");                        // fall back if error
   bam1_t *bam_rec = bam_init1();                                                // create BAM alignment structure
+  
+  // base modifications
+  hts_base_mod_state *mod_state = hts_base_mod_state_alloc();                   // allocate space for base modification states
+  hts_base_mod base_mods[max_nmods];                                            // allocate an array of MAX 16 possible modifications per base
+  int mod_pos = 0, nmods = 0;                                                   // position of modified base in the query, number of modifications at that base
 
   // main containers
   std::vector<std::string>* seq = new std::vector<std::string>;                 // SEQ
@@ -423,10 +429,6 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
         (skip_duplicates && (bam_rec->core.flag & BAM_FDUP))) continue;         // or if record is an optical/PCR duplicate
 
     int record_strand = ! ( bam_rec->core.flag & BAM_FREVERSE );                // genome strand, 0 if forward, 1 if reverse
-    
-    // char *record_mm = (char*) bam_aux_get(bam_rec, "MM");                       // MM base modification tag
-    // // add ML tag parsing later; it might be quite complex
-    // if (!record_mm) continue;                                                   // skip if no MM tag (no base modification info available)
 
     // get record sequence, quality string
     uint8_t *record_qual = bam_get_qual(bam_rec);                               // quality string (Phred scale with no +33 offset)
@@ -469,6 +471,21 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
     const unsigned char* context_map = context_shift ? triad_forward_context : triad_reverse_context; // lookup table to use
     for (int i=0; i<query_width; i++) {
       record_xm[i] = triad_to_ctx((record_seq+context_shift+i), context_map);   // look up context
+    }
+    
+    // parse base modifications: any location not reported is implicitly
+    // assumed to contain no modification
+    bam_parse_basemod(bam_rec, mod_state);                                      // fill the mod_state structure
+    while ((nmods = bam_next_basemod(bam_rec, mod_state, base_mods, max_nmods, &mod_pos)) > 0) {
+      int meth_prob = 0, max_other_prob = 0;                                    // scaled probabilities: methylation mod, maximum of any other mods of a current base
+      for (int i=0; i<nmods; i++) {
+        if (base_mods[i].modified_base=='m' || base_mods[i].modified_base==-27551) { // if it's a 5mC
+          meth_prob = base_mods[i].qual;
+        } else {
+          if (max_other_prob < base_mods[i].qual) // that's not right...
+            max_other_prob = base_mods[i].qual;
+        }
+      }
     }
 
     // apply CIGAR
@@ -522,7 +539,8 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
   }
 
   // cleaning
-  bam_destroy1(bam_rec);                                                        // clean BAM alignment structure
+  hts_base_mod_state_free(mod_state);                                           // free base modification state structure
+  bam_destroy1(bam_rec);                                                        // free BAM alignment structure
   hts_close(bam_fp);                                                            // close BAM file
   if (thread_pool.pool) hts_tpool_destroy(thread_pool.pool);                    // free thread pool
   free(record_seq_rs);                                                          // and free manually allocated memory
