@@ -375,6 +375,8 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
 Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               // file name
                                   int min_mapq,                                 // min read mapping quality
                                   int min_baseq,                                // min base quality
+                                  int min_prob,                                 // min probability of 5mC modification
+                                  bool highest_prob,                            // consider only if 5mC probability is the highest of all mods at particular pos
                                   bool skip_duplicates,                         // skip marked duplicates
                                   int trim5,                                    // trim bases from 5'
                                   int trim3,                                    // trim bases from 3'
@@ -476,17 +478,25 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
     // parse base modifications: any location not reported is implicitly
     // assumed to contain no modification
     bam_parse_basemod(bam_rec, mod_state);                                      // fill the mod_state structure
-    while ((nmods = bam_next_basemod(bam_rec, mod_state, base_mods, max_nmods, &mod_pos)) > 0) {
-      int meth_prob = 0, max_other_prob = 0;                                    // scaled probabilities: methylation mod, maximum of any other mods of a current base
-      for (int i=0; i<nmods; i++) {
+    while ((nmods = bam_next_basemod(bam_rec, mod_state, base_mods, max_nmods, &mod_pos)) > 0) { // cycle through modified bases
+      if (record_strand) mod_pos = query_width - mod_pos - 1;                   // if mapped to reverse strand, then position is on revcomplemented query
+      Rcpp::Rcout << record_xm[mod_pos];
+      if (record_xm[mod_pos]<'A') continue;                                     // skip if this position is not a 'hxz'
+      unsigned int meth_prob = 0, max_other_prob = 0;                           // scaled probabilities: methylation mod, maximum of any other mods of a current base
+      for (int i=0; i<nmods; i++) {                                             // cycle through all mods of a current base
         if (base_mods[i].modified_base=='m' || base_mods[i].modified_base==-27551) { // if it's a 5mC
-          meth_prob = base_mods[i].qual;
-        } else {
-          if (max_other_prob < base_mods[i].qual) // that's not right...
-            max_other_prob = base_mods[i].qual;
+          meth_prob = (unsigned int) base_mods[i].qual;                         // -1 (unknown probability) becomes MAX_INT (highest probability)
+        } else if (max_other_prob < (unsigned int) base_mods[i].qual) {         // if NOT a 5mC and probability is higher than max_other_prob
+            max_other_prob = (unsigned int) base_mods[i].qual;                  // record the highest probability of other modifications
         }
       }
+      if (meth_prob>0 &&                                                        // if there is a 5mC modification
+          meth_prob>=min_prob &&                                                // and its probability is not less than min_prob
+          (!highest_prob || meth_prob>max_other_prob)) {                        // and its probability is either highest or highest_prob==FALSE
+        record_xm[mod_pos] &= 0b11011111;                                       // uppercase the context char
+      }
     }
+    Rcpp::Rcout << "\n";
 
     // apply CIGAR
     uint32_t query_pos = 0;                                                     // starting position in query array
@@ -534,8 +544,8 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
     npushed++;                                                                  // +1
 
     Rcpp::Rcout << "dest_pos:" << dest_pos << ", record_width:" << record_width << ", query_width:" << query_width << ", strand:" << strand.back() << "\n";
-    Rcpp::Rcout << seq->back().substr(0, std::min(record_width, 100)) << "\n";
-    Rcpp::Rcout << xm->back().substr(0, std::min(record_width, 100)) << "\n\n";
+    Rcpp::Rcout << seq->back()/*.substr(0, std::min(record_width, 100))*/ << "\n";
+    Rcpp::Rcout << xm->back()/*.substr(0, std::min(record_width, 100))*/ << "\n\n";
   }
 
   // cleaning
