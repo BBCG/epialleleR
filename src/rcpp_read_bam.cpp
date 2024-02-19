@@ -72,8 +72,9 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
     nrecs++;                                                                    // BAM alignment records ++
     if ((nrecs & 0xFFFFF) == 0) Rcpp::checkUserInterrupt();                     // every ~1M reads check for the interrupt
     
-    if ((bam_rec->core.qual < min_mapq) ||                                      // skip if mapping quality < min.mapq
+    if ((bam_rec->core.flag & BAM_FUNMAP) ||                                    // skip if unmapped
         (!(bam_rec->core.flag & BAM_FPROPER_PAIR)) ||                           // or if not a proper pair
+        (bam_rec->core.qual < min_mapq) ||                                      // or if mapping quality < min.mapq
         (skip_duplicates && (bam_rec->core.flag & BAM_FDUP))) continue;         // or if record is an optical/PCR duplicate
     
     char *rec_strand = (char*) bam_aux_get(bam_rec, "XG");                      // genome strand
@@ -247,7 +248,8 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
     nrecs++;                                                                    // BAM alignment records ++
     if ((nrecs & 0xFFFFF) == 0) Rcpp::checkUserInterrupt();                     // every ~1M reads check for the interrupt
 
-    if ((bam_rec->core.qual < min_mapq) ||                                      // skip if mapping quality < min.mapq
+    if ((bam_rec->core.flag & BAM_FUNMAP) ||                                    // skip if unmapped
+        (bam_rec->core.qual < min_mapq) ||                                      // or if mapping quality < min.mapq
         (skip_duplicates && (bam_rec->core.flag & BAM_FDUP))) continue;         // or if record is an optical/PCR duplicate
     
     char *record_strand = (char*) bam_aux_get(bam_rec, "XG");                   // genome strand
@@ -427,10 +429,11 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
     nrecs++;                                                                    // BAM alignment records ++
     if ((nrecs & 0xFFFFF) == 0) Rcpp::checkUserInterrupt();                     // every ~1M reads check for the interrupt
 
-    if ((bam_rec->core.qual < min_mapq) ||                                      // skip if mapping quality < min.mapq
+    if ((bam_rec->core.flag & BAM_FUNMAP) ||                                    // skip if unmapped
+        (bam_rec->core.qual < min_mapq) ||                                      // or if mapping quality < min.mapq
         (skip_duplicates && (bam_rec->core.flag & BAM_FDUP))) continue;         // or if record is an optical/PCR duplicate
 
-    int record_strand = ! ( bam_rec->core.flag & BAM_FREVERSE );                // genome strand, 0 if forward, 1 if reverse
+    int record_strand = (bool) (bam_rec->core.flag & BAM_FREVERSE);             // genome strand, 0 if forward, 1 if reverse
 
     // get record sequence, quality string
     uint8_t *record_qual = bam_get_qual(bam_rec);                               // quality string (Phred scale with no +33 offset)
@@ -479,25 +482,23 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
     // assumed to contain no modification
     bam_parse_basemod(bam_rec, mod_state);                                      // fill the mod_state structure
     while ((nmods = bam_next_basemod(bam_rec, mod_state, base_mods, max_nmods, &mod_pos)) > 0) { // cycle through modified bases
-      if (record_strand) mod_pos = query_width - mod_pos - 1;                   // if mapped to reverse strand, then position is on revcomplemented query
-      Rcpp::Rcout << record_xm[mod_pos];
       if (record_xm[mod_pos]<'A') continue;                                     // skip if this position is not a 'hxz'
-      unsigned int meth_prob = 0, max_other_prob = 0;                           // scaled probabilities: methylation mod, maximum of any other mods of a current base
+      int ismeth = 0, meth_prob = -2, max_other_prob = -2;                      // bool for having meth mod; scaled probabilities: meth mod, maximum of any other mods of a current base
       for (int i=0; i<nmods; i++) {                                             // cycle through all mods of a current base
-        if (base_mods[i].modified_base=='m' || base_mods[i].modified_base==-27551) { // if it's a 5mC
-          meth_prob = (unsigned int) base_mods[i].qual;                         // -1 (unknown probability) becomes MAX_INT (highest probability)
-        } else if (max_other_prob < (unsigned int) base_mods[i].qual) {         // if NOT a 5mC and probability is higher than max_other_prob
-            max_other_prob = (unsigned int) base_mods[i].qual;                  // record the highest probability of other modifications
+        if (base_mods[i].modified_base=='m' || base_mods[i].modified_base==-27551) { // if it's a 5mC (for any of 'C+m' or 'G-m')
+          ismeth = 1;                                                           // base has meth mod
+          meth_prob = base_mods[i].qual;                                        // record meth prob
+        } else if (max_other_prob < base_mods[i].qual) {                        // if NOT a 5mC and probability is higher than max_other_prob
+            max_other_prob = base_mods[i].qual;                                 // record the highest probability of other modifications
         }
       }
-      if (meth_prob>0 &&                                                        // if there is a 5mC modification
+      if (ismeth &&                                                             // if there is a 5mC modification
           meth_prob>=min_prob &&                                                // and its probability is not less than min_prob
           (!highest_prob || meth_prob>max_other_prob)) {                        // and its probability is either highest or highest_prob==FALSE
         record_xm[mod_pos] &= 0b11011111;                                       // uppercase the context char
       }
     }
-    Rcpp::Rcout << "\n";
-
+    
     // apply CIGAR
     uint32_t query_pos = 0;                                                     // starting position in query array
     uint32_t dest_pos = 0;                                                      // starting position in destination array
