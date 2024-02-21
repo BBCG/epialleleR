@@ -122,22 +122,13 @@ int rcpp_simulate_bam (std::vector<std::string> header,                         
         break;
       }
       
-      
-      // if (a_types[c]=="f") {
-      //   // std::vector<float> tag = Rcpp::as<std::vector<float>>( ((Rcpp::List)(a_tags[c]))[i] );               // float tag values
-      //   // call_res = bam_aux_update_array(out_rec, a_cols[c].c_str(), a_types[c][0], tag.size(), tag.data());  // add array tag
-      //   // Rcpp::Rcout << tag.size();
-      //   
-      // } else if (a_types[c]=="i") {
-      //   save_array_tag<int32_t>(out_rec, a_cols[c].c_str(), a_types[c][0], (Rcpp::NumericVector)((Rcpp::List)(a_tags[c]))[i]);
-      //   // std::vector<int> tag = Rcpp::as<std::vector<int>>( ((Rcpp::List)(a_tags[c]))[i] );     // int tag values
-      //   // Rcpp::Rcout << tag.size();
+      // if (a_types[c]=="c") {
+      //   std::vector<int8_t> tag = Rcpp::as<std::vector<int8_t>>( ((Rcpp::List)(a_tags[c]))[i] );               // tag values
+      //   call_res = bam_aux_update_array(out_rec, a_cols[c].c_str(), a_types[c][0], tag.size(), tag.data());  // add array tag
       // }
-      // Rcpp::Rcout << ",";
-      // 
+      
       if (call_res<0) Rcpp::stop("Unable to add %s tag", a_cols[c]);            // fall back on error
     }
-    // Rcpp::Rcout << "|";
     
     call_res = sam_write1(out_fp, out_hdr, out_rec);                            // write record
     if (call_res<0) Rcpp::stop("Unable to write BAM record");                   // fall back on error
