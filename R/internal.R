@@ -323,13 +323,47 @@ utils::globalVariables(
   )
   i_tags <- data.table::as.data.table(tags[sapply(tags, is.integer)])
   i_tags <- i_tags[rep_len(seq_len(nrow(i_tags)), nrecs)]
+  f_tags <- data.table::as.data.table(tags[sapply(tags, is.double)])
+  f_tags <- f_tags[rep_len(seq_len(nrow(f_tags)), nrecs)]
   s_tags <- data.table::as.data.table(tags[sapply(tags, is.character)])
   s_tags <- s_tags[rep_len(seq_len(nrow(s_tags)), nrecs)]
+  a_tags <- data.table::as.data.table(tags[sapply(tags, is.list)])
+  a_tags <- a_tags[rep_len(seq_len(nrow(a_tags)), nrecs)]
+  a_types <- apply(a_tags, 2, function (t) {
+    t.all   <- unlist(t)
+    t.class <- class(t.all)
+    if (t.class=="numeric") {
+      return("f")
+    } else if (t.class=="integer") {
+      t.min <- min(t.all)
+      t.max <- max(t.all)
+      if (t.min<0 & t.min>-2**7 & t.max<2**7) {                      # int8_t
+        return("c")
+      } else if (t.min>=0 & t.max<2**8) {                            # uint8_t
+        return("C")
+      } else if (t.min<0 & t.min>-2**15 & t.max<2**15) {             # int16_t
+        return("s")
+      } else if (t.min>=0 & t.max<2**16) {                           # uint16_t
+        return("S")
+      } else if (t.min<0) {                                          # int32_t
+        return("i")
+      } else {                                                       # uint32_t
+        return("I")
+      }
+    } else if (length(t.all)>0) {                       # unsupported array tags
+      stop("BAM file format does not support non-numeric arrays", call.=FALSE)
+    } else {
+      return(character(0))                              # no array tags
+    }
+  })
   
   if (!is.null(output.bam.file))
-    result <- rcpp_simulate_bam(header, fields, i_tags, s_tags, output.bam.file)
+    result <- rcpp_simulate_bam(header, fields,
+                                i_tags, f_tags, s_tags,
+                                a_tags, as.character(a_types),
+                                output.bam.file)
   else
-    result <- cbind(fields, i_tags, s_tags)
+    result <- cbind(fields, i_tags, f_tags, s_tags, a_tags)
   
   if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(result)

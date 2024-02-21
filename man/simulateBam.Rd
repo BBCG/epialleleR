@@ -69,8 +69,8 @@ of 47 + 33). The lengths of these quality strings equal to the length of the
 corresponding query sequences (`seq`) for every record.}
 
 \item{...}{optional tags to add to the records, in the form `tag=value`.
-Can be either integer vector (e.g., for "NM" tag),
-or character vector (e.g., "XM" tag for methylation call string,
+Value can be either an integer vector (e.g., for "NM" tag),
+or a character vector (e.g., "XM" tag for methylation call string,
 "XG"/"YD"/"ZS" tag for reference strand read was aligned to).}
 
 \item{verbose}{boolean to report progress and timings (default: TRUE).}

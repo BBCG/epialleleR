@@ -11,11 +11,21 @@
 // Returns simple statistics on records written.
 
 
+template<typename T>
+int save_array_tag(bam1_t *b, const char name[2], uint8_t type, const Rcpp::NumericVector &l) {
+  std::vector<T> tag = Rcpp::as<std::vector<T>>( l );                        // tag values
+  int res = bam_aux_update_array(b, name, type, tag.size(), tag.data());         // add array tag
+  return res;
+}
+
 // [[Rcpp::export]]
 int rcpp_simulate_bam (std::vector<std::string> header,                         // header records
                        Rcpp::DataFrame &fields,                                 // mandatory fields
                        Rcpp::DataFrame &i_tags,                                 // optional integer tags
+                       Rcpp::DataFrame &f_tags,                                 // optional float tags
                        Rcpp::DataFrame &s_tags,                                 // optional string tags
+                       Rcpp::DataFrame &a_tags,                                 // optional array tags
+                       std::vector<std::string> a_types,                        // types ('cCsSiIf') of optional array tags
                        std::string out_fn)                                      // output BAM file name
 {
   // main
@@ -32,7 +42,9 @@ int rcpp_simulate_bam (std::vector<std::string> header,                         
   std::vector<std::string> qual = Rcpp::as<std::vector<std::string>>(fields["qual"]);     // Sequence quality
   
   std::vector<std::string> i_cols = Rcpp::as<std::vector<std::string>>(i_tags.names());   // Column names for integer tags
+  std::vector<std::string> f_cols = Rcpp::as<std::vector<std::string>>(f_tags.names());   // Column names for float tags
   std::vector<std::string> s_cols = Rcpp::as<std::vector<std::string>>(s_tags.names());   // Column names for string tags
+  std::vector<std::string> a_cols = Rcpp::as<std::vector<std::string>>(a_tags.names());   // Column names for array tags
   
   // file IO
   htsFile *out_fp = hts_open(out_fn.c_str(), "wb");                             // try open output file
@@ -70,7 +82,13 @@ int rcpp_simulate_bam (std::vector<std::string> header,                         
     for (size_t c=0; c<i_cols.size(); c++) {                                    // add integer tags
       int tag = ((Rcpp::IntegerVector)(i_tags[c]))[i];                          // tag value
       call_res = bam_aux_update_int(out_rec, i_cols[c].c_str(), tag);           // add tag
-      if (call_res<0) Rcpp::stop("Unable to add %s tag", s_cols[c]);            // fall back on error
+      if (call_res<0) Rcpp::stop("Unable to add %s tag", i_cols[c]);            // fall back on error
+    }
+    
+    for (size_t c=0; c<f_cols.size(); c++) {                                    // add float tags
+      float tag = ((Rcpp::NumericVector)(f_tags[c]))[i];                        // tag value
+      call_res = bam_aux_update_float(out_rec, f_cols[c].c_str(), tag);         // add tag
+      if (call_res<0) Rcpp::stop("Unable to add %s tag", f_cols[c]);            // fall back on error
     }
     
     for (size_t c=0; c<s_cols.size(); c++) {                                    // add string tags
@@ -78,6 +96,25 @@ int rcpp_simulate_bam (std::vector<std::string> header,                         
       call_res = bam_aux_update_str(out_rec, s_cols[c].c_str(), tag.size(), tag.c_str());  // add tag
       if (call_res<0) Rcpp::stop("Unable to add %s tag", s_cols[c]);            // fall back on error
     }
+    
+    for (size_t c=0; c<a_cols.size(); c++) {                                    // add array tags
+      Rcpp::Rcout << a_cols[c] << ":" << a_types[c] << ":";
+      void* ptag;
+      
+      if (a_types[c]=="f") {
+        std::vector<float> tag = Rcpp::as<std::vector<float>>( ((Rcpp::List)(a_tags[c]))[i] );               // float tag values
+        call_res = bam_aux_update_array(out_rec, a_cols[c].c_str(), a_types[c][0], tag.size(), tag.data());  // add array tag
+        Rcpp::Rcout << tag.size();
+      } else if (a_types[c]=="i") {
+        save_array_tag<int32_t>(out_rec, a_cols[c].c_str(), a_types[c][0], (Rcpp::NumericVector)((Rcpp::List)(a_tags[c]))[i]);
+        // std::vector<int> tag = Rcpp::as<std::vector<int>>( ((Rcpp::List)(a_tags[c]))[i] );     // int tag values
+        // Rcpp::Rcout << tag.size();
+      }
+      Rcpp::Rcout << ",";
+      // 
+      if (call_res<0) Rcpp::stop("Unable to add %s tag", a_cols[c]);            // fall back on error
+    }
+    Rcpp::Rcout << "|";
     
     call_res = sam_write1(out_fp, out_hdr, out_rec);                            // write record
     if (call_res<0) Rcpp::stop("Unable to write BAM record");                   // fall back on error

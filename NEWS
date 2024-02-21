@@ -76,3 +76,7 @@ Changes in version 1.11.4 (2024-02-11)
 
 Changes in version 1.11.5 (2024-02-12)
 + RRBS-ready
+
+Changes in version 1.11.6 (2024-02-29)
++ float and array tags in simulateBam
++ long-read data input

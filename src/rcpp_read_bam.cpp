@@ -485,7 +485,7 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
       if (record_xm[mod_pos]<'A') continue;                                     // skip if this position is not a 'hxz'
       int ismeth = 0, meth_prob = -2, max_other_prob = -2;                      // bool for having meth mod; scaled probabilities: meth mod, maximum of any other mods of a current base
       for (int i=0; i<nmods; i++) {                                             // cycle through all mods of a current base
-        if (base_mods[i].modified_base=='m' || base_mods[i].modified_base==-27551) { // if it's a 5mC (for any of 'C+m' or 'G-m')
+        if (base_mods[i].modified_base=='m' || base_mods[i].modified_base==-27551) { // if it's a 5mC (and any of 'C+m' or 'G-m')
           ismeth = 1;                                                           // base has meth mod
           meth_prob = base_mods[i].qual;                                        // record meth prob
         } else if (max_other_prob < base_mods[i].qual) {                        // if NOT a 5mC and probability is higher than max_other_prob
@@ -544,9 +544,9 @@ Rcpp::DataFrame rcpp_read_bam_mm (std::string fn,                               
     xm->emplace_back( (const char*) record_xm_rs + trim5,  dest_pos - (trim5+trim3)); // XM
     npushed++;                                                                  // +1
 
-    Rcpp::Rcout << "dest_pos:" << dest_pos << ", record_width:" << record_width << ", query_width:" << query_width << ", strand:" << strand.back() << "\n";
-    Rcpp::Rcout << seq->back()/*.substr(0, std::min(record_width, 100))*/ << "\n";
-    Rcpp::Rcout << xm->back()/*.substr(0, std::min(record_width, 100))*/ << "\n\n";
+    // Rcpp::Rcout << "dest_pos:" << dest_pos << ", record_width:" << record_width << ", query_width:" << query_width << ", strand:" << strand.back() << "\n";
+    // Rcpp::Rcout << seq->back()/*.substr(0, std::min(record_width, 100))*/ << "\n";
+    // Rcpp::Rcout << xm->back()/*.substr(0, std::min(record_width, 100))*/ << "\n\n";
   }
 
   // cleaning
