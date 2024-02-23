@@ -181,9 +181,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rcpp_read_bam_mm
-Rcpp::DataFrame rcpp_read_bam_mm(std::string fn, int min_mapq, int min_baseq, int min_prob, bool highest_prob, bool skip_duplicates, int trim5, int trim3, int nthreads);
-RcppExport SEXP _epialleleR_rcpp_read_bam_mm(SEXP fnSEXP, SEXP min_mapqSEXP, SEXP min_baseqSEXP, SEXP min_probSEXP, SEXP highest_probSEXP, SEXP skip_duplicatesSEXP, SEXP trim5SEXP, SEXP trim3SEXP, SEXP nthreadsSEXP) {
+// rcpp_read_bam_mm_single
+Rcpp::DataFrame rcpp_read_bam_mm_single(std::string fn, int min_mapq, int min_baseq, int min_prob, bool highest_prob, bool skip_duplicates, int trim5, int trim3, int nthreads);
+RcppExport SEXP _epialleleR_rcpp_read_bam_mm_single(SEXP fnSEXP, SEXP min_mapqSEXP, SEXP min_baseqSEXP, SEXP min_probSEXP, SEXP highest_probSEXP, SEXP skip_duplicatesSEXP, SEXP trim5SEXP, SEXP trim3SEXP, SEXP nthreadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -196,7 +196,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type trim5(trim5SEXP);
     Rcpp::traits::input_parameter< int >::type trim3(trim3SEXP);
     Rcpp::traits::input_parameter< int >::type nthreads(nthreadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_read_bam_mm(fn, min_mapq, min_baseq, min_prob, highest_prob, skip_duplicates, trim5, trim3, nthreads));
+    rcpp_result_gen = Rcpp::wrap(rcpp_read_bam_mm_single(fn, min_mapq, min_baseq, min_prob, highest_prob, skip_duplicates, trim5, trim3, nthreads));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -262,7 +262,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_epialleleR_rcpp_mhl_report", (DL_FUNC) &_epialleleR_rcpp_mhl_report, 4},
     {"_epialleleR_rcpp_read_bam_paired", (DL_FUNC) &_epialleleR_rcpp_read_bam_paired, 7},
     {"_epialleleR_rcpp_read_bam_single", (DL_FUNC) &_epialleleR_rcpp_read_bam_single, 7},
-    {"_epialleleR_rcpp_read_bam_mm", (DL_FUNC) &_epialleleR_rcpp_read_bam_mm, 9},
+    {"_epialleleR_rcpp_read_bam_mm_single", (DL_FUNC) &_epialleleR_rcpp_read_bam_mm_single, 9},
     {"_epialleleR_rcpp_read_genome", (DL_FUNC) &_epialleleR_rcpp_read_genome, 2},
     {"_epialleleR_rcpp_simulate_bam", (DL_FUNC) &_epialleleR_rcpp_simulate_bam, 8},
     {"_epialleleR_rcpp_threshold_reads", (DL_FUNC) &_epialleleR_rcpp_threshold_reads, 8},

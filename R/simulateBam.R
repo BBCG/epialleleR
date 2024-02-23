@@ -57,9 +57,15 @@
 #' of 47 + 33). The lengths of these quality strings equal to the length of the
 #' corresponding query sequences (`seq`) for every record.
 #' @param ... optional tags to add to the records, in the form `tag=value`.
-#' Value can be either an integer vector (e.g., for "NM" tag),
-#' or a character vector (e.g., "XM" tag for methylation call string,
-#' "XG"/"YD"/"ZS" tag for reference strand read was aligned to).
+#' Value can be either:
+#' \itemize{
+#'   \item an integer vector to create a tag with a single integer value (e.g.,
+#'   "NM" tag),
+#'   \item or a float vector to create a tag with a single float value,
+#'   \item or a character vector (e.g., "XM" tag for methylation call string,
+#'   "XG"/"YD"/"ZS" tag for reference strand read was aligned to)
+#'   \item or a list of numeric vectors to create array tags.
+#' }
 #' @param verbose boolean to report progress and timings (default: TRUE).
 #' @return number of BAM records written (if `output.bam.file` is not NULL) or
 #' \code{\link[data.table]{data.table}} object containing final records
@@ -82,9 +88,14 @@
 #'     output.bam.file=out.bam,
 #'     pos=c(1, 2),
 #'     XM=c("ZZZzzZZZ", "ZZzzzzZZ"),
-#'     XG=c("CT", "AG")
+#'     XG=c("CT", "AG"),
+#'     xi=5:6,
+#'     xf=0.05,
+#'     ai=list(as.integer(c(1:3)), as.integer(c(4:6))),
+#'     af=list(seq(-1, 1, 0.5))
 #'   )
 #'   generateCytosineReport(out.bam, threshold.reads=FALSE)
+#'   # check this BAM with `samtools view` or using `output.bam.file=NULL`
 #' @export
 simulateBam <- function (output.bam.file=NULL,
                          qname=NULL,

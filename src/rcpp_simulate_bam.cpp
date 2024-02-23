@@ -11,10 +11,13 @@
 // Returns simple statistics on records written.
 
 
+// template function to convert R's Rcpp::NumericVector to any numeric type
+// and add values to a BAM array tag
 template<typename T>
-int save_array_tag(bam1_t *b, const char tag[2], uint8_t type, const SEXP &l) {
-  std::vector<T> array = Rcpp::as<std::vector<T>>( l );                         // tag values
-  int res = bam_aux_update_array(b, tag, type, array.size(), array.data());     // add array tag
+int save_array_tag(bam1_t *b, const char tag[2], uint8_t type, const Rcpp::NumericVector &l) {
+  std::vector<T> vec (l.size());                                                // new container
+  for (auto i=0; i<l.size(); i++) { vec[i] = static_cast<T>(l[i]); }            // copy tag values
+  int res = bam_aux_update_array(b, tag, type, vec.size(), vec.data());         // add array tag
   return res;
 }
 
@@ -63,7 +66,6 @@ int rcpp_simulate_bam (std::vector<std::string> header,                         
   uint32_t *cigar_mem = NULL;                                                   // destination uint32_t CIGAR buffer
   size_t n_cigar = 0;                                                           // allocated number of CIGAR buffer elements
   for (size_t i=0; i<qname.size(); i++) {
-    // call_res = bam_parse_cigar(cigar[i].c_str(), NULL, out_rec);                // fill CIGAR array - this for some reason don't work
     call_res = sam_parse_cigar(cigar[i].c_str(), NULL, &cigar_mem, &n_cigar);   // fill CIGAR array
     if (call_res<0) Rcpp::stop("Unable to fill CIGAR array");                   // fall back on error
     
@@ -99,33 +101,28 @@ int rcpp_simulate_bam (std::vector<std::string> header,                         
     
     for (size_t c=0; c<a_cols.size(); c++) {                                    // add array tags
       switch (a_types[c][0]) {
-      case 'f':
+      case 'f':                                                                 // float array
         call_res = save_array_tag<float>(out_rec, a_cols[c].c_str(), a_types[c][0], ((Rcpp::List)(a_tags[c]))[i]);
         break;
-      // case 'c':
-      //   call_res = save_array_tag<int8_t>(out_rec, a_cols[c].c_str(), a_types[c][0], ((Rcpp::List)(a_tags[c]))[i]);
-      //   break;
-      case 'C':
+      case 'c':                                                                 // int8_t array
+        call_res = save_array_tag<int8_t>(out_rec, a_cols[c].c_str(), a_types[c][0], ((Rcpp::List)(a_tags[c]))[i]);
+        break;
+      case 'C':                                                                 // uint8_t array
         call_res = save_array_tag<uint8_t>(out_rec, a_cols[c].c_str(), a_types[c][0], ((Rcpp::List)(a_tags[c]))[i]);
         break;
-      case 's':
+      case 's':                                                                 // int16_t array
         call_res = save_array_tag<int16_t>(out_rec, a_cols[c].c_str(), a_types[c][0], ((Rcpp::List)(a_tags[c]))[i]);
         break;
-      case 'S':
+      case 'S':                                                                 // uint16_t array
         call_res = save_array_tag<uint16_t>(out_rec, a_cols[c].c_str(), a_types[c][0], ((Rcpp::List)(a_tags[c]))[i]);
         break;
-      case 'i':
+      case 'i':                                                                 // int32_t array
         call_res = save_array_tag<int32_t>(out_rec, a_cols[c].c_str(), a_types[c][0], ((Rcpp::List)(a_tags[c]))[i]);
         break;
-      case 'I':
+      case 'I':                                                                 // uint32_t array
         call_res = save_array_tag<uint32_t>(out_rec, a_cols[c].c_str(), a_types[c][0], ((Rcpp::List)(a_tags[c]))[i]);
         break;
       }
-      
-      // if (a_types[c]=="c") {
-      //   std::vector<int8_t> tag = Rcpp::as<std::vector<int8_t>>( ((Rcpp::List)(a_tags[c]))[i] );               // tag values
-      //   call_res = bam_aux_update_array(out_rec, a_cols[c].c_str(), a_types[c][0], tag.size(), tag.data());  // add array tag
-      // }
       
       if (call_res<0) Rcpp::stop("Unable to add %s tag", a_cols[c]);            // fall back on error
     }
@@ -147,35 +144,5 @@ int rcpp_simulate_bam (std::vector<std::string> header,                         
 // #############################################################################
 // test code and sourcing don't work on OS X
 /*** R
-file <- tempfile(pattern="simulated" ,fileext=".bam")
-
-rcpp_simulate_bam(
-  c("@SQ\tSN:seq1\tLN:1575", "@SQ\tSN:seq2\tLN:1584", "@PG\tID:epialleleR\tPN:epialleleR\tVN:1.9.5\tCL:rcpp_simulate_bam()"),
-  data.frame(
-    qname=paste0("rr", 1:2),
-    flag=c(0,0),
-    tid=c(0,0),
-    pos=c(0,5),
-    mapq=c(60,60),
-    cigar=c("10M","10M"),
-    mtid=c(0,0),
-    mpos=c(0,0),
-    isize=c(10,10),
-    seq=c("ACTGACTGAC","TGACTGACTG"),
-    qual=c("          ","          ")
-  ),
-  data.frame(
-    H0=c(1,2)
-  ),
-  data.frame(
-    XG=c("CT","CT"),
-    XM=c("ZZzzZZzzZZ","ZZzzZZzzZZ")
-  ),
-  file)
-
-bam <- preprocessBam(file)
-generateCytosineReport(bam, threshold.reads=FALSE)
-extractPatterns(bam, as("seq1:1-13", "GRanges"))
-rcpp_wtf_report(bam, "zZ", TRUE, 0)
 */
 // #############################################################################

@@ -158,4 +158,154 @@ test_generateCytosineReport <- function () {
     )
   )
   
+  ### long-read
+  output.bam <- tempfile(pattern="output-", fileext=".bam")
+  
+  # C+m and chebi for other mod
+  # modified from htslib/test/base_mods/MM-chebi.sam
+  simulateBam(
+    flag=c(0),
+    seq=c("AGCTCTCCAGAGTCGNACGCCATYCGCGCGCCACCA"),
+    pos=1,
+    Mm=c("C+m,2,2,1,4,1;C+76792,6,7;N+n,15;"),
+    Ml=list(as.integer(c(102,128,153,179,161,187,212,169))),
+    output.bam.file=output.bam
+  )
+  cx.report <- generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX")
+  RUnit::checkEquals(
+    cx.report[, .(strand, pos, context, meth, unmeth)],
+    data.table::data.table(
+      strand=factor("+", levels=c("+","-")),
+      pos=as.integer(c(3, 5, 7, 8, 14, 18, 20, 21, 25, 27, 29, 31, 32, 34, 35)),
+      context=factor(c(2, 2, 2, 6, 7, 7, 2, 2, 7, 7, 7, 2, 2, 2, 2), levels=1:7,
+                     labels=c("NA1", "CHH", "NA3", "NA4", "NA5", "CHG", "CG")),
+      meth=  as.integer(c(0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0)),
+      unmeth=as.integer(c(1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1))
+    )
+  )
+  cx.report <- generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX",
+                                      min.prob=160, highest.prob=FALSE)
+  RUnit::checkEquals(
+    cx.report[, .(strand, pos, context, meth, unmeth)],
+    data.table::data.table(
+      strand=factor("+", levels=c("+","-")),
+      pos=as.integer(c(3, 5, 7, 8, 14, 18, 20, 21, 25, 27, 29, 31, 32, 34, 35)),
+      context=factor(c(2, 2, 2, 6, 7, 7, 2, 2, 7, 7, 7, 2, 2, 2, 2), levels=1:7,
+                     labels=c("NA1", "CHH", "NA3", "NA4", "NA5", "CHG", "CG")),
+      meth=  as.integer(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1)),
+      unmeth=as.integer(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0))
+    )
+  )
+  
+  # C+m and chebi for C+m
+  # modified from htslib/test/base_mods/MM-chebi.sam
+  simulateBam(
+    flag=c(0),
+    seq=c("AGCTCTCCAGAGTCGNACGCCATYCGCGCGCCACCA"),
+    pos=1,
+    Mm=c("C+m,2,2,1,4,1;C+27551,6,7;N+n,15;"),
+    Ml=list(as.integer(c(102,128,153,179,161,187,212,169))),
+    output.bam.file=output.bam
+  )
+  cx.report <- generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX")
+  RUnit::checkEquals(
+    cx.report[, .(strand, pos, context, meth, unmeth)],
+    data.table::data.table(
+      strand=factor("+", levels=c("+","-")),
+      pos=as.integer(c(3, 5, 7, 8, 14, 18, 20, 21, 25, 27, 29, 31, 32, 34, 35)),
+      context=factor(c(2, 2, 2, 6, 7, 7, 2, 2, 7, 7, 7, 2, 2, 2, 2), levels=1:7,
+                     labels=c("NA1", "CHH", "NA3", "NA4", "NA5", "CHG", "CG")),
+      meth=  as.integer(c(0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1)),
+      unmeth=as.integer(c(1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0))
+    )
+  )
+  cx.report <- generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX",
+                                      min.prob=160)
+  RUnit::checkEquals(
+    cx.report[, .(strand, pos, context, meth, unmeth)],
+    data.table::data.table(
+      strand=factor("+", levels=c("+","-")),
+      pos=as.integer(c(3, 5, 7, 8, 14, 18, 20, 21, 25, 27, 29, 31, 32, 34, 35)),
+      context=factor(c(2, 2, 2, 6, 7, 7, 2, 2, 7, 7, 7, 2, 2, 2, 2), levels=1:7,
+                     labels=c("NA1", "CHH", "NA3", "NA4", "NA5", "CHG", "CG")),
+      meth=  as.integer(c(0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1)),
+      unmeth=as.integer(c(1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0))
+    )
+  )
+  
+  # modification on both strands
+  # modified from htslib/test/base_mods/MM-double.sam
+  simulateBam(
+    flag=c(0),
+    seq=c("AGGATCTCTAGCGGATCGGCGGGGGATATGCCATAT"),
+    pos=1,
+    Mm=c("C+m,1,3,0;G-m,0,2,0,4;G+o,4;"),
+    Ml=list(as.integer(c(128,153,179,115,141,166,192,102))),
+    output.bam.file=output.bam
+  )
+  cx.report <- generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX")
+  
+  
+  simulateBam(
+    flag=c(0, 16),
+    seq=c("AGGATCTCTAGCGGATCGGCGGGGGATATGCCATAT",
+          "ATATGGCATATCCCCCGCCGATCCGCTAGAGATCCT"),
+    pos=1,
+    Mm=c("C+m,2,0,0;", "C+m,2,0,0;",
+         "G-m,2,0,0;", "G-m,2,0,0;"),
+    Ml=list(as.integer(c(128,153,179)), as.integer(c(128,153,179)),
+            as.integer(c(115,141,166)), as.integer(c(115,141,166))),
+    output.bam.file=output.bam
+  )
+  simulateBam(
+    flag=c(0, 16),
+    seq=c("AGGATCTCTAGCGGATCGGCGGGGGATATGCCATAT",
+          "ATATGGCATATCCCCCGCCGATCCGCTAGAGATCCT"),
+    pos=1,
+    Mm=c("C+m,2,0,0;", "C+m,2,0,0;"),
+    Ml=list(as.integer(c(128,153,179)), as.integer(c(128,153,179))),
+    output.bam.file=output.bam
+  )
+  simulateBam(
+    flag=c(0, 0),
+    seq=c("AGGATCTCTAGCGGATCGGCGGGGGATATGCCATAT"),
+    pos=1,
+    Mm=c("C+m,2,0,0;", "G-m,2,0,0;"),
+    Ml=list(as.integer(c(128,153,179)), as.integer(c(115,141,166))),
+    output.bam.file=output.bam
+  )
+  generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX")
+  
+  
+  
+  simulateBam(
+    flag=c(0, 16),
+    seq=c("AGGATCTCTAGCGGATCGGCGGGGGATATGCCATAT",
+          "ATATGGCATATCCCCCGCCGATCCGCTAGAGATCCT"),
+    pos=1,
+    Mm=c("C+m,1,3,0;", "C+m,1,3,0;",
+         "G-m,0,0,4,3;", "G-m,0,0,4,3;"),
+    Ml=list(as.integer(c(128,153,179)), as.integer(c(128,153,179)),
+            as.integer(c(115,141,166,192)), as.integer(c(115,141,166,192))),
+    output.bam.file=output.bam
+  )
+  simulateBam(
+    flag=c(0, 0),
+    seq=c("AGGATCTCTAGCGGATCGGCGGGGGATATGCCATAT"),
+    pos=1,
+    Mm=c("C+m,1,3,0;", "G-m,0,0,4,3;"),
+    Ml=list(as.integer(c(128,153,179)), as.integer(c(115,141,166,192))),
+    output.bam.file=output.bam
+  )
+  simulateBam(
+    flag=c(0, 16),
+    seq=c("AGGATCTCTAGCGGATCGGCGGGGGATATGCCATAT",
+          "ATATGGCATATCCCCCGCCGATCCGCTAGAGATCCT"),
+    pos=1,
+    Mm=c("C+m,1,3,0;", "C+m,1,3,0;"),
+    Ml=list(as.integer(c(128,153,179)), as.integer(c(128,153,179))),
+    output.bam.file=output.bam
+  )
+  generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX")
+  
 }

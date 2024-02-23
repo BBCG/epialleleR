@@ -197,13 +197,5 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
 // #############################################################################
 // test code and sourcing don't work on OS X
 /*** R
-setwd("~/work/packages/epialleleR/")
-devtools::document()
-devtools::load_all()
-system.time(genome <- rcpp_read_genome("/scratch/ref/DRAGEN/hg38_plus_lambda_ChrY_PAR_masked.fa.gz", 1))
-system.time(genome <- rcpp_read_genome("/Users/oleksii.nikolaienko/work/data/hg38/hg38_plus_lambda_ChrY_PAR_masked.fa.gz", 1))
-inout <- c(system.file("extdata", "test", "paired-name-xm.bam", package="epialleleR"), "/tmp/out.bam")
-rcpp_call_methylation_genome(inout[1], inout[2], genome, "XG", 8)
-sapply(inout, file.size)
 */
 // #############################################################################

@@ -3,6 +3,11 @@ test_preprocessBam <- function () {
   ### good BAMs
   
   capture.bam  <- system.file("extdata", "capture.bam", package="epialleleR")
+  RUnit::checkIdentical(
+    epialleleR:::.checkBam(capture.bam, TRUE)[c("paired", "sorted", "tagged")],
+    list(paired=TRUE, sorted=TRUE, tagged="XM")
+  )
+  
   capture.data <- preprocessBam(capture.bam, verbose=FALSE)
   RUnit::checkEquals(
     dim(capture.data),
@@ -19,6 +24,11 @@ test_preprocessBam <- function () {
   )
   
   amplicon.bam  <- system.file("extdata", "amplicon010meth.bam", package="epialleleR")
+  RUnit::checkIdentical(
+    epialleleR:::.checkBam(amplicon.bam, TRUE)[c("paired", "sorted", "tagged")],
+    list(paired=TRUE, sorted=TRUE, tagged="XM")
+  )
+  
   amplicon.data <- preprocessBam(amplicon.bam, skip.duplicates=TRUE, verbose=FALSE)
   RUnit::checkEquals(
     dim(amplicon.data),
@@ -54,6 +64,10 @@ test_preprocessBam <- function () {
       "data.table"
     )
   )
+  RUnit::checkIdentical(
+    epialleleR:::.checkBam(system.file("extdata", "test", "dragen-pe-namesort-xg-xm.bam", package="epialleleR"), TRUE)[c("paired", "sorted", "tagged")],
+    list(paired=TRUE, sorted=TRUE, tagged="XM")
+  )
   
   # paired, name-sorted, no XM
   RUnit::checkException(
@@ -76,6 +90,10 @@ test_preprocessBam <- function () {
       preprocessBam(system.file("extdata", "test", "dragen-se-unsort-xg-xm.bam", package="epialleleR"), verbose=TRUE, skip.duplicates=TRUE),
       "data.table"
     )
+  )
+  RUnit::checkIdentical(
+    epialleleR:::.checkBam(system.file("extdata", "test", "dragen-se-unsort-xg-xm.bam", package="epialleleR"), TRUE)[c("paired", "sorted", "tagged")],
+    list(paired=FALSE, sorted=FALSE, tagged="XM")
   )
   
   # single-ended, unsorted, no XG but there's YD

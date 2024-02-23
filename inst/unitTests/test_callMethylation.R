@@ -11,6 +11,10 @@ test_callMethylation <- function () {
     ),
     list(nrecs=200, ncalled=0)
   )
+  RUnit::checkIdentical(
+    epialleleR:::.checkBam(bam.file=output.bam, verbose=TRUE)[c("paired", "sorted", "tagged")],
+    list(paired=TRUE, sorted=TRUE, tagged="XM")
+  )
   
   RUnit::checkEquals(
     callMethylation(
@@ -18,6 +22,10 @@ test_callMethylation <- function () {
       output.bam.file=output.bam, genome=genome
     ),
     list(nrecs=100, ncalled=100)
+  )
+  RUnit::checkIdentical(
+    epialleleR:::.checkBam(bam.file=output.bam, verbose=TRUE)[c("paired", "sorted", "tagged")],
+    list(paired=FALSE, sorted=FALSE, tagged="XM")
   )
   
   RUnit::checkEquals(
@@ -27,6 +35,10 @@ test_callMethylation <- function () {
     ),
     list(nrecs=200, ncalled=170)
   )
+  RUnit::checkIdentical(
+    epialleleR:::.checkBam(bam.file=output.bam, verbose=TRUE)[c("paired", "sorted", "tagged")],
+    list(paired=TRUE, sorted=TRUE, tagged="XM")
+  )
   
   RUnit::checkEquals(
     callMethylation(
@@ -34,6 +46,10 @@ test_callMethylation <- function () {
       output.bam.file=output.bam, genome=genome
     ),
     list(nrecs=100, ncalled=73)
+  )
+  RUnit::checkIdentical(
+    epialleleR:::.checkBam(bam.file=output.bam, verbose=TRUE)[c("paired", "sorted", "tagged")],
+    list(paired=FALSE, sorted=FALSE, tagged="XM")
   )
   
   RUnit::checkEquals(
@@ -43,6 +59,10 @@ test_callMethylation <- function () {
     ),
     list(nrecs=200, ncalled=200)
   )
+  RUnit::checkIdentical(
+    epialleleR:::.checkBam(bam.file=output.bam, verbose=TRUE)[c("paired", "sorted", "tagged")],
+    list(paired=TRUE, sorted=TRUE, tagged="XM")
+  )
   
   RUnit::checkEquals(
     callMethylation(
@@ -50,6 +70,10 @@ test_callMethylation <- function () {
       output.bam.file=output.bam, genome=genome
     ),
     list(nrecs=100, ncalled=100)
+  )
+  RUnit::checkIdentical(
+    epialleleR:::.checkBam(bam.file=output.bam, verbose=TRUE)[c("paired", "sorted", "tagged")],
+    list(paired=FALSE, sorted=FALSE, tagged="XM")
   )
   
   # calls - errors

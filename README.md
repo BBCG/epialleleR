@@ -20,10 +20,10 @@ an input. See below for additional functionality.
  * creating sample BAM files given mandatory and optional BAM fields
  (*`simulateBam`*)
  * conventional reporting of cytosine methylation (*`generateCytosineReport`*)
- * calling the hypermethylated variant epiallele frequency (VEF) at the
+ * reporting the hypermethylated variant epiallele frequency (VEF) at the
  level of genomic regions (*`generate[Bed|Amplicon|Capture]Report`*) or
  individual cytosines (*`generateCytosineReport`*)
- * calculating linearised Methylated Haplotype Load (lMHL, 
+ * reporting linearised Methylated Haplotype Load (lMHL, 
  *`generateMhlReport`*)
  * extracting methylation patterns for genomic region of interest
  (*`extractPatterns`*)
@@ -33,6 +33,13 @@ an input. See below for additional functionality.
  interest (*`generateBedEcdf`*)
  
 ### Recent improvements
+
+##### v1.12 [BioC 3.19]
+
+ * inputs long-read sequencing alignments
+ * full support for short-read sequencing alignments by Illumina DRAGEN,
+ Bismark, bwa-meth, BSMAP
+ * RRBS-specific options
 
 ##### v1.10 [BioC 3.18]
 
@@ -44,7 +51,7 @@ an input. See below for additional functionality.
 ##### v1.4 [BioC 3.15]
 
  * significant speed-up
- * method to visualize methylation patterns
+ * method to extract and visualize methylation patterns
 
 ##### v1.2 [BioC 3.14]
 

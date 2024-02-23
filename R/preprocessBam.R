@@ -68,6 +68,21 @@
 #' quality (default: 0).
 #' @param min.baseq non-negative integer threshold for minimum nucleotide base
 #' quality (default: 0).
+#' @param min.prob integer threshold for minimum scaled probability of
+#' modification (methylation) to consider. Affects processing long-read
+#' sequencing alignments only. According to SAM/BAM specification, the
+#' continuous base modification probability range 0.0 to 1.0 is
+#' remapped in equal sized portions to the discrete integers 0 to 255
+#' inclusively. If default (-1), then all C+m and G-m cytosine
+#' methylation modifications recorded in MM/Mm tag will be included, even if
+#' ML/Ml tag with probabilities is absent (in such case, probability of
+#' modification equals -1).
+#' @param highest.prob boolean defining if methylation modification must have
+#' the highest probability among all modifications at a particular base to be
+#' considered in the analyses (default: TRUE). Affects processing long-read
+#' sequencing alignments only. If default (TRUE) and ML/Ml tag with probability
+#' scores is absent, then cytosines with more than one modification will be
+#' omitted (as the probability of all modifications will be equal).
 #' @param skip.duplicates boolean defining if duplicate aligned reads should be
 #' skipped (default: FALSE). Option has no effect if duplicate reads were not
 #' marked by alignment software.
@@ -105,20 +120,23 @@ preprocessBam <- function (bam.file,
                            paired=NULL,
                            min.mapq=0,
                            min.baseq=0,
+                           min.prob=-1,
+                           highest.prob=TRUE,
                            skip.duplicates=FALSE,
                            trim=0,
                            nthreads=1,
                            verbose=TRUE)
 {
   if (is.character(bam.file)) {
-    paired.check <- .checkBam(bam.file=bam.file, verbose=verbose)
+    bam.check <- .checkBam(bam.file=bam.file, verbose=verbose)
     if (!is.null(paired))
-      if (paired.check!=paired)
+      if (bam.check$paired!=paired)
         stop("Expected endness is different from detected! Exiting",call.=FALSE)
     trim <- utils::head(rep.int(trim, times=2), 2)
     bam.processed <- .readBam(
-      bam.file=bam.file, paired=paired.check,
+      bam.file=bam.file, bam.check=bam.check,
       min.mapq=min.mapq, min.baseq=min.baseq,
+      min.prob=min.prob, highest.prob=highest.prob,
       skip.duplicates=skip.duplicates, trim=trim,
       nthreads=nthreads, verbose=verbose
     )
@@ -126,6 +144,7 @@ preprocessBam <- function (bam.file,
   } else {
     if (verbose &
         !all(missing(paired), missing(min.mapq), missing(min.baseq),
+             missing(min.prob), missing(highest.prob),
              missing(skip.duplicates), missing(trim), missing(nthreads))) 
       message("Already preprocessed BAM supplied as an input. Explicitly set",
               " 'preprocessBam' options will have no effect.")

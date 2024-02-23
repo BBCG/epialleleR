@@ -103,6 +103,6 @@ const unsigned char triad_reverse_context[512] = {
 // triad: pointer to the first char in the triad
 // lookup: lookup table as above
 // 9-bit index is calculated using three last bits of each of bases in the triad
-#define triad_to_ctx(triad, lookup) lookup[ (((unsigned int)(triad[0])&7)<<6) | ((triad[1]&7)<<3) | (triad[2]&7) ]
+#define triad_to_ctx(triad, lookup) lookup[ (((unsigned int)((triad)[0])&7)<<6) | ((((triad)[1])&7)<<3) | (((triad)[2])&7) ]
 
 

@@ -25,6 +25,16 @@ test_simulateBam <- function () {
   )
   
   simulateBam(
+    pos=1,
+    "AB"=1:10,
+    Zf=list(c(1.1, -3.3, 1e-4)),
+    ZC=list(10:20), Zc=list(-10:0),
+    ZS=list(240:260), Zs=list(-260:-240),
+    ZI=list(65530:65540), Zi=list(-65540:-65530),
+    output.bam.file=out.bam
+  )
+  
+  simulateBam(
     output.bam.file=out.bam,
     pos=1:6,
     XM=c("ZZZzzZZZ", "ZZzzzzZZ"),

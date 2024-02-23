@@ -9,6 +9,8 @@ preprocessBam(
   paired = NULL,
   min.mapq = 0,
   min.baseq = 0,
+  min.prob = -1,
+  highest.prob = TRUE,
   skip.duplicates = FALSE,
   trim = 0,
   nthreads = 1,
@@ -26,6 +28,23 @@ quality (default: 0).}
 
 \item{min.baseq}{non-negative integer threshold for minimum nucleotide base
 quality (default: 0).}
+
+\item{min.prob}{integer threshold for minimum scaled probability of
+modification (methylation) to consider. Affects processing long-read
+sequencing alignments only. According to SAM/BAM specification, the
+continuous base modification probability range 0.0 to 1.0 is
+remapped in equal sized portions to the discrete integers 0 to 255
+inclusively. If default (-1), then all C+m and G-m cytosine
+methylation modifications recorded in MM/Mm tag will be included, even if
+ML/Ml tag with probabilities is absent (in such case, probability of
+modification equals -1).}
+
+\item{highest.prob}{boolean defining if methylation modification must have
+the highest probability among all modifications at a particular base to be
+considered in the analyses (default: TRUE). Affects processing long-read
+sequencing alignments only. If default (TRUE) and ML/Ml tag with probability
+scores is absent, then cytosines with more than one modification will be
+omitted (as the probability of all modifications will be equal).}
 
 \item{skip.duplicates}{boolean defining if duplicate aligned reads should be
 skipped (default: FALSE). Option has no effect if duplicate reads were not
