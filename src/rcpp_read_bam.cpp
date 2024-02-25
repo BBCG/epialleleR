@@ -368,6 +368,8 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
 // LONG-READ SINGLE-END BAM
 // https://samtools.github.io/hts-specs/SAMv1.pdf
 // https://samtools.github.io/hts-specs/SAMtags.pdf
+// https://github.com/samtools/hts-specs/tree/master/test/SAMtags
+// https://github.com/samtools/htslib/tree/develop/test/base_mods
 
 // EXPLAIN THE LOGIC IN DOCS - NAMELY, DIFF BETWEEN SHORT-READ (BISULFITE) AND
 // LONG-READ (NATIVE) SEQUENCING METHYLATION CALLING (GENOME IS ABSOLUTELY
@@ -417,21 +419,14 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
   seq->reserve(0xFFFFF); xm->reserve(0xFFFFF);
 
   // read holders
-  bool strand_has_mods[2];                                                      // 
-  int query_width = max_query_width;                                                                            // NON-refspaced query length
-  uint8_t  *record_seq    = (uint8_t*)       malloc(sizeof(uint8_t) *(query_width+4));                       // NON-refspaced query SEQ array, plus NN at the end
-  // uint8_t **record_xm = (uint8_t**) malloc(2 * sizeof(uint8_t**));       // NON-refspaced query 2D XM array for both strands
-  uint8_t *record_xm[2];       // NON-refspaced query 2D XM array for both strands
-  for(int i=0; i<2; i++) record_xm[i] = (uint8_t*) malloc(query_width * sizeof(uint8_t));
-  // uint8_t (*record_xm)[2] = (uint8_t (*)[2]) malloc(sizeof(uint8_t[2][query_width]));       // NON-refspaced query 2D XM array for both strands
-  // uint8_t (*record_xm)[2] = (uint8_t (*)[2]) malloc(sizeof(uint8_t) *  query_width * sizeof(*record_xm));       // NON-refspaced query 2D XM array for both strands
-  int record_width = max_record_width;                                                                          // refspaced record ISIZE/TLEN
-  uint8_t  *record_seq_rs    = (uint8_t*)       malloc(sizeof(uint8_t) * record_width);                         // refspaced record SEQ array
-  // uint8_t **record_xm_rs = (uint8_t**) malloc(2 * sizeof(uint8_t**));       // refspaced record 2D XM array for both strands
-  uint8_t *record_xm_rs[2];       // refspaced record 2D XM array for both strands
-  for(int i=0; i<2; i++) record_xm_rs[i] = (uint8_t*) malloc(record_width * sizeof(uint8_t));
-  // uint8_t (*record_xm_rs)[2] = (uint8_t (*)[2]) malloc(sizeof(uint8_t[2][record_width])); // refspaced record 2D XM array for both strands
-  // uint8_t (*record_xm_rs)[2] = (uint8_t (*)[2]) malloc(sizeof(uint8_t) * record_width * sizeof(*record_xm_rs)); // refspaced record 2D XM array for both strands
+  int query_width = max_query_width;                                            // NON-refspaced query length
+  uint8_t *record_seq = (uint8_t*) malloc(sizeof(uint8_t) *(query_width+4));    // NON-refspaced query SEQ array, plus NN at the end
+  uint8_t *record_xm[2];                                                        // NON-refspaced query 2D XM array for both strands
+  for (int s=0; s<2; s++) record_xm[s] = (uint8_t*) malloc(query_width * sizeof(uint8_t)); // allocate memory for query 2D XM array
+  int record_width = max_record_width;                                          // refspaced record ISIZE/TLEN
+  uint8_t *record_seq_rs = (uint8_t*) malloc(sizeof(uint8_t) * record_width);   // refspaced record SEQ array
+  uint8_t *record_xm_rs[2];                                                     // refspaced record 2D XM array for both strands
+  for (int s=0; s<2; s++) record_xm_rs[s] = (uint8_t*) malloc(record_width * sizeof(uint8_t)); // allocate memory for record 2D XM array
   
   // process alignments
   while( sam_read1(bam_fp, bam_hdr, bam_rec) > 0 ) {                            // rec by rec
@@ -457,28 +452,23 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
     // resize containers if necessary
     if (query_width > max_query_width) {
       max_query_width = query_width;                                            // expand template holders
-      record_seq = (uint8_t *)      realloc(record_seq, sizeof(uint8_t) * (query_width + 4));
-      for(int i=0; i<2; i++) record_xm[i] = (uint8_t*) realloc(record_xm[i], query_width * sizeof(uint8_t));
-      // record_xm  = (uint8_t (*)[2]) realloc(record_xm,  sizeof(uint8_t[2][query_width]));
-      // record_xm  = (uint8_t (*)[2]) realloc(record_xm,  sizeof(uint8_t) *  query_width * sizeof(*record_xm));
+      record_seq = (uint8_t *) realloc(record_seq, (query_width + 4) * sizeof(uint8_t));
+      for(int s=0; s<2; s++) record_xm[s] = (uint8_t*) realloc(record_xm[s], query_width * sizeof(uint8_t));
       if (!record_seq || !record_xm[0] || !record_xm[1]) Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs); // check memory allocation
-
     }
     if (record_width > max_record_width) {
       max_record_width = record_width;                                          // expand template holders
-      record_seq_rs = (uint8_t *)      realloc(record_seq_rs, sizeof(uint8_t) * record_width);
-      for(int i=0; i<2; i++) record_xm_rs[i] = (uint8_t*) realloc(record_xm_rs[i], record_width * sizeof(uint8_t));
-      // record_xm_rs  = (uint8_t (*)[2]) realloc(record_xm_rs,  sizeof(uint8_t[2][record_width]));
-      // record_xm_rs  = (uint8_t (*)[2]) realloc(record_xm_rs,  sizeof(uint8_t) * record_width * sizeof(*record_xm_rs));
+      record_seq_rs = (uint8_t *) realloc(record_seq_rs, record_width * sizeof(uint8_t));
+      for(int s=0; s<2; s++) record_xm_rs[s] = (uint8_t*) realloc(record_xm_rs[s], record_width * sizeof(uint8_t));
       if (!record_seq_rs || !record_xm_rs[0] || !record_xm_rs[1]) Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs); // check memory allocation
     }
 
     // prepare for the new record
-    std::memset(record_seq_rs,   'N', record_width);                            // fill refspaced SEQ holder with N
-    std::memset(record_xm_rs[0], '-', record_width);                            // fill refspaced XM holder for forward strand with N
-    std::memset(record_xm_rs[1], '-', record_width);                            // fill refspaced XM holder for forward strand with N
+    std::memset(record_seq_rs,   'N', record_width);                            // fill refspaced SEQ holder with 'N'
+    std::memset(record_xm_rs[0], '-', record_width);                            // fill refspaced XM holder for forward strand with '-'
+    std::memset(record_xm_rs[1], '-', record_width);                            // fill refspaced XM holder for reverse strand with '-'
     
-    // unpack the sequence string
+    // unpack the sequence string, restore flanking NN's
     for (int i=0; i<query_width; i++) {
       record_seq[i+2] = seq_nt16_str[bam_seqi(record_pseq,i)];
     }
@@ -486,49 +476,37 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
     std::memset(record_seq+query_width+2, 'N', 2);
 
     // create a non-refspaced context strings for both strands
-    std::memset((char*) (record_xm[0]), '?', query_width);
-    std::memset((char*) (record_xm[1]), '*', 30);
-    std::memcpy((char*) (record_xm[0]), "abcdefgh", 8);
-    Rcpp::Rcout << "\nFCTX:" << std::string((const char*) record_xm[0], query_width) << "\n";
-    Rcpp::Rcout <<   "RCTX:" << std::string((const char*) record_xm[1], query_width) << "\n";
-    for (int s=0; s<2; s++) {
-      int context_shift = s ? 0 : 2;                                  // start making genomic context from 2nd base for fwd strand, and 0th base for reverse
-      const unsigned char* context_map = s ? triad_reverse_context : triad_forward_context; // lookup table to use
-      for (int i=0; i<query_width; i++) {
-        record_xm[s][i] = triad_to_ctx((record_seq+context_shift+i), context_map);   // look up context
-      }
-    }
-    Rcpp::Rcout << "\nFCTX:" << std::string((const char*) record_xm[0], query_width) << "\n";
-    Rcpp::Rcout <<   "RCTX:" << std::string((const char*) record_xm[1], query_width) << "\n";
     for (int i=0; i<query_width; i++) {
-      record_xm[0][i] = triad_to_ctx((record_seq+i+2), triad_forward_context);   // look up context
-      record_xm[1][i] = triad_to_ctx((record_seq+i),   triad_reverse_context);   // look up context
+      record_xm[0][i] = triad_to_ctx((record_seq+i+2), triad_forward_context);   // look up fwd context
+      record_xm[1][i] = triad_to_ctx((record_seq+i),   triad_reverse_context);   // look up rev context
     }
-    Rcpp::Rcout << "\nFCTX:" << std::string((const char*) record_xm[0], query_width) << "\n";
-    Rcpp::Rcout <<   "RCTX:" << std::string((const char*) record_xm[1], query_width) << "\n";
-    // WTF...
     
-    // BOTH STRANDS CAN HAVE OVERLAPPING MODS!
+    // BOTH STRANDS CAN HAVE OVERLAPPING MODS ('C+m' and 'G-m')!
     // parse base modifications: any location not reported is implicitly
     // assumed to contain no modification
+    bool strand_has_mods[2] = {0, 0};                                           // bool array with TRUE if XM for fwd==[0] or rev==[1] strand has base mods
     bam_parse_basemod(bam_rec, mod_state);                                      // fill the mod_state structure
     while ((nmods = bam_next_basemod(bam_rec, mod_state, base_mods, max_nmods, &mod_pos)) > 0) { // cycle through modified bases
-      Rcpp::Rcout << mod_pos << record_xm[0][mod_pos] << ":";
-      Rcpp::Rcout << base_mods[0].modified_base << "|" << base_mods[0].canonical_base << "|" << base_mods[0].strand+31 << ", ";
-      if (record_xm[0][mod_pos]<'A') continue;                                     // skip if this position is not a 'hxz'
-      int ismeth = 0, meth_prob = -2, max_other_prob = -2;                      // bool for having meth mod; scaled probabilities: meth mod, maximum of any other mods of a current base
+      int ismeth[2] = {0, 0},                                                   // bool array for pos having meth mod at fwd==[0] or rev==[1] strand;
+        meth_prob[2] = {-2, -2},                                                // int array for probability of meth mod at fwd==[0] or rev==[1] strand;
+        max_other_prob[2] = {-2, -2};                                           // int array for probability of any other mod at fwd==[0] or rev==[1] strand;
       for (int i=0; i<nmods; i++) {                                             // cycle through all mods of a current base
         if (base_mods[i].modified_base=='m' || base_mods[i].modified_base==-27551) { // if it's a 5mC (and any of 'C+m' or 'G-m')
-          ismeth = 1;                                                           // base has meth mod
-          meth_prob = base_mods[i].qual;                                        // record meth prob
-        } else if (max_other_prob < base_mods[i].qual) {                        // if NOT a 5mC and probability is higher than max_other_prob
-            max_other_prob = base_mods[i].qual;                                 // record the highest probability of other modifications
+          ismeth[base_mods[i].strand] = 1;                                      // base has meth mod
+          meth_prob[base_mods[i].strand] = base_mods[i].qual;                   // record meth prob
+        } else if (max_other_prob[base_mods[i].strand] < base_mods[i].qual) {   // if NOT a 5mC and probability is higher than max_other_prob
+            max_other_prob[base_mods[i].strand] = base_mods[i].qual;            // record the highest probability of other modifications
         }
       }
-      if (ismeth &&                                                             // if there is a 5mC modification
-          meth_prob>=min_prob &&                                                // and its probability is not less than min_prob
-          (!highest_prob || meth_prob>max_other_prob)) {                        // and its probability is either highest or highest_prob==FALSE
-        record_xm[0][mod_pos] &= 0b11011111;                                    // uppercase the context char
+      for (int s=0; s<2; s++) {                                                 // as the same pos can have mods on both strands, cycle through strands and apply modification to relevant context string
+        int ctx_strand = abs(record_strand - s);                                // have to flip the context strand for revcomplemented query (because mods are always on NON-revcomp)
+        if (ismeth[s] &&                                                        // if there is a C+m or G-m modification
+            meth_prob[s]>=min_prob &&                                           // and its probability is not less than min_prob
+            (!highest_prob || meth_prob[s]>max_other_prob[s]) &&                // and its probability is either highest or highest_prob==FALSE
+            record_xm[ctx_strand][mod_pos]>'A') {                               // and its not a '.-'
+          record_xm[ctx_strand][mod_pos] &= 0b11011111;                         // uppercase the context char
+          strand_has_mods[ctx_strand] = 1;                                      // record that the context string for this strand has mods
+        }
       }
     }
     
@@ -546,6 +524,7 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
           if (record_qual[query_pos+j] >= min_baseq) {
             record_seq_rs[dest_pos+j] = record_seq[query_pos+2+j];
             record_xm_rs[0][dest_pos+j] = record_xm[0][query_pos+j];
+            record_xm_rs[1][dest_pos+j] = record_xm[1][query_pos+j];
           }
         }
         query_pos += cigar_oplen;
@@ -569,17 +548,18 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
       }
     }
 
-    // pushing record data to vectors
-    rname.push_back(bam_rec->core.tid + 1);                                     // RNAME+1
-    strand.push_back(record_strand + 1);                                        // STRAND is 1 if "CT"/"+", 2 if "GA"/"-"
-    start.push_back(bam_rec->core.pos + trim5 + 1);                             // POS+1
-    seq->emplace_back((const char*) record_seq_rs + trim5, dest_pos - (trim5+trim3)); // SEQ
-    xm->emplace_back( (const char*) record_xm_rs[0] + trim5,  dest_pos - (trim5+trim3)); // XM
-    npushed++;                                                                  // +1
-
-    Rcpp::Rcout << "\ndest_pos:" << dest_pos << ", record_width:" << record_width << ", query_width:" << query_width << ", strand:" << strand.back() << "\n";
-    Rcpp::Rcout << seq->back()/*.substr(0, std::min(record_width, 100))*/ << "\n";
-    Rcpp::Rcout << xm->back()/*.substr(0, std::min(record_width, 100))*/ << "\n\n";
+    // pushing record data to vectors, once for the record strand (even if there are no 'C+m') and once again if the other strand has mods too (has 'G-m')
+    strand_has_mods[record_strand] = 1;                                         // always push at least one context string
+    for (int s=0; s<2; s++) {
+      if (strand_has_mods[s]) {
+        rname.push_back(bam_rec->core.tid + 1);                                 // RNAME+1
+        strand.push_back(s + 1);                                                // STRAND is 1 if "CT"/"+", 2 if "GA"/"-"
+        start.push_back(bam_rec->core.pos + trim5 + 1);                         // POS+1
+        seq->emplace_back((const char*) record_seq_rs   + trim5, dest_pos - (trim5+trim3)); // SEQ
+        xm->emplace_back( (const char*) record_xm_rs[s] + trim5, dest_pos - (trim5+trim3)); // XM
+        npushed++;                                                              // +1
+      }
+    }
   }
 
   // cleaning
@@ -589,10 +569,8 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
   if (thread_pool.pool) hts_tpool_destroy(thread_pool.pool);                    // free thread pool
   free(record_seq_rs);                                                          // and free manually allocated memory
   for(int i=0; i<2; i++) free(record_xm_rs[i]);
-  // free(record_xm_rs);
   free(record_seq);
   for(int i=0; i<2; i++) free(record_xm[i]);
-  // free(record_xm);
 
   // wrap and return the results
   Rcpp::DataFrame res = Rcpp::DataFrame::create(                                // final DF
