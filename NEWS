@@ -79,4 +79,4 @@ Changes in version 1.11.5 (2024-02-12)
 
 Changes in version 1.11.6 (2024-02-29)
 + float and array tags in simulateBam
-+ long-read data input
++ long-read data input (not optimised yet)

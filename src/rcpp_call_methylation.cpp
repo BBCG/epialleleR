@@ -158,16 +158,8 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
           }                                                                     // leave lowercase otherwise
         }
         // *** the actual methylation calling ends here ***
-        
       }
       
-      // if ((record_xm) && (memcmp(xm, record_xm+1, query_width)!=0)) {     // check differences with available XM
-      //   Rcpp::Rcout << nrecs << ": S|" << std::string(rs, query_width+4) << std::endl;
-      //   Rcpp::Rcout << nrecs << ": R|  " << std::string(record_xm+1, query_width) << std::endl;
-      //   Rcpp::Rcout << nrecs << ": C|  " << std::string(xm, query_width) << std::endl;
-      // }
-      
-      // if (!record_xm)
       bam_aux_update_str(in_rec, "XM", query_width, xm);                        // since XM tag is absent, add it
       ncalled++;                                                                // successfully called
     }

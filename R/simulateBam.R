@@ -26,7 +26,7 @@
 #' records are not written to BAM but returned as a
 #' \code{\link[data.table]{data.table}} object for review.
 #' @param qname character vector of query names. When default (NULL), names
-#' like "q0001".."qnnnn" will be assigned.
+#' like "q0001".."qNNNN" will be assigned.
 #' @param flag integer vector of bitwise flags (a combination of the BAM_F*
 #' constants). When default (NULL), zero (i.e., unique, valid, single-end,
 #' aligned read) is assigned for every record.
@@ -59,12 +59,14 @@
 #' @param ... optional tags to add to the records, in the form `tag=value`.
 #' Value can be either:
 #' \itemize{
-#'   \item an integer vector to create a tag with a single integer value (e.g.,
-#'   "NM" tag),
-#'   \item or a float vector to create a tag with a single float value,
+#'   \item an integer vector to create a tag with a single integer value per
+#'   alignment record (e.g., "NM" tag),
+#'   \item or a float vector to create a tag with a single float value per
+#'   alignment record,
 #'   \item or a character vector (e.g., "XM" tag for methylation call string,
 #'   "XG"/"YD"/"ZS" tag for reference strand read was aligned to)
-#'   \item or a list of numeric vectors to create array tags.
+#'   \item or a list of numeric vectors to create tags array holding arrays of
+#'   numeric values.
 #' }
 #' @param verbose boolean to report progress and timings (default: TRUE).
 #' @return number of BAM records written (if `output.bam.file` is not NULL) or

@@ -44,10 +44,14 @@
 #'   chr1 \tab 1 \tab 100 \tab 100 \tab * \tab 4 \tab 0 \tab 0.25
 #' }
 #' 
+#' Please note, that read thresholding by an average methylation level
+#' (as explained above) makes little sense for long-read sequencing alignments,
+#' as such reads can cover multiple regions with very different DNA methylation
+#' properties. Instead, please use \code{\link{extractPatterns}}, limiting
+#' pattern output to the region of interest only.
+#' 
 #' @param bam BAM file location string OR preprocessed output of
-#' \code{\link[epialleleR]{preprocessBam}} function. BAM file alignment records
-#' must contain XG tag (strand information for the reference genome) and
-#' methylation call string (XM tag). Read more about these and other
+#' \code{\link[epialleleR]{preprocessBam}} function. Read more about BAM file
 #' requirements and BAM preprocessing at \code{\link{preprocessBam}}.
 #' @param bed Browser Extensible Data (BED) file location string OR object of
 #' class \code{\link[GenomicRanges]{GRanges}} holding genomic coordinates for
@@ -84,10 +88,13 @@
 #' \code{\link[GenomicRanges]{GRanges}} are \strong{not} sorted internally).
 #' @param threshold.reads boolean defining if sequence reads should be
 #' thresholded before counting reads belonging to variant epialleles (default:
-#' TRUE). Disabling thresholding is possible but makes no sense in this context
-#' as all the reads will be assigned to the variant epiallele, which will result
+#' TRUE). Disabling thresholding is possible but makes no sense in the context
+#' of this function, because
+#' all the reads will be assigned to the variant epiallele, which will result
 #' in VEF==1 (in such case `NA` VEF values are returned in order to avoid
-#' confusion).
+#' confusion). As thresholding is \strong{not} recommended for long-read
+#' sequencing data, this function is \strong{not} recommended for such data
+#' either.
 #' @param threshold.context string defining cytosine methylation context used
 #' for thresholding the reads:
 #' \itemize{
