@@ -79,8 +79,15 @@ by means of HTSlib decompression threads.
 This function is also called internally when BAM file location is supplied as
 an input for other `epialleleR` methods.
 
-Please note that for BAM preprocessing as well as all its reporting methods,
-`epialleleR` requires genomic
+`preprocessBam` currently allows to load both short-read (e.g., bisulfite)
+and long-read (native) sequencing alignments. Specific requirements for these
+types of data are given below.
+}
+\section{Short-read sequencing}{
+
+
+For preprocessing of short reads (and therefore for all reporting
+methods), `epialleleR` requires genomic
 strand (XG tag) and a methylation call string (XM tag) to be present in a
 BAM file - i.e., methylation calling must be performed after read
 mapping/alignment by your software of choice. It is the case for BAM files
@@ -89,12 +96,26 @@ Illumina DRAGEN, Illumina Cloud analysis solutions, as well as
 contemporary Illumina sequencing instruments
 with on-board read mapping/alignment (NextSeq 1000/2000, NovaSeq X),
 therefore such files can be analysed without additional steps.
-For alignments produced by other tools, e.g., BWA-meth, methylation calling
-must be performed prior to BAM loading / reporting, by means of
+For alignments produced by other tools, e.g., BWA-meth or BSMAP, methylation
+calling must be performed prior to BAM loading / reporting, by means of
 \code{\link[epialleleR]{callMethylation}}.
+}
+
+\section{Long-read sequencing}{
+
+
+For preprocessing of long reads, `epialleleR` requires presence of MM (Mm)
+and ML (Ml) tags that hold information on base modifications and related
+probabilities, respectively. These are standard tags described in SAM/BAM
+format specification, therefore relevant tools for analysis and alignment
+of long sequencing reads should be able to produce them.
+}
+
+\section{Other details}{
+
 
 `preprocessBam` always tests if BAM file is paired- or single-ended
-and has all necessary tags (XM/XG) available. It is recommended to use
+and has all necessary tags available. It is recommended to use
 `verbose` processing and check messages for correct identification of
 alignment endness. Otherwise, if the `paired` parameter is set explicitly,
 exception is thrown when expected endness differs from the auto detected one.
@@ -127,9 +148,66 @@ of genomic location (i.e., "unsorted") to perform merging of paired-end
 reads. Error message is shown if it is sorted by genomic location, in this
 case please sort it by QNAME using 'samtools sort -n -o out.bam in.bam'.
 }
+
+\section{Specific considerations for long-read sequencing data}{
+
+
+Any location not reported is implicitly assumed to contain no modification.
+
+According to their specification,
+MM base modification tags are allowed to list modifications observed not
+only on the original sequenced strand (e.g., `C+m`) but also on the 
+opposite strand (e.g., `G-m`). The logic of their processing is as follows
+(with the examples given below):
+
+\itemize{
+  \item if an alignment record has no methylation modifications (neither
+  `C+m`, nor `G-m` are present), this record is, naturally, considered to
+  be a single read with no cytosines methylated
+  \item if an alignment record has `C+m` modification (base modifications
+  on the original sequenced strand), then this record is, naturally,
+  considered to be a single read with cytosine modifications on the
+  sequenced strand
+  \item if an alignment record has `G-m` modification (base modifications
+  on the strand opposite to sequenced), then this record is treated as two
+  reads, with the original sequenced strand having no modifications,
+  while the opposite strand having cytosine modifications
+  \item if both `C+m` and `G-m` are present, then this record is treated
+  as two reads, with both strands having cytosine modifications
+}
+}
+
 \examples{
   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
   bam.data    <- preprocessBam(capture.bam)
+  
+  # Specifics of long-read alignment processing
+  out.bam <- tempfile(pattern="out-", fileext=".bam")
+  
+  simulateBam(
+    seq=c("ACGCCATYCGCGCCA"),
+    Mm=c("C+m,0,2,0;"),
+    Ml=list(as.integer(c(102,128,153))),
+    output.bam.file=out.bam
+  )
+  generateCytosineReport(out.bam, threshold.reads=FALSE, report.context="CX")
+  
+  simulateBam(
+    seq=c("ACGCCATYCGCGCCA"),
+    Mm=c("G-m,0,0,0;"),
+    Ml=list(as.integer(c(138,101,96))),
+    output.bam.file=out.bam
+  )
+  generateCytosineReport(out.bam, threshold.reads=FALSE, report.context="CX")
+  
+  simulateBam(
+    seq=c("ACGCCATYCGCGCCA"),
+    Mm=c("C+m,0,2,0;G-m,0,0,0;"),
+    Ml=list(as.integer(c(102,128,153,138,101,96))),
+    output.bam.file=out.bam
+  )
+  generateCytosineReport(out.bam, threshold.reads=FALSE, report.context="CX")
+  
 }
 \seealso{
 \code{\link{preprocessGenome}} for preloading reference
@@ -144,6 +222,7 @@ analysing the distribution of per-read beta values, and `epialleleR`
 vignettes for the description of usage and sample data.
 
 Sequence Alignment/Map \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{format specifications},
+specifications for \href{https://samtools.github.io/hts-specs/SAMtags.pdf}{optional SAM tags},
 duplicate alignments marking by \href{http://www.htslib.org/doc/samtools-markdup.html}{Samtools}
 and \href{https://support.illumina.com/content/dam/illumina-support/help/Illumina_DRAGEN_Bio_IT_Platform_v3_7_1000000141465/Content/SW/Informatics/Dragen/DuplicateMarking_fDG.htm}{Illumina DRAGEN Bio IT Platform}.
 }
