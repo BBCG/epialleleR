@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.6</span>
       </span>
     </div>
 
@@ -68,6 +68,8 @@
 <span>  paired <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  min.mapq <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  min.baseq <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  min.prob <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,</span>
+<span>  highest.prob <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  skip.duplicates <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  trim <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  nthreads <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -94,6 +96,27 @@ quality (default: 0).</p></dd>
 <dt>min.baseq</dt>
 <dd><p>non-negative integer threshold for minimum nucleotide base
 quality (default: 0).</p></dd>
+
+
+<dt>min.prob</dt>
+<dd><p>integer threshold for minimum scaled probability of
+modification (methylation) to consider. Affects processing long-read
+sequencing alignments only. According to SAM/BAM specification, the
+continuous base modification probability range 0.0 to 1.0 is
+remapped in equal sized portions to the discrete integers 0 to 255
+inclusively. If default (-1), then all C+m and G-m cytosine
+methylation modifications recorded in MM/Mm tag will be included, even if
+ML/Ml tag with probabilities is absent (in such case, probability of
+modification equals -1).</p></dd>
+
+
+<dt>highest.prob</dt>
+<dd><p>boolean defining if methylation modification must have
+the highest probability among all modifications at a particular base to be
+considered in the analyses (default: TRUE). Affects processing long-read
+sequencing alignments only. If default (TRUE) and ML/Ml tag with probability
+scores is absent, then cytosines with more than one modification will be
+omitted (as the probability of all modifications will be equal).</p></dd>
 
 
 <dt>skip.duplicates</dt>
@@ -136,8 +159,17 @@ is used to read the data, therefore it is possible to speed up the loading
 by means of HTSlib decompression threads.</p>
 <p>This function is also called internally when BAM file location is supplied as
 an input for other `epialleleR` methods.</p>
-<p>Please note that for BAM preprocessing as well as all its reporting methods,
-`epialleleR` requires genomic
+<p>`preprocessBam` currently allows to load both short-read (e.g., bisulfite)
+and long-read (native) sequencing alignments. Specific requirements for these
+types of data are given below.</p>
+    </div>
+    <div id="short-read-sequencing">
+    <h2>Short-read sequencing</h2>
+    
+
+
+<p>For preprocessing of short reads (and therefore for all reporting
+methods), `epialleleR` requires genomic
 strand (XG tag) and a methylation call string (XM tag) to be present in a
 BAM file - i.e., methylation calling must be performed after read
 mapping/alignment by your software of choice. It is the case for BAM files
@@ -146,11 +178,28 @@ Illumina DRAGEN, Illumina Cloud analysis solutions, as well as
 contemporary Illumina sequencing instruments
 with on-board read mapping/alignment (NextSeq 1000/2000, NovaSeq X),
 therefore such files can be analysed without additional steps.
-For alignments produced by other tools, e.g., BWA-meth, methylation calling
-must be performed prior to BAM loading / reporting, by means of
+For alignments produced by other tools, e.g., BWA-meth or BSMAP, methylation
+calling must be performed prior to BAM loading / reporting, by means of
 <code><a href="callMethylation.html">callMethylation</a></code>.</p>
+    </div>
+    <div id="long-read-sequencing">
+    <h2>Long-read sequencing</h2>
+    
+
+
+<p>For preprocessing of long reads, `epialleleR` requires presence of MM (Mm)
+and ML (Ml) tags that hold information on base modifications and related
+probabilities, respectively. These are standard tags described in SAM/BAM
+format specification, therefore relevant tools for analysis and alignment
+of long sequencing reads should be able to produce them.</p>
+    </div>
+    <div id="other-details">
+    <h2>Other details</h2>
+    
+
+
 <p>`preprocessBam` always tests if BAM file is paired- or single-ended
-and has all necessary tags (XM/XG) available. It is recommended to use
+and has all necessary tags available. It is recommended to use
 `verbose` processing and check messages for correct identification of
 alignment endness. Otherwise, if the `paired` parameter is set explicitly,
 exception is thrown when expected endness differs from the auto detected one.</p>
@@ -179,6 +228,31 @@ of genomic location (i.e., "unsorted") to perform merging of paired-end
 reads. Error message is shown if it is sorted by genomic location, in this
 case please sort it by QNAME using 'samtools sort -n -o out.bam in.bam'.</p>
     </div>
+    <div id="specific-considerations-for-long-read-sequencing-data">
+    <h2>Specific considerations for long-read sequencing data</h2>
+    
+
+
+<p>Any location not reported is implicitly assumed to contain no modification.</p>
+<p>According to SAM format specification,
+MM base modification tags are allowed to list modifications observed not
+only on the original sequenced strand (e.g., `C+m`) but also on the 
+opposite strand (e.g., `G-m`). The logic of their processing is as follows
+(with the examples given below):</p>
+<ul><li><p>if an alignment record has no methylation modifications (neither
+  `C+m`, nor `G-m` are present), this record is, naturally, considered to
+  be a single read with no cytosines methylated</p></li>
+<li><p>if an alignment record has `C+m` modification (base modifications
+  on the original sequenced strand), then this record is, naturally,
+  considered to be a single read with cytosine modifications on the
+  sequenced strand</p></li>
+<li><p>if an alignment record has `G-m` modification (base modifications
+  on the strand opposite to sequenced), then this record is treated as two
+  reads, with the original sequenced strand having no modifications,
+  while the opposite strand having cytosine modifications</p></li>
+<li><p>if both `C+m` and `G-m` are present, then this record is treated
+  as two reads, with both strands having cytosine modifications</p></li>
+</ul></div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p><code><a href="preprocessGenome.html">preprocessGenome</a></code> for preloading reference
@@ -191,6 +265,7 @@ exploring methylation patterns, <code><a href="generateBedEcdf.html">generateBed
 analysing the distribution of per-read beta values, and `epialleleR`
 vignettes for the description of usage and sample data.</p>
 <p>Sequence Alignment/Map <a href="https://samtools.github.io/hts-specs/SAMv1.pdf" class="external-link">format specifications</a>,
+specifications for <a href="https://samtools.github.io/hts-specs/SAMtags.pdf" class="external-link">optional SAM tags</a>,
 duplicate alignments marking by <a href="http://www.htslib.org/doc/samtools-markdup.html" class="external-link">Samtools</a>
 and <a href="https://support.illumina.com/content/dam/illumina-support/help/Illumina_DRAGEN_Bio_IT_Platform_v3_7_1000000141465/Content/SW/Informatics/Dragen/DuplicateMarking_fDG.htm" class="external-link">Illumina DRAGEN Bio IT Platform</a>.</p></div>
     </div>
@@ -200,9 +275,97 @@ and <a href="https://support.illumina.com/content/dam/illumina-support/help/Illu
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="va">capture.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">bam.data</span>    <span class="op">&lt;-</span> <span class="fu">preprocessBam</span><span class="op">(</span><span class="va">capture.bam</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> paired-end, name-sorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.014s]</span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># Specifics of long-read alignment processing</span></span></span>
+<span class="r-in"><span>  <span class="va">out.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>pattern<span class="op">=</span><span class="st">"out-"</span>, fileext<span class="op">=</span><span class="st">".bam"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="fu"><a href="simulateBam.html">simulateBam</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    seq<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ACGCCATYCGCGCCA"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    Mm<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C+m,0,2,0;"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    Ml<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">102</span>,<span class="fl">128</span>,<span class="fl">153</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    output.bam.file<span class="op">=</span><span class="va">out.bam</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Writing sample BAM </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
+<span class="r-in"><span>  <span class="fu"><a href="generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">out.bam</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span>, report.context<span class="op">=</span><span class="st">"CX"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> long-read, single-end, unsorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing cytosine report </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     rname strand   pos context  meth unmeth</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;fctr&gt; &lt;fctr&gt; &lt;int&gt;  &lt;fctr&gt; &lt;int&gt;  &lt;int&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   chrS      +     2      CG     1      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:   chrS      +     4     CHH     0      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   chrS      +     5     CHH     0      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:   chrS      +     9      CG     1      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:   chrS      +    11      CG     1      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:   chrS      +    13     CHH     0      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7:   chrS      +    14     CHH     0      1</span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="fu"><a href="simulateBam.html">simulateBam</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    seq<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ACGCCATYCGCGCCA"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    Mm<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"G-m,0,0,0;"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    Ml<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">138</span>,<span class="fl">101</span>,<span class="fl">96</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    output.bam.file<span class="op">=</span><span class="va">out.bam</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Writing sample BAM </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
+<span class="r-in"><span>  <span class="fu"><a href="generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">out.bam</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span>, report.context<span class="op">=</span><span class="st">"CX"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> long-read, single-end, unsorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing cytosine report </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      rname strand   pos context  meth unmeth</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     &lt;fctr&gt; &lt;fctr&gt; &lt;int&gt;  &lt;fctr&gt; &lt;int&gt;  &lt;int&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:   chrS      +     2      CG     0      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:   chrS      -     3      CG     1      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:   chrS      +     4     CHH     0      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:   chrS      +     5     CHH     0      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:   chrS      +     9      CG     0      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:   chrS      -    10      CG     1      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:   chrS      +    11      CG     0      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:   chrS      -    12      CG     1      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:   chrS      +    13     CHH     0      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:   chrS      +    14     CHH     0      1</span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="fu"><a href="simulateBam.html">simulateBam</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    seq<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ACGCCATYCGCGCCA"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    Mm<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C+m,0,2,0;G-m,0,0,0;"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    Ml<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">102</span>,<span class="fl">128</span>,<span class="fl">153</span>,<span class="fl">138</span>,<span class="fl">101</span>,<span class="fl">96</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    output.bam.file<span class="op">=</span><span class="va">out.bam</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Writing sample BAM </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
+<span class="r-in"><span>  <span class="fu"><a href="generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">out.bam</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span>, report.context<span class="op">=</span><span class="st">"CX"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> long-read, single-end, unsorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing cytosine report </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      rname strand   pos context  meth unmeth</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     &lt;fctr&gt; &lt;fctr&gt; &lt;int&gt;  &lt;fctr&gt; &lt;int&gt;  &lt;int&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:   chrS      +     2      CG     1      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:   chrS      -     3      CG     1      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:   chrS      +     4     CHH     0      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:   chrS      +     5     CHH     0      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:   chrS      +     9      CG     1      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:   chrS      -    10      CG     1      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:   chrS      +    11      CG     1      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:   chrS      -    12      CG     1      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:   chrS      +    13     CHH     0      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:   chrS      +    14     CHH     0      1</span>
+<span class="r-in"><span>  </span></span>
 </code></pre></div>
     </div>
   </div>

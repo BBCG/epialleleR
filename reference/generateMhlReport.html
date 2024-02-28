@@ -18,7 +18,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.6</span>
       </span>
     </div>
 
@@ -81,9 +81,7 @@
     <h2>Arguments</h2>
     <dl><dt>bam</dt>
 <dd><p>BAM file location string OR preprocessed output of
-<code><a href="preprocessBam.html">preprocessBam</a></code> function. BAM file alignment records
-must contain XG tag (strand information for the reference genome) and
-methylation call string (XM tag). Read more about these and other
+<code><a href="preprocessBam.html">preprocessBam</a></code> function. Read more about BAM file
 requirements and BAM preprocessing at <code><a href="preprocessBam.html">preprocessBam</a></code>.</p></dd>
 
 
@@ -247,29 +245,29 @@ beta values.</p></div>
 <span class="r-in"><span>  <span class="co"># lMHL report</span></span></span>
 <span class="r-in"><span>  <span class="va">mhl.report</span> <span class="op">&lt;-</span> <span class="fu">generateMhlReport</span><span class="op">(</span><span class="va">capture.bam</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> paired-end, name-sorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.013s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing lMHL report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.028s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.029s]</span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># lMHL report with a `max.haplotype.window` of 1 is identical to a</span></span></span>
 <span class="r-in"><span>  <span class="co"># conventional cytosine report (or nearly identical when sequencing errors</span></span></span>
 <span class="r-in"><span>  <span class="co"># are present)</span></span></span>
 <span class="r-in"><span>  <span class="va">mhl.report</span> <span class="op">&lt;-</span> <span class="fu">generateMhlReport</span><span class="op">(</span><span class="va">capture.bam</span>, max.haplotype.window<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> paired-end, name-sorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.013s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.011s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing lMHL report </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.028s]</span>
 <span class="r-in"><span>  <span class="va">cg.report</span>  <span class="op">&lt;-</span> <span class="fu"><a href="generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">capture.bam</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> paired-end, name-sorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.014s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing cytosine report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.018s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.019s]</span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="va">mhl.report</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">rname</span>, <span class="va">strand</span>, <span class="va">pos</span>, <span class="va">context</span>, value<span class="op">=</span><span class="va">lmhl</span><span class="op">)</span><span class="op">]</span>,</span></span>
 <span class="r-in"><span>    <span class="va">cg.report</span><span class="op">[</span> , <span class="fu">.</span><span class="op">(</span><span class="va">rname</span>, <span class="va">strand</span>, <span class="va">pos</span>, <span class="va">context</span>, value<span class="op">=</span><span class="va">meth</span><span class="op">/</span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span></span>

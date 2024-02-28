@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.6</span>
       </span>
     </div>
 
@@ -107,13 +107,19 @@ written to the output BAM.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>The function makes cytosine methylation calls for input BAM file and writes
+    <p>The function makes cytosine methylation calls for short-read methylation
+(bisulfite/enzymatic) sequencing alignments from input BAM file and writes
 them in the XM tag of the output BAM file. Calls are made on the basis of
 reference (e.g., genomic) sequence and observed sequence and cytosine context
 of reads. Data reading/processing is done by means of HTSlib,
 therefore it is possible to significantly (&gt;5x) speed up the calling
 using several (4-8) HTSlib decompression threads.</p>
-<p>Methylation calling is only possible if genomic strand the read was aligned
+<p>Methylation calling with this function is only possible for sequencing data
+obtained using either bisulfite or other similar sequencing method
+(enzymatic methylation sequencing). Cytosine methylation in long-read,
+native DNA sequencing alignments should be called using other, appropriate
+tools.</p>
+<p>It is a requirement that the genomic strand the read was aligned
 to is known. This information is typically stored in XG tag of
 Bismark/Illumina BAM files, or in YD tag of BWA-meth alignment files, or in
 ZS tag of BSMAP alignment files.
@@ -138,8 +144,8 @@ and correctly recognised, however all the other symbols (e.g., extended IUPAC
 symbols, MRSVWYHKDB) within sequences are converted to N.</p>
 <p>As a reference sequence, the function expects either location of
 (preferably `bgzip`ped) FASTA file or an object obtained by
-<code><a href="preprocessGenome.html">preprocessGenome</a></code>. The latter is preferred if methylation
-calling is performed on multiple BAM files.</p>
+<code><a href="preprocessGenome.html">preprocessGenome</a></code>. The latter is recommended if methylation
+calling is to be performed on multiple BAM files.</p>
 <p>The alignment records of the output BAM file will contain additional XM tag
 with the methylation
 call string for every mapped read which did not have XM tag available.
@@ -158,6 +164,7 @@ of names and lengths of reference sequences).</p>
 and `epialleleR` vignettes for the description of usage and sample data.</p>
 <p><a href="https://www.bioinformatics.babraham.ac.uk/projects/bismark/" class="external-link">Bismark</a> Bisulfite Read Mapper and Methylation Caller,
 <a href="https://arxiv.org/abs/1401.1129" class="external-link">bwa-meth</a> for fast and accurate alignment of long bisulfite-seq reads,
+<a href="https://doi.org/10.1186/1471-2105-10-232" class="external-link">BSMAP</a>: whole genome bisulfite sequence MAPping program,
 or info on <a href="https://support-docs.illumina.com/SW/dragen_v42/Content/SW/DRAGEN/MPipelineMeth_fDG.htm" class="external-link">Illumina DRAGEN Bio IT Platform</a>.</p></div>
     </div>
 
@@ -169,7 +176,7 @@ or info on <a href="https://support-docs.illumina.com/SW/dragen_v42/Content/SW/D
 <span class="r-in"><span>    genome<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"test"</span>, <span class="st">"reference.fasta.gz"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading reference genome file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Making methylation calls </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.022s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $nrecs</span>

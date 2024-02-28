@@ -18,7 +18,7 @@ fields."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mat
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.6</span>
       </span>
     </div>
 
@@ -93,7 +93,7 @@ records are not written to BAM but returned as a
 
 <dt>qname</dt>
 <dd><p>character vector of query names. When default (NULL), names
-like "q0001".."qnnnn" will be assigned.</p></dd>
+like "q0001".."qNNNN" will be assigned.</p></dd>
 
 
 <dt>flag</dt>
@@ -157,9 +157,15 @@ corresponding query sequences (`seq`) for every record.</p></dd>
 
 <dt>...</dt>
 <dd><p>optional tags to add to the records, in the form `tag=value`.
-Can be either integer vector (e.g., for "NM" tag),
-or character vector (e.g., "XM" tag for methylation call string,
-"XG"/"YD"/"ZS" tag for reference strand read was aligned to).</p></dd>
+Value can be either:</p><ul><li><p>an integer vector to create a tag with a single integer value per
+  alignment record (e.g., "NM" tag),</p></li>
+<li><p>or a float vector to create a tag with a single float value per
+  alignment record,</p></li>
+<li><p>or a character vector (e.g., "XM" tag for methylation call string,
+  "XG"/"YD"/"ZS" tag for reference strand read was aligned to)</p></li>
+<li><p>or a list of numeric vectors to create tags array holding arrays of
+  numeric values.</p></li>
+</ul></dd>
 
 
 <dt>verbose</dt>
@@ -213,18 +219,22 @@ DNA methylation heterogeneity calculation from bisulfite alignments.</p></div>
 <span class="r-in"><span>    output.bam.file<span class="op">=</span><span class="va">out.bam</span>,</span></span>
 <span class="r-in"><span>    pos<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    XM<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ZZZzzZZZ"</span>, <span class="st">"ZZzzzzZZ"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    XG<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CT"</span>, <span class="st">"AG"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    XG<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CT"</span>, <span class="st">"AG"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    xi<span class="op">=</span><span class="fl">5</span><span class="op">:</span><span class="fl">6</span>,</span></span>
+<span class="r-in"><span>    xf<span class="op">=</span><span class="fl">0.05</span>,</span></span>
+<span class="r-in"><span>    ai<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    af<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Writing sample BAM </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
 <span class="r-in"><span>  <span class="fu"><a href="generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">out.bam</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> single-end alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing cytosine report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      rname strand   pos context  meth unmeth</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     &lt;fctr&gt; &lt;fctr&gt; &lt;int&gt;  &lt;fctr&gt; &lt;int&gt;  &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1:   chrS      +     1      CG     1      0</span>
@@ -243,6 +253,7 @@ DNA methylation heterogeneity calculation from bisulfite alignments.</p></div>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 14:   chrS      +     8      CG     1      0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 15:   chrS      -     8      CG     1      0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 16:   chrS      -     9      CG     1      0</span>
+<span class="r-in"><span>  <span class="co"># check this BAM with `samtools view` or using `output.bam.file=NULL`</span></span></span>
 </code></pre></div>
     </div>
   </div>

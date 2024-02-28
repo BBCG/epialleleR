@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.6</span>
       </span>
     </div>
 
@@ -93,8 +93,8 @@
 <li>calling cytosine methylation and saving calls in BAM file (<em><code>callMethylation</code></em>)</li>
 <li>creating sample BAM files given mandatory and optional BAM fields (<em><code>simulateBam</code></em>)</li>
 <li>conventional reporting of cytosine methylation (<em><code>generateCytosineReport</code></em>)</li>
-<li>calling the hypermethylated variant epiallele frequency (VEF) at the level of genomic regions (<em><code>generate[Bed|Amplicon|Capture]Report</code></em>) or individual cytosines (<em><code>generateCytosineReport</code></em>)</li>
-<li>calculating linearised Methylated Haplotype Load (lMHL, <em><code>generateMhlReport</code></em>)</li>
+<li>reporting the hypermethylated variant epiallele frequency (VEF) at the level of genomic regions (<em><code>generate[Bed|Amplicon|Capture]Report</code></em>) or individual cytosines (<em><code>generateCytosineReport</code></em>)</li>
+<li>reporting linearised Methylated Haplotype Load (lMHL, <em><code>generateMhlReport</code></em>)</li>
 <li>extracting methylation patterns for genomic region of interest (<em><code>extractPatterns</code></em>)</li>
 <li>testing for the association between epiallele methylation status and sequence variations (<em><code>generateVcfReport</code></em>)</li>
 <li>assessing the distribution of per-read beta values for genomic regions of interest (<em><code>generateBedEcdf</code></em>)</li>
@@ -103,6 +103,15 @@
 <div class="section level3">
 <h3 id="recent-improvements">Recent improvements<a class="anchor" aria-label="anchor" href="#recent-improvements"></a>
 </h3>
+<div class="section level5">
+<h5 id="v112-bioc-319">v1.12 [BioC 3.19]<a class="anchor" aria-label="anchor" href="#v112-bioc-319"></a>
+</h5>
+<ul>
+<li>inputs long-read sequencing alignments</li>
+<li>full support for short-read sequencing alignments by Illumina DRAGEN, Bismark, bwa-meth, BSMAP</li>
+<li>RRBS-specific options</li>
+</ul>
+</div>
 <div class="section level5">
 <h5 id="v110-bioc-318">v1.10 [BioC 3.18]<a class="anchor" aria-label="anchor" href="#v110-bioc-318"></a>
 </h5>
@@ -118,7 +127,7 @@
 </h5>
 <ul>
 <li>significant speed-up</li>
-<li>method to visualize methylation patterns</li>
+<li>method to extract and visualize methylation patterns</li>
 </ul>
 </div>
 <div class="section level5">

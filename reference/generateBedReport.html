@@ -20,7 +20,7 @@ threshold."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.6</span>
       </span>
     </div>
 
@@ -124,9 +124,7 @@ threshold.</p>
     <h2>Arguments</h2>
     <dl><dt>bam</dt>
 <dd><p>BAM file location string OR preprocessed output of
-<code><a href="preprocessBam.html">preprocessBam</a></code> function. BAM file alignment records
-must contain XG tag (strand information for the reference genome) and
-methylation call string (XM tag). Read more about these and other
+<code><a href="preprocessBam.html">preprocessBam</a></code> function. Read more about BAM file
 requirements and BAM preprocessing at <code><a href="preprocessBam.html">preprocessBam</a></code>.</p></dd>
 
 
@@ -157,10 +155,13 @@ matching of amplicon-based NGS reads (default: 1).</p></dd>
 <dt>threshold.reads</dt>
 <dd><p>boolean defining if sequence reads should be
 thresholded before counting reads belonging to variant epialleles (default:
-TRUE). Disabling thresholding is possible but makes no sense in this context
-as all the reads will be assigned to the variant epiallele, which will result
+TRUE). Disabling thresholding is possible but makes no sense in the context
+of this function, because
+all the reads will be assigned to the variant epiallele, which will result
 in VEF==1 (in such case `NA` VEF values are returned in order to avoid
-confusion).</p></dd>
+confusion). As thresholding is <strong>not</strong> recommended for long-read
+sequencing data, this function is <strong>not</strong> recommended for such data
+either.</p></dd>
 
 
 <dt>threshold.context</dt>
@@ -278,7 +279,12 @@ threshold.context = "CG", min.context.sites = 2, min.context.beta = 0.5,
 max.outofcontext.beta = 0.1), the input and results will look as following:</p>
 <table class="table table"><tr><td>methylation string</td><td>threshold</td><td>explained</td></tr><tr><td>...Z..x+.h..x..h.</td><td>below</td><td>min.context.sites &lt; 2 (only one zZ base)</td></tr><tr><td>...Z..z.h..x..h.</td><td>above</td><td>pass all criteria</td></tr><tr><td>...Z..z.h..X..h.</td><td>below</td><td>max.outofcontext.beta &gt; 0.1 (1XH / 3xXhH = 0.33)</td></tr><tr><td>...Z..z.h..z-.h.</td><td>below</td><td>min.context.beta &lt; 0.5 (1Z / 3zZ = 0.33)</td></tr></table><p>Only the second read will satisfy all of the thresholding criteria, leading
 to the following BED report (given that all reads map to chr1:+:1-16):</p>
-<table class="table table"><tr><td>seqnames</td><td>start</td><td>end</td><td>width</td><td>strand</td><td>nreads+</td><td>nreads-</td><td>VEF</td></tr><tr><td>chr1</td><td>1</td><td>100</td><td>100</td><td>*</td><td>4</td><td>0</td><td>0.25</td></tr></table></div>
+<table class="table table"><tr><td>seqnames</td><td>start</td><td>end</td><td>width</td><td>strand</td><td>nreads+</td><td>nreads-</td><td>VEF</td></tr><tr><td>chr1</td><td>1</td><td>100</td><td>100</td><td>*</td><td>4</td><td>0</td><td>0.25</td></tr></table><p>Please note, that read thresholding by an average methylation level
+(as explained above) makes little sense for long-read sequencing alignments,
+as such reads can cover multiple regions with very different DNA methylation
+properties. Instead, please use <code><a href="extractPatterns.html">extractPatterns</a></code>, limiting
+pattern output to the region of interest only.</p>
+    </div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p><code><a href="preprocessBam.html">preprocessBam</a></code> for preloading BAM data,
@@ -303,15 +309,15 @@ the seqlevels style.</p></div>
 <span class="r-in"><span>  <span class="va">amplicon.report</span> <span class="op">&lt;-</span> <span class="fu">generateAmpliconReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>,</span></span>
 <span class="r-in"><span>                                            bed<span class="op">=</span><span class="va">amplicon.bed</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.008s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.007s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> paired-end, name-sorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.004s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing amplicon report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.015s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.013s]</span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># capture NGS</span></span></span>
 <span class="r-in"><span>  <span class="va">capture.bam</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>,</span></span>
@@ -320,28 +326,28 @@ the seqlevels style.</p></div>
 <span class="r-in"><span>                                package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">capture.report</span> <span class="op">&lt;-</span> <span class="fu">generateCaptureReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.008s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.007s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> paired-end, name-sorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.013s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing capture report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.018s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.013s]</span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># generateAmpliconReport and generateCaptureReport are just aliases</span></span></span>
 <span class="r-in"><span>  <span class="co"># of the generateBedReport</span></span></span>
 <span class="r-in"><span>  <span class="va">bed.report</span> <span class="op">&lt;-</span> <span class="fu">generateBedReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span>,</span></span>
 <span class="r-in"><span>                                  bed.type<span class="op">=</span><span class="st">"capture"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.008s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.007s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> paired-end, name-sorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.011s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing capture report </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.013s]</span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">capture.report</span>, <span class="va">bed.report</span><span class="op">)</span></span></span>
