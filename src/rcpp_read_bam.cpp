@@ -2,6 +2,7 @@
 #include <htslib/hts.h>
 #include <htslib/sam.h>
 #include <htslib/thread_pool.h>
+#include "epialleleR.h"
 
 // [[Rcpp::depends(Rhtslib)]]
 
@@ -12,7 +13,7 @@
 // [?] reverse QNAME
 // [ ] free resources on interrupt
 
-// PAIRED-END BAM
+// SHORT-READ PAIRED-END BAM
 
 // [[Rcpp::export]]
 Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           // file name
@@ -30,14 +31,14 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   
   // file IO
   htsFile *bam_fp = hts_open(fn.c_str(), "r");                                  // try open file
-  if (bam_fp==NULL) Rcpp::stop("Unable to open BAM file for reading");          // fall back if error
+  if (!bam_fp) Rcpp::stop("Unable to open BAM file for reading");               // fall back if error
   htsThreadPool thread_pool = {NULL, 0};                                        // thread pool cuts time by 30%
   if (nthreads>0) {
     thread_pool.pool = hts_tpool_init(nthreads);                                // when initiated for >0 threads
     hts_set_opt(bam_fp, HTS_OPT_THREAD_POOL, &thread_pool);                     // and bound to the file pointer
   }
   bam_hdr_t *bam_hdr = sam_hdr_read(bam_fp);                                    // try read file header
-  if (bam_hdr==NULL) Rcpp::stop("Unable to read BAM header");                   // fall back if error  
+  if (!bam_hdr) Rcpp::stop("Unable to read BAM header");                        // fall back if error  
   bam1_t *bam_rec = bam_init1();                                                // create BAM alignment structure
   
   // main containers
@@ -71,13 +72,14 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
     nrecs++;                                                                    // BAM alignment records ++
     if ((nrecs & 0xFFFFF) == 0) Rcpp::checkUserInterrupt();                     // every ~1M reads check for the interrupt
     
-    if ((bam_rec->core.qual < min_mapq) ||                                      // skip if mapping quality < min.mapq
+    if ((bam_rec->core.flag & BAM_FUNMAP) ||                                    // skip if unmapped
         (!(bam_rec->core.flag & BAM_FPROPER_PAIR)) ||                           // or if not a proper pair
+        (bam_rec->core.qual < min_mapq) ||                                      // or if mapping quality < min.mapq
         (skip_duplicates && (bam_rec->core.flag & BAM_FDUP))) continue;         // or if record is an optical/PCR duplicate
     
     char *rec_strand = (char*) bam_aux_get(bam_rec, "XG");                      // genome strand
     char *rec_xm = (char*) bam_aux_get(bam_rec, "XM");                          // methylation string
-    if ((rec_strand==NULL) || (rec_xm==NULL)) continue;                         // skip if no XM/XG tags (no methylation info available)
+    if (!rec_strand || !rec_xm) continue;                                       // skip if no XM/XG tags (no methylation info available)
     
     // check if not the same template (QNAME)
     if ((strcmp(templ_qname, bam_get_qname(bam_rec)) != 0)) {                
@@ -98,8 +100,7 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
         templ_qual_rs = (uint8_t *) realloc(templ_qual_rs, max_templ_width);
         templ_seq_rs  = (uint8_t *) realloc(templ_seq_rs,  max_templ_width);
         templ_xm_rs   = (uint8_t *) realloc(templ_xm_rs,   max_templ_width);
-        if (templ_qual_rs==NULL || templ_seq_rs==NULL || templ_xm_rs==NULL)     // check memory allocation
-          Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs);
+        if (!templ_qual_rs || !templ_seq_rs || !templ_xm_rs) Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs); // check memory allocation
       }
       std::memset(templ_qual_rs, (uint8_t) min_baseq, templ_width);             // clean template holders
       std::memset(templ_seq_rs, 'N', templ_width);
@@ -201,7 +202,7 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
 
 // #############################################################################
 
-// SINGLE-END BAM
+// SHORT-READ SINGLE-END BAM
 
 // [[Rcpp::export]]
 Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           // file name
@@ -217,14 +218,14 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
   
   // file IO
   htsFile *bam_fp = hts_open(fn.c_str(), "r");                                  // try open file
-  if (bam_fp==NULL) Rcpp::stop("Unable to open BAM file for reading");          // fall back if error
+  if (!bam_fp) Rcpp::stop("Unable to open BAM file for reading");               // fall back if error
   htsThreadPool thread_pool = {NULL, 0};                                        // thread pool cuts time by 30%
   if (nthreads>0) {
     thread_pool.pool = hts_tpool_init(nthreads);                                // when initiated for >0 threads
     hts_set_opt(bam_fp, HTS_OPT_THREAD_POOL, &thread_pool);                     // and bound to the file pointer
   }
   bam_hdr_t *bam_hdr = sam_hdr_read(bam_fp);                                    // try read file header
-  if (bam_hdr==NULL) Rcpp::stop("Unable to read BAM header");                   // fall back if error  
+  if (!bam_hdr) Rcpp::stop("Unable to read BAM header");                        // fall back if error  
   bam1_t *bam_rec = bam_init1();                                                // create BAM alignment structure
   
   // main containers
@@ -247,18 +248,14 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
     nrecs++;                                                                    // BAM alignment records ++
     if ((nrecs & 0xFFFFF) == 0) Rcpp::checkUserInterrupt();                     // every ~1M reads check for the interrupt
 
-    if ((bam_rec->core.qual < min_mapq) ||                                      // skip if mapping quality < min.mapq
+    if ((bam_rec->core.flag & BAM_FUNMAP) ||                                    // skip if unmapped
+        (bam_rec->core.qual < min_mapq) ||                                      // or if mapping quality < min.mapq
         (skip_duplicates && (bam_rec->core.flag & BAM_FDUP))) continue;         // or if record is an optical/PCR duplicate
     
     char *record_strand = (char*) bam_aux_get(bam_rec, "XG");                   // genome strand
     char *record_xm = (char*) bam_aux_get(bam_rec, "XM");                       // methylation string
-    if ((record_strand==NULL) || (record_xm==NULL)) continue;                   // skip if no XM/XG tags (no methylation info available)
+    if (!record_strand || !record_xm) continue;                                 // skip if no XM/XG tags (no methylation info available)
     
-    // clean after old record
-    std::memset(record_seq_rs, 'N', record_width);
-    std::memset(record_xm_rs,  '-', record_width);
-    
-    // start with new record
     // get record sequence, XM, quality string
     uint8_t *record_qual = bam_get_qual(bam_rec);                               // quality string (Phred scale with no +33 offset)
     record_xm++;                                                                // remove leading 'Z' from XM string
@@ -274,9 +271,12 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
       max_record_width = record_width;                                          // expand template holders
       record_seq_rs  = (uint8_t *) realloc(record_seq_rs, record_width * sizeof(uint8_t));
       record_xm_rs   = (uint8_t *) realloc(record_xm_rs,  record_width * sizeof(uint8_t));
-      if (record_seq_rs==NULL || record_xm_rs==NULL)                            // check memory allocation
-        Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs);
+      if (!record_seq_rs || !record_xm_rs) Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs); // check memory allocation
     }
+    
+    // prepare for the new record
+    std::memset(record_seq_rs, 'N', record_width);
+    std::memset(record_xm_rs,  '-', record_width);
     
     // apply CIGAR
     uint32_t query_pos = 0;                                                     // starting position in query array
@@ -322,8 +322,6 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
     seq->emplace_back((const char*) record_seq_rs + trim5, dest_pos - (trim5+trim3)); // SEQ 
     xm->emplace_back( (const char*) record_xm_rs + trim5,  dest_pos - (trim5+trim3)); // XM 
     npushed++;                                                                  // +1 
-    
-    record_width = dest_pos;                                                    // because bam_rec->core.isize can be 0 for single-end
   }
   
   // cleaning
@@ -361,6 +359,247 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
   res.attr("nrecs") = nrecs;                                                    // number of records in BAM file
   res.attr("npushed") = npushed;                                                // number of records pushed to data.frame
   
+  return(res);
+}
+
+
+// #############################################################################
+
+// LONG-READ SINGLE-END BAM
+// https://samtools.github.io/hts-specs/SAMv1.pdf
+// https://samtools.github.io/hts-specs/SAMtags.pdf
+// https://github.com/samtools/hts-specs/tree/master/test/SAMtags
+// https://github.com/samtools/htslib/tree/develop/test/base_mods
+
+// EXPLAIN THE LOGIC IN DOCS - NAMELY, DIFF BETWEEN SHORT-READ (BISULFITE) AND
+// LONG-READ (NATIVE) SEQUENCING METHYLATION CALLING (GENOME IS ABSOLUTELY
+// NECESSARY FOR THE FIRST BUT NOT THE SECOND)
+
+// [[Rcpp::export]]
+Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        // file name
+                                         int min_mapq,                          // min read mapping quality
+                                         int min_baseq,                         // min base quality
+                                         int min_prob,                          // min probability of 5mC modification
+                                         bool highest_prob,                     // consider only if 5mC probability is the highest of all mods at particular pos
+                                         bool skip_duplicates,                  // skip marked duplicates
+                                         int trim5,                             // trim bases from 5'
+                                         int trim3,                             // trim bases from 3'
+                                         int nthreads)                          // HTSlib threads, >0 for multiple
+{
+  // constants
+  int max_query_width   = 1024;                                                 // max NON-refspaced query width, expanded if necessary
+  int max_record_width  = 1024;                                                 // max refspaced record width, expanded if necessary
+  const int max_nmods   = 16;                                                   // allow MAX 16 modifications per base
+
+  // file IO
+  htsFile *bam_fp = hts_open(fn.c_str(), "r");                                  // try open file
+  if (!bam_fp) Rcpp::stop("Unable to open BAM file for reading");               // fall back if error
+  htsThreadPool thread_pool = {NULL, 0};                                        // thread pool cuts time by 30%
+  if (nthreads>0) {
+    thread_pool.pool = hts_tpool_init(nthreads);                                // when initiated for >0 threads
+    hts_set_opt(bam_fp, HTS_OPT_THREAD_POOL, &thread_pool);                     // and bound to the file pointer
+  }
+  bam_hdr_t *bam_hdr = sam_hdr_read(bam_fp);                                    // try read file header
+  if (!bam_hdr) Rcpp::stop("Unable to read BAM header");                        // fall back if error
+  bam1_t *bam_rec = bam_init1();                                                // create BAM alignment structure
+  
+  // base modifications
+  hts_base_mod_state *mod_state = hts_base_mod_state_alloc();                   // allocate space for base modification states
+  hts_base_mod base_mods[max_nmods];                                            // allocate an array of MAX 16 possible modifications per base
+  int mod_pos = 0, nmods = 0;                                                   // position of modified base in the query, number of modifications at that base
+
+  // main containers
+  std::vector<std::string>* seq = new std::vector<std::string>;                 // SEQ
+  std::vector<std::string>* xm  = new std::vector<std::string>;                 // XM
+  std::vector<int> rname, strand, start;                                        // id for RNAME, id for CT==1/GA==2, POS
+  int nrecs = 0, npushed = 0;                                                   // counters: BAM records read, BAM records pushed to data.table
+
+  // reserve some memory
+  rname.reserve(0xFFFFF); strand.reserve(0xFFFFF); start.reserve(0xFFFFF);
+  seq->reserve(0xFFFFF); xm->reserve(0xFFFFF);
+
+  // read holders
+  int query_width = max_query_width;                                            // NON-refspaced query length
+  uint8_t *record_seq = (uint8_t*) malloc(sizeof(uint8_t) *(query_width+4));    // NON-refspaced query SEQ array, plus NN at the end
+  uint8_t *record_xm[2];                                                        // NON-refspaced query 2D XM array for both strands
+  for (int s=0; s<2; s++) record_xm[s] = (uint8_t*) malloc(query_width * sizeof(uint8_t)); // allocate memory for query 2D XM array
+  int record_width = max_record_width;                                          // refspaced record ISIZE/TLEN
+  uint8_t *record_seq_rs = (uint8_t*) malloc(sizeof(uint8_t) * record_width);   // refspaced record SEQ array
+  uint8_t *record_xm_rs[2];                                                     // refspaced record 2D XM array for both strands
+  for (int s=0; s<2; s++) record_xm_rs[s] = (uint8_t*) malloc(record_width * sizeof(uint8_t)); // allocate memory for record 2D XM array
+  
+  // process alignments
+  while( sam_read1(bam_fp, bam_hdr, bam_rec) > 0 ) {                            // rec by rec
+    nrecs++;                                                                    // BAM alignment records ++
+    if ((nrecs & 0xFFFFF) == 0) Rcpp::checkUserInterrupt();                     // every ~1M reads check for the interrupt
+
+    if ((bam_rec->core.flag & BAM_FUNMAP) ||                                    // skip if unmapped
+        (bam_rec->core.qual < min_mapq) ||                                      // or if mapping quality < min.mapq
+        (skip_duplicates && (bam_rec->core.flag & BAM_FDUP))) continue;         // or if record is an optical/PCR duplicate
+
+    int record_strand = (bool) (bam_rec->core.flag & BAM_FREVERSE);             // genome strand, 0 if forward, 1 if reverse
+
+    // get record sequence, quality string
+    uint8_t *record_qual = bam_get_qual(bam_rec);                               // quality string (Phred scale with no +33 offset)
+    uint8_t *record_pseq = bam_get_seq(bam_rec);                                // packed sequence string (4 bit per base)
+
+    // get CIGAR
+    uint32_t n_cigar = bam_rec->core.n_cigar;                                   // number of CIGAR operations
+    uint32_t *record_cigar = bam_get_cigar(bam_rec);                            // CIGAR array
+    query_width = abs(bam_rec->core.l_qseq);                                    // NON-refspaced query width
+    record_width = bam_cigar2rlen(n_cigar, record_cigar);                       // reference length for the current query (refspaced)
+
+    // resize containers if necessary
+    if (query_width > max_query_width) {
+      max_query_width = query_width;                                            // expand template holders
+      record_seq = (uint8_t *) realloc(record_seq, (query_width + 4) * sizeof(uint8_t));
+      for(int s=0; s<2; s++) record_xm[s] = (uint8_t*) realloc(record_xm[s], query_width * sizeof(uint8_t));
+      if (!record_seq || !record_xm[0] || !record_xm[1]) Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs); // check memory allocation
+    }
+    if (record_width > max_record_width) {
+      max_record_width = record_width;                                          // expand template holders
+      record_seq_rs = (uint8_t *) realloc(record_seq_rs, record_width * sizeof(uint8_t));
+      for(int s=0; s<2; s++) record_xm_rs[s] = (uint8_t*) realloc(record_xm_rs[s], record_width * sizeof(uint8_t));
+      if (!record_seq_rs || !record_xm_rs[0] || !record_xm_rs[1]) Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs); // check memory allocation
+    }
+
+    // prepare for the new record
+    std::memset(record_seq_rs,   'N', record_width);                            // fill refspaced SEQ holder with 'N'
+    std::memset(record_xm_rs[0], '-', record_width);                            // fill refspaced XM holder for forward strand with '-'
+    std::memset(record_xm_rs[1], '-', record_width);                            // fill refspaced XM holder for reverse strand with '-'
+    
+    // unpack the sequence string, restore flanking NN's
+    for (int i=0; i<query_width; i++) {
+      record_seq[i+2] = seq_nt16_str[bam_seqi(record_pseq,i)];
+    }
+    std::memset(record_seq, 'N', 2);
+    std::memset(record_seq+query_width+2, 'N', 2);
+
+    // create a non-refspaced context strings for both strands
+    for (int i=0; i<query_width; i++) {
+      record_xm[0][i] = triad_to_ctx((record_seq+i+2), triad_forward_context);   // look up fwd context
+      record_xm[1][i] = triad_to_ctx((record_seq+i),   triad_reverse_context);   // look up rev context
+    }
+    
+    // BOTH STRANDS CAN HAVE OVERLAPPING MODS ('C+m' and 'G-m')!
+    // parse base modifications: any location not reported is implicitly
+    // assumed to contain no modification
+    bool strand_has_mods[2] = {0, 0};                                           // bool array with TRUE if XM for fwd==[0] or rev==[1] strand has base mods
+    bam_parse_basemod(bam_rec, mod_state);                                      // fill the mod_state structure
+    while ((nmods = bam_next_basemod(bam_rec, mod_state, base_mods, max_nmods, &mod_pos)) > 0) { // cycle through modified bases
+      int ismeth[2] = {0, 0},                                                   // bool array for pos having meth mod at fwd==[0] or rev==[1] strand;
+        meth_prob[2] = {-2, -2},                                                // int array for probability of meth mod at fwd==[0] or rev==[1] strand;
+        max_other_prob[2] = {-2, -2};                                           // int array for probability of any other mod at fwd==[0] or rev==[1] strand;
+      for (int i=0; i<nmods; i++) {                                             // cycle through all mods of a current base
+        if (base_mods[i].modified_base=='m' || base_mods[i].modified_base==-27551) { // if it's a 5mC (and any of 'C+m' or 'G-m')
+          ismeth[base_mods[i].strand] = 1;                                      // base has meth mod
+          meth_prob[base_mods[i].strand] = base_mods[i].qual;                   // record meth prob
+        } else if (max_other_prob[base_mods[i].strand] < base_mods[i].qual) {   // if NOT a 5mC and probability is higher than max_other_prob
+            max_other_prob[base_mods[i].strand] = base_mods[i].qual;            // record the highest probability of other modifications
+        }
+      }
+      for (int s=0; s<2; s++) {                                                 // as the same pos can have mods on both strands, cycle through strands and apply modification to relevant context string
+        int ctx_strand = abs(record_strand - s);                                // have to flip the context strand for revcomplemented query (because mods are always on NON-revcomp)
+        if (ismeth[s] &&                                                        // if there is a C+m or G-m modification
+            meth_prob[s]>=min_prob &&                                           // and its probability is not less than min_prob
+            (!highest_prob || meth_prob[s]>max_other_prob[s]) &&                // and its probability is either highest or highest_prob==FALSE
+            record_xm[ctx_strand][mod_pos]>'A') {                               // and its not a '.-'
+          record_xm[ctx_strand][mod_pos] &= 0b11011111;                         // uppercase the context char
+          strand_has_mods[ctx_strand] = 1;                                      // record that the context string for this strand has mods
+        }
+      }
+    }
+    
+    // apply CIGAR
+    uint32_t query_pos = 0;                                                     // starting position in query array
+    uint32_t dest_pos = 0;                                                      // starting position in destination array
+    for (size_t i=0; i<n_cigar; i++) {                                          // op by op
+      uint32_t cigar_op = bam_cigar_op(record_cigar[i]);                        // CIGAR operation
+      uint32_t cigar_oplen = bam_cigar_oplen(record_cigar[i]);                  // CIGAR operation length
+      switch(cigar_op) {
+      case BAM_CMATCH :                                                         // 'M', 0
+      case BAM_CEQUAL :                                                         // '=', 7
+      case BAM_CDIFF :                                                          // 'X', 8
+        for (size_t j=0; j<cigar_oplen; j++) {
+          if (record_qual[query_pos+j] >= min_baseq) {
+            record_seq_rs[dest_pos+j] = record_seq[query_pos+2+j];
+            record_xm_rs[0][dest_pos+j] = record_xm[0][query_pos+j];
+            record_xm_rs[1][dest_pos+j] = record_xm[1][query_pos+j];
+          }
+        }
+        query_pos += cigar_oplen;
+        dest_pos += cigar_oplen;
+        break;
+      case BAM_CINS :                                                           // 'I', 1
+      case BAM_CSOFT_CLIP :                                                     // 'S', 4
+        query_pos += cigar_oplen;
+        break;
+      case BAM_CDEL :                                                           // 'D', 2
+      case BAM_CREF_SKIP :                                                      // 'N', 3
+        dest_pos += cigar_oplen;
+        break;
+      case BAM_CHARD_CLIP :                                                     // 'H', 5
+      case BAM_CPAD :                                                           // 'P', 6
+      case BAM_CBACK :
+        break;
+      default :
+        Rcpp::stop("Unknown CIGAR operation for BAM entry %s",                  // unknown CIGAR operation
+                   bam_get_qname(bam_rec));
+      }
+    }
+
+    // pushing record data to vectors, once for the record strand (even if there are no 'C+m') and once again if the other strand has mods too (has 'G-m')
+    strand_has_mods[record_strand] = 1;                                         // always push at least one context string
+    for (int s=0; s<2; s++) {
+      if (strand_has_mods[s]) {
+        rname.push_back(bam_rec->core.tid + 1);                                 // RNAME+1
+        strand.push_back(s + 1);                                                // STRAND is 1 if "CT"/"+", 2 if "GA"/"-"
+        start.push_back(bam_rec->core.pos + trim5 + 1);                         // POS+1
+        seq->emplace_back((const char*) record_seq_rs   + trim5, dest_pos - (trim5+trim3)); // SEQ
+        xm->emplace_back( (const char*) record_xm_rs[s] + trim5, dest_pos - (trim5+trim3)); // XM
+        npushed++;                                                              // +1
+      }
+    }
+  }
+
+  // cleaning
+  hts_base_mod_state_free(mod_state);                                           // free base modification state structure
+  bam_destroy1(bam_rec);                                                        // free BAM alignment structure
+  hts_close(bam_fp);                                                            // close BAM file
+  if (thread_pool.pool) hts_tpool_destroy(thread_pool.pool);                    // free thread pool
+  free(record_seq_rs);                                                          // and free manually allocated memory
+  for(int i=0; i<2; i++) free(record_xm_rs[i]);
+  free(record_seq);
+  for(int i=0; i<2; i++) free(record_xm[i]);
+
+  // wrap and return the results
+  Rcpp::DataFrame res = Rcpp::DataFrame::create(                                // final DF
+    Rcpp::Named("rname") = rname,                                               // numeric ids (factor) for reference names
+    Rcpp::Named("strand") = strand,                                             // numeric ids (factor) for reference strands
+    Rcpp::Named("start") = start                                                // start positions of reads
+  );
+
+  // factor levels
+  std::vector<std::string> chromosomes (                                        // vector of reference names
+      bam_hdr->target_name, bam_hdr->target_name + bam_hdr->n_targets);
+  std::vector<std::string> strands = {"+", "-"};
+
+  Rcpp::IntegerVector col_rname = res["rname"];                                 // make rname a factor
+  col_rname.attr("class") = "factor";
+  col_rname.attr("levels") = chromosomes;
+
+  Rcpp::IntegerVector col_strand = res["strand"];                               // make strand a factor
+  col_strand.attr("class") = "factor";
+  col_strand.attr("levels") = strands;
+
+  Rcpp::XPtr<std::vector<std::string>> seq_xptr(seq, true);
+  res.attr("seq_xptr") = seq_xptr;                                              // external pointer to sequences
+  Rcpp::XPtr<std::vector<std::string>> xm_xptr(xm, true);
+  res.attr("xm_xptr") = xm_xptr;                                                // external pointer to methylation strings
+
+  res.attr("nrecs") = nrecs;                                                    // number of records in BAM file
+  res.attr("npushed") = npushed;                                                // number of records pushed to data.frame
+
   return(res);
 }
 

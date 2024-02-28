@@ -2,6 +2,7 @@
 #include <htslib/hts.h>
 #include <htslib/sam.h>
 #include <htslib/thread_pool.h>
+#include "epialleleR.h"
 
 // [[Rcpp::plugins(cpp17)]]
 // [[Rcpp::depends(Rhtslib)]]
@@ -21,77 +22,6 @@
 // Returns simple statistics on records parsed and calls made.
 
 
-// genomic sequence-to-context lookup tables
-const unsigned char triad_forward_context[512] = {
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', 'h', '.', 'h', 'h', '.', 'h', 'x',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', 'h', '.', 'h', 'h', '.', 'h', 'x',
-  '.', 'h', '.', 'h', 'h', '.', 'h', 'x', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', 'h', '.', 'h', 'h', '.', 'h', 'x', '.', 'z', '.', 'z', 'z', '.', 'z', 'z',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'
-};
-const unsigned char triad_reverse_context[512] = {
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'h',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'z',
-  '.', '.', '.', '.', '.', '.', '.', 'h', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', 'h', '.', '.', '.', '.', '.', '.', '.', 'h',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'x',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'z',
-  '.', '.', '.', '.', '.', '.', '.', 'x', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', 'x', '.', '.', '.', '.', '.', '.', '.', 'x',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'h',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'z',
-  '.', '.', '.', '.', '.', '.', '.', 'h', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', 'h', '.', '.', '.', '.', '.', '.', '.', 'h',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'h',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'z',
-  '.', '.', '.', '.', '.', '.', '.', 'h', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', 'h', '.', '.', '.', '.', '.', '.', '.', 'h',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'h',
-  '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.', 'z',
-  '.', '.', '.', '.', '.', '.', '.', 'h', '.', '.', '.', '.', '.', '.', '.', '.',
-  '.', '.', '.', '.', '.', '.', '.', 'h', '.', '.', '.', '.', '.', '.', '.', 'h'
-};
-
-
 // this one makes calls based on genomic sequence in the absence of MM/ML tags
 // [[Rcpp::export]]
 Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     // input BAM file name
@@ -107,9 +37,9 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
   
   // file IO
   htsFile *in_fp = hts_open(in_fn.c_str(), "r");                                // try open input file
-  if (in_fp==NULL) Rcpp::stop("Unable to open input BAM file for reading");     // fall back if error
+  if (!in_fp) Rcpp::stop("Unable to open input BAM file for reading");          // fall back if error
   htsFile *out_fp = hts_open(out_fn.c_str(), "wb");                             // try open output file
-  if (out_fp==NULL) Rcpp::stop("Unable to open output BAM file for writing");   // fall back if error
+  if (!out_fp) Rcpp::stop("Unable to open output BAM file for writing");        // fall back if error
   // shared thread pool
   htsThreadPool thread_pool = {NULL, 0};                                        // thread pool cuts time by 30%
   if (nthreads>0) {
@@ -119,7 +49,7 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
   }
   
   bam_hdr_t *in_hdr = sam_hdr_read(in_fp);                                      // try read input file header
-  if (in_hdr==NULL) Rcpp::stop("Unable to read input BAM header");              // fall back if error
+  if (!in_hdr) Rcpp::stop("Unable to read input BAM header");                   // fall back if error
   if (sam_hdr_write(out_fp, in_hdr) < 0) Rcpp::stop("Unable to write header");  // try write output file header
   
   // vars
@@ -146,8 +76,8 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
     char *record_strand = (char*) bam_aux_get(in_rec, tag.c_str());             // genome strand ("ZCT" or "ZGA")
     char *record_xm = (char*) bam_aux_get(in_rec, "XM");                        // methylation string (XM)
     if ((in_rec->core.flag & BAM_FUNMAP) ||                                     // if unmapped
-        (record_strand==NULL) ||                                                // or genome strand is unknown
-        (record_xm!=NULL))                                                      // or XM is already present
+        (!record_strand) ||                                                     // or genome strand is unknown
+        (record_xm))                                                            // or XM is already present
       goto writeout;                                                            // don't do anything, just write out
     
     {
@@ -165,7 +95,7 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
         max_query_width = query_width;                                          // new max
         rs = (char *) realloc(rs, (max_query_width+4) * sizeof(char));          // expand rs holder
         xm = (char *) realloc(xm, max_query_width * sizeof(char));              // expand xm holder
-        if ((rs==NULL) || (xm==NULL)) Rcpp::stop("No memory for BAM record #%i", nrecs); // check memory allocation
+        if (!rs || !xm) Rcpp::stop("No memory for BAM record #%i", nrecs);      // check memory allocation
       }
 
       // apply CIGAR to reference seq (convert from reference to query space)
@@ -217,10 +147,7 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
       int context_shift = (record_strand[1] == 'C') ? 2 : 0;                    // start making genomic context from 2nd base for fwd strand, and 0th base for reverse
       const unsigned char* context_map = context_shift ? triad_forward_context : triad_reverse_context; // lookup table to use
       for (int i=0; i<query_width; i++) {
-        unsigned int idx = ((rs[i+context_shift] &7) << 6) |                    // last 3 bits of the first base << 6
-                           ((rs[i+1+context_shift] &7) << 3) |                  // last 3 bits of the second base << 3
-                           (rs[i+2+context_shift] &7);                          // last 3 bits of the third base
-        xm[i] = context_map[idx];                                               // look up context
+        xm[i] = triad_to_ctx((rs+i+context_shift), context_map);                // look up context
         
         // *** the actual methylation calling starts here ***
         if (xm[i]!='.') {                                                       // if it's a hxz
@@ -231,16 +158,8 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
           }                                                                     // leave lowercase otherwise
         }
         // *** the actual methylation calling ends here ***
-        
       }
       
-      // if ((record_xm!=NULL) && (memcmp(xm, record_xm+1, query_width)!=0)) {     // check differences with available XM
-      //   Rcpp::Rcout << nrecs << ": S|" << std::string(rs, query_width+4) << std::endl;
-      //   Rcpp::Rcout << nrecs << ": R|  " << std::string(record_xm+1, query_width) << std::endl;
-      //   Rcpp::Rcout << nrecs << ": C|  " << std::string(xm, query_width) << std::endl;
-      // }
-      
-      // if (record_xm==NULL)
       bam_aux_update_str(in_rec, "XM", query_width, xm);                        // since XM tag is absent, add it
       ncalled++;                                                                // successfully called
     }
@@ -270,13 +189,5 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
 // #############################################################################
 // test code and sourcing don't work on OS X
 /*** R
-setwd("~/work/packages/epialleleR/")
-devtools::document()
-devtools::load_all()
-system.time(genome <- rcpp_read_genome("/scratch/ref/DRAGEN/hg38_plus_lambda_ChrY_PAR_masked.fa.gz", 1))
-system.time(genome <- rcpp_read_genome("/Users/oleksii.nikolaienko/work/data/hg38/hg38_plus_lambda_ChrY_PAR_masked.fa.gz", 1))
-inout <- c(system.file("extdata", "test", "paired-name-xm.bam", package="epialleleR"), "/tmp/out.bam")
-rcpp_call_methylation_genome(inout[1], inout[2], genome, "XG", 8)
-sapply(inout, file.size)
 */
 // #############################################################################

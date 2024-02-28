@@ -126,7 +126,7 @@ if (require("ggplot2", quietly=TRUE) & require("gridExtra", quietly=TRUE)) {
 ```
 
 *`epialleleR`* is a very fast and scalable solution for analysis of data
-obtained by next-generation sequencing of bisulfite-treated DNA samples. The
+obtained by next-generation methylation/native sequencing of DNA samples. The
 minimum requirement for the input is a Binary Alignment Map (BAM) file
 containing sequencing reads. These reads can be obtained from either deep or
 ultra-deep sequencing, using either narrowly targeted gene panels (amplicon
@@ -134,9 +134,9 @@ sequencing), larger methylation capture panels, or even whole-genome approaches.
 
 ## Current Features
 
- * If methylation call strings are not present in BAM file, *`epialleleR`* can
+ * If methylation calls are not present in BAM file, *`epialleleR`* can
  make and store such calls in output BAM (similar to Bismark or Illumina's
- mapping/alignment solutions)
+ mapping/alignment solutions; short-read sequencing alignments only)
  * *`epialleleR`* can create and store sample BAM files for testing purposes by
  means of *`simulateBam`* method
  * In addition to conventional reporting of cytosine DNA methylation levels
@@ -165,12 +165,13 @@ C++ functions, and usually take reasonable time.
 
 During methylation calling, human genome (hg38) loading usually takes 10-15
 seconds. Using preloaded reference genome, the calling itself is performed
-at the speed of 200-300 thousand reads per second (25-40 MB/s of BAM data).
+at the speed of 200-300 thousand short reads (150 or 225 bases long) per second
+(25-40 MB/s of BAM data).
 
 During methylation reporting,
 running time for complete task "BAM on disk -> CX report on disk" depends on the
 size of the BAM file, and the speed is usually within the range of 30-50 MB/s
-(or 250-400 thousand reads per second) for a single core of a relatively
+(or 250-400 thousand short reads per second) for a single core of a relatively
 modern CPU (Intel(R) Core(TM) i7-7700).
 
 Major bottlenecks (in BAM loading and preprocessing) were removed in the release
@@ -242,7 +243,15 @@ their default values.
 ## Requirements
 
 As mentioned earlier, *`epialleleR`* uses data stored in Binary Alignment Map
-(BAM) files as its input. It is a prerequisite that records in the BAM file
+(BAM) files as its input and currently allows to load both short-read
+(e.g., bisulfite) and long-read (native) sequencing alignments. Specific
+requirements for these types of data are given below. Additionally, 
+please check the *`preprocessBam`* function help file for a full description
+of available parameters, as well as explanation of the function's logic.
+
+### Short-read sequencing
+
+It is a prerequisite that records in the BAM file
 contain an XG tag with a genomic strand they map to ("CT" or "GA"), and an XM
 tag with the methylation call string &#8212; such files are
 produced by mapping and alignment tools such as Bismark Bisulfite Read Mapper
@@ -259,12 +268,13 @@ BSMAP) and lack XG/XM data, it is possible to call methylation using
 and save all data in the output BAM file that can be further analysed by 
 *`epialleleR`*.
 
-For paired-end alignments, BAM file must be sorted by read name
-(and not genomic location). Arbitrary sorting is allowed for single-end
-sequencing alignments.
+### Long-read sequencing
 
-Please use the function help files for a full description of available
-parameters, as well as explanation of the functions' logic and output values.
+For preprocessing of long reads, *`epialleleR`* requires presence of MM (Mm)
+and ML (Ml) tags that hold information on base modifications and related
+probabilities, respectively. These are standard tags described in SAM/BAM
+format specification, therefore relevant tools for analysis and alignment
+of long sequencing reads should be able to produce them.
 
 ## Reading the data
 
@@ -288,7 +298,11 @@ unless its quality is less than *`min.baseq`*, which results in no information
 for that particular position ("-"/"N"). These **merged reads** are then
 processed as a **single entity** in all *`epialleleR`* methods. Due to merging,
 overlapping bases in read pairs are counted only once, and the base with the
-highest quality is taken.
+highest quality is taken. It is a requirement currently that paired-end BAM
+file must be sorted by QNAME instead
+of genomic location (i.e., "unsorted") to perform merging of paired-end
+reads. Error message is shown if it is sorted by genomic location, in this
+case please sort it by QNAME using 'samtools sort -n -o out.bam in.bam'.
 
 During preprocessing of single-end alignments, no read merging is
 performed. Only bases with quality of at least *`min.baseq`* are considered.
@@ -303,16 +317,50 @@ individual read for single-end BAM). This ensures that only necessary parts
 (real ends of sequenced fragment) are removed for paired-end sequencing
 reads.
 
+### Specific considerations for long-read sequencing data:
+
+Any location not reported is implicitly assumed to contain no modification.
+
+According to SAM format specification,
+MM base modification tags are allowed to list modifications observed not
+only on the original sequenced strand (e.g., `C+m`) but also on the 
+opposite strand (e.g., `G-m`). The logic of their processing is as follows
+(with the examples given below):
+ * if an alignment record has no methylation modifications (neither
+ `C+m`, nor `G-m` are present), this record is, naturally, considered to
+ be a single read with no cytosines methylated
+ * if an alignment record has `C+m` modification (base modifications
+ on the original sequenced strand), then this record is, naturally,
+ considered to be a single read with cytosine modifications on the
+ sequenced strand
+ * if an alignment record has `G-m` modification (base modifications
+ on the strand opposite to sequenced), then this record is treated as two
+ reads, with the original sequenced strand having no modifications,
+ while the opposite strand having cytosine modifications
+ * if both `C+m` and `G-m` are present, then this record is treated
+ as two reads, with both strands having cytosine modifications
+
 ```{r}
 library(epialleleR)
 
 capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
 bam.data    <- preprocessBam(capture.bam)
+
+# Specifics of long-read alignment processing
+out.bam <- tempfile(pattern="out-", fileext=".bam")
+simulateBam(
+  seq=c("ACGCCATYCGCGCCA"),
+  Mm=c("C+m,0,2,0;G-m,0,0,0;"),
+  Ml=list(as.integer(c(102,128,153,138,101,96))),
+  output.bam.file=out.bam
+  )
+generateCytosineReport(out.bam, threshold.reads=FALSE, report.context="CX")
 ```
 
 ## Optional calling of cytosine methylation
 
-If BAM file lacks XG/XM tags (e.g., is an output of bwa-meth or BSMAP),
+If short-read BAM file lacks XG/XM tags (e.g., is an output of bwa-meth or
+BSMAP),
 preprocessing will fail with the message that cytosine methylation calling
 must be performed. This can be done as follows:
 

@@ -74,9 +74,7 @@
 #' without using the reference genome sequence.
 #'
 #' @param bam BAM file location string OR preprocessed output of
-#' \code{\link[epialleleR]{preprocessBam}} function. BAM file alignment records
-#' must contain XG tag (strand information for the reference genome) and
-#' methylation call string (XM tag). Read more about these and other
+#' \code{\link[epialleleR]{preprocessBam}} function. Read more about BAM file
 #' requirements and BAM preprocessing at \code{\link{preprocessBam}}.
 #' @param report.file file location string to write the \eqn{lMHL} report.
 #' If NULL (the default) then report is returned as a

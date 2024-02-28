@@ -145,7 +145,7 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     if (num_buf_len < size_x) {
       num_buf_len = size_x;                                                     // new size
       num_buf  = (uint64_t*) realloc(num_buf, num_buf_len * sizeof(uint64_t));  // expand numerator buffer
-      if (num_buf==NULL) Rcpp::stop("Unable to allocate memory");               // check memory allocation
+      if (!num_buf) Rcpp::stop("Unable to allocate memory");                    // check memory allocation
     }
     std::memset(num_buf,  0, size_x * sizeof(uint64_t));                        // clean the buffer
     size_t mh_start = 0, mh_end = 0, mh_size = 0, h_size = 0;                   // start, end and size of the current methylated stretch (number of ctx bases); total size of haplotype

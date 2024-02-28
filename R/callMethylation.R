@@ -4,14 +4,21 @@
 #' This function calls cytosine methylation and stores calls in BAM files.
 #'
 #' @details
-#' The function makes cytosine methylation calls for input BAM file and writes
+#' The function makes cytosine methylation calls for short-read methylation
+#' (bisulfite/enzymatic) sequencing alignments from input BAM file and writes
 #' them in the XM tag of the output BAM file. Calls are made on the basis of
 #' reference (e.g., genomic) sequence and observed sequence and cytosine context
 #' of reads. Data reading/processing is done by means of HTSlib,
 #' therefore it is possible to significantly (>5x) speed up the calling
 #' using several (4-8) HTSlib decompression threads.
 #' 
-#' Methylation calling is only possible if genomic strand the read was aligned
+#' Methylation calling with this function is only possible for sequencing data
+#' obtained using either bisulfite or other similar sequencing method
+#' (enzymatic methylation sequencing). Cytosine methylation in long-read,
+#' native DNA sequencing alignments should be called using other, appropriate
+#' tools.
+#' 
+#' It is a requirement that the genomic strand the read was aligned
 #' to is known. This information is typically stored in XG tag of
 #' Bismark/Illumina BAM files, or in YD tag of BWA-meth alignment files, or in
 #' ZS tag of BSMAP alignment files.
@@ -38,8 +45,8 @@
 #' 
 #' As a reference sequence, the function expects either location of
 #' (preferably `bgzip`ped) FASTA file or an object obtained by
-#' \code{\link{preprocessGenome}}. The latter is preferred if methylation
-#' calling is performed on multiple BAM files.
+#' \code{\link{preprocessGenome}}. The latter is recommended if methylation
+#' calling is to be performed on multiple BAM files.
 #' 
 #' The alignment records of the output BAM file will contain additional XM tag
 #' with the methylation
@@ -70,6 +77,7 @@
 #' 
 #' \href{https://www.bioinformatics.babraham.ac.uk/projects/bismark/}{Bismark} Bisulfite Read Mapper and Methylation Caller,
 #' \href{https://arxiv.org/abs/1401.1129}{bwa-meth} for fast and accurate alignment of long bisulfite-seq reads,
+#' \href{https://doi.org/10.1186/1471-2105-10-232}{BSMAP}: whole genome bisulfite sequence MAPping program,
 #' or info on \href{https://support-docs.illumina.com/SW/dragen_v42/Content/SW/DRAGEN/MPipelineMeth_fDG.htm}{Illumina DRAGEN Bio IT Platform}.
 #' @examples
 #'   callMethylation(

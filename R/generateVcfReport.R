@@ -1,7 +1,7 @@
 #' generateVcfReport
 #'
 #' @description
-#' This function calculates base frequencies at particular genomic positions and
+#' This function reports base frequencies at particular genomic positions and
 #' tests their association with the methylation status of the sequencing reads.
 #'
 #' @details
@@ -34,10 +34,14 @@
 #' by misalignments. Remember to increase `min.baseq` (`samtools mplieup -Q`
 #' default value is 13) to obtain higher-quality results.
 #'
+#' Read thresholding by an average methylation level used in this function
+#' makes little sense for long-read sequencing alignments,
+#' as such reads can cover multiple regions with very different DNA methylation
+#' properties. Instead, please use \code{\link{extractPatterns}},
+#' limiting pattern output to the region of interest only.
+#'
 #' @param bam BAM file location string OR preprocessed output of
-#' \code{\link[epialleleR]{preprocessBam}} function. BAM file alignment records
-#' must contain XG tag (strand information for the reference genome) and
-#' methylation call string (XM tag). Read more about these and other
+#' \code{\link[epialleleR]{preprocessBam}} function. Read more about BAM file
 #' requirements and BAM preprocessing at \code{\link{preprocessBam}}.
 #' @param vcf Variant Call Format (VCF) file location string OR a VCF object
 #' returned by \code{\link[VariantAnnotation]{readVcf}} function. If VCF object
@@ -66,9 +70,12 @@
 #' @param threshold.reads boolean defining if sequence reads should be
 #' thresholded before counting bases in reference and variant epialleles
 #' (default: TRUE). Disabling thresholding is possible but makes no sense in
-#' this context as all the reads will be assigned to the variant epiallele,
+#' the context of this function, because
+#' all the reads will be assigned to the variant epiallele,
 #' which will result in Fisher's Exact test p-value of 1 (in columns `FEp+` and
-#' `FEP-`).
+#' `FEP-`). As thresholding is \strong{not} recommended for long-read
+#' sequencing data, this function is \strong{not} recommended for such data
+#' either.
 #' @param threshold.context string defining cytosine methylation context used
 #' for thresholding the reads:
 #' \itemize{

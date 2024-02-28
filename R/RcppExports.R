@@ -49,12 +49,16 @@ rcpp_read_bam_single <- function(fn, min_mapq, min_baseq, skip_duplicates, trim5
     .Call(`_epialleleR_rcpp_read_bam_single`, fn, min_mapq, min_baseq, skip_duplicates, trim5, trim3, nthreads)
 }
 
+rcpp_read_bam_mm_single <- function(fn, min_mapq, min_baseq, min_prob, highest_prob, skip_duplicates, trim5, trim3, nthreads) {
+    .Call(`_epialleleR_rcpp_read_bam_mm_single`, fn, min_mapq, min_baseq, min_prob, highest_prob, skip_duplicates, trim5, trim3, nthreads)
+}
+
 rcpp_read_genome <- function(fn, nthreads) {
     .Call(`_epialleleR_rcpp_read_genome`, fn, nthreads)
 }
 
-rcpp_simulate_bam <- function(header, fields, i_tags, s_tags, out_fn) {
-    .Call(`_epialleleR_rcpp_simulate_bam`, header, fields, i_tags, s_tags, out_fn)
+rcpp_simulate_bam <- function(header, fields, i_tags, f_tags, s_tags, a_tags, a_types, out_fn) {
+    .Call(`_epialleleR_rcpp_simulate_bam`, header, fields, i_tags, f_tags, s_tags, a_tags, a_types, out_fn)
 }
 
 rcpp_threshold_reads <- function(df, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac) {

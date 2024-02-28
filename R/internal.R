@@ -71,7 +71,7 @@ utils::globalVariables(
 ################################################################################
 
 # descr: check BAM file before reading (using HTSlib)
-# value: TRUE (for paired-end) or FALSE (for single-end) or error
+# value: list with tags and counters from rcpp_check_bam or error
 #        if BAM loading is not possible
 
 .checkBam <- function (bam.file,
@@ -80,38 +80,53 @@ utils::globalVariables(
   if (verbose) message("Checking BAM file: ", appendLF=FALSE)
   
   bam.file <- path.expand(bam.file)
-  check.out <- rcpp_check_bam(bam.file)
+  bam.check <- rcpp_check_bam(bam.file)
+  
+  # predominantly PE:
+  bam.check$paired <- (bam.check$npaired > bam.check$nrecs/2)
+  # name-sorted:
+  bam.check$sorted <- (bam.check$ntempls > 0) &
+    any(bam.check$ntempls == c(bam.check$nrecs, bam.check$npaired)%/%2)
   
   # main logic
-  if (check.out$nrecs==0) {                                     # no records
+  if (bam.check$nrecs==0) {                                         # no records
     stop("Empty file provided! Exiting",
          call.=FALSE)
-  } else if (is.null(check.out$XG) & !is.null(check.out$YD)) {  # YDs but no XGs
+  } else if (is.null(bam.check$XG) & !is.null(bam.check$YD)) {    # YD but no XG
     stop("No XG tags found (though YD tags are there)! BWA-meth alignment?\n",
          "If so, make methylation calls using epialleleR::callMethylation.\n",
          "Exiting", call.=FALSE)
-  } else if (is.null(check.out$XG) & !is.null(check.out$ZS)) {  # ZSs but no XGs
+  } else if (is.null(bam.check$XG) & !is.null(bam.check$ZS)) {    # ZS but no XG
     stop("No XG tags found (though ZS tags are there)! BSMAP alignment?\n",
          "If so, make methylation calls using epialleleR::callMethylation.\n",
          "Exiting", call.=FALSE)
-  } else if (is.null(check.out$XM) & !is.null(check.out$XG)) {  # XGs but no XMs
+  } else if (is.null(bam.check$XM) & !is.null(bam.check$XG)) {    # XG but no XM
     stop("No XM tags found! Was methylation called successfully?\n",
          "If not, make methylation calls using epialleleR::callMethylation.\n",
          "Exiting", call.=FALSE)
-  } else if (check.out$npaired < check.out$nrecs/2) {       # predominantly SE
-    paired <- FALSE
+  } else if (!is.null(bam.check$MM) | !is.null(bam.check$Mm)) {       # MM or Mm
+    bam.check$tagged <- "MM"
+  } else if (!is.null(bam.check$XG) & !is.null(bam.check$XM)) {      # XG and XM
+    bam.check$tagged <- "XM"
   } else {
-    if (check.out$ntempls*2 < check.out$npaired - 1) {      # not sorted by name
-      stop("BAM file seems to be paired-end but not sorted by name!\n",
-           "Please sort using 'samtools sort -n -o out.bam in.bam'.\n",
-           "Exiting", call.=FALSE)
-    }
-    paired <- TRUE
+    stop("No known methylation tags found!\n",
+         "If you believe it's a mistake, please submit an issue at GitHub.\n",
+         "Exiting", call.=FALSE)
   }
   
-  if (verbose) message(ifelse(paired, "paired-end, name-sorted", "single-end"),
-                       " alignment detected", appendLF=TRUE)
-  return(paired)
+  if (bam.check$paired & !bam.check$sorted) {# paired but not name-sorted
+    stop("BAM file seems to be paired-end but not sorted by name!\n",
+         "Please sort using 'samtools sort -n -o out.bam in.bam'.\n",
+         "Exiting", call.=FALSE)
+  } 
+  
+  if (verbose) message(
+    ifelse(bam.check$tagged=="XM", "short-read, ", "long-read, "),
+    ifelse(bam.check$paired, "paired-end, ", "single-end, "),
+    ifelse(bam.check$sorted, "name-sorted", "unsorted"),
+    " alignment detected", appendLF=TRUE
+  )
+  return(bam.check)
 }
 
 ################################################################################
@@ -139,27 +154,36 @@ utils::globalVariables(
 # value: data.table
 
 .readBam <- function (bam.file,
-                      paired,
+                      bam.check,
                       min.mapq,
                       min.baseq,
+                      min.prob,
+                      highest.prob,
                       skip.duplicates,
                       trim,
                       nthreads,
                       verbose)
 {
-  if (verbose) message("Reading ", ifelse(paired, "paired", "single"), 
+  if (verbose) message("Reading ", ifelse(bam.check$paired, "paired", "single"), 
                        "-end BAM file ", appendLF=FALSE)
   tm <- proc.time()
   
   bam.file <- path.expand(bam.file)
-  if (paired) {
-    bam.processed <- rcpp_read_bam_paired(bam.file, min.mapq, min.baseq, 
-                                          skip.duplicates, trim[1], trim[2],
-                                          nthreads)
-  } else {
-    bam.processed <- rcpp_read_bam_single(bam.file, min.mapq, min.baseq, 
-                                          skip.duplicates, trim[1], trim[2],
-                                          nthreads)
+  if (bam.check$tagged=="XM") {                           # short-read alignment
+    if (bam.check$paired) {
+      bam.processed <- rcpp_read_bam_paired(bam.file, min.mapq, min.baseq, 
+                                            skip.duplicates, trim[1], trim[2],
+                                            nthreads)
+    } else {
+      bam.processed <- rcpp_read_bam_single(bam.file, min.mapq, min.baseq, 
+                                            skip.duplicates, trim[1], trim[2],
+                                            nthreads)
+    }
+  } else {                                                 # long-read alignment
+    bam.processed <- rcpp_read_bam_mm_single(bam.file, min.mapq, min.baseq,
+                                             min.prob, highest.prob,
+                                             skip.duplicates, trim[1], trim[2],
+                                             nthreads)
   }
   
   data.table::setDT(bam.processed)
@@ -323,13 +347,47 @@ utils::globalVariables(
   )
   i_tags <- data.table::as.data.table(tags[sapply(tags, is.integer)])
   i_tags <- i_tags[rep_len(seq_len(nrow(i_tags)), nrecs)]
+  f_tags <- data.table::as.data.table(tags[sapply(tags, is.double)])
+  f_tags <- f_tags[rep_len(seq_len(nrow(f_tags)), nrecs)]
   s_tags <- data.table::as.data.table(tags[sapply(tags, is.character)])
   s_tags <- s_tags[rep_len(seq_len(nrow(s_tags)), nrecs)]
+  a_tags <- data.table::as.data.table(tags[sapply(tags, is.list)])
+  a_tags <- a_tags[rep_len(seq_len(nrow(a_tags)), nrecs)]
+  a_types <- apply(a_tags, 2, function (t) {
+    t.all   <- unlist(t)
+    t.class <- class(t.all)
+    if (t.class=="numeric") {
+      return("f")
+    } else if (t.class=="integer") {
+      t.min <- min(t.all)
+      t.max <- max(t.all)
+      if (t.min<0 & t.min>-2**7 & t.max<2**7) {                      # int8_t
+        return("c")
+      } else if (t.min>=0 & t.max<2**8) {                            # uint8_t
+        return("C")
+      } else if (t.min<0 & t.min>-2**15 & t.max<2**15) {             # int16_t
+        return("s")
+      } else if (t.min>=0 & t.max<2**16) {                           # uint16_t
+        return("S")
+      } else if (t.min<0) {                                          # int32_t
+        return("i")
+      } else {                                                       # uint32_t
+        return("I")
+      }
+    } else if (length(t.all)>0) {                       # unsupported array tags
+      stop("BAM file format does not support non-numeric arrays", call.=FALSE)
+    } else {
+      return(character(0))                              # no array tags
+    }
+  })
   
   if (!is.null(output.bam.file))
-    result <- rcpp_simulate_bam(header, fields, i_tags, s_tags, output.bam.file)
+    result <- rcpp_simulate_bam(header, fields,
+                                i_tags, f_tags, s_tags,
+                                a_tags, as.character(a_types),
+                                output.bam.file)
   else
-    result <- cbind(fields, i_tags, s_tags)
+    result <- cbind(fields, i_tags, f_tags, s_tags, a_tags)
   
   if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(result)
@@ -348,15 +406,15 @@ utils::globalVariables(
   
   input.bam.file <- path.expand(input.bam.file)
   output.bam.file <- path.expand(output.bam.file)
-  check.out <- rcpp_check_bam(input.bam.file)
+  bam.check <- rcpp_check_bam(input.bam.file)
   
-  if (check.out$nrecs==0) {                             # no records
+  if (bam.check$nrecs==0) {                             # no records
     stop("Empty file provided! Exiting", call.=FALSE)
-  } else if (!is.null(check.out$XG)) {
+  } else if (!is.null(bam.check$XG)) {
     tag <- "XG"
-  } else if (!is.null(check.out$YD)) {
+  } else if (!is.null(bam.check$YD)) {
     tag <- "YD"
-  } else if (!is.null(check.out$ZS)) {
+  } else if (!is.null(bam.check$ZS)) {
     tag <- "ZS"
   } else stop("Unable to call methylation: neither of XG/YD/ZS tags is present",
               " (genome strand unknown).\nExiting", call.=FALSE)
