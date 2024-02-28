@@ -80,7 +80,7 @@
 #' 
 #' Any location not reported is implicitly assumed to contain no modification.
 #' 
-#' According to their specification,
+#' According to SAM format specification,
 #' MM base modification tags are allowed to list modifications observed not
 #' only on the original sequenced strand (e.g., `C+m`) but also on the 
 #' opposite strand (e.g., `G-m`). The logic of their processing is as follows
