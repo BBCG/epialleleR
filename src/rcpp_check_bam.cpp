@@ -30,9 +30,9 @@ Rcpp::List rcpp_check_bam (std::string fn)                                      
   bam1_t *bam_rec = bam_init1();                                                // create BAM alignment structure
   
   // main counters
-  std::map<std::string,unsigned int> aux_map = {{"nrecs",0},                    /* BAM records */                   \
-                                                {"npaired",0},                  /* have BAM_FPROPER_PAIR flag */    \
-                                                {"ntempls",0}};                 /* templates (consecutive pairs) */
+  // nrecs: BAM records; npaired: have BAM_FPROPER_PAIR flag; ntempls: templates (consecutive pairs)
+  std::map<std::string,unsigned int> aux_map = {{"nrecs",0}, {"npaired",0}, {"ntempls",0}};
+  
   // template holders
   char *templ_qname = (char*) malloc(max_qname_width * sizeof(char));           // template QNAME
   

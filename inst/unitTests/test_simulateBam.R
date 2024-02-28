@@ -27,11 +27,14 @@ test_simulateBam <- function () {
   simulateBam(
     pos=1,
     "AB"=1:10,
-    Zf=list(c(1.1, -3.3, 1e-4)),
-    ZC=list(10:20), Zc=list(-10:0),
-    ZS=list(240:260), Zs=list(-260:-240),
-    ZI=list(65530:65540), Zi=list(-65540:-65530),
+    zf=list(c(1.1, -3.3, 1e-4)),
+    zC=list(10:20), zc=list(-10:0),
+    zS=list(240:260), zs=list(-260:-240),
+    zI=list(65530:65540), zi=list(-65540:-65530),
     output.bam.file=out.bam
+  )
+  RUnit::checkException(
+    preprocessBam(out.bam)
   )
   
   RUnit::checkException(
@@ -122,5 +125,15 @@ test_simulateBam <- function () {
     genome=preprocessGenome(system.file("extdata", "test", "reference.fasta.gz", package="epialleleR"))
   )
   cg.beta <- generateCytosineReport(out.bam, threshold.reads=FALSE)
+  
+  simulateBam(
+    output.bam.file=out.bam,
+    pos=1,
+    cigar=c("1X4899M1H"),
+    tlen=4900,
+    Mm=c("C+m,0,2,0;G-m,0,0,0;"),
+    Ml=list(as.integer(c(102,128,153,138,101,96)))
+  )
+  cx.report <- generateCytosineReport(out.bam, threshold.reads=FALSE, report.context="CX")
   
 }
