@@ -86,7 +86,7 @@ utils::globalVariables(
   bam.check$paired <- (bam.check$npaired > bam.check$nrecs/2)
   # name-sorted:
   bam.check$sorted <- (bam.check$ntempls > 0) &
-    any(bam.check$ntempls == c(bam.check$nrecs, bam.check$npaired)%/%2)
+    any(bam.check$ntempls >= c(bam.check$nrecs, bam.check$npaired)%/%2)
   
   # main logic
   if (bam.check$nrecs==0) {                                         # no records
