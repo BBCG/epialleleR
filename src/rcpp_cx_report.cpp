@@ -49,7 +49,7 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
   
   // main typedefs
   typedef uint64_t T_key;                                                       // {62bit:pos, 2bit:strand}
-  typedef std::array<int,16> T_val;                                             // {0:rname, 1:pos, 8:strand, 9:coverage, and 10 more for 11 valid chars}
+  typedef std::array<int,32> T_val;                                             // {0:rname, 1:pos, 8:strand, 9:coverage, and 10 more for 11 valid chars}
   typedef boost::container::flat_map<T_key, T_val> T_cx_fmap;                   // attaboy
   
 // macros
@@ -117,7 +117,8 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
       const unsigned int idx_to_increase = (ctx_to_idx(xm_x[i])) | pass_x;      // see the table above; if not pass -> lowercase
       if (idx_to_increase==11) continue;                                        // skip +-
       map_val[1] = start_x+i;
-      const T_key map_key = ((T_key)map_val[1] << 2) | map_val[8];
+      // const T_key map_key = ((T_key)map_val[1] << 2) | map_val[8];
+      const T_key map_key = ((T_key)map_val[1] << 2) | 1;
       hint = cx_map.try_emplace(hint, map_key, map_val);
       hint->second[idx_to_increase]++;
       hint->second[9]++;                                                        // total coverage
