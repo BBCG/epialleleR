@@ -122,8 +122,7 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
       const unsigned int idx_to_increase = (ctx_to_idx(xm_x[i])) | pass_x;      // see the table above; if not pass -> lowercase
       if (idx_to_increase==11) continue;                                        // skip +-
       map_val[1] = start_x+i;
-      const T_key map_key = map_val[1];
-      hint = cx_map.try_emplace(hint, map_key, map_val);
+      hint = cx_map.try_emplace(hint, (T_key)(map_val[1]), map_val);
       hint->second[idx_to_increase+str_shft]++;
       hint->second[9+str_shft]++;                                               // total coverage
     }
