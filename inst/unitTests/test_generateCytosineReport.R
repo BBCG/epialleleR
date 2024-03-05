@@ -10,8 +10,23 @@ test_generateCytosineReport <- function () {
   )
   
   RUnit::checkEquals(
+    as.numeric(table(cx.report$strand)[c("+", "-")]),
+    c(48517, 48669)
+  )
+  
+  RUnit::checkEquals(
     as.numeric(table(cx.report$context)[c("CHH", "CHG", "CG")]),
     c(58292, 23486, 15408)
+  )
+  
+  RUnit::checkEquals(
+    as.numeric(table(cx.report[strand=="+"]$context)[c("CHH", "CHG", "CG")]),
+    c(28762, 11853, 7902)
+  )
+  
+  RUnit::checkEquals(
+    as.numeric(table(cx.report[strand=="-"]$context)[c("CHH", "CHG", "CG")]),
+    c(29530, 11633, 7506)
   )
   
   RUnit::checkEquals(
