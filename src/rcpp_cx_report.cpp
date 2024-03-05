@@ -36,9 +36,11 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
                                std::string ctx)                                 // context string for bases to report
 {
   // walking trough bunch of reads <- filling the map
-  // pos<<2|strand -> {0: rname,  1: pos,       2: 'H',  3: '',    4: '',   5: 'U',  6: 'X',  7: 'Z',
-  //                   8: strand, 9: coverage, 10: 'h', 11: '+-', 12: '.', 13: 'u', 14: 'x', 15: 'z'}
-  // boost::container::flat_map<uint64_t, std::array<int,16>>
+  // pos -> { 0: rname,  1: pos,       2: 'H',  3: '',    4: '',   5: 'U',  6: 'X',  7: 'Z',  # + strand
+  //          8: '',     9: coverage, 10: 'h', 11: '+-', 12: '.', 13: 'u', 14: 'x', 15: 'z'}  # + strand
+  // pos -> {16: rname, 17: pos,      18: 'H', 19: '',   20: '',  21: 'U', 22: 'X', 23: 'Z',  # - strand
+  //         24: '',    25: coverage, 26: 'h', 27: '+-', 28: '.', 29: 'u', 30: 'x', 31: 'z'}  # - strand
+  // boost::container::flat_map<uint64_t, std::array<int,32>>
   
   Rcpp::IntegerVector rname   = df["rname"];                                    // template rname
   Rcpp::IntegerVector strand  = df["strand"];                                   // template strand
@@ -48,35 +50,38 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
   Rcpp::XPtr<std::vector<std::string>> xm((SEXP)df.attr("xm_xptr"));            // merged refspaced template XMs, as a pointer to std::vector<std::string>
   
   // main typedefs
-  typedef uint64_t T_key;                                                       // {62bit:pos, 2bit:strand}
-  typedef std::array<int,32> T_val;                                             // {0:rname, 1:pos, 8:strand, 9:coverage, and 10 more for 11 valid chars}
+  typedef uint64_t T_key;                                                       // {64bit:pos}
+  typedef std::array<int,32> T_val;                                             // {0:rname, 1:pos, 9:coverage, and 10 more for 11 valid chars * 2 strands}
   typedef boost::container::flat_map<T_key, T_val> T_cx_fmap;                   // attaboy
   
 // macros
-#define spit_results {                           /* save aggregated counts  */ \
-  for (T_cx_fmap::iterator it=cx_map.begin(); it!=cx_map.end(); it++) {        \
-    it->second[9] /= 2;                               /* halve the coverage */ \
-    if (it->second[12] > it->second[9]) continue;     /* skip if most are . */ \
-    else if ((it->second[2] + it->second[10]) > it->second[9])                 \
-      max_freq_idx=2;                                                  /* H */ \
-    else if ((it->second[6] + it->second[14]) > it->second[9])                 \
-      max_freq_idx=6;                                                  /* X */ \
-    else if ((it->second[7] + it->second[15]) > it->second[9])                 \
-      max_freq_idx=7;                                                  /* Z */ \
-    else continue;                                 /* skip if none is > 50% */ \
-    if (ctx_map[max_freq_idx]) {                           /* if within ctx */ \
-      /* res_rname.push_back(it->second[0]);                          rname */ \
-      res_strand.push_back(it->second[8]);                        /* strand */ \
-      res_pos.push_back(it->second[1]);                              /* pos */ \
-      res_ctx.push_back(max_freq_idx);                           /* context */ \
-      res_meth.push_back(it->second[max_freq_idx]);                 /* meth */ \
-      res_unmeth.push_back(it->second[max_freq_idx | 8]);         /* unmeth */ \
-    }                                                                          \
-  }                                                                            \
-  res_rname.resize(res_strand.size(), map_val[0]);           /* same rname! */ \
-  max_pos=0;                                                                   \
-  cx_map.clear();                                                              \
-  hint = cx_map.end();                                                         \
+#define spit_results {                                                                          /* save aggregated counts  */ \
+  for (T_cx_fmap::iterator it=cx_map.begin(); it!=cx_map.end(); it++) {                                                       \
+    for (int s=0; s<2; s++) {                                                                      /* iterate over strands */ \
+      str_shft = s<<4;                                                               /* strand shift: 0 for F and 16 for R */ \
+      if (it->second[9+str_shft]==0) continue;                                                      /* skip if not covered */ \
+      it->second[9+str_shft] /= 2;                                                                   /* halve the coverage */ \
+      if (it->second[12+str_shft] > it->second[9+str_shft]) continue;                                /* skip if most are . */ \
+      else if ((it->second[2+str_shft] + it->second[10+str_shft]) > it->second[9+str_shft])                                   \
+        max_freq_idx=2;                                                                                               /* H */ \
+      else if ((it->second[6+str_shft] + it->second[14+str_shft]) > it->second[9+str_shft])                                   \
+        max_freq_idx=6;                                                                                               /* X */ \
+      else if ((it->second[7+str_shft] + it->second[15+str_shft]) > it->second[9+str_shft])                                   \
+        max_freq_idx=7;                                                                                               /* Z */ \
+      else continue;                                                                              /* skip if none is > 50% */ \
+      if (ctx_map[max_freq_idx]) {                                                                        /* if within ctx */ \
+        res_strand.push_back(s+1);                                                                               /* strand */ \
+        res_pos.push_back(it->first);                                                                               /* pos */ \
+        res_ctx.push_back(max_freq_idx);                                                                        /* context */ \
+        res_meth.push_back(it->second[max_freq_idx+str_shft]);                                                     /* meth */ \
+        res_unmeth.push_back(it->second[(max_freq_idx+str_shft) | 8]);                                           /* unmeth */ \
+      }                                                                                                                       \
+    }                                                                                                                         \
+  }                                                                                                                           \
+  res_rname.resize(res_strand.size(), map_val[0]);                                                          /* same rname! */ \
+  max_pos=0;                                                                                                                  \
+  cx_map.clear();                                                                                                             \
+  hint = cx_map.end();                                                                                                        \
 };
 
   // array of contexts to print
@@ -97,7 +102,7 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
   T_cx_fmap::iterator hint;
   T_val map_val = {0};
   int max_pos = 0;
-  unsigned int max_freq_idx;
+  unsigned int max_freq_idx, str_shft;
   
   cx_map.reserve(100000);                                                       // reserving helps?
   for (unsigned int x=0; x<rname.size(); x++) {
@@ -109,7 +114,7 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
       spit_results;
       map_val[0] = rname[x];
     }
-    map_val[8] = strand[x];
+    str_shft = (strand[x]-1)<<4;                                                // strand shift: 0 for F and 16 for R
     const unsigned int pass_x = (!pass[x])<<3;                                  // should we lowercase this XM (TRUE==0, FALSE==8)
     const char* xm_x = xm->at(templid[x]).c_str();                              // xm->at(templid[x]) is a reference to a corresponding XM string
     const unsigned int size_x = xm->at(templid[x]).size();                      // length of the current read
@@ -117,11 +122,10 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
       const unsigned int idx_to_increase = (ctx_to_idx(xm_x[i])) | pass_x;      // see the table above; if not pass -> lowercase
       if (idx_to_increase==11) continue;                                        // skip +-
       map_val[1] = start_x+i;
-      // const T_key map_key = ((T_key)map_val[1] << 2) | map_val[8];
-      const T_key map_key = ((T_key)map_val[1] << 2) | 1;
+      const T_key map_key = map_val[1];
       hint = cx_map.try_emplace(hint, map_key, map_val);
-      hint->second[idx_to_increase]++;
-      hint->second[9]++;                                                        // total coverage
+      hint->second[idx_to_increase+str_shft]++;
+      hint->second[9+str_shft]++;                                               // total coverage
     }
     if (max_pos<map_val[1]) max_pos=map_val[1];                                 // last position of C in cx_map
   }
