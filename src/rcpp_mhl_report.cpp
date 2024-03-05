@@ -49,9 +49,11 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
                                 int hmin)                                       // ignore haplotypes smaller than hmin
 {
   // walking trough bunch of reads <- filling the map
-  // pos<<2|strand -> {0: h_size, 1: pos,       2: 'H',  3: numer,  4: denom, 5: 'U',  6: 'X',  7: 'Z',
-  //                   8: strand, 9: coverage, 10: 'h', 11: '+-',  12: '.',  13: 'u', 14: 'x', 15: 'z'}
-  // boost::container::flat_map<uint64_t, std::array<uint64_t,16>>
+  // pos -> { 0: rname,   1: pos,       2: 'H',  3: numer,  4: denom,  5: 'U',  6: 'X',  7: 'Z',  # + strand
+  //          8: h_size,  9: coverage, 10: 'h', 11: '+-',  12: '.',   13: 'u', 14: 'x', 15: 'z',  # + strand
+  //         16: ''    , 17: '',       18: 'H', 19: numer, 20: denom, 21: 'U', 22: 'X', 23: 'Z',  # - strand
+  //         24: h_size, 25: coverage, 26: 'h', 27: '+-',  28: '.',   29: 'u', 30: 'x', 31: 'z'}  # - strand
+  // boost::container::flat_map<uint64_t, std::array<uint64_t,32>>
   
   Rcpp::IntegerVector rname   = df["rname"];                                    // template rname
   Rcpp::IntegerVector strand  = df["strand"];                                   // template strand
@@ -61,36 +63,40 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
   Rcpp::XPtr<std::vector<std::string>> xm((SEXP)df.attr("xm_xptr"));            // merged refspaced template XMs, as a pointer to std::vector<std::string>
   
   // main typedefs
-  typedef uint64_t T_key;                                                       // {62bit:pos, 2bit:strand}
-  typedef std::array<uint64_t, 16> T_val;                                       // {0:h_size, 1:pos, 8:strand, 9:coverage, 3:numerator, 4:denominator, and 10 more for 11 valid chars}
+  typedef uint64_t T_key;                                                       // {64bit:pos}
+  typedef std::array<uint64_t, 32> T_val;                                       // {0:rname, 1:pos, 8,25:h_size, 9,25:coverage, 3,19:numerator, 4,20:denominator, and 10 more for 11 valid chars * two strands}
   typedef boost::container::flat_map<T_key, T_val> T_mhl_map;                   // attaboy
   
 // macros
-#define spit_results {                            /* save aggregated counts */ \
-  for (T_mhl_map::iterator it=mhl_map.begin(); it!=mhl_map.end(); it++) {      \
-    it->second[9] /= 2;                               /* halve the coverage */ \
-    if (it->second[12] > it->second[9]) continue;     /* skip if most are . */ \
-    else if ((it->second[2] + it->second[10]) > it->second[9])                 \
-      max_freq_idx=2;                                                  /* H */ \
-    else if ((it->second[6] + it->second[14]) > it->second[9])                 \
-      max_freq_idx=6;                                                  /* X */ \
-    else if ((it->second[7] + it->second[15]) > it->second[9])                 \
-      max_freq_idx=7;                                                  /* Z */ \
-    else continue;                                 /* skip if none is > 50% */ \
-    if (ctx_map[max_freq_idx]) {                           /* if within ctx */ \
-      res_strand.push_back(it->second[8]);                        /* strand */ \
-      res_pos.push_back(it->second[1]);                              /* pos */ \
-      res_ctx.push_back(max_freq_idx);                           /* context */ \
-      const int cov = it->second[max_freq_idx] + it->second[max_freq_idx | 8]; \
-      res_cov.push_back(cov);                              /* meth + unmeth */ \
-      res_hlen.push_back((double)it->second[0]/cov);    /* average hap size */ \
-      res_mhl.push_back((double)it->second[3]/it->second[4]);       /* lMHL */ \
-    }                                                                          \
-  }                                                                            \
-  res_rname.resize(res_strand.size(), cur_rname);            /* same rname! */ \
-  max_pos=0;                                                                   \
-  mhl_map.clear();                                                             \
-  hint = mhl_map.end();                                                        \
+#define spit_results {                                                                           /* save aggregated counts */ \
+  for (T_mhl_map::iterator it=mhl_map.begin(); it!=mhl_map.end(); it++) {                                                     \
+    for (int s=0; s<2; s++) {                                                                      /* iterate over strands */ \
+      str_shft = s<<4;                                                               /* strand shift: 0 for F and 16 for R */ \
+      if (it->second[9+str_shft]==0) continue;                                                      /* skip if not covered */ \
+      it->second[9+str_shft] /= 2;                                                                   /* halve the coverage */ \
+      if (it->second[12+str_shft] > it->second[9+str_shft]) continue;                                /* skip if most are . */ \
+      else if ((it->second[2+str_shft] + it->second[10+str_shft]) > it->second[9+str_shft])                                   \
+        max_freq_idx=2;                                                                                               /* H */ \
+      else if ((it->second[6+str_shft] + it->second[14+str_shft]) > it->second[9+str_shft])                                   \
+        max_freq_idx=6;                                                                                               /* X */ \
+      else if ((it->second[7+str_shft] + it->second[15+str_shft]) > it->second[9+str_shft])                                   \
+        max_freq_idx=7;                                                                                               /* Z */ \
+      else continue;                                                                              /* skip if none is > 50% */ \
+      if (ctx_map[max_freq_idx]) {                                                                        /* if within ctx */ \
+        res_strand.push_back(s+1);                                                                               /* strand */ \
+        res_pos.push_back(it->first);                                                                               /* pos */ \
+        res_ctx.push_back(max_freq_idx);                                                                        /* context */ \
+        const int cov = it->second[max_freq_idx+str_shft] + it->second[(max_freq_idx+str_shft) | 8];                          \
+        res_cov.push_back(cov);                                                                           /* meth + unmeth */ \
+        res_hlen.push_back((double)it->second[8+str_shft]/cov);                                        /* average hap size */ \
+        res_mhl.push_back((double)it->second[3+str_shft]/it->second[4+str_shft]);                                  /* lMHL */ \
+      }                                                                                                                       \
+    }                                                                                                                         \
+  }                                                                                                                           \
+  res_rname.resize(res_strand.size(), map_val[0]);                                                          /* same rname! */ \
+  max_pos=0;                                                                                                                  \
+  mhl_map.clear();                                                                                                            \
+  hint = mhl_map.end();                                                                                                       \
 };
 
   // array of contexts to print
@@ -124,8 +130,8 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
   T_mhl_map mhl_map;
   T_mhl_map::iterator hint;
   T_val map_val = {0};
-  int max_pos = 0, cur_rname = 0;
-  unsigned int max_freq_idx;
+  int max_pos = 0;
+  unsigned int max_freq_idx, str_shft;
   
   mhl_map.reserve(100000);                                                      // reserving helps?
   for (unsigned int x=0; x<rname.size(); x++) {
@@ -133,11 +139,11 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     if ((x & 0xFFFF) == 0) Rcpp::checkUserInterrupt();                          // every ~65k reads
     
     const int start_x = start[x];                                               // start of the current read
-    if ((start_x>max_pos) || (rname[x]!=cur_rname)) {                           // if current position is further downstream or another reference
+    if ((start_x>max_pos) || ((uint64_t)rname[x]!=map_val[0])) {                // if current position is further downstream or another reference
       spit_results;
-      cur_rname = rname[x];
+      map_val[0] = rname[x];
     }
-    map_val[8] = strand[x];
+    str_shft = (strand[x]-1)<<4;                                                // strand shift: 0 for F and 16 for R
     const char* xm_x = xm->at(templid[x]).c_str();                              // xm->at(templid[x]) is a reference to a corresponding XM string
     const unsigned int size_x = xm->at(templid[x]).size();                      // length of the current read
     
@@ -173,13 +179,12 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
       const unsigned int idx_to_increase = ctx_to_idx(xm_x[i]);                 // index of context; see the table in epialleleR.h
       if (idx_to_increase==11) continue;                                        // skip +-
       map_val[1] = start_x+i;                                                   // current position
-      const T_key map_key = ((T_key)map_val[1] << 2) | map_val[8];
-      hint = mhl_map.try_emplace(hint, map_key, map_val);
-      hint->second[idx_to_increase]++;
-      hint->second[9]++;                                                        // total coverage
-      hint->second[0] += h_size;                                                // sum haplotype sizes
-      hint->second[3] += num_buf[i];                                            // lMHL numerator
-      hint->second[4] += mhl_lookup[h_size];                                    // lMHL denominator
+      hint = mhl_map.try_emplace(hint, (T_key)(map_val[1]), map_val);
+      hint->second[idx_to_increase+str_shft]++;
+      hint->second[9+str_shft]++;                                               // total coverage
+      hint->second[8+str_shft] += h_size;                                       // sum haplotype sizes
+      hint->second[3+str_shft] += num_buf[i];                                   // lMHL numerator
+      hint->second[4+str_shft] += mhl_lookup[h_size];                           // lMHL denominator
     }
     if ((uint64_t)max_pos<map_val[1]) max_pos=map_val[1];                       // last position of C in mhl_map
   }

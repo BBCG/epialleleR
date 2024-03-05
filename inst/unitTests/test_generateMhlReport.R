@@ -11,17 +11,43 @@ test_generateMhlReport <- function () {
     )
   )
   
+  mhl.report <- generateMhlReport(capture.bam)
+  RUnit::checkEquals(
+    c(sum(mhl.report$coverage), sum(mhl.report[strand=="+"]$coverage), sum(mhl.report[strand=="-"]$coverage)),
+    c(20219, 10188, 10031)
+  )
+  RUnit::checkEquals(
+    c(sum(mhl.report$length), sum(mhl.report$lmhl)),
+    c(229119.960, 2666.456)
+  )
+  RUnit::checkEquals(
+    c(sum(mhl.report[strand=="+"]$length), sum(mhl.report[strand=="+"]$lmhl)),
+    c(119605.010, 1281.342)
+  )
+  RUnit::checkEquals(
+    c(sum(mhl.report[strand=="-"]$length), sum(mhl.report[strand=="-"]$lmhl)),
+    c(109514.950, 1385.114)
+  )
+  
   # amplicon 10%
   amplicon.bam <- system.file("extdata", "amplicon010meth.bam", package="epialleleR")
   
   mhl.report <- generateMhlReport(amplicon.bam)
   RUnit::checkEquals(
-    sum(mhl.report$coverage),
-    7081
+    c(sum(mhl.report$coverage), sum(mhl.report[strand=="+"]$coverage), sum(mhl.report[strand=="-"]$coverage)),
+    c(7081, 342, 6739)
   )
   RUnit::checkEquals(
     c(sum(mhl.report$length), sum(mhl.report$lmhl)),
     c(6060.46765, 45.78637)
+  )
+  RUnit::checkEquals(
+    c(sum(mhl.report[strand=="+"]$length), sum(mhl.report[strand=="+"]$lmhl)),
+    c(2380.83333, 34.03206)
+  )
+  RUnit::checkEquals(
+    c(sum(mhl.report[strand=="-"]$length), sum(mhl.report[strand=="-"]$lmhl)),
+    c(3679.63432, 11.75431)
   )
   
   # amplicon 100%
