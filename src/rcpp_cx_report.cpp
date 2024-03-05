@@ -37,8 +37,8 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
 {
   // walking trough bunch of reads <- filling the map
   // pos -> { 0: rname,  1: pos,       2: 'H',  3: '',    4: '',   5: 'U',  6: 'X',  7: 'Z',  # + strand
-  //          8: '',     9: coverage, 10: 'h', 11: '+-', 12: '.', 13: 'u', 14: 'x', 15: 'z'}  # + strand
-  // pos -> {16: rname, 17: pos,      18: 'H', 19: '',   20: '',  21: 'U', 22: 'X', 23: 'Z',  # - strand
+  //          8: '',     9: coverage, 10: 'h', 11: '+-', 12: '.', 13: 'u', 14: 'x', 15: 'z',  # + strand
+  //         16: rname, 17: pos,      18: 'H', 19: '',   20: '',  21: 'U', 22: 'X', 23: 'Z',  # - strand
   //         24: '',    25: coverage, 26: 'h', 27: '+-', 28: '.', 29: 'u', 30: 'x', 31: 'z'}  # - strand
   // boost::container::flat_map<uint64_t, std::array<int,32>>
   
