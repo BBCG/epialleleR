@@ -116,6 +116,9 @@
 #' When `min.haplotype.length`>0, reads
 #' (read pairs) with fewer than `min.haplotype.length` cytosines
 #' within the `haplotype.context` are skipped.
+#' @param max.outofcontext.beta real number in the range [0;1] (default: 0.1).
+#' Reads (read pairs) with average beta value for out-of-context cytosines
+#' \strong{above} this threshold are skipped. Set to 1 to disable filtering.
 #' @param ... other parameters to pass to the
 #' \code{\link[epialleleR]{preprocessBam}} function.
 #' Options have no effect if preprocessed BAM data was supplied as an input.
@@ -168,6 +171,7 @@ generateMhlReport <- function (bam,
                                haplotype.context=c("CG", "CHG", "CHH", "CxG", "CX"),
                                max.haplotype.window=0,
                                min.haplotype.length=0,
+                               max.outofcontext.beta=0.1,
                                ...,
                                gzip=FALSE,
                                verbose=TRUE)
@@ -180,6 +184,7 @@ generateMhlReport <- function (bam,
     bam.processed=bam, 
     ctx=paste(.context.to.bases[[haplotype.context]][c("ctx.meth", "ctx.unmeth")], collapse=""),
     max.window=max.haplotype.window, min.length=min.haplotype.length,
+    max.ooctx.beta=max.outofcontext.beta,
     verbose=verbose
   )
   

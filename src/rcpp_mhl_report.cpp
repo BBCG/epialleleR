@@ -46,7 +46,8 @@ uint64_t nrS(uint64_t n)
 Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            // data frame with BAM data
                                 std::string ctx,                                // context string for bases to report,
                                 int hmax,                                       // maximum length of a computation window (limit for l in lMHL formula)
-                                int hmin)                                       // ignore haplotypes smaller than hmin
+                                int hmin,                                       // ignore haplotypes smaller than hmin
+                                double max_ooctx_meth_frac)                     // maximum fraction of methylated to total out-of-context bases (max out-of-context beta value)
 {
   // walking trough bunch of reads <- filling the map
   // pos -> { 0: rname,   1: pos,       2: 'H',  3: numer,  4: denom,  5: 'U',  6: 'X',  7: 'Z',  # + strand
@@ -155,6 +156,7 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     }
     std::memset(num_buf,  0, size_x * sizeof(uint64_t));                        // clean the buffer
     size_t mh_start = 0, mh_end = 0, mh_size = 0, h_size = 0;                   // start, end and size of the current methylated stretch (number of ctx bases); total size of haplotype
+    size_t ooctx_map [16] = {0};                                                // counter array for methylated and unmethylated out-of-context bases
     for (unsigned int i=0; i<size_x; i++) {                                     // first pass to compute local lMHL values, char by char
       const unsigned int base_idx = ctx_to_idx(xm_x[i]);                        // index of current base context; see the table in epialleleR.h
       if (ctx_map[base_idx]) {                                                  // if within context
@@ -167,9 +169,14 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
           std::fill(num_buf+mh_start, num_buf+mh_end+1, mhl_lookup[mh_size]);   // set values to nrS(mh_size) within methylated stretch
           mh_size = 0;                                                          // reset the size
         }
+      } else {                                                                  // only if out-of-context
+        ooctx_map[base_idx]++;                                                  // increment the counter of that symbol
       }
     }
-    if ((int)h_size<hmin) continue;                                             // skip read if haplotype is smaller than hmin
+    size_t ooctx_meth = ooctx_map[2]+ooctx_map[5]+ooctx_map[6]+ooctx_map[7];    // sum of o-o-ctx methylated
+    size_t ooctx_unmeth = ooctx_map[10]+ooctx_map[13]+ooctx_map[14]+ooctx_map[15];  // sum of o-o-ctx unmethylated
+    double ooctx_meth_frac = (double)ooctx_meth / (ooctx_meth+ooctx_unmeth);    // fraction of o-o-ctx methylated
+    if ((int)h_size<hmin || ooctx_meth_frac>max_ooctx_meth_frac) continue;      // skip read if haplotype is smaller than hmin or too many o-o-ctx meth bases
     if (mh_size) {                                                              // save last non-0-length methylated stretch
       std::fill(num_buf+mh_start, num_buf+mh_end+1, mhl_lookup[mh_size]);
     }

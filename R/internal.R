@@ -502,14 +502,15 @@ utils::globalVariables(
 # value: data.table with lMHL report
 
 .getMhlReport <- function (bam.processed,
-                           ctx, max.window, min.length,
+                           ctx, max.window, min.length, max.ooctx.beta,
                            verbose)
 {
   if (verbose) message("Preparing lMHL report ", appendLF=FALSE)
   tm <- proc.time()
   
   # must be ordered
-  mhl.report <- rcpp_mhl_report(bam.processed, ctx, max.window, min.length)
+  mhl.report <- rcpp_mhl_report(bam.processed, ctx, max.window, min.length,
+                                max.ooctx.beta)
   data.table::setDT(mhl.report)
   
   if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)

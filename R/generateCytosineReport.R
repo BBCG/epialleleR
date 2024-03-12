@@ -55,6 +55,14 @@
 #' 
 #' Other notes:
 #' 
+#' To produce conventional cytosine reports without thresholding by
+#' within-context methylation level though
+#' minimally affected by incomplete cytosine conversion, run this method with
+#' the following parameters: `threshold.reads=TRUE`, `threshold.context="CG"`,
+#' `min.context.sites=0`, `min.context.beta=0`, `max.outofcontext.beta=0.1`.
+#' All cytosines within reads (read pairs) having more than 10% out-of-context
+#' cytosines methylated, will be effectively treated as unmethylated ones.
+#' 
 #' Methylation string bases in unknown context ("uU") are simply ignored, which,
 #' to the best of our knowledge, is consistent with the behaviour of other
 #' tools.

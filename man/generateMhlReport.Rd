@@ -10,6 +10,7 @@ generateMhlReport(
   haplotype.context = c("CG", "CHG", "CHH", "CxG", "CX"),
   max.haplotype.window = 0,
   min.haplotype.length = 0,
+  max.outofcontext.beta = 0.1,
   ...,
   gzip = FALSE,
   verbose = TRUE
@@ -63,6 +64,10 @@ haplotype (default: 0 will include haplotypes of any length).
 When `min.haplotype.length`>0, reads
 (read pairs) with fewer than `min.haplotype.length` cytosines
 within the `haplotype.context` are skipped.}
+
+\item{max.outofcontext.beta}{real number in the range [0;1] (default: 0.1).
+Reads (read pairs) with average beta value for out-of-context cytosines
+\strong{above} this threshold are skipped. Set to 1 to disable filtering.}
 
 \item{...}{other parameters to pass to the
 \code{\link[epialleleR]{preprocessBam}} function.
