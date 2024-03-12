@@ -83,3 +83,6 @@ Changes in version 1.11.6 (2024-02-29)
 
 Changes in version 1.11.7 (2024-03-05)
 + optimised reporting from long-read data
+
+Changes in version 1.11.8 (2024-03-12)
++ stricter filtering in lMHL reports

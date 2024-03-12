@@ -134,8 +134,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_mhl_report
-Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame& df, std::string ctx, int hmax, int hmin);
-RcppExport SEXP _epialleleR_rcpp_mhl_report(SEXP dfSEXP, SEXP ctxSEXP, SEXP hmaxSEXP, SEXP hminSEXP) {
+Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame& df, std::string ctx, int hmax, int hmin, double max_ooctx_meth_frac);
+RcppExport SEXP _epialleleR_rcpp_mhl_report(SEXP dfSEXP, SEXP ctxSEXP, SEXP hmaxSEXP, SEXP hminSEXP, SEXP max_ooctx_meth_fracSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -143,7 +143,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::string >::type ctx(ctxSEXP);
     Rcpp::traits::input_parameter< int >::type hmax(hmaxSEXP);
     Rcpp::traits::input_parameter< int >::type hmin(hminSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_mhl_report(df, ctx, hmax, hmin));
+    Rcpp::traits::input_parameter< double >::type max_ooctx_meth_frac(max_ooctx_meth_fracSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_mhl_report(df, ctx, hmax, hmin, max_ooctx_meth_frac));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -259,7 +260,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_epialleleR_rcpp_get_xm_beta", (DL_FUNC) &_epialleleR_rcpp_get_xm_beta, 3},
     {"_epialleleR_rcpp_match_amplicon", (DL_FUNC) &_epialleleR_rcpp_match_amplicon, 3},
     {"_epialleleR_rcpp_match_capture", (DL_FUNC) &_epialleleR_rcpp_match_capture, 3},
-    {"_epialleleR_rcpp_mhl_report", (DL_FUNC) &_epialleleR_rcpp_mhl_report, 4},
+    {"_epialleleR_rcpp_mhl_report", (DL_FUNC) &_epialleleR_rcpp_mhl_report, 5},
     {"_epialleleR_rcpp_read_bam_paired", (DL_FUNC) &_epialleleR_rcpp_read_bam_paired, 7},
     {"_epialleleR_rcpp_read_bam_single", (DL_FUNC) &_epialleleR_rcpp_read_bam_single, 7},
     {"_epialleleR_rcpp_read_bam_mm_single", (DL_FUNC) &_epialleleR_rcpp_read_bam_mm_single, 9},
