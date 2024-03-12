@@ -18,7 +18,7 @@ account average methylation level of the entire sequence read."><!-- mathjax -->
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.11.8</span>
       </span>
     </div>
 
@@ -191,6 +191,13 @@ will retain their status, so the CX report will be similar to the reports
 produced by other methylation callers (such as Bismark or Illumina DRAGEN Bio
 IT Platform):</p>
 <table class="table table"><tr><td>rname</td><td>strand</td><td>pos</td><td>context</td><td>meth</td><td>unmeth</td></tr><tr><td>chr1</td><td>+</td><td>4</td><td>CG</td><td>4</td><td>0</td></tr><tr><td>chr1</td><td>+</td><td>7</td><td>CG</td><td>0</td><td>3</td></tr><tr><td>chr1</td><td>+</td><td>9</td><td>CHH</td><td>0</td><td>4</td></tr><tr><td>chr1</td><td>+</td><td>12</td><td>CHG</td><td>1</td><td>2</td></tr><tr><td>chr1</td><td>+</td><td>15</td><td>CHH</td><td>0</td><td>4</td></tr></table><p>Other notes:</p>
+<p>To produce conventional cytosine reports without thresholding by
+within-context methylation level though
+minimally affected by incomplete cytosine conversion, run this method with
+the following parameters: `threshold.reads=TRUE`, `threshold.context="CG"`,
+`min.context.sites=0`, `min.context.beta=0`, `max.outofcontext.beta=0.1`.
+All cytosines within reads (read pairs) having more than 10<!-- % out-of-context -->
+cytosines methylated, will be effectively treated as unmethylated ones.</p>
 <p>Methylation string bases in unknown context ("uU") are simply ignored, which,
 to the best of our knowledge, is consistent with the behaviour of other
 tools.</p>
@@ -243,9 +250,9 @@ beta values.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.014s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.011s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing cytosine report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.016s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.017s]</span>
 </code></pre></div>
     </div>
   </div>
