@@ -217,19 +217,17 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
   bam1_t *bam_rec = bam_init1();                                                // create BAM alignment structure
   
   // main containers
-  std::vector<std::string>* seq = new std::vector<std::string>;                 // SEQ
-  std::vector<std::string>* xm = new std::vector<std::string>;                  // XM
+  std::vector<std::string>* seqxm = new std::vector<std::string>;               // SEQXM, leftmost 4 bits are SEQ and rightmost 4 are XM
   std::vector<int> rname, strand, start;                                        // id for RNAME, id for CT==1/GA==2, POS
   int nrecs = 0, npushed = 0;                                                   // counters: BAM records read, BAM records pushed to data.table
   
   // reserve some memory
   rname.reserve(0xFFFFF); strand.reserve(0xFFFFF); start.reserve(0xFFFFF); 
-  seq->reserve(0xFFFFF); xm->reserve(0xFFFFF);
+  seqxm->reserve(0xFFFFF);
   
   // read holders
   int record_width = max_record_width;                                          // record ISIZE/TLEN
-  uint8_t *record_seq_rs  = (uint8_t*) malloc(record_width * sizeof(uint8_t));  // record SEQ array
-  uint8_t *record_xm_rs   = (uint8_t*) malloc(record_width * sizeof(uint8_t));  // record XM array
+  uint8_t *record_seqxm_rs  = (uint8_t*) malloc(record_width * sizeof(uint8_t));// record SEQXM array
   
   // process alignments
   while( sam_read1(bam_fp, bam_hdr, bam_rec) > 0 ) {                            // rec by rec
@@ -257,14 +255,12 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
     // resize containers if necessary
     if (record_width > max_record_width) {
       max_record_width = record_width;                                          // expand template holders
-      record_seq_rs  = (uint8_t *) realloc(record_seq_rs, record_width * sizeof(uint8_t));
-      record_xm_rs   = (uint8_t *) realloc(record_xm_rs,  record_width * sizeof(uint8_t));
-      if (!record_seq_rs || !record_xm_rs) Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs); // check memory allocation
+      record_seqxm_rs = (uint8_t *) realloc(record_seqxm_rs, record_width * sizeof(uint8_t));
+      if (!record_seqxm_rs) Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs); // check memory allocation
     }
     
     // prepare for the new record
-    std::memset(record_seq_rs, 'N', record_width);
-    std::memset(record_xm_rs,  '-', record_width);
+    std::memset(record_seqxm_rs, 0b11111011, record_width);                     // fill SEQXM with 'N-', i.e., '15,11'
     
     // apply CIGAR
     uint32_t query_pos = 0;                                                     // starting position in query array
@@ -278,8 +274,7 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
       case BAM_CDIFF :                                                          // 'X', 8
         for (size_t j=0; j<cigar_oplen; j++) {
           if (record_qual[query_pos+j] >= min_baseq) {
-            record_seq_rs[dest_pos+j] = seq_nt16_str[bam_seqi(record_pseq,query_pos+j)];
-            record_xm_rs[dest_pos+j] = record_xm[query_pos+j];
+            record_seqxm_rs[dest_pos+j] = bam_seqi_shifted(record_pseq,query_pos+j) | ctx_to_idx(record_xm[query_pos+j]);
           }
         }
         query_pos += cigar_oplen;
@@ -307,8 +302,7 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
     rname.push_back(bam_rec->core.tid + 1);                                     // RNAME+1 
     strand.push_back(( record_strand[1] == 'C' ) ? 1 : 2);                      // STRAND is 1 if "ZCT"/"+", 2 if "ZGA"/"-"
     start.push_back(bam_rec->core.pos + trim5 +1);                              // POS+1 
-    seq->emplace_back((const char*) record_seq_rs + trim5, dest_pos - (trim5+trim3)); // SEQ 
-    xm->emplace_back( (const char*) record_xm_rs + trim5,  dest_pos - (trim5+trim3)); // XM 
+    seqxm->emplace_back((const char*) record_seqxm_rs + trim5, dest_pos - (trim5+trim3)); // SEQXM
     npushed++;                                                                  // +1 
   }
   
@@ -316,8 +310,7 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
   bam_destroy1(bam_rec);                                                        // clean BAM alignment structure 
   hts_close(bam_fp);                                                            // close BAM file
   if (thread_pool.pool) hts_tpool_destroy(thread_pool.pool);                    // free thread pool
-  free(record_seq_rs);                                                          // and free manually allocated memory
-  free(record_xm_rs);
+  free(record_seqxm_rs);                                                        // and free manually allocated memory
   
   // wrap and return the results
   Rcpp::DataFrame res = Rcpp::DataFrame::create(                                // final DF
@@ -339,10 +332,8 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
   col_strand.attr("class") = "factor";
   col_strand.attr("levels") = strands;
   
-  Rcpp::XPtr<std::vector<std::string>> seq_xptr(seq, true);
-  res.attr("seq_xptr") = seq_xptr;                                              // external pointer to sequences
-  Rcpp::XPtr<std::vector<std::string>> xm_xptr(xm, true);
-  res.attr("xm_xptr") = xm_xptr;                                                // external pointer to methylation strings
+  Rcpp::XPtr<std::vector<std::string>> seqxm_xptr(seqxm, true);
+  res.attr("seqxm_xptr") = seqxm_xptr;                                          // external pointer to packed sequences + methylation strings
   
   res.attr("nrecs") = nrecs;                                                    // number of records in BAM file
   res.attr("npushed") = npushed;                                                // number of records pushed to data.frame
@@ -397,14 +388,13 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
   int mod_pos = 0, nmods = 0;                                                   // position of modified base in the query, number of modifications at that base
 
   // main containers
-  std::vector<std::string>* seq = new std::vector<std::string>;                 // SEQ
-  std::vector<std::string>* xm  = new std::vector<std::string>;                 // XM
+  std::vector<std::string>* seqxm = new std::vector<std::string>;               // SEQXM, leftmost 4 bits are SEQ and rightmost 4 are XM
   std::vector<int> rname, strand, start;                                        // id for RNAME, id for CT==1/GA==2, POS
   int nrecs = 0, npushed = 0;                                                   // counters: BAM records read, BAM records pushed to data.table
 
   // reserve some memory
   rname.reserve(0xFFFFF); strand.reserve(0xFFFFF); start.reserve(0xFFFFF);
-  seq->reserve(0xFFFFF); xm->reserve(0xFFFFF);
+  seqxm->reserve(0xFFFFF);
 
   // read holders
   int query_width = max_query_width;                                            // NON-refspaced query length
@@ -540,11 +530,13 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
     strand_has_mods[record_strand] = 1;                                         // always push at least one context string
     for (int s=0; s<2; s++) {
       if (strand_has_mods[s]) {
+        for (size_t j=0; j<dest_pos; j++) {                                     // pack SEQ + XM
+          record_xm_rs[s][j] = (seq_nt16_table[record_seq_rs[j]] << 4) | ctx_to_idx(record_xm_rs[s][j]);
+        }
         rname.push_back(bam_rec->core.tid + 1);                                 // RNAME+1
         strand.push_back(s + 1);                                                // STRAND is 1 if "CT"/"+", 2 if "GA"/"-"
         start.push_back(bam_rec->core.pos + trim5 + 1);                         // POS+1
-        seq->emplace_back((const char*) record_seq_rs   + trim5, dest_pos - (trim5+trim3)); // SEQ
-        xm->emplace_back( (const char*) record_xm_rs[s] + trim5, dest_pos - (trim5+trim3)); // XM
+        seqxm->emplace_back( (const char*) record_xm_rs[s] + trim5, dest_pos - (trim5+trim3)); // SEQXM
         npushed++;                                                              // +1
       }
     }
@@ -580,10 +572,8 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
   col_strand.attr("class") = "factor";
   col_strand.attr("levels") = strands;
 
-  Rcpp::XPtr<std::vector<std::string>> seq_xptr(seq, true);
-  res.attr("seq_xptr") = seq_xptr;                                              // external pointer to sequences
-  Rcpp::XPtr<std::vector<std::string>> xm_xptr(xm, true);
-  res.attr("xm_xptr") = xm_xptr;                                                // external pointer to methylation strings
+  Rcpp::XPtr<std::vector<std::string>> seqxm_xptr(seqxm, true);
+  res.attr("seq_xptr") = seqxm_xptr;                                            // external pointer to sequences
 
   res.attr("nrecs") = nrecs;                                                    // number of records in BAM file
   res.attr("npushed") = npushed;                                                // number of records pushed to data.frame
