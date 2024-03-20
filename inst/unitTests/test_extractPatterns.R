@@ -7,6 +7,11 @@ test_extractPatterns <- function () {
   
   message(paste(unique(noclip.patterns$pattern), collapse=" "))
   RUnit::checkEquals(
+    dim(noclip.patterns),
+    c(310, 43)
+  )
+  
+  RUnit::checkEquals(
     length(unique(noclip.patterns$pattern)),
     34
   )
@@ -21,10 +26,30 @@ test_extractPatterns <- function () {
     11
   )
   
+  RUnit::checkEquals(
+    match(c("43125196", "43125214", "43125957", "43126000"), colnames(noclip.patterns)),
+    c(8, 9, 42, 43)
+  )
+  
+  RUnit::checkEquals(
+    sum(noclip.patterns=="z", na.rm=TRUE),
+    4519
+  )
+  
+  RUnit::checkEquals(
+    sum(noclip.patterns=="Z", na.rm=TRUE),
+    396
+  )
+  
   clip.patterns <- extractPatterns(
     bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
     bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
     bed.row=2, clip.patterns=TRUE, verbose=TRUE
+  )
+  
+  RUnit::checkEquals(
+    dim(clip.patterns),
+    c(154, 26)
   )
   
   RUnit::checkEquals(
@@ -40,6 +65,16 @@ test_extractPatterns <- function () {
   RUnit::checkEquals(
     clip.patterns[beta>0.5, length(unique(pattern))],
     8
+  )
+  
+  RUnit::checkEquals(
+    sum(clip.patterns=="z", na.rm=TRUE),
+    2006
+  )
+  
+  RUnit::checkEquals(
+    sum(clip.patterns=="Z", na.rm=TRUE),
+    180
   )
   
   exact.patterns <- extractPatterns(
@@ -89,6 +124,59 @@ test_extractPatterns <- function () {
     match(c("43124895", "43124896", "43125985", "43126001"), colnames(cxg.patterns)),
     c(8, 9, 126, 127)
   )
+  
+  cx.patterns <- extractPatterns(
+    bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
+    bed=as("chr17:43124895-43126001", "GRanges"),
+    extract.context="CX", clip.patterns=TRUE, verbose=FALSE
+  )
+  
+  RUnit::checkEquals(
+    dim(cx.patterns),
+    c(394, 269)
+  )
+  
+  RUnit::checkEquals(
+    length(unique(cx.patterns$pattern)),
+    135
+  )
+  
+  RUnit::checkEquals(
+    match(c("43124895", "43124896", "43125985", "43126001"), colnames(cx.patterns)),
+    c(8, 9, 264, 269)
+  )
+  
+  RUnit::checkEquals(
+    sum(cx.patterns=="h", na.rm=TRUE),
+    18944
+  )
+  
+  RUnit::checkEquals(
+    sum(cx.patterns=="H", na.rm=TRUE),
+    38
+  )
+  
+  RUnit::checkEquals(
+    sum(cx.patterns=="x", na.rm=TRUE),
+    8801
+  )
+  
+  RUnit::checkEquals(
+    sum(cx.patterns=="X", na.rm=TRUE),
+    26
+  )
+  
+  RUnit::checkEquals(
+    sum(cx.patterns=="z", na.rm=TRUE),
+    5853
+  )
+  
+  RUnit::checkEquals(
+    sum(cx.patterns=="Z", na.rm=TRUE),
+    565
+  )
+  
+  
   
   capture.patterns <- extractPatterns(
     bam=system.file("extdata", "capture.bam", package="epialleleR"),
@@ -148,6 +236,37 @@ test_extractPatterns <- function () {
     snv.patterns[beta>0.5, length(unique(pattern))],
     12
   )
+  
+  RUnit::checkEquals(
+    sum(snv.patterns=="C", na.rm=TRUE),
+    11
+  )
+  
+  RUnit::checkEquals(
+    sum(snv.patterns=="T", na.rm=TRUE),
+    8
+  )
+  
+  RUnit::checkEquals(
+    sum(snv.patterns=="z", na.rm=TRUE),
+    18
+  )
+  
+  RUnit::checkEquals(
+    sum(snv.patterns=="Z", na.rm=TRUE),
+    37
+  )
+  
+  RUnit::checkEquals(
+    snv.patterns[, .N, by=.(strand, `61864584`)][order(strand, `61864584`)]$N,
+    c(8, 3, 11, 2)
+  )
+  
+  RUnit::checkEquals(
+    snv.patterns[, .N, by=.(strand, `61864584`, pattern)][order(strand, `61864584`)]$N,
+    c(3, 1, 2, 1, 1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 1, 1, 2)
+  )
+  
   
   RUnit::checkEquals(
     extractPatterns(
