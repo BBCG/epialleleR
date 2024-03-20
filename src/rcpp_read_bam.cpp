@@ -42,29 +42,26 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   bam1_t *bam_rec = bam_init1();                                                // create BAM alignment structure
   
   // main containers
-  std::vector<std::string>* seq = new std::vector<std::string>;                 // SEQ
-  std::vector<std::string>* xm = new std::vector<std::string>;                  // XM
+  std::vector<std::string>* seqxm = new std::vector<std::string>;               // SEQXM, leftmost 4 bits are SEQ and rightmost 4 are XM
   std::vector<int> rname, strand, start;                                        // id for RNAME, id for CT==1/GA==2, POS
   int nrecs = 0, ntempls = 0;                                                   // counters: BAM records, templates (consecutive proper read pairs)
   
   // reserve some memory
   rname.reserve(0xFFFFF); strand.reserve(0xFFFFF); start.reserve(0xFFFFF); 
-  seq->reserve(0xFFFFF); xm->reserve(0xFFFFF);
+  seqxm->reserve(0xFFFFF);
   
   // template holders
   char *templ_qname = (char*) malloc(max_qname_width * sizeof(char));           // template QNAME
-  uint8_t *templ_qual_rs = (uint8_t*) malloc(max_templ_width * sizeof(uint8_t));// template QUAL array
-  uint8_t *templ_seq_rs  = (uint8_t*) malloc(max_templ_width * sizeof(uint8_t));// template SEQ array
-  uint8_t *templ_xm_rs   = (uint8_t*) malloc(max_templ_width * sizeof(uint8_t));// template XM array
+  uint8_t *templ_qual_rs  = (uint8_t*)malloc(max_templ_width * sizeof(uint8_t));// template QUAL array
+  uint8_t *templ_seqxm_rs = (uint8_t*)malloc(max_templ_width * sizeof(uint8_t));// template SEQXM array
   int templ_rname = 0, templ_start = 0, templ_strand = 0, templ_width = 0;      // template RNAME, POS, STRAND, ISIZE
   
-  #define push_template {                                       /* pushing template data to vectors */ \
-    rname.push_back(templ_rname + 1);                                                    /* RNAME+1 */ \
-    strand.push_back(templ_strand);                                                       /* STRAND */ \
-    start.push_back(templ_start + trim5 + 1);                                              /* POS+1 */ \
-    seq->emplace_back((const char*) templ_seq_rs + trim5, templ_width - (trim5+trim3));      /* SEQ */ \
-    xm->emplace_back( (const char*) templ_xm_rs  + trim5, templ_width - (trim5+trim3));       /* XM */ \
-    ntempls++;                                                                                /* +1 */ \
+  #define push_template {                                        /* pushing template data to vectors */ \
+    rname.push_back(templ_rname + 1);                                                     /* RNAME+1 */ \
+    strand.push_back(templ_strand);                                                        /* STRAND */ \
+    start.push_back(templ_start + trim5 + 1);                                               /* POS+1 */ \
+    seqxm->emplace_back((const char*) templ_seqxm_rs + trim5, templ_width - (trim5+trim3)); /* SEQXM */ \
+    ntempls++;                                                                                 /* +1 */ \
   }
   
   // process alignments
@@ -92,22 +89,17 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
       templ_start = bam_rec->core.pos < bam_rec->core.mpos ?                    // smallest of POS,MPOS is a start
         bam_rec->core.pos : bam_rec->core.mpos;
       templ_width = abs(bam_rec->core.isize);                                   // template ISIZE
-      templ_strand = ( rec_strand[1] == 'C' ) ? 1 : 2 ;                         // STRAND is 1 if "ZCT"/"+", 2 if "ZGA"/"-"
+      templ_strand = 2 - (rec_strand[1] == 'C');                                // STRAND is 1 if "ZCT"/"+", 2 if "ZGA"/"-"
       
       // resize containers if necessary
       if (templ_width > max_templ_width) {
         max_templ_width = templ_width;                                          // expand template holders
-        templ_qual_rs = (uint8_t *) realloc(templ_qual_rs, max_templ_width);
-        templ_seq_rs  = (uint8_t *) realloc(templ_seq_rs,  max_templ_width);
-        templ_xm_rs   = (uint8_t *) realloc(templ_xm_rs,   max_templ_width);
-        if (!templ_qual_rs || !templ_seq_rs || !templ_xm_rs) Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs); // check memory allocation
+        templ_qual_rs  = (uint8_t *) realloc(templ_qual_rs,  max_templ_width);
+        templ_seqxm_rs = (uint8_t *) realloc(templ_seqxm_rs, max_templ_width);
+        if (!templ_qual_rs || !templ_seqxm_rs) Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs); // check memory allocation
       }
       std::memset(templ_qual_rs, (uint8_t) min_baseq, templ_width);             // clean template holders
-      std::memset(templ_seq_rs, 'N', templ_width);
-      std::memset(templ_xm_rs,  '-', templ_width);
-      // std::fill_n(templ_qual_rs, templ_width, (uint8_t) min_baseq);             // clean template holders
-      // std::fill_n(templ_seq_rs,  templ_width, 'N');
-      // std::fill_n(templ_xm_rs,   templ_width, '-');
+      std::memset(templ_seqxm_rs, 0b11111011, templ_width);                     // fill SEQXM with 'N-', i.e., '15,11'
      }
     
     // add another read to the template
@@ -131,8 +123,7 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
           for (size_t j=0; j<cigar_oplen; j++) {
             if (rec_qual[query_pos+j] > templ_qual_rs[dest_pos+j]) {
               templ_qual_rs[dest_pos+j] = rec_qual[query_pos+j];
-              templ_seq_rs[dest_pos+j] = seq_nt16_str[bam_seqi(rec_pseq,query_pos+j)];
-              templ_xm_rs[dest_pos+j] = rec_xm[query_pos+j];
+              templ_seqxm_rs[dest_pos+j] = bam_seqi_shifted(rec_pseq,query_pos+j) | ctx_to_idx(rec_xm[query_pos+j]);
             }
           }
           query_pos += cigar_oplen;
@@ -166,8 +157,7 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   if (thread_pool.pool) hts_tpool_destroy(thread_pool.pool);                    // free thread pool
   free(templ_qname);                                                            // and free manually allocated memory
   free(templ_qual_rs);
-  free(templ_seq_rs);
-  free(templ_xm_rs);
+  free(templ_seqxm_rs);
   
   // wrap and return the results
   Rcpp::DataFrame res = Rcpp::DataFrame::create(                                // final DF
@@ -189,10 +179,8 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   col_strand.attr("class") = "factor";
   col_strand.attr("levels") = strands;
   
-  Rcpp::XPtr<std::vector<std::string>> seq_xptr(seq, true);
-  res.attr("seq_xptr") = seq_xptr;                                              // external pointer to sequences
-  Rcpp::XPtr<std::vector<std::string>> xm_xptr(xm, true);
-  res.attr("xm_xptr") = xm_xptr;                                                // external pointer to methylation strings
+  Rcpp::XPtr<std::vector<std::string>> seqxm_xptr(seqxm, true);
+  res.attr("seqxm_xptr") = seqxm_xptr;                                          // external pointer to packed sequences + methylation strings
   
   res.attr("nrecs") = nrecs;                                                    // number of records in BAM file
   res.attr("npushed") = ntempls;                                                // number of templates pushed to data.frame

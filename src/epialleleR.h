@@ -25,7 +25,11 @@
 // u    01110101  01110111  1101    13
 // x    01111000  01111010  1110    14
 // z    01111010  01111100  1111    15
-#define ctx_to_idx(c) ((c+2)>>2) & 15
+#define ctx_to_idx(c) ((((c)+2)>>2) & 15)
+
+// Macro to unpack sequence char and shift it by 4 bits to the left;
+// modified from bam_seqi of HTSlib
+#define bam_seqi_shifted(s, i) ((s)[(i)>>1] << (((i)&1)<<2))
 
 // Genomic sequence-to-cytosine-context lookup tables
 // these 9-bit tables are built for the sequence containing ACGNT only,
