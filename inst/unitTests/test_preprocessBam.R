@@ -96,6 +96,21 @@ test_preprocessBam <- function () {
     list(paired=FALSE, sorted=FALSE, tagged="XM")
   )
   
+  # long-read, single-ended, unsorted
+  out.bam <- tempfile(pattern="simulated", fileext=".bam")
+  simulateBam(
+    output.bam.file=out.bam,
+    pos=1,
+    cigar=c("1X4899M1H"),
+    tlen=4900,
+    Mm=c("C+m,0,2,0;G-m,0,0,0;"),
+    Ml=list(as.integer(c(102,128,153,138,101,96)))
+  )
+  RUnit::checkIdentical(
+    epialleleR:::.checkBam(out.bam, TRUE)[c("paired", "sorted", "tagged")],
+    list(paired=FALSE, sorted=FALSE, tagged="MM")
+  )
+  
   # single-ended, unsorted, no XG but there's YD
   RUnit::checkException(
     preprocessBam(system.file("extdata", "test", "bwameth-se-unsort-yd.bam", package="epialleleR"), verbose=TRUE)
