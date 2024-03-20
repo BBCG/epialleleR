@@ -354,6 +354,11 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
 // LONG-READ (NATIVE) SEQUENCING METHYLATION CALLING (GENOME IS ABSOLUTELY
 // NECESSARY FOR THE FIRST BUT NOT THE SECOND)
 
+// SEQXM packing is not efficient here. Would be great to rewrite methylation
+// calling to allow all IUPAC bases, which will use 4096-byte context lookup
+// tables, HTSlib codes for bases and, therefore, will save some ops by
+// avoiding unnecessary conversions
+
 // [[Rcpp::export]]
 Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        // file name
                                          int min_mapq,                          // min read mapping quality
@@ -531,7 +536,7 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
     for (int s=0; s<2; s++) {
       if (strand_has_mods[s]) {
         for (size_t j=0; j<dest_pos; j++) {                                     // pack SEQ + XM
-          record_xm_rs[s][j] = (seq_nt16_table[record_seq_rs[j]] << 4) | ctx_to_idx(record_xm_rs[s][j]);
+          record_xm_rs[s][j] = ((seq_nt16_table[record_seq_rs[j]]) << 4) | (ctx_to_idx(record_xm_rs[s][j]));
         }
         rname.push_back(bam_rec->core.tid + 1);                                 // RNAME+1
         strand.push_back(s + 1);                                                // STRAND is 1 if "CT"/"+", 2 if "GA"/"-"
