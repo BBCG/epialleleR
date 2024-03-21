@@ -119,7 +119,7 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
     const char* seqxm_x = seqxm->at(templid[x]).c_str();                        // seqxm->at(templid[x]) is a reference to a corresponding SEQXM string
     const unsigned int size_x = seqxm->at(templid[x]).size();                   // length of the current read
     for (unsigned int i=0; i<size_x; i++) {                                     // char by char - it's faster this way than using std::string in the cycle
-      const unsigned int idx_to_increase = (seqxm_x[i] & 15) | pass_x;          // extract lower 4 bits (XM); if not pass -> lowercase
+      const unsigned int idx_to_increase = unpack_ctx_idx(seqxm_x[i]) | pass_x; // extract lower 4 bits (XM); if not pass -> lowercase
       if (idx_to_increase==11) continue;                                        // skip +-
       map_val[1] = start_x+i;
       hint = cx_map.try_emplace(hint, (T_key)(map_val[1]), map_val);
