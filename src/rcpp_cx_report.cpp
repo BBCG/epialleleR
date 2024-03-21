@@ -116,7 +116,7 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
     }
     str_shft = (strand[x]-1)<<4;                                                // strand shift: 0 for F and 16 for R
     const unsigned int pass_x = (!pass[x])<<3;                                  // should we lowercase this XM (TRUE==0, FALSE==8)
-    const char* seqxm_x = seqxm->at(templid[x]).c_str();                        // xm->at(templid[x]) is a reference to a corresponding XM string
+    const char* seqxm_x = seqxm->at(templid[x]).c_str();                        // seqxm->at(templid[x]) is a reference to a corresponding SEQXM string
     const unsigned int size_x = seqxm->at(templid[x]).size();                   // length of the current read
     for (unsigned int i=0; i<size_x; i++) {                                     // char by char - it's faster this way than using std::string in the cycle
       const unsigned int idx_to_increase = (seqxm_x[i] & 15) | pass_x;          // extract lower 4 bits (XM); if not pass -> lowercase
