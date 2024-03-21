@@ -40,6 +40,7 @@ an input. See below for additional functionality.
  * full support for short-read sequencing alignments by Illumina DRAGEN,
  Bismark, bwa-meth, BSMAP
  * RRBS-specific options
+ * lower memory usage
 
 ##### v1.10 [BioC 3.18]
 
