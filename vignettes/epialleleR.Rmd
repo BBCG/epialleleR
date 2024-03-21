@@ -660,7 +660,7 @@ if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
              group=pattern, color=factor(base))) +
     geom_line(color="grey", position=position_dodgev(height=0.9)) +
     geom_point(position=position_dodgev(height=0.9)) +
-    scale_colour_manual(values=c("blue","red","grey80","black")) +
+    scale_colour_manual(values=c("blue",NA,"red","grey80","black")) +
     theme_light() +
     labs(x="position", y="count", title="BRIP1", color="base")
 }
