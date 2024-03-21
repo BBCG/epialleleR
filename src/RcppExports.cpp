@@ -50,20 +50,20 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_extract_patterns
-Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame& df, unsigned int target_rname, unsigned int target_start, unsigned int target_end, signed int min_overlap, std::string& ctx, double min_ctx_freq, bool clip, unsigned int reverse_offset, Rcpp::IntegerVector& hlght);
+Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame& df, const unsigned int target_rname, const unsigned int target_start, const unsigned int target_end, const signed int min_overlap, const std::string ctx, const double min_ctx_freq, const bool clip, const unsigned int reverse_offset, Rcpp::IntegerVector& hlght);
 RcppExport SEXP _epialleleR_rcpp_extract_patterns(SEXP dfSEXP, SEXP target_rnameSEXP, SEXP target_startSEXP, SEXP target_endSEXP, SEXP min_overlapSEXP, SEXP ctxSEXP, SEXP min_ctx_freqSEXP, SEXP clipSEXP, SEXP reverse_offsetSEXP, SEXP hlghtSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
-    Rcpp::traits::input_parameter< unsigned int >::type target_rname(target_rnameSEXP);
-    Rcpp::traits::input_parameter< unsigned int >::type target_start(target_startSEXP);
-    Rcpp::traits::input_parameter< unsigned int >::type target_end(target_endSEXP);
-    Rcpp::traits::input_parameter< signed int >::type min_overlap(min_overlapSEXP);
-    Rcpp::traits::input_parameter< std::string& >::type ctx(ctxSEXP);
-    Rcpp::traits::input_parameter< double >::type min_ctx_freq(min_ctx_freqSEXP);
-    Rcpp::traits::input_parameter< bool >::type clip(clipSEXP);
-    Rcpp::traits::input_parameter< unsigned int >::type reverse_offset(reverse_offsetSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type target_rname(target_rnameSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type target_start(target_startSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type target_end(target_endSEXP);
+    Rcpp::traits::input_parameter< const signed int >::type min_overlap(min_overlapSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type ctx(ctxSEXP);
+    Rcpp::traits::input_parameter< const double >::type min_ctx_freq(min_ctx_freqSEXP);
+    Rcpp::traits::input_parameter< const bool >::type clip(clipSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type reverse_offset(reverse_offsetSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector& >::type hlght(hlghtSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_extract_patterns(df, target_rname, target_start, target_end, min_overlap, ctx, min_ctx_freq, clip, reverse_offset, hlght));
     return rcpp_result_gen;
