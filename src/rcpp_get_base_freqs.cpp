@@ -1,6 +1,6 @@
 #include <Rcpp.h>
 #include <htslib/hts.h>
-// using namespace Rcpp;
+#include "epialleleR.h"
 
 // Matches reads with given 1-base positions (VCF) and returns base frequencies.
 // FUNCTION ASSUMES THAT BOTH READS AND VCF ENTRIES ARE SORTED!
@@ -49,7 +49,7 @@ Rcpp::NumericMatrix rcpp_get_base_freqs(Rcpp::DataFrame &df,                    
       }
       if (vcf_chr_i==read_rname_x &&
           vcf_pos_i>=read_start_x && vcf_pos_i<=read_end_x) {                   // match found
-        int idx = seq_nt16_int[(seqxm->at(templid[x])[vcf_pos_i-read_start_x]) >> 4]; // index of a base, [0;4]
+        int idx = seq_nt16_int[unpack_seq_idx(seqxm->at(templid[x])[vcf_pos_i-read_start_x])]; // index of a base, [0;4]
         idx += (read_strand[x]-1) * 5;                                          // shift by 5 if '-' strand (==2)
         idx += ((bool)(pass[x])) * 10;                                          // shift by 10 if pass==TRUE (==1)
         res(i,idx)++;

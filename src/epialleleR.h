@@ -27,9 +27,15 @@
 // z    01111010  01111100  1111    15
 #define ctx_to_idx(c) ((((c)+2)>>2) & 15)
 
-// Macro to unpack sequence char and shift it by 4 bits to the left;
-// modified from bam_seqi of HTSlib
+// Macro to unpack sequence char from BAM pseq field and shift it by 4 bits to
+// the left; modified from bam_seqi of HTSlib
 #define bam_seqi_shifted(s, i) (((s)[(i)>>1] << (((i)&1)<<2)) & 0xF0)
+
+// Macro to unpack sequence char index from packed SEQXM
+#define unpack_seq_idx(c) (((c)>>4) & 15)
+
+// Macro to unpack XM context index from packed SEQXM
+#define unpack_ctx_idx(c) ((c) & 15)
 
 // Genomic sequence-to-cytosine-context lookup tables
 // these 9-bit tables are built for the sequence containing ACGNT only,
