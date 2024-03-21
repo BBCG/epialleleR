@@ -108,27 +108,27 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_match_amplicon
-std::vector<int> rcpp_match_amplicon(Rcpp::DataFrame& df, Rcpp::DataFrame& bed, int tolerance);
+std::vector<int> rcpp_match_amplicon(Rcpp::DataFrame& df, Rcpp::DataFrame& bed, const int tolerance);
 RcppExport SEXP _epialleleR_rcpp_match_amplicon(SEXP dfSEXP, SEXP bedSEXP, SEXP toleranceSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type bed(bedSEXP);
-    Rcpp::traits::input_parameter< int >::type tolerance(toleranceSEXP);
+    Rcpp::traits::input_parameter< const int >::type tolerance(toleranceSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_match_amplicon(df, bed, tolerance));
     return rcpp_result_gen;
 END_RCPP
 }
 // rcpp_match_capture
-std::vector<int> rcpp_match_capture(Rcpp::DataFrame& df, Rcpp::DataFrame& bed, signed int min_overlap);
+std::vector<int> rcpp_match_capture(Rcpp::DataFrame& df, Rcpp::DataFrame& bed, const signed int min_overlap);
 RcppExport SEXP _epialleleR_rcpp_match_capture(SEXP dfSEXP, SEXP bedSEXP, SEXP min_overlapSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type bed(bedSEXP);
-    Rcpp::traits::input_parameter< signed int >::type min_overlap(min_overlapSEXP);
+    Rcpp::traits::input_parameter< const signed int >::type min_overlap(min_overlapSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_match_capture(df, bed, min_overlap));
     return rcpp_result_gen;
 END_RCPP
