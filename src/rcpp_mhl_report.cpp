@@ -158,7 +158,7 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     size_t mh_start = 0, mh_end = 0, mh_size = 0, h_size = 0;                   // start, end and size of the current methylated stretch (number of ctx bases); total size of haplotype
     size_t ooctx_map [16] = {0};                                                // counter array for methylated and unmethylated out-of-context bases
     for (unsigned int i=0; i<size_x; i++) {                                     // first pass to compute local lMHL values, char by char
-      const unsigned int base_idx = seqxm_x[i] & 15;                            // index of current base context; see the table in epialleleR.h
+      const unsigned int base_idx = unpack_ctx_idx(seqxm_x[i]);                 // index of current base context; see the table in epialleleR.h
       if (ctx_map[base_idx]) {                                                  // if within context
         h_size++;                                                               // haplotype size++
         if (base_idx<8) {                                                       // if uppercase (methylated stretch started/continues)
@@ -183,7 +183,7 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     
     // second, walk through XM once again, filling the map
     for (unsigned int i=0; i<size_x; i++) {                                     // char by char - it's faster this way than using std::string in the cycle
-      const unsigned int idx_to_increase = seqxm_x[i] & 15;                     // index of context; see the table in epialleleR.h
+      const unsigned int idx_to_increase = unpack_ctx_idx(seqxm_x[i]);          // index of context; see the table in epialleleR.h
       if (idx_to_increase==11) continue;                                        // skip +-
       map_val[1] = start_x+i;                                                   // current position
       hint = mhl_map.try_emplace(hint, (T_key)(map_val[1]), map_val);
