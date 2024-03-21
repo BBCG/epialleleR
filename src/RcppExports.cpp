@@ -232,19 +232,19 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_threshold_reads
-std::vector<bool> rcpp_threshold_reads(Rcpp::DataFrame& df, std::string ctx_meth, std::string ctx_unmeth, std::string ooctx_meth, std::string ooctx_unmeth, unsigned int min_n_ctx, double min_ctx_meth_frac, double max_ooctx_meth_frac);
+std::vector<bool> rcpp_threshold_reads(Rcpp::DataFrame& df, const std::string ctx_meth, const std::string ctx_unmeth, const std::string ooctx_meth, const std::string ooctx_unmeth, const unsigned int min_n_ctx, const double min_ctx_meth_frac, const double max_ooctx_meth_frac);
 RcppExport SEXP _epialleleR_rcpp_threshold_reads(SEXP dfSEXP, SEXP ctx_methSEXP, SEXP ctx_unmethSEXP, SEXP ooctx_methSEXP, SEXP ooctx_unmethSEXP, SEXP min_n_ctxSEXP, SEXP min_ctx_meth_fracSEXP, SEXP max_ooctx_meth_fracSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
-    Rcpp::traits::input_parameter< std::string >::type ctx_meth(ctx_methSEXP);
-    Rcpp::traits::input_parameter< std::string >::type ctx_unmeth(ctx_unmethSEXP);
-    Rcpp::traits::input_parameter< std::string >::type ooctx_meth(ooctx_methSEXP);
-    Rcpp::traits::input_parameter< std::string >::type ooctx_unmeth(ooctx_unmethSEXP);
-    Rcpp::traits::input_parameter< unsigned int >::type min_n_ctx(min_n_ctxSEXP);
-    Rcpp::traits::input_parameter< double >::type min_ctx_meth_frac(min_ctx_meth_fracSEXP);
-    Rcpp::traits::input_parameter< double >::type max_ooctx_meth_frac(max_ooctx_meth_fracSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type ctx_meth(ctx_methSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type ctx_unmeth(ctx_unmethSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type ooctx_meth(ooctx_methSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type ooctx_unmeth(ooctx_unmethSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type min_n_ctx(min_n_ctxSEXP);
+    Rcpp::traits::input_parameter< const double >::type min_ctx_meth_frac(min_ctx_meth_fracSEXP);
+    Rcpp::traits::input_parameter< const double >::type max_ooctx_meth_frac(max_ooctx_meth_fracSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_threshold_reads(df, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac));
     return rcpp_result_gen;
 END_RCPP
