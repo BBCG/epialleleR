@@ -44,10 +44,10 @@ uint64_t nrS(uint64_t n)
 
 // [[Rcpp::export]]
 Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            // data frame with BAM data
-                                std::string ctx,                                // context string for bases to report,
+                                const std::string ctx,                          // context string for bases to report,
                                 int hmax,                                       // maximum length of a computation window (limit for l in lMHL formula)
-                                int hmin,                                       // ignore haplotypes smaller than hmin
-                                double max_ooctx_meth_frac)                     // maximum fraction of methylated to total out-of-context bases (max out-of-context beta value)
+                                const int hmin,                                 // ignore haplotypes smaller than hmin
+                                const double max_ooctx_meth_frac)               // maximum fraction of methylated to total out-of-context bases (max out-of-context beta value)
 {
   // walking trough bunch of reads <- filling the map
   // pos -> { 0: rname,   1: pos,       2: 'H',  3: numer,  4: denom,  5: 'U',  6: 'X',  7: 'Z',  # + strand
@@ -61,7 +61,7 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
   Rcpp::IntegerVector start   = df["start"];                                    // template start
   Rcpp::IntegerVector templid = df["templid"];                                  // template id, effectively holds indexes of corresponding std::string in std::vector
   
-  Rcpp::XPtr<std::vector<std::string>> xm((SEXP)df.attr("xm_xptr"));            // merged refspaced template XMs, as a pointer to std::vector<std::string>
+  Rcpp::XPtr<std::vector<std::string>> seqxm((SEXP)df.attr("seqxm_xptr"));      // merged refspaced packed template SEQXMs, as a pointer to std::vector<std::string>
   
   // main typedefs
   typedef uint64_t T_key;                                                       // {64bit:pos}
@@ -145,8 +145,8 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
       map_val[0] = rname[x];
     }
     str_shft = (strand[x]-1)<<4;                                                // strand shift: 0 for F and 16 for R
-    const char* xm_x = xm->at(templid[x]).c_str();                              // xm->at(templid[x]) is a reference to a corresponding XM string
-    const unsigned int size_x = xm->at(templid[x]).size();                      // length of the current read
+    const char* seqxm_x = seqxm->at(templid[x]).c_str();                        // seqxm->at(templid[x]) is a reference to a corresponding SEQXM string
+    const unsigned int size_x = seqxm->at(templid[x]).size();                   // length of the current read
     
     // first, prefill lMHL numerator buffer in first pass of XM
     if (num_buf_len < size_x) {
@@ -158,7 +158,7 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     size_t mh_start = 0, mh_end = 0, mh_size = 0, h_size = 0;                   // start, end and size of the current methylated stretch (number of ctx bases); total size of haplotype
     size_t ooctx_map [16] = {0};                                                // counter array for methylated and unmethylated out-of-context bases
     for (unsigned int i=0; i<size_x; i++) {                                     // first pass to compute local lMHL values, char by char
-      const unsigned int base_idx = ctx_to_idx(xm_x[i]);                        // index of current base context; see the table in epialleleR.h
+      const unsigned int base_idx = unpack_ctx_idx(seqxm_x[i]);                 // index of current base context; see the table in epialleleR.h
       if (ctx_map[base_idx]) {                                                  // if within context
         h_size++;                                                               // haplotype size++
         if (base_idx<8) {                                                       // if uppercase (methylated stretch started/continues)
@@ -183,7 +183,7 @@ Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame &df,                            
     
     // second, walk through XM once again, filling the map
     for (unsigned int i=0; i<size_x; i++) {                                     // char by char - it's faster this way than using std::string in the cycle
-      const unsigned int idx_to_increase = ctx_to_idx(xm_x[i]);                 // index of context; see the table in epialleleR.h
+      const unsigned int idx_to_increase = unpack_ctx_idx(seqxm_x[i]);          // index of context; see the table in epialleleR.h
       if (idx_to_increase==11) continue;                                        // skip +-
       map_val[1] = start_x+i;                                                   // current position
       hint = mhl_map.try_emplace(hint, (T_key)(map_val[1]), map_val);

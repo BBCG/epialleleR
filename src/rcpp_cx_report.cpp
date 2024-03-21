@@ -33,7 +33,7 @@
 // [[Rcpp::export("rcpp_cx_report")]]
 Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             // data frame with BAM data
                                Rcpp::LogicalVector &pass,                       // does it pass the threshold
-                               std::string ctx)                                 // context string for bases to report
+                               const std::string ctx)                           // context string for bases to report
 {
   // walking trough bunch of reads <- filling the map
   // pos -> { 0: rname,  1: pos,       2: 'H',  3: '',    4: '',   5: 'U',  6: 'X',  7: 'Z',  # + strand
@@ -47,7 +47,7 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
   Rcpp::IntegerVector start   = df["start"];                                    // template start
   Rcpp::IntegerVector templid = df["templid"];                                  // template id, effectively holds indexes of corresponding std::string in std::vector
   
-  Rcpp::XPtr<std::vector<std::string>> xm((SEXP)df.attr("xm_xptr"));            // merged refspaced template XMs, as a pointer to std::vector<std::string>
+  Rcpp::XPtr<std::vector<std::string>> seqxm((SEXP)df.attr("seqxm_xptr"));      // merged refspaced packed template SEQXMs, as a pointer to std::vector<std::string>
   
   // main typedefs
   typedef uint64_t T_key;                                                       // {64bit:pos}
@@ -116,10 +116,10 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
     }
     str_shft = (strand[x]-1)<<4;                                                // strand shift: 0 for F and 16 for R
     const unsigned int pass_x = (!pass[x])<<3;                                  // should we lowercase this XM (TRUE==0, FALSE==8)
-    const char* xm_x = xm->at(templid[x]).c_str();                              // xm->at(templid[x]) is a reference to a corresponding XM string
-    const unsigned int size_x = xm->at(templid[x]).size();                      // length of the current read
+    const char* seqxm_x = seqxm->at(templid[x]).c_str();                        // seqxm->at(templid[x]) is a reference to a corresponding SEQXM string
+    const unsigned int size_x = seqxm->at(templid[x]).size();                   // length of the current read
     for (unsigned int i=0; i<size_x; i++) {                                     // char by char - it's faster this way than using std::string in the cycle
-      const unsigned int idx_to_increase = (ctx_to_idx(xm_x[i])) | pass_x;      // see the table above; if not pass -> lowercase
+      const unsigned int idx_to_increase = unpack_ctx_idx(seqxm_x[i]) | pass_x; // extract lower 4 bits (XM); if not pass -> lowercase
       if (idx_to_increase==11) continue;                                        // skip +-
       map_val[1] = start_x+i;
       hint = cx_map.try_emplace(hint, (T_key)(map_val[1]), map_val);

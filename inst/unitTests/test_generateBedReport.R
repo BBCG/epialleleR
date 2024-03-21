@@ -30,6 +30,11 @@ test_generateBedReport <- function () {
   )
   
   RUnit::checkEquals(
+    amplicon.report$VEF,
+    c(0.08333333333, 0.11475409836, 0.05376344086, 0.10714285714, 0.13207547170),
+  )
+  
+  RUnit::checkEquals(
     sum(capture.report$`nreads-`, na.rm=TRUE),
     1472
   )
@@ -70,5 +75,10 @@ test_generateBedReport <- function () {
   
   RUnit::checkTrue(
     amplicon.report[5]$VEF != quality.report[5]$VEF
+  )
+  
+  RUnit::checkEquals(
+    quality.report$VEF,
+    c(0.08333333333, 0.11475409836, 0.05376344086, 0.10714285714, 0.13186813187),
   )
 }

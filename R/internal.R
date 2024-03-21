@@ -624,10 +624,10 @@ utils::globalVariables(
          "Please provide VCF as an object with correct seqlevels.")
   
   freqs <- rcpp_get_base_freqs(bam.processed, pass, vcf.dt)
-  colnames(freqs) <- c("","U+A","","U+C","U+T","","U+N","U+G",
-                       "","U-A","","U-C","U-T","","U-N","U-G",
-                       "","M+A","","M+C","M+T","","M+N","M+G",
-                       "","M-A","","M-C","M-T","","M-N","M-G")
+  colnames(freqs) <- c("U+A","U+C","U+G","U+T","U+N",
+                       "U-A","U-C","U-G","U-T","U-N",
+                       "M+A","M+C","M+G","M+T","M+N",
+                       "M-A","M-C","M-G","M-T","M-N")
   
   bf.report <- data.table::data.table(
     name=names(vcf.ranges),

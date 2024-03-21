@@ -37,33 +37,33 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_cx_report
-Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame& df, Rcpp::LogicalVector& pass, std::string ctx);
+Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame& df, Rcpp::LogicalVector& pass, const std::string ctx);
 RcppExport SEXP _epialleleR_rcpp_cx_report(SEXP dfSEXP, SEXP passSEXP, SEXP ctxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
     Rcpp::traits::input_parameter< Rcpp::LogicalVector& >::type pass(passSEXP);
-    Rcpp::traits::input_parameter< std::string >::type ctx(ctxSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type ctx(ctxSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_cx_report(df, pass, ctx));
     return rcpp_result_gen;
 END_RCPP
 }
 // rcpp_extract_patterns
-Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame& df, unsigned int target_rname, unsigned int target_start, unsigned int target_end, signed int min_overlap, std::string& ctx, double min_ctx_freq, bool clip, unsigned int reverse_offset, Rcpp::IntegerVector& hlght);
+Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame& df, const unsigned int target_rname, const unsigned int target_start, const unsigned int target_end, const signed int min_overlap, const std::string ctx, const double min_ctx_freq, const bool clip, const unsigned int reverse_offset, Rcpp::IntegerVector& hlght);
 RcppExport SEXP _epialleleR_rcpp_extract_patterns(SEXP dfSEXP, SEXP target_rnameSEXP, SEXP target_startSEXP, SEXP target_endSEXP, SEXP min_overlapSEXP, SEXP ctxSEXP, SEXP min_ctx_freqSEXP, SEXP clipSEXP, SEXP reverse_offsetSEXP, SEXP hlghtSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
-    Rcpp::traits::input_parameter< unsigned int >::type target_rname(target_rnameSEXP);
-    Rcpp::traits::input_parameter< unsigned int >::type target_start(target_startSEXP);
-    Rcpp::traits::input_parameter< unsigned int >::type target_end(target_endSEXP);
-    Rcpp::traits::input_parameter< signed int >::type min_overlap(min_overlapSEXP);
-    Rcpp::traits::input_parameter< std::string& >::type ctx(ctxSEXP);
-    Rcpp::traits::input_parameter< double >::type min_ctx_freq(min_ctx_freqSEXP);
-    Rcpp::traits::input_parameter< bool >::type clip(clipSEXP);
-    Rcpp::traits::input_parameter< unsigned int >::type reverse_offset(reverse_offsetSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type target_rname(target_rnameSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type target_start(target_startSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type target_end(target_endSEXP);
+    Rcpp::traits::input_parameter< const signed int >::type min_overlap(min_overlapSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type ctx(ctxSEXP);
+    Rcpp::traits::input_parameter< const double >::type min_ctx_freq(min_ctx_freqSEXP);
+    Rcpp::traits::input_parameter< const bool >::type clip(clipSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type reverse_offset(reverse_offsetSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector& >::type hlght(hlghtSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_extract_patterns(df, target_rname, target_start, target_end, min_overlap, ctx, min_ctx_freq, clip, reverse_offset, hlght));
     return rcpp_result_gen;
@@ -95,55 +95,55 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_get_xm_beta
-std::vector<double> rcpp_get_xm_beta(Rcpp::DataFrame& df, std::string ctx_meth, std::string ctx_unmeth);
+std::vector<double> rcpp_get_xm_beta(Rcpp::DataFrame& df, const std::string ctx_meth, const std::string ctx_unmeth);
 RcppExport SEXP _epialleleR_rcpp_get_xm_beta(SEXP dfSEXP, SEXP ctx_methSEXP, SEXP ctx_unmethSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
-    Rcpp::traits::input_parameter< std::string >::type ctx_meth(ctx_methSEXP);
-    Rcpp::traits::input_parameter< std::string >::type ctx_unmeth(ctx_unmethSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type ctx_meth(ctx_methSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type ctx_unmeth(ctx_unmethSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_get_xm_beta(df, ctx_meth, ctx_unmeth));
     return rcpp_result_gen;
 END_RCPP
 }
 // rcpp_match_amplicon
-std::vector<int> rcpp_match_amplicon(Rcpp::DataFrame& df, Rcpp::DataFrame& bed, int tolerance);
+std::vector<int> rcpp_match_amplicon(Rcpp::DataFrame& df, Rcpp::DataFrame& bed, const int tolerance);
 RcppExport SEXP _epialleleR_rcpp_match_amplicon(SEXP dfSEXP, SEXP bedSEXP, SEXP toleranceSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type bed(bedSEXP);
-    Rcpp::traits::input_parameter< int >::type tolerance(toleranceSEXP);
+    Rcpp::traits::input_parameter< const int >::type tolerance(toleranceSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_match_amplicon(df, bed, tolerance));
     return rcpp_result_gen;
 END_RCPP
 }
 // rcpp_match_capture
-std::vector<int> rcpp_match_capture(Rcpp::DataFrame& df, Rcpp::DataFrame& bed, signed int min_overlap);
+std::vector<int> rcpp_match_capture(Rcpp::DataFrame& df, Rcpp::DataFrame& bed, const signed int min_overlap);
 RcppExport SEXP _epialleleR_rcpp_match_capture(SEXP dfSEXP, SEXP bedSEXP, SEXP min_overlapSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type bed(bedSEXP);
-    Rcpp::traits::input_parameter< signed int >::type min_overlap(min_overlapSEXP);
+    Rcpp::traits::input_parameter< const signed int >::type min_overlap(min_overlapSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_match_capture(df, bed, min_overlap));
     return rcpp_result_gen;
 END_RCPP
 }
 // rcpp_mhl_report
-Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame& df, std::string ctx, int hmax, int hmin, double max_ooctx_meth_frac);
+Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame& df, const std::string ctx, int hmax, const int hmin, const double max_ooctx_meth_frac);
 RcppExport SEXP _epialleleR_rcpp_mhl_report(SEXP dfSEXP, SEXP ctxSEXP, SEXP hmaxSEXP, SEXP hminSEXP, SEXP max_ooctx_meth_fracSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
-    Rcpp::traits::input_parameter< std::string >::type ctx(ctxSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type ctx(ctxSEXP);
     Rcpp::traits::input_parameter< int >::type hmax(hmaxSEXP);
-    Rcpp::traits::input_parameter< int >::type hmin(hminSEXP);
-    Rcpp::traits::input_parameter< double >::type max_ooctx_meth_frac(max_ooctx_meth_fracSEXP);
+    Rcpp::traits::input_parameter< const int >::type hmin(hminSEXP);
+    Rcpp::traits::input_parameter< const double >::type max_ooctx_meth_frac(max_ooctx_meth_fracSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_mhl_report(df, ctx, hmax, hmin, max_ooctx_meth_frac));
     return rcpp_result_gen;
 END_RCPP
@@ -232,19 +232,19 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_threshold_reads
-std::vector<bool> rcpp_threshold_reads(Rcpp::DataFrame& df, std::string ctx_meth, std::string ctx_unmeth, std::string ooctx_meth, std::string ooctx_unmeth, unsigned int min_n_ctx, double min_ctx_meth_frac, double max_ooctx_meth_frac);
+std::vector<bool> rcpp_threshold_reads(Rcpp::DataFrame& df, const std::string ctx_meth, const std::string ctx_unmeth, const std::string ooctx_meth, const std::string ooctx_unmeth, const unsigned int min_n_ctx, const double min_ctx_meth_frac, const double max_ooctx_meth_frac);
 RcppExport SEXP _epialleleR_rcpp_threshold_reads(SEXP dfSEXP, SEXP ctx_methSEXP, SEXP ctx_unmethSEXP, SEXP ooctx_methSEXP, SEXP ooctx_unmethSEXP, SEXP min_n_ctxSEXP, SEXP min_ctx_meth_fracSEXP, SEXP max_ooctx_meth_fracSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
-    Rcpp::traits::input_parameter< std::string >::type ctx_meth(ctx_methSEXP);
-    Rcpp::traits::input_parameter< std::string >::type ctx_unmeth(ctx_unmethSEXP);
-    Rcpp::traits::input_parameter< std::string >::type ooctx_meth(ooctx_methSEXP);
-    Rcpp::traits::input_parameter< std::string >::type ooctx_unmeth(ooctx_unmethSEXP);
-    Rcpp::traits::input_parameter< unsigned int >::type min_n_ctx(min_n_ctxSEXP);
-    Rcpp::traits::input_parameter< double >::type min_ctx_meth_frac(min_ctx_meth_fracSEXP);
-    Rcpp::traits::input_parameter< double >::type max_ooctx_meth_frac(max_ooctx_meth_fracSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type ctx_meth(ctx_methSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type ctx_unmeth(ctx_unmethSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type ooctx_meth(ooctx_methSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type ooctx_unmeth(ooctx_unmethSEXP);
+    Rcpp::traits::input_parameter< const unsigned int >::type min_n_ctx(min_n_ctxSEXP);
+    Rcpp::traits::input_parameter< const double >::type min_ctx_meth_frac(min_ctx_meth_fracSEXP);
+    Rcpp::traits::input_parameter< const double >::type max_ooctx_meth_frac(max_ooctx_meth_fracSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_threshold_reads(df, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac));
     return rcpp_result_gen;
 END_RCPP
