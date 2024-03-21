@@ -33,7 +33,7 @@
 // [[Rcpp::export("rcpp_cx_report")]]
 Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             // data frame with BAM data
                                Rcpp::LogicalVector &pass,                       // does it pass the threshold
-                               std::string ctx)                                 // context string for bases to report
+                               const std::string ctx)                           // context string for bases to report
 {
   // walking trough bunch of reads <- filling the map
   // pos -> { 0: rname,  1: pos,       2: 'H',  3: '',    4: '',   5: 'U',  6: 'X',  7: 'Z',  # + strand
