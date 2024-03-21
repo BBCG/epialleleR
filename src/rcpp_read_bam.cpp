@@ -578,7 +578,7 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
   col_strand.attr("levels") = strands;
 
   Rcpp::XPtr<std::vector<std::string>> seqxm_xptr(seqxm, true);
-  res.attr("seq_xptr") = seqxm_xptr;                                            // external pointer to sequences
+  res.attr("seqxm_xptr") = seqxm_xptr;                                          // external pointer to sequences
 
   res.attr("nrecs") = nrecs;                                                    // number of records in BAM file
   res.attr("npushed") = npushed;                                                // number of records pushed to data.frame
