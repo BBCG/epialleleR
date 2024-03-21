@@ -33,7 +33,7 @@ std::vector<bool> rcpp_threshold_reads(Rcpp::DataFrame &df,                     
     const char* seqxm_x = seqxm->at(templid[x]).c_str();                        // seqxm->at(templid[x]) is a reference to a corresponding SEQXM string
     const unsigned int size_x = seqxm->at(templid[x]).size();                   // length of the current read
     for (unsigned int i=0; i<size_x; i++) {                                     // char by char - it's faster this way than using std::string in the cycle
-      ctx_map[seqxm_x[i] & 15]++;                                               // extract lower 4 bits (XM) and count them;
+      ctx_map[unpack_ctx_idx(seqxm_x[i])]++;                                    // extract lower 4 bits (XM) and count them;
     }
     
     unsigned int n_ctx_meth = 0;
