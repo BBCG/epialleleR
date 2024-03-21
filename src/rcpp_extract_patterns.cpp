@@ -137,7 +137,7 @@ Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame &df,                      
               meth += !(base & 8);                                              // methylated + (0 for lowercase, 1 for uppercase)
               total++;                                                          // total++
               fnv_add(fnv, reinterpret_cast<const char*>(&pos), sizeof(pos));   // FNV-1a: add int position
-              fnv_add(fnv, seqxm_x+i, sizeof(char));                            // FNV-1a: add char+context base
+              fnv_add(fnv, &base, sizeof(char));                                // FNV-1a: add context index
             }
           }
         }
@@ -151,7 +151,7 @@ Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame &df,                      
               auto hint = hlght_map.find(hlght[i]);                             // find this position
               hint->second[npat] = base;                                        // save base by position
               fnv_add(fnv, reinterpret_cast<char*>(&hlght[i]), sizeof(hlght[i])); // FNV-1a: add int position
-              fnv_add(fnv, seqxm_x+hlght_pos, sizeof(char));                      // FNV-1a: add char+context base
+              fnv_add(fnv, &base, sizeof(char));                                // FNV-1a: add sequence index
             }
           }
           

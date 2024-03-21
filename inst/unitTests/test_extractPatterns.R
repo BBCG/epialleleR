@@ -259,7 +259,7 @@ test_extractPatterns <- function () {
   
   RUnit::checkEquals(
     snv.patterns[, .N, by=.(strand, `61864584`)][order(strand, `61864584`)]$N,
-    c(8, 3, 11, 2)
+    c(8, 2, 1, 11, 2)
   )
   
   RUnit::checkEquals(
