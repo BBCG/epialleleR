@@ -37,14 +37,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_cx_report
-Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame& df, Rcpp::LogicalVector& pass, std::string ctx);
+Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame& df, Rcpp::LogicalVector& pass, const std::string ctx);
 RcppExport SEXP _epialleleR_rcpp_cx_report(SEXP dfSEXP, SEXP passSEXP, SEXP ctxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
     Rcpp::traits::input_parameter< Rcpp::LogicalVector& >::type pass(passSEXP);
-    Rcpp::traits::input_parameter< std::string >::type ctx(ctxSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type ctx(ctxSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_cx_report(df, pass, ctx));
     return rcpp_result_gen;
 END_RCPP
@@ -134,16 +134,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_mhl_report
-Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame& df, std::string ctx, int hmax, int hmin, double max_ooctx_meth_frac);
+Rcpp::DataFrame rcpp_mhl_report(Rcpp::DataFrame& df, const std::string ctx, int hmax, const int hmin, const double max_ooctx_meth_frac);
 RcppExport SEXP _epialleleR_rcpp_mhl_report(SEXP dfSEXP, SEXP ctxSEXP, SEXP hmaxSEXP, SEXP hminSEXP, SEXP max_ooctx_meth_fracSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
-    Rcpp::traits::input_parameter< std::string >::type ctx(ctxSEXP);
+    Rcpp::traits::input_parameter< const std::string >::type ctx(ctxSEXP);
     Rcpp::traits::input_parameter< int >::type hmax(hmaxSEXP);
-    Rcpp::traits::input_parameter< int >::type hmin(hminSEXP);
-    Rcpp::traits::input_parameter< double >::type max_ooctx_meth_frac(max_ooctx_meth_fracSEXP);
+    Rcpp::traits::input_parameter< const int >::type hmin(hminSEXP);
+    Rcpp::traits::input_parameter< const double >::type max_ooctx_meth_frac(max_ooctx_meth_fracSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_mhl_report(df, ctx, hmax, hmin, max_ooctx_meth_frac));
     return rcpp_result_gen;
 END_RCPP
