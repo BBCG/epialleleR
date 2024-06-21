@@ -110,18 +110,6 @@
 #'   plot.data <- data.table::melt.data.table(patterns.summary,
 #'     measure.vars=base.positions, variable.name="pos", value.name="base")
 #'   
-#'   # continuous positions, nonunique patterns according to their counts
-#'   if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
-#'     ggplot(na.omit(plot.data)[N>1],
-#'            aes(x=as.numeric(as.character(pos)), y=factor(N),
-#'                group=pattern, color=factor(base, levels=c("z","Z")))) +
-#'       geom_line(color="grey", position=position_dodgev(height=0.5)) +
-#'       geom_point(position=position_dodgev(height=0.5)) +
-#'       scale_colour_grey(start=0.8, end=0) +
-#'       theme_light() +
-#'       labs(x="position", y="count", title="epialleles", color="base")
-#'   }
-#'   
 #'   # upset-like plot of all patterns, categorical positions, sorted by counts
 #'   if (require("ggplot2", quietly=TRUE) & require("gridExtra", quietly=TRUE)){
 #'     grid.arrange(
