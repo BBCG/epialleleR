@@ -33,8 +33,7 @@ Imports:
 LinkingTo:
   Rcpp,
   BH,
-  Rhtslib,
-  zlibbioc
+  Rhtslib
 Suggests:
   RUnit,
   knitr,
