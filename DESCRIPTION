@@ -1,6 +1,6 @@
 Package: epialleleR
 Title: Fast, Epiallele-Aware Methylation Caller and Reporter
-Version: 1.13.0
+Version: 1.13.1
 Authors@R: 
   person(given = "Oleksii",
     family = "Nikolaienko",
@@ -33,14 +33,12 @@ Imports:
 LinkingTo:
   Rcpp,
   BH,
-  Rhtslib,
-  zlibbioc
+  Rhtslib
 Suggests:
   RUnit,
   knitr,
   rmarkdown,
   ggplot2,
-  ggstance,
   gridExtra
 License: Artistic-2.0
 URL: https://github.com/BBCG/epialleleR

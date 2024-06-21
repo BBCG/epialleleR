@@ -515,12 +515,12 @@ plot.data <- data.table::melt.data.table(patterns.summary,
   measure.vars=base.positions, variable.name="pos", value.name="base")
 
 # categorical positions, all patterns sorted by beta, with counts on the right
-if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
+if (require("ggplot2", quietly=TRUE)) {
   ggplot(na.omit(plot.data),
          aes(x=pos, y=reorder(pattern,beta),
              group=pattern, color=factor(base))) +
-    geom_line(color="grey", position=position_dodgev(height=0.5)) +
-    geom_point(position=position_dodgev(height=0.5)) +
+    geom_line(color="grey") +
+    geom_point() +
     scale_colour_grey(start=0.8, end=0) +
     theme_light() +
     theme(axis.text.x=element_text(angle=60, hjust=1, vjust=1),
@@ -529,18 +529,6 @@ if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
     scale_x_discrete(expand=c(0.05,0)) +
     geom_text(inherit.aes=FALSE, data=patterns.summary,
               mapping=aes(x="count", y=pattern, label=N), size=3)
-}
-
-# continuous positions, nonunique patterns according to their counts
-if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
-  ggplot(na.omit(plot.data)[N>1],
-         aes(x=as.numeric(as.character(pos)), y=factor(N),
-             group=pattern, color=factor(base))) +
-    geom_line(color="grey", position=position_dodgev(height=0.5)) +
-    geom_point(position=position_dodgev(height=0.5)) +
-    scale_colour_grey(start=0.8, end=0) +
-    theme_light() +
-    labs(x="position", y="count", title="epialleles", color="base")
 }
 
 # upset-like plot of all patterns, continuous positions, sorted by counts
@@ -581,15 +569,16 @@ capture.summary <-
                    by=.(pattern, beta), .SDcols=capture.positions]
 capture.data <- data.table::melt.data.table(capture.summary,
   measure.vars=capture.positions, variable.name="pos", value.name="base")
-if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
+if (require("ggplot2", quietly=TRUE)) {
   ggplot(na.omit(capture.data),
-         aes(x=as.numeric(as.character(pos)), y=factor(N),
-             group=pattern, color=factor(base))) +
-    geom_line(color="grey", position=position_dodgev(height=0.9)) +
-    geom_point(position=position_dodgev(height=0.9)) +
+       aes(x=as.numeric(as.character(pos)), y=pattern,
+           group=pattern, color=factor(base))) +
+    geom_line(color="grey") +
+    geom_point() +
     scale_colour_grey(start=0.8, end=0) +
     theme_light() +
-    labs(x="position", y="count", title="RAD51C", color="base")
+    theme(axis.text.y=element_blank()) +
+    labs(x="position", y="pattern", title="RAD51C", color="base")
 }
 ```
 
@@ -654,15 +643,16 @@ brip1.summary <-
                  by=.(pattern, beta), .SDcols=brip1.positions]
 brip1.data <- data.table::melt.data.table(brip1.summary,
   measure.vars=brip1.positions, variable.name="pos", value.name="base")
-if (require("ggplot2", quietly=TRUE) & require("ggstance", quietly=TRUE)) {
+if (require("ggplot2", quietly=TRUE)) {
   ggplot(na.omit(brip1.data),
-         aes(x=as.numeric(as.character(pos)), y=factor(N),
-             group=pattern, color=factor(base))) +
-    geom_line(color="grey", position=position_dodgev(height=0.9)) +
-    geom_point(position=position_dodgev(height=0.9)) +
+       aes(x=as.numeric(as.character(pos)), y=pattern,
+           group=pattern, color=factor(base))) +
+    geom_line(color="grey") +
+    geom_point() +
     scale_colour_manual(values=c("blue",NA,"red","grey80","black")) +
     theme_light() +
-    labs(x="position", y="count", title="BRIP1", color="base")
+    theme(axis.text.y=element_blank()) +
+    labs(x="position", y="pattern", title="BRIP1", color="base")
 }
 ```
 

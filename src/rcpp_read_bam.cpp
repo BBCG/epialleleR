@@ -54,6 +54,8 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   char *templ_qname = (char*) malloc(max_qname_width * sizeof(char));           // template QNAME
   uint8_t *templ_qual_rs  = (uint8_t*)malloc(max_templ_width * sizeof(uint8_t));// template QUAL array
   uint8_t *templ_seqxm_rs = (uint8_t*)malloc(max_templ_width * sizeof(uint8_t));// template SEQXM array
+  std::memset(templ_qual_rs, (uint8_t) min_baseq, max_templ_width);             // prefill QUAL holder with min_baseq
+  std::memset(templ_seqxm_rs, 0b11111011, max_templ_width);                     // prefill SEQXM holder with 'N-', i.e., '15,11'
   int templ_rname = 0, templ_start = 0, templ_strand = 0, templ_width = 0;      // template RNAME, POS, STRAND, ISIZE
   
   #define push_template {                                        /* pushing template data to vectors */ \
@@ -61,6 +63,8 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
     strand.push_back(templ_strand);                                                        /* STRAND */ \
     start.push_back(templ_start + trim5 + 1);                                               /* POS+1 */ \
     seqxm->emplace_back((const char*) templ_seqxm_rs + trim5, templ_width - (trim5+trim3)); /* SEQXM */ \
+    std::memset(templ_qual_rs, (uint8_t) min_baseq, templ_width); /* fill QUAL holder with min_baseq */ \
+    std::memset(templ_seqxm_rs, 0b11111011, templ_width);     /* fill SEQXM with 'N-', i.e., '15,11' */ \
     ntempls++;                                                                                 /* +1 */ \
   }
   
@@ -97,10 +101,10 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
         templ_qual_rs  = (uint8_t *) realloc(templ_qual_rs,  max_templ_width);
         templ_seqxm_rs = (uint8_t *) realloc(templ_seqxm_rs, max_templ_width);
         if (!templ_qual_rs || !templ_seqxm_rs) Rcpp::stop("Unable to allocate memory for BAM record #%i", nrecs); // check memory allocation
+        std::memset(templ_qual_rs, (uint8_t) min_baseq, templ_width);           // fill QUAL holder with min_baseq
+        std::memset(templ_seqxm_rs, 0b11111011, templ_width);                   // fill SEQXM with 'N-', i.e., '15,11'
       }
-      std::memset(templ_qual_rs, (uint8_t) min_baseq, templ_width);             // clean template holders
-      std::memset(templ_seqxm_rs, 0b11111011, templ_width);                     // fill SEQXM with 'N-', i.e., '15,11'
-     }
+    }
     
     // add another read to the template
     // source containers
@@ -146,6 +150,7 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
                      bam_get_qname(bam_rec));
       }
     }
+    if (templ_width < (int)dest_pos) templ_width = dest_pos;                    // need this to include everything from 'dovetail' alignments
   }
   
   // push last, yet unsaved template (no empty files enter this function)
