@@ -149,55 +149,55 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_read_bam_paired
-Rcpp::DataFrame rcpp_read_bam_paired(std::string fn, int min_mapq, int min_baseq, bool skip_duplicates, int trim5, int trim3, int nthreads);
-RcppExport SEXP _epialleleR_rcpp_read_bam_paired(SEXP fnSEXP, SEXP min_mapqSEXP, SEXP min_baseqSEXP, SEXP skip_duplicatesSEXP, SEXP trim5SEXP, SEXP trim3SEXP, SEXP nthreadsSEXP) {
+Rcpp::DataFrame rcpp_read_bam_paired(std::string fn, const int min_mapq, int min__baseq, const uint16_t skip_flags, const int trim5, const int trim3, const int nthreads);
+RcppExport SEXP _epialleleR_rcpp_read_bam_paired(SEXP fnSEXP, SEXP min_mapqSEXP, SEXP min__baseqSEXP, SEXP skip_flagsSEXP, SEXP trim5SEXP, SEXP trim3SEXP, SEXP nthreadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type fn(fnSEXP);
-    Rcpp::traits::input_parameter< int >::type min_mapq(min_mapqSEXP);
-    Rcpp::traits::input_parameter< int >::type min_baseq(min_baseqSEXP);
-    Rcpp::traits::input_parameter< bool >::type skip_duplicates(skip_duplicatesSEXP);
-    Rcpp::traits::input_parameter< int >::type trim5(trim5SEXP);
-    Rcpp::traits::input_parameter< int >::type trim3(trim3SEXP);
-    Rcpp::traits::input_parameter< int >::type nthreads(nthreadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_read_bam_paired(fn, min_mapq, min_baseq, skip_duplicates, trim5, trim3, nthreads));
+    Rcpp::traits::input_parameter< const int >::type min_mapq(min_mapqSEXP);
+    Rcpp::traits::input_parameter< int >::type min__baseq(min__baseqSEXP);
+    Rcpp::traits::input_parameter< const uint16_t >::type skip_flags(skip_flagsSEXP);
+    Rcpp::traits::input_parameter< const int >::type trim5(trim5SEXP);
+    Rcpp::traits::input_parameter< const int >::type trim3(trim3SEXP);
+    Rcpp::traits::input_parameter< const int >::type nthreads(nthreadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_read_bam_paired(fn, min_mapq, min__baseq, skip_flags, trim5, trim3, nthreads));
     return rcpp_result_gen;
 END_RCPP
 }
 // rcpp_read_bam_single
-Rcpp::DataFrame rcpp_read_bam_single(std::string fn, int min_mapq, int min_baseq, bool skip_duplicates, int trim5, int trim3, int nthreads);
-RcppExport SEXP _epialleleR_rcpp_read_bam_single(SEXP fnSEXP, SEXP min_mapqSEXP, SEXP min_baseqSEXP, SEXP skip_duplicatesSEXP, SEXP trim5SEXP, SEXP trim3SEXP, SEXP nthreadsSEXP) {
+Rcpp::DataFrame rcpp_read_bam_single(std::string fn, const int min_mapq, const int min_baseq, const uint16_t skip_flags, const int trim5, const int trim3, const int nthreads);
+RcppExport SEXP _epialleleR_rcpp_read_bam_single(SEXP fnSEXP, SEXP min_mapqSEXP, SEXP min_baseqSEXP, SEXP skip_flagsSEXP, SEXP trim5SEXP, SEXP trim3SEXP, SEXP nthreadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type fn(fnSEXP);
-    Rcpp::traits::input_parameter< int >::type min_mapq(min_mapqSEXP);
-    Rcpp::traits::input_parameter< int >::type min_baseq(min_baseqSEXP);
-    Rcpp::traits::input_parameter< bool >::type skip_duplicates(skip_duplicatesSEXP);
-    Rcpp::traits::input_parameter< int >::type trim5(trim5SEXP);
-    Rcpp::traits::input_parameter< int >::type trim3(trim3SEXP);
-    Rcpp::traits::input_parameter< int >::type nthreads(nthreadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_read_bam_single(fn, min_mapq, min_baseq, skip_duplicates, trim5, trim3, nthreads));
+    Rcpp::traits::input_parameter< const int >::type min_mapq(min_mapqSEXP);
+    Rcpp::traits::input_parameter< const int >::type min_baseq(min_baseqSEXP);
+    Rcpp::traits::input_parameter< const uint16_t >::type skip_flags(skip_flagsSEXP);
+    Rcpp::traits::input_parameter< const int >::type trim5(trim5SEXP);
+    Rcpp::traits::input_parameter< const int >::type trim3(trim3SEXP);
+    Rcpp::traits::input_parameter< const int >::type nthreads(nthreadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_read_bam_single(fn, min_mapq, min_baseq, skip_flags, trim5, trim3, nthreads));
     return rcpp_result_gen;
 END_RCPP
 }
 // rcpp_read_bam_mm_single
-Rcpp::DataFrame rcpp_read_bam_mm_single(std::string fn, int min_mapq, int min_baseq, int min_prob, bool highest_prob, bool skip_duplicates, int trim5, int trim3, int nthreads);
-RcppExport SEXP _epialleleR_rcpp_read_bam_mm_single(SEXP fnSEXP, SEXP min_mapqSEXP, SEXP min_baseqSEXP, SEXP min_probSEXP, SEXP highest_probSEXP, SEXP skip_duplicatesSEXP, SEXP trim5SEXP, SEXP trim3SEXP, SEXP nthreadsSEXP) {
+Rcpp::DataFrame rcpp_read_bam_mm_single(std::string fn, const int min_mapq, const int min_baseq, const int min_prob, const bool highest_prob, const uint16_t skip_flags, const int trim5, const int trim3, const int nthreads);
+RcppExport SEXP _epialleleR_rcpp_read_bam_mm_single(SEXP fnSEXP, SEXP min_mapqSEXP, SEXP min_baseqSEXP, SEXP min_probSEXP, SEXP highest_probSEXP, SEXP skip_flagsSEXP, SEXP trim5SEXP, SEXP trim3SEXP, SEXP nthreadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type fn(fnSEXP);
-    Rcpp::traits::input_parameter< int >::type min_mapq(min_mapqSEXP);
-    Rcpp::traits::input_parameter< int >::type min_baseq(min_baseqSEXP);
-    Rcpp::traits::input_parameter< int >::type min_prob(min_probSEXP);
-    Rcpp::traits::input_parameter< bool >::type highest_prob(highest_probSEXP);
-    Rcpp::traits::input_parameter< bool >::type skip_duplicates(skip_duplicatesSEXP);
-    Rcpp::traits::input_parameter< int >::type trim5(trim5SEXP);
-    Rcpp::traits::input_parameter< int >::type trim3(trim3SEXP);
-    Rcpp::traits::input_parameter< int >::type nthreads(nthreadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcpp_read_bam_mm_single(fn, min_mapq, min_baseq, min_prob, highest_prob, skip_duplicates, trim5, trim3, nthreads));
+    Rcpp::traits::input_parameter< const int >::type min_mapq(min_mapqSEXP);
+    Rcpp::traits::input_parameter< const int >::type min_baseq(min_baseqSEXP);
+    Rcpp::traits::input_parameter< const int >::type min_prob(min_probSEXP);
+    Rcpp::traits::input_parameter< const bool >::type highest_prob(highest_probSEXP);
+    Rcpp::traits::input_parameter< const uint16_t >::type skip_flags(skip_flagsSEXP);
+    Rcpp::traits::input_parameter< const int >::type trim5(trim5SEXP);
+    Rcpp::traits::input_parameter< const int >::type trim3(trim3SEXP);
+    Rcpp::traits::input_parameter< const int >::type nthreads(nthreadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(rcpp_read_bam_mm_single(fn, min_mapq, min_baseq, min_prob, highest_prob, skip_flags, trim5, trim3, nthreads));
     return rcpp_result_gen;
 END_RCPP
 }

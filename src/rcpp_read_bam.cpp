@@ -17,17 +17,17 @@
 
 // [[Rcpp::export]]
 Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           // file name
-                                      int min_mapq,                             // min read mapping quality
-                                      int min_baseq,                            // min base quality
-                                      bool skip_duplicates,                     // skip marked duplicates
-                                      int trim5,                                // trim bases from 5'
-                                      int trim3,                                // trim bases from 3'
-                                      int nthreads)                             // HTSlib threads, >0 for multiple
+                                      const int min_mapq,                       // min read mapping quality
+                                      int min__baseq,                           // min base quality
+                                      const uint16_t skip_flags,                // BAM flags to skip (duplicates, etc)
+                                      const int trim5,                          // trim bases from 5'
+                                      const int trim3,                          // trim bases from 3'
+                                      const int nthreads)                       // HTSlib threads, >0 for multiple
 {
   // constants
   int max_qname_width = 1024;                                                   // max QNAME length, not expanded yet, ever error-prone?
   int max_templ_width = 8192;                                                   // max insert size, expanded if necessary
-  min_baseq = min_baseq - (min_baseq>0);                                        // decrease base quality by one to include bases with QUAL==min_baseq
+  const int min_baseq = min__baseq - (min__baseq>0);                            // decrease base quality by one to include bases with QUAL==min_baseq
   
   // file IO
   htsFile *bam_fp = hts_open(fn.c_str(), "r");                                  // try open file
@@ -73,10 +73,9 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
     nrecs++;                                                                    // BAM alignment records ++
     if ((nrecs & 0xFFFFF) == 0) Rcpp::checkUserInterrupt();                     // every ~1M reads check for the interrupt
     
-    if ((bam_rec->core.flag & BAM_FUNMAP) ||                                    // skip if unmapped
+    if ((bam_rec->core.flag & skip_flags) ||                                    // skip if any of flags present (unmapped, secondary, qcfail, duplicate, supplementary)
         (!(bam_rec->core.flag & BAM_FPROPER_PAIR)) ||                           // or if not a proper pair
-        (bam_rec->core.qual < min_mapq) ||                                      // or if mapping quality < min.mapq
-        (skip_duplicates && (bam_rec->core.flag & BAM_FDUP))) continue;         // or if record is an optical/PCR duplicate
+        (bam_rec->core.qual < min_mapq)) continue;                              // or if mapping quality < min.mapq
     
     char *rec_strand = (char*) bam_aux_get(bam_rec, "XG");                      // genome strand
     char *rec_xm = (char*) bam_aux_get(bam_rec, "XM");                          // methylation string
@@ -199,12 +198,12 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
 
 // [[Rcpp::export]]
 Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           // file name
-                                      int min_mapq,                             // min read mapping quality
-                                      int min_baseq,                            // min base quality
-                                      bool skip_duplicates,                     // skip marked duplicates
-                                      int trim5,                                // trim bases from 5'
-                                      int trim3,                                // trim bases from 3'
-                                      int nthreads)                             // HTSlib threads, >0 for multiple
+                                      const int min_mapq,                       // min read mapping quality
+                                      const int min_baseq,                      // min base quality
+                                      const uint16_t skip_flags,                // BAM flags to skip (duplicates, etc)
+                                      const int trim5,                          // trim bases from 5'
+                                      const int trim3,                          // trim bases from 3'
+                                      const int nthreads)                       // HTSlib threads, >0 for multiple
 {
   // constants
   int max_record_width  = 1024;                                                 // max record width, expanded if necessary
@@ -239,9 +238,8 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
     nrecs++;                                                                    // BAM alignment records ++
     if ((nrecs & 0xFFFFF) == 0) Rcpp::checkUserInterrupt();                     // every ~1M reads check for the interrupt
 
-    if ((bam_rec->core.flag & BAM_FUNMAP) ||                                    // skip if unmapped
-        (bam_rec->core.qual < min_mapq) ||                                      // or if mapping quality < min.mapq
-        (skip_duplicates && (bam_rec->core.flag & BAM_FDUP))) continue;         // or if record is an optical/PCR duplicate
+    if ((bam_rec->core.flag & skip_flags) ||                                    // skip if any of flags present (unmapped, secondary, qcfail, duplicate, supplementary)
+        (bam_rec->core.qual < min_mapq)) continue;                              // or if mapping quality < min.mapq
     
     char *record_strand = (char*) bam_aux_get(bam_rec, "XG");                   // genome strand
     char *record_xm = (char*) bam_aux_get(bam_rec, "XM");                       // methylation string
@@ -366,14 +364,14 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
 
 // [[Rcpp::export]]
 Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        // file name
-                                         int min_mapq,                          // min read mapping quality
-                                         int min_baseq,                         // min base quality
-                                         int min_prob,                          // min probability of 5mC modification
-                                         bool highest_prob,                     // consider only if 5mC probability is the highest of all mods at particular pos
-                                         bool skip_duplicates,                  // skip marked duplicates
-                                         int trim5,                             // trim bases from 5'
-                                         int trim3,                             // trim bases from 3'
-                                         int nthreads)                          // HTSlib threads, >0 for multiple
+                                         const int min_mapq,                    // min read mapping quality
+                                         const int min_baseq,                   // min base quality
+                                         const int min_prob,                    // min probability of 5mC modification
+                                         const bool highest_prob,               // consider only if 5mC probability is the highest of all mods at particular pos
+                                         const uint16_t skip_flags,             // BAM flags to skip (duplicates, etc)
+                                         const int trim5,                       // trim bases from 5'
+                                         const int trim3,                       // trim bases from 3'
+                                         const int nthreads)                    // HTSlib threads, >0 for multiple
 {
   // constants
   int max_query_width   = 1024;                                                 // max NON-refspaced query width, expanded if necessary
@@ -420,9 +418,8 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
     nrecs++;                                                                    // BAM alignment records ++
     if ((nrecs & 0xFFFFF) == 0) Rcpp::checkUserInterrupt();                     // every ~1M reads check for the interrupt
 
-    if ((bam_rec->core.flag & BAM_FUNMAP) ||                                    // skip if unmapped
-        (bam_rec->core.qual < min_mapq) ||                                      // or if mapping quality < min.mapq
-        (skip_duplicates && (bam_rec->core.flag & BAM_FDUP))) continue;         // or if record is an optical/PCR duplicate
+    if ((bam_rec->core.flag & skip_flags) ||                                    // skip if any of flags present (unmapped, secondary, qcfail, duplicate, supplementary)
+        (bam_rec->core.qual < min_mapq)) continue;                              // or if mapping quality < min.mapq
 
     int record_strand = (bool) (bam_rec->core.flag & BAM_FREVERSE);             // genome strand, 0 if forward, 1 if reverse
 
