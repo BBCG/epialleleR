@@ -12,6 +12,9 @@ preprocessBam(
   min.prob = -1,
   highest.prob = TRUE,
   skip.duplicates = FALSE,
+  skip.secondary = TRUE,
+  skip.qcfail = TRUE,
+  skip.supplementary = TRUE,
   trim = 0,
   nthreads = 1,
   verbose = TRUE
@@ -49,6 +52,15 @@ omitted (as the probability of all modifications will be equal).}
 \item{skip.duplicates}{boolean defining if duplicate aligned reads should be
 skipped (default: FALSE). Option has no effect if duplicate reads were not
 marked by alignment software.}
+
+\item{skip.secondary}{boolean defining if secondary alignments should be
+skipped (default: TRUE). Do not change.}
+
+\item{skip.qcfail}{boolean defining if alignments failing QC should be
+skipped (default: TRUE). Do not change.}
+
+\item{skip.supplementary}{boolean defining if supplementary alignments
+should be skipped (default: TRUE). Do not change.}
 
 \item{trim}{non-negative integer or vector of length 2 for the number of
 nucleotide bases to be trimmed from 5' and 3' ends of a template (i.e., 

@@ -128,6 +128,12 @@
 #' @param skip.duplicates boolean defining if duplicate aligned reads should be
 #' skipped (default: FALSE). Option has no effect if duplicate reads were not
 #' marked by alignment software.
+#' @param skip.secondary boolean defining if secondary alignments should be
+#' skipped (default: TRUE). Do not change.
+#' @param skip.qcfail boolean defining if alignments failing QC should be
+#' skipped (default: TRUE). Do not change.
+#' @param skip.supplementary boolean defining if supplementary alignments
+#' should be skipped (default: TRUE). Do not change.
 #' @param trim non-negative integer or vector of length 2 for the number of
 #' nucleotide bases to be trimmed from 5' and 3' ends of a template (i.e., 
 #' read pair for paired-end BAM or read for single-end BAM).
@@ -194,6 +200,9 @@ preprocessBam <- function (bam.file,
                            min.prob=-1,
                            highest.prob=TRUE,
                            skip.duplicates=FALSE,
+                           skip.secondary=TRUE,
+                           skip.qcfail=TRUE,
+                           skip.supplementary=TRUE,
                            trim=0,
                            nthreads=1,
                            verbose=TRUE)
@@ -208,15 +217,18 @@ preprocessBam <- function (bam.file,
       bam.file=bam.file, bam.check=bam.check,
       min.mapq=min.mapq, min.baseq=min.baseq,
       min.prob=min.prob, highest.prob=highest.prob,
-      skip.duplicates=skip.duplicates, trim=trim,
-      nthreads=nthreads, verbose=verbose
+      skip.duplicates=skip.duplicates, skip.secondary=skip.secondary,
+      skip.qcfail=skip.qcfail, skip.supplementary=skip.supplementary,
+      trim=trim, nthreads=nthreads, verbose=verbose
     )
     return(bam.processed)
   } else {
     if (verbose &
         !all(missing(paired), missing(min.mapq), missing(min.baseq),
              missing(min.prob), missing(highest.prob),
-             missing(skip.duplicates), missing(trim), missing(nthreads))) 
+             missing(skip.duplicates), missing(skip.secondary),
+             missing(skip.qcfail), missing(skip.supplementary),
+             missing(trim), missing(nthreads))) 
       message("Already preprocessed BAM supplied as an input. Explicitly set",
               " 'preprocessBam' options will have no effect.")
     return(bam.file)

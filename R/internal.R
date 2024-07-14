@@ -160,6 +160,9 @@ utils::globalVariables(
                       min.prob,
                       highest.prob,
                       skip.duplicates,
+                      skip.secondary,
+                      skip.qcfail,
+                      skip.supplementary,
                       trim,
                       nthreads,
                       verbose)
@@ -169,20 +172,23 @@ utils::globalVariables(
   tm <- proc.time()
   
   bam.file <- path.expand(bam.file)
+  skip.flags <- sum(c(4, 256, 512, 1024, 2048)[                  # 4==BAM_FUNMAP
+    c(TRUE, skip.secondary, skip.qcfail, skip.duplicates, skip.supplementary)])
   if (bam.check$tagged=="XM") {                           # short-read alignment
-    if (bam.check$paired) {
+    if (bam.check$paired) {                                         # paired-end
+      skip.flags <- skip.flags + 8                              # 8==BAM_FMUNMAP
       bam.processed <- rcpp_read_bam_paired(bam.file, min.mapq, min.baseq, 
-                                            skip.duplicates, trim[1], trim[2],
+                                            skip.flags, trim[1], trim[2],
                                             nthreads)
-    } else {
+    } else {                                                        # single-end
       bam.processed <- rcpp_read_bam_single(bam.file, min.mapq, min.baseq, 
-                                            skip.duplicates, trim[1], trim[2],
+                                            skip.flags, trim[1], trim[2],
                                             nthreads)
     }
   } else {                                                 # long-read alignment
     bam.processed <- rcpp_read_bam_mm_single(bam.file, min.mapq, min.baseq,
                                              min.prob, highest.prob,
-                                             skip.duplicates, trim[1], trim[2],
+                                             skip.flags, trim[1], trim[2],
                                              nthreads)
   }
   
