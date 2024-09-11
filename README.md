@@ -1,4 +1,4 @@
-# Fast, epiallele-aware methylation<br> caller and reporter <a href="https://github.com/BBCG/epialleleR"><img src="vignettes/epialleleR_logo.svg" alt="logo" align="right" height="50%" /></a>
+# Fast, epiallele-aware methylation<br> caller and reporter <a href="https://github.com/BBCG/epialleleR"><img src="vignettes/epialleleR_logo.svg" alt="logo" align="right" height="50%" class="pull-right" /></a>
 
 [![](https://github.com/BBCG/epialleleR/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/BBCG/epialleleR/actions)
 [![](https://codecov.io/gh/BBCG/epialleleR/branch/devel/graph/badge.svg)](https://codecov.io/gh/BBCG/epialleleR/tree/devel)
