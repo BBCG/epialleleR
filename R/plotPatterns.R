@@ -1,5 +1,6 @@
 # TODO:
 #   [ ] add bed to attributes
+#   [ ] strand info is ignored in all methods - be clear on that
 #   [ ] marginal=c("density", "count", "none")
 #   [ ] labels=c("none", "pattern", "count")
 #   [ ] same expand for all plots, e.g., c(0, 0.5)
