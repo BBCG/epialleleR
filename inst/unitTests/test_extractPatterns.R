@@ -303,6 +303,7 @@ test_extractPatterns <- function () {
       bed=as("chr17:61864583-61864585", "GRanges"), bed.row=c(2),
       verbose=FALSE
     ),
-    data.table::data.table()
+    data.table::data.table(),
+    check.attributes=FALSE
   )
 }
