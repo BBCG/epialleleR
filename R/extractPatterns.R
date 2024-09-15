@@ -17,10 +17,11 @@
 #' @param bed Browser Extensible Data (BED) file location string OR object of
 #' class \code{\linkS4class{GRanges}} holding genomic coordinates for
 #' regions of interest. It is used to match sequencing reads to the genomic
-#' regions prior to eCDF computation. The style of seqlevels of BED file/object
+#' regions for pattern extraction. The style of seqlevels of BED file/object
 #' must match the style of seqlevels of the BAM file/object used. The 
 #' BED/\code{\link[GenomicRanges]{GRanges}} rows are \strong{not} sorted
-#' internally.
+#' internally. As of now, the strand information is ignored and patterns
+#' matching both strands are extracted.
 #' @param bed.row single non-negative integer specifying what `bed` region
 #' should be included in the output (default: 1).
 #' @param zero.based.bed boolean defining if BED coordinates are zero based

@@ -691,7 +691,8 @@ utils::globalVariables(
   tm <- proc.time()
   
   bed.dt <- data.table::as.data.table(bed)[bed.row]
-  bed.dt[, seqnames := factor(seqnames, levels=levels(bam.processed$rname))]
+  bed.dt[, `:=` (seqnames = factor(seqnames, levels=levels(bam.processed$rname)),
+                 strand = "*")]
   
   highlight.positions <- sort(unique(
     highlight.positions[highlight.positions>=bed.dt$start &
@@ -708,6 +709,7 @@ utils::globalVariables(
                                     highlight.positions)
   data.table::setDT(patterns)
   colnames(patterns) <- sub("^X([0-9]+)$", "\\1", colnames(patterns))
+  data.table::setattr(patterns, "bed", as.character(bed)[bed.row])
   
   if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(patterns)
