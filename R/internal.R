@@ -20,6 +20,7 @@
 #' @importFrom SummarizedExperiment rowRanges
 #' @importFrom stats ecdf
 #' @importFrom stats setNames
+#' @importFrom stats density
 #' @importFrom methods is
 #' @importFrom utils globalVariables
 #' @importFrom utils packageVersion
@@ -40,7 +41,8 @@ utils::globalVariables(
     "templid", "FALSE+", "FALSE-", "TRUE+", "TRUE-", "REF", "ALT",
     "M+Ref","U+Ref","M+Alt","U+Alt", "M-Ref","U-Ref","M-Alt","U-Alt",
     "M+A", "M+C", "M+G", "M+T", "M-A", "M-C", "M-G", "M-T",
-    "U+A", "U+C", "U+G", "U+T", "U-A", "U-C", "U-G", "U-T")
+    "U+A", "U+C", "U+G", "U+T", "U-A", "U-C", "U-G", "U-T",
+    ".SD", "bin", "count", "code", "pos", "cntx", "base", "meth", "x", "y")
 )
 
 .onUnload <- function (libpath) {library.dynam.unload("epialleleR", libpath)}

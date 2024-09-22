@@ -1,6 +1,6 @@
 # TODO:
-#   [ ] add bed to attributes
-#   [ ] strand info is ignored in all methods - be clear on that
+#   [x] add bed to attributes
+#   [x] strand info is ignored in all methods - be clear on that
 #   [ ] marginal=c("density", "count", "none")
 #   [ ] labels=c("none", "pattern", "count")
 #   [ ] same expand for all plots, e.g., c(0, 0.5)
@@ -27,7 +27,10 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   
   # plot=TRUE; verbose=TRUE; order.by="beta"; genomic.scale="continuous"; breaks="auto"; beta.range=c(0, 1); bin.context="CG"; plot.context="CG"; nbins=10; max.patterns=20; title=TRUE; subtitle=TRUE; context.size=1; verbose=TRUE; marginal="density"; marginal.position="left"; marginal.transform="identity"; marginal.limits=NULL; colors=c("grey97", "grey10"); 
   # marginal="count"; genomic.scale="discrete"; marginal.transform="log10"
-  require(ggplot2, quietly=TRUE)
+  if (!requireNamespace("ggplot2", quietly=TRUE)) {
+    message("ggplot2 is required for plotting. Please install")
+    return(NULL)
+  }
   
   if (plot.context=="CxG") {
     plot.context <- c("CG", "CHG")
