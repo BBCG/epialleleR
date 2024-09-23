@@ -173,9 +173,11 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
       # i.out[i.out>scale.max] <- scale.max
       return(i.out)
     }
+    # corr.y <- function () {}
+    # corr.ymax <- function () {}
     corr.plot <- ggplot2::ggplot(unique(plot.data[, .(I, beta)]), ggplot2::aes(x=1, xend=2, y=max(I)*(beta-beta.range[1])/(beta.range[2]-beta.range[1])*0.9 + cor.offset(I), yend=cor.scale(I))) +
       ggplot2::geom_segment(linewidth=0.5, colour="grey") +
-      ggplot2::theme_void() +
+      # ggplot2::theme_void() +
       ggplot2::scale_x_continuous(expand=ggplot2::expansion(0, 0)) +
       ggplot2::scale_y_continuous(limits=c(0, max(plot.data$I)), expand=ggplot2::expansion(0, 0)) +
       # ggplot2::scale_y_continuous(expand=ggplot2::expansion(0, 0.5)) +
