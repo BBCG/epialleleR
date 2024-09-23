@@ -29,7 +29,9 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   
   # plot=TRUE; verbose=TRUE; order.by="beta"; genomic.scale="continuous"; breaks="auto"; beta.range=c(0, 1); bin.context="CG"; plot.context="CG"; nbins=10; npatterns.per.bin=2; title=TRUE; subtitle=TRUE; context.size=1; verbose=TRUE; marginal="density"; marginal.position="left"; marginal.transform="identity"; marginal.limits=NULL; colors=c("grey97", "grey10"); marginal.size=0.25 
   # marginal="count"; genomic.scale="discrete"; marginal.transform="log10"
-  # nbins=3
+  # nbins=10; npatterns.per.bin=3;
+  # nbins=2; npatterns.per.bin=1;
+  # nbins=2; npatterns.per.bin=2;
   
   npatterns.per.bin <- rep(npatterns.per.bin, length.out=nbins)
   
@@ -105,14 +107,15 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   # need some kind of workaround for empty page
   
   
-  main.plot <- ggplot2::ggplot(plot.data, ggplot2::aes(x=pos, y=I, group=I)) +
+  main.plot <- ggplot2::ggplot(plot.data, ggplot2::aes(x=pos, y=factor(I), group=factor(I))) +
     ggplot2::geom_line() +
-    ggplot2::geom_segment(data=plot.data[, .(pos=sort(pos)[1]), by=I], mapping=ggplot2::aes(xend=-Inf, yend=I), linewidth=0.5, colour="grey") +
+    ggplot2::geom_segment(data=plot.data[, .(pos=sort(pos)[1]), by=I], mapping=ggplot2::aes(xend=-Inf, yend=factor(I)), linewidth=0.5, colour="grey") +
     ggplot2::geom_label(data=plot.data[!is.na(base)], mapping=ggplot2::aes(label=base, color=base)) +
     ggplot2::geom_point(data=plot.data[!is.na(cntx) & cntx %in% plot.context], mapping=ggplot2::aes(size=cntx, fill=meth), shape=21, colour=colors[2]) +
     ggplot2::scale_size_manual(name="context", values=c("CHH"=1, "CHG"=2, "CG"=3)*context.size) +
     ggplot2::scale_fill_manual(name="methylated", values=colors) +
-    ggplot2::scale_y_continuous(name=NULL, breaks=NULL, labels=NULL, expand=ggplot2::expansion(0, 0.5)) +
+    # ggplot2::scale_y_continuous(name=NULL, breaks=NULL, labels=NULL, expand=ggplot2::expansion(0, 0.5)) +
+    ggplot2::scale_y_discrete(name=NULL, breaks=NULL, labels=NULL) +
     ggplot2::theme_light() +
     ggplot2::theme(plot.margin=grid::unit(c(5.5, 5.5, 5.5, 0), "points")) +
     do.call(what=sprintf("scale_x_%s", genomic.scale), args=list(name="genomic position", breaks=breaks), envir=asNamespace("ggplot2"))
@@ -132,16 +135,18 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
     side.plot <- ggplot2::ggplot(plot.data[, .(count=unique(count), beta=unique(beta)), by=I], ggplot2::aes(xmin=0, ymin=I-0.4, xmax=count, ymax=I+0.4, fill=beta)) +
       ggplot2::geom_rect(color=colors[2]) + #, ...) +
       ggplot2::scale_x_continuous(transform=trans, minor_breaks=NULL, name="count") +
-      ggplot2::scale_y_continuous(name="patterns", breaks=NULL, minor_breaks=NULL, expand=ggplot2::expansion(0, 0.1)) + # , expand=ggplot2::expansion(0, max(plot.data$I)*0.03)) + # 
+      # ggplot2::scale_y_continuous(name="patterns", breaks=NULL, minor_breaks=NULL, expand=ggplot2::expansion(0, 0.1)) + # , expand=ggplot2::expansion(0, max(plot.data$I)*0.03)) + # 
+      ggplot2::scale_y_continuous(name="patterns", breaks=NULL, minor_breaks=NULL, expand=ggplot2::expansion(0, 0.2)) + # , expand=ggplot2::expansion(0, max(plot.data$I)*0.03)) + # 
       ggplot2::scale_fill_gradient(low=colors[1], high=colors[2], limits=c(0, 1), guide="none") +
       ggplot2::theme_light() +
       ggplot2::theme(plot.margin=grid::unit(c(5.5, 0, 5.5, 5.5), "points"))
     marg.grob <- ggplot2::ggplotGrob(side.plot + ggplot2::ggtitle(title, subtitle=subtitle))
     marg.grob$widths[[marg.grob$layout[which(marg.grob$layout$name=="panel"), "l"]]] <- grid::unit(marginal.size/(1-marginal.size), "null")
   } else if (marginal=="density") {
+    ### !!! PUT THE DOTS BACK !!! ###
     beta.dens <- data.table::as.data.table(
       stats::density(patterns.summary$beta, weights=patterns.summary$count/sum(patterns.summary$count),
-                     from=min(patterns.summary$beta), to=max(patterns.summary$beta), n=2048, warnWbw=FALSE, ...)[c("x","y")]
+                     from=min(patterns.summary$beta), to=max(patterns.summary$beta), n=2048, warnWbw=FALSE)[c("x","y")] #, ...)[c("x","y")]
     )
     plotted.min <- min(beta.dens[y>segment.xend]$y)
     beta.dens[y<plotted.min, y:=plotted.min] # beta.dens[y<plotted.min, y:=NA] # 
@@ -150,7 +155,7 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
       ggplot2::geom_line(color="black", linewidth=0.25) + 
       ggplot2::scale_color_gradient(low=colors[1], high=colors[2], limits=c(0, 1), guide="none") +
       ggplot2::scale_y_continuous(transform=trans, minor_breaks=NULL, name="density") +
-      ggplot2::scale_x_continuous(name="average beta", breaks=bins, labels=format(bins, digits=2), minor_breaks=NULL, limits=beta.range) + #, expand=ggplot2::expansion(0, 0.5)) +
+      ggplot2::scale_x_continuous(name="average beta", breaks=bins, labels=format(bins, digits=2), minor_breaks=NULL, limits=beta.range, expand=ggplot2::expansion(0.05, 0)) +
       ggplot2::coord_flip() +
       ggplot2::geom_vline(mapping=ggplot2::aes(xintercept=x), data=data.table::data.table(x=bins), color="white") +
       ggplot2::theme_light() +
@@ -158,24 +163,28 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
       ggplot2::theme(plot.margin=grid::unit(c(5.5, 0, 5.5, 5.5), "points"))
     
     # corresponding lines
+    cor.offset <- function (i) { max(i)*0.05 }
     cor.scale <- function (i) {
-      lower <- i < max(i)/2
-      i[lower] <- i[lower] + 0.5 * i[lower]/max(i)
-      i[!lower] <- i[!lower] - 0.5 * i[!lower]/max(i)
-      return(i)
+      scale.min <- 0
+      scale.max <- (max(i) + 2*0.6) # default scaling is 0.6 for discrete and 5% for continuous
+      scale.factor <- scale.max / max(i)
+      i.out <- i/scale.factor + 0.6
+      # i.out[i.out<scale.min] <- scale.min
+      # i.out[i.out>scale.max] <- scale.max
+      return(i.out)
     }
-    corr.plot <- ggplot2::ggplot(unique(plot.data[, .(I, beta)]), ggplot2::aes(x=1, xend=2, y=max(I)*(beta-beta.range[1])/(beta.range[2]-beta.range[1]), yend=I)) +
+    corr.plot <- ggplot2::ggplot(unique(plot.data[, .(I, beta)]), ggplot2::aes(x=1, xend=2, y=max(I)*(beta-beta.range[1])/(beta.range[2]-beta.range[1])*0.9 + cor.offset(I), yend=cor.scale(I))) +
       ggplot2::geom_segment(linewidth=0.5, colour="grey") +
       ggplot2::theme_void() +
       ggplot2::scale_x_continuous(expand=ggplot2::expansion(0, 0)) +
-      ggplot2::scale_y_continuous(limits=c(0, max(plot.data$I))) +
+      ggplot2::scale_y_continuous(limits=c(0, max(plot.data$I)), expand=ggplot2::expansion(0, 0)) +
       # ggplot2::scale_y_continuous(expand=ggplot2::expansion(0, 0.5)) +
       ggplot2::theme(plot.margin=grid::unit(c(5.5, 0, 5.5, 0), "points"))
     
     side.grob <- ggplot2::ggplotGrob(side.plot + ggplot2::ggtitle(title, subtitle=subtitle))
     corr.grob <- ggplot2::ggplotGrob(corr.plot)
     side.grob$widths[[side.grob$layout[which(side.grob$layout$name=="panel"), "l"]]] <- grid::unit(marginal.size/(1-marginal.size), "null")
-    corr.grob$widths[[corr.grob$layout[which(corr.grob$layout$name=="panel"), "l"]]] <- grid::unit(12, "points")
+    corr.grob$widths[[corr.grob$layout[which(corr.grob$layout$name=="panel"), "l"]]] <- grid::unit(48, "points") # 12
     marg.grob <- cbind(side.grob, corr.grob)
   }
   
