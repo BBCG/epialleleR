@@ -2,11 +2,13 @@
 #   [x] add bed to attributes
 #   [x] strand info is ignored in all methods - be clear on that
 #   [ ] marginal=c("density", "count", "none")
-#   [ ] labels=c("none", "pattern", "count")
-#   [ ] same expand for all plots, e.g., c(0, 0.5)
-#   [ ] scale labels together with context?
+#   [ ] labels=c("none", "beta", "count", "pattern")
+#   [x] proper expand for all plots
+#   [x] scale labels too
 #   [ ] fill labels? N==NA?
-#   [ ] import only required from ggplot? or fall back on its absence?
+#   [x] import only required from ggplot? or fall back on its absence?
+#   [ ] make verbose work
+#   [ ] make "right" work?
 
 
 # WORK IN PROGRESS
@@ -17,7 +19,7 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
                           genomic.scale=c("continuous", "discrete"), breaks="auto",
                           marginal=c("density", "count"), marginal.position=c("left", "right"),
                           marginal.transform=c("identity", "log10"), marginal.limits=NULL, marginal.size=0.25, ...,
-                          title=TRUE, subtitle=TRUE, context.size=1, colors=c("grey97", "grey10"),
+                          title=TRUE, subtitle=TRUE, context.size=c(1, 2, 3), base.size=3, colors=c("grey97", "grey10"),
                           plot=TRUE, verbose=TRUE) {
   order.by <- match.arg(order.by)
   genomic.scale <- match.arg(genomic.scale)
@@ -27,13 +29,14 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   marginal <- match.arg(marginal)
   marginal.transform <- match.arg(marginal.transform)
   
-  # plot=TRUE; verbose=TRUE; order.by="beta"; genomic.scale="continuous"; breaks="auto"; beta.range=c(0, 1); bin.context="CG"; plot.context="CG"; nbins=10; npatterns.per.bin=2; title=TRUE; subtitle=TRUE; context.size=1; verbose=TRUE; marginal="density"; marginal.position="left"; marginal.transform="identity"; marginal.limits=NULL; colors=c("grey97", "grey10"); marginal.size=0.25 
+  # plot=TRUE; verbose=TRUE; order.by="beta"; genomic.scale="continuous"; breaks="auto"; beta.range=c(0, 1); bin.context="CG"; plot.context="CG"; nbins=10; npatterns.per.bin=2; title=TRUE; subtitle=TRUE; context.size=c(1, 2, 3); base.size=3, verbose=TRUE; marginal="density"; marginal.position="left"; marginal.transform="identity"; marginal.limits=NULL; colors=c("grey97", "grey10"); marginal.size=0.25 
   # marginal="count"; genomic.scale="discrete"; marginal.transform="log10"
   # nbins=10; npatterns.per.bin=3;
   # nbins=2; npatterns.per.bin=1;
   # nbins=2; npatterns.per.bin=2;
   
   npatterns.per.bin <- rep(npatterns.per.bin, length.out=nbins)
+  context.size <- rep(context.size, length.out=3)
   
   if (!requireNamespace("ggplot2", quietly=TRUE)) {
     message("ggplot2 is required for plotting. Please install")
@@ -99,21 +102,21 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
     subtitle <- sprintf("%i of %i unique patterns", nrow(patterns.selected), nrow(patterns.summary))
   }
   
-  # marginal position
-  if (marginal.position=="right") {
-    # todo
-  }
+  # # marginal position
+  # if (marginal.position=="right") {
+  #   # todo
+  # }
   
-  # need some kind of workaround for empty page
+  # also need some kind of workaround for empty page
   
   
   main.plot <- ggplot2::ggplot(plot.data, ggplot2::aes(x=pos, y=factor(I), group=factor(I))) +
     ggplot2::geom_line() +
     ggplot2::geom_segment(data=plot.data[, .(pos=sort(pos)[1]), by=I], mapping=ggplot2::aes(xend=-Inf, yend=factor(I)), linewidth=0.5, colour="grey") +
-    ggplot2::geom_label(data=plot.data[!is.na(base)], mapping=ggplot2::aes(label=base, color=base)) +
+    ggplot2::geom_label(data=plot.data[!is.na(base)], mapping=ggplot2::aes(label=base, color=base), size=base.size) +
     ggplot2::geom_point(data=plot.data[!is.na(cntx) & cntx %in% plot.context], mapping=ggplot2::aes(size=cntx, fill=meth), shape=21, colour=colors[2]) +
-    ggplot2::scale_size_manual(name="context", values=c("CHH"=1, "CHG"=2, "CG"=3)*context.size) +
-    ggplot2::scale_fill_manual(name="methylated", values=colors) +
+    ggplot2::scale_size_manual(name="context", values=setNames(context.size, c("CHH", "CHG", "CG"))) +
+    ggplot2::scale_fill_manual(name="methylated", values=colors, drop=FALSE) +
     # ggplot2::scale_y_continuous(name=NULL, breaks=NULL, labels=NULL, expand=ggplot2::expansion(0, 0.5)) +
     ggplot2::scale_y_discrete(name=NULL, breaks=NULL, labels=NULL) +
     ggplot2::theme_light() +
@@ -133,9 +136,8 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   
   if (marginal=="count") { 
     side.plot <- ggplot2::ggplot(plot.data[, .(count=unique(count), beta=unique(beta)), by=I], ggplot2::aes(xmin=0, ymin=I-0.4, xmax=count, ymax=I+0.4, fill=beta)) +
-      ggplot2::geom_rect(color=colors[2]) + #, ...) +
+      ggplot2::geom_rect(color=colors[2]) +
       ggplot2::scale_x_continuous(transform=trans, minor_breaks=NULL, name="count") +
-      # ggplot2::scale_y_continuous(name="patterns", breaks=NULL, minor_breaks=NULL, expand=ggplot2::expansion(0, 0.1)) + # , expand=ggplot2::expansion(0, max(plot.data$I)*0.03)) + # 
       ggplot2::scale_y_continuous(name="patterns", breaks=NULL, minor_breaks=NULL, expand=ggplot2::expansion(0, 0.2)) + # , expand=ggplot2::expansion(0, max(plot.data$I)*0.03)) + # 
       ggplot2::scale_fill_gradient(low=colors[1], high=colors[2], limits=c(0, 1), guide="none") +
       ggplot2::theme_light() +
@@ -163,30 +165,23 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
       ggplot2::theme(plot.margin=grid::unit(c(5.5, 0, 5.5, 5.5), "points"))
     
     # corresponding lines
-    cor.offset <- function (i) { max(i)*0.05 }
-    cor.scale <- function (i) {
-      scale.min <- 0
-      scale.max <- (max(i) + 2*0.6) # default scaling is 0.6 for discrete and 5% for continuous
-      scale.factor <- scale.max / max(i)
-      i.out <- i/scale.factor + 0.6
-      # i.out[i.out<scale.min] <- scale.min
-      # i.out[i.out>scale.max] <- scale.max
-      return(i.out)
+    max.one <- function (i, ...) { max(i, 1, ...) }
+    corr.y <- function (i, b, mult=0.05) {
+      b.scaled <- (b - beta.range[1]) / (beta.range[2] - beta.range[1])
+      max.one(i) * (b.scaled + mult) / (1 + 2 * mult)
     }
-    # corr.y <- function () {}
-    # corr.ymax <- function () {}
-    corr.plot <- ggplot2::ggplot(unique(plot.data[, .(I, beta)]), ggplot2::aes(x=1, xend=2, y=max(I)*(beta-beta.range[1])/(beta.range[2]-beta.range[1])*0.9 + cor.offset(I), yend=cor.scale(I))) +
+    corr.ymax <- function (i, add=0.6) { (i+add) * max.one(i) / (max(i) + 2*add) }
+    corr.plot <- ggplot2::ggplot(unique(plot.data[, .(I, beta)]), ggplot2::aes(x=1, xend=2, y=corr.y(I, beta), yend=corr.ymax(I))) +
       ggplot2::geom_segment(linewidth=0.5, colour="grey") +
-      # ggplot2::theme_void() +
+      ggplot2::theme_void() +
       ggplot2::scale_x_continuous(expand=ggplot2::expansion(0, 0)) +
-      ggplot2::scale_y_continuous(limits=c(0, max(plot.data$I)), expand=ggplot2::expansion(0, 0)) +
-      # ggplot2::scale_y_continuous(expand=ggplot2::expansion(0, 0.5)) +
+      ggplot2::scale_y_continuous(limits=c(0, max.one(plot.data$I)), expand=ggplot2::expansion(0, 0)) +
       ggplot2::theme(plot.margin=grid::unit(c(5.5, 0, 5.5, 0), "points"))
-    
+
     side.grob <- ggplot2::ggplotGrob(side.plot + ggplot2::ggtitle(title, subtitle=subtitle))
     corr.grob <- ggplot2::ggplotGrob(corr.plot)
     side.grob$widths[[side.grob$layout[which(side.grob$layout$name=="panel"), "l"]]] <- grid::unit(marginal.size/(1-marginal.size), "null")
-    corr.grob$widths[[corr.grob$layout[which(corr.grob$layout$name=="panel"), "l"]]] <- grid::unit(48, "points") # 12
+    corr.grob$widths[[corr.grob$layout[which(corr.grob$layout$name=="panel"), "l"]]] <- grid::unit(16, "points") # 12
     marg.grob <- cbind(side.grob, corr.grob)
   }
   
