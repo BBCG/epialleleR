@@ -2,7 +2,7 @@
 #   [x] add bed to attributes
 #   [x] strand info is ignored in all methods - be clear on that
 #   [ ] marginal=c("density", "count", "none")
-#   [ ] labels=c("none", "beta", "count", "pattern")
+#   [ ] labels=c("none", "count", "beta", "pattern")
 #   [x] proper expand for all plots
 #   [x] scale labels too
 #   [ ] fill labels? N==NA?
@@ -93,12 +93,12 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   }
   
   # get title from bed
-  if (title==TRUE) {
+  if (is.logical(title) && title==TRUE) {
     title <- attr(patterns, "bed")
   }
   
   # get some subtitle stats
-  if (subtitle==TRUE) {
+  if (is.logical(subtitle) && subtitle==TRUE) {
     subtitle <- sprintf("%i of %i unique patterns", nrow(patterns.selected), nrow(patterns.summary))
   }
   
@@ -107,9 +107,9 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   #   # todo
   # }
   
-  # also need some kind of workaround for empty page
-  
-  
+  # some kind of workaround for empty page but only when plotting
+  if (plot) grid::grid.newpage()
+
   main.plot <- ggplot2::ggplot(plot.data, ggplot2::aes(x=pos, y=factor(I), group=factor(I))) +
     ggplot2::geom_line() +
     ggplot2::geom_segment(data=plot.data[, .(pos=sort(pos)[1]), by=I], mapping=ggplot2::aes(xend=-Inf, yend=factor(I)), linewidth=0.5, colour="grey") +
@@ -189,7 +189,7 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   for (i in which(comb.grob$layout$name=="background")) comb.grob$layout[i, c(1:4)] <- c(1, 1, dim(comb.grob))
   
   if (plot) {
-    plot(comb.grob)
+    grid::grid.draw(comb.grob)
     return(invisible(patterns.selected))
   } else {
     return(comb.grob)
