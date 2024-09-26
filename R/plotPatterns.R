@@ -2,10 +2,11 @@
 #   [x] add bed to attributes
 #   [x] strand info is ignored in all methods - be clear on that
 #   [ ] marginal=c("density", "count", "none")
-#   [ ] labels=c("none", "count", "beta", "pattern")
+#   [x] tag=c("none", "count", "beta", "pattern")
+#   [ ] tag guide
 #   [x] proper expand for all plots
 #   [x] scale labels too
-#   [ ] fill labels? N==NA?
+#   [?] fill labels? N==NA? That would require that methylation aesthetics to be shape not colour
 #   [x] import only required from ggplot? or fall back on its absence?
 #   [ ] make verbose work
 #   [ ] make "right" work?
@@ -19,6 +20,7 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
                           genomic.scale=c("continuous", "discrete"), breaks="auto",
                           marginal=c("density", "count"), marginal.position=c("left", "right"),
                           marginal.transform=c("identity", "log10"), marginal.limits=NULL, marginal.size=0.25, ...,
+                          tag=c("none", "count", "beta", "pattern"), tag.size=2.5, tag.color="#87654c", tag.fill="lemonchiffon",
                           title=TRUE, subtitle=TRUE, context.size=c(1, 2, 3), base.size=3, colors=c("grey97", "grey10"),
                           plot=TRUE, verbose=TRUE) {
   order.by <- match.arg(order.by)
@@ -28,8 +30,9 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   plot.context <- match.arg(plot.context)
   marginal <- match.arg(marginal)
   marginal.transform <- match.arg(marginal.transform)
+  tag <- match.arg(tag)
   
-  # plot=TRUE; verbose=TRUE; order.by="beta"; genomic.scale="continuous"; breaks="auto"; beta.range=c(0, 1); bin.context="CG"; plot.context="CG"; nbins=10; npatterns.per.bin=2; title=TRUE; subtitle=TRUE; context.size=c(1, 2, 3); base.size=3, verbose=TRUE; marginal="density"; marginal.position="left"; marginal.transform="identity"; marginal.limits=NULL; colors=c("grey97", "grey10"); marginal.size=0.25 
+  # plot=TRUE; verbose=TRUE; order.by="beta"; genomic.scale="continuous"; breaks="auto"; beta.range=c(0, 1); bin.context="CG"; plot.context="CG"; nbins=10; npatterns.per.bin=2; title=TRUE; subtitle=TRUE; context.size=c(1, 2, 3); base.size=3; verbose=TRUE; marginal="density"; marginal.position="left"; marginal.transform="identity"; marginal.limits=NULL; colors=c("grey97", "grey10"); marginal.size=0.25; tag="count"; tag.size=2; tag.color="black"; tag.fill="lemonchiffon"
   # marginal="count"; genomic.scale="discrete"; marginal.transform="log10"
   # nbins=10; npatterns.per.bin=3;
   # nbins=2; npatterns.per.bin=1;
@@ -109,7 +112,7 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   
   # some kind of workaround for empty page but only when plotting
   if (plot) grid::grid.newpage()
-
+  
   main.plot <- ggplot2::ggplot(plot.data, ggplot2::aes(x=pos, y=factor(I), group=factor(I))) +
     ggplot2::geom_line() +
     ggplot2::geom_segment(data=plot.data[, .(pos=sort(pos)[1]), by=I], mapping=ggplot2::aes(xend=-Inf, yend=factor(I)), linewidth=0.5, colour="grey") +
@@ -122,6 +125,21 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
     ggplot2::theme_light() +
     ggplot2::theme(plot.margin=grid::unit(c(5.5, 5.5, 5.5, 0), "points")) +
     do.call(what=sprintf("scale_x_%s", genomic.scale), args=list(name="genomic position", breaks=breaks), envir=asNamespace("ggplot2"))
+  
+  # add tags if requested
+  if (tag!="none") {
+    tag.data <- plot.data[, .(pos=max(as.integer(pos))+0.5), by=.(I, label=get(tag))]
+    if (tag=="beta") tag.data[, label:=sprintf("%.2g", label)]
+    scale.range <- plot.data[, .(from=min(as.integer(pos)), to=max(as.integer(pos)))]
+    tag.nchar <- max(nchar(as.character(tag.data$label)))
+    tag.expand <- as.numeric(grid::convertX(grid::unit(tag.size/3.88*tag.nchar, "strwidth", "A"), "npc")) * (scale.range$to - scale.range$from + 1)
+    main.plot <- main.plot +
+      # ggplot2::annotate(geom="label", x=tag.data$pos, y=tag.data$I+1, label=tag.data$label, hjust=0, size=tag.size, color=tag.color, fill=tag.fill) +
+      ggplot2::geom_label(data=tag.data, mapping=ggplot2::aes(x=pos, y=factor(I), label=label), hjust=0, size=tag.size, color=tag.color, fill=tag.fill, inherit.aes=FALSE, show.legend=FALSE) +
+      ggplot2::expand_limits(x=scale.range$to+tag.expand) #+
+      # ggplot2::guides(custom=ggplot2::guide_custom(grid::textGrob(tag, gp=grid::gpar(col=tag.color, fill=tag.fill, cex=tag.size/3.88, hjust=1)), title="tag"))
+  }
+  
   main.grob <- ggplot2::ggplotGrob(main.plot)
   
   if (marginal.transform=="identity") {
@@ -148,7 +166,7 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
     ### !!! PUT THE DOTS BACK !!! ###
     beta.dens <- data.table::as.data.table(
       stats::density(patterns.summary$beta, weights=patterns.summary$count/sum(patterns.summary$count),
-                     from=min(patterns.summary$beta), to=max(patterns.summary$beta), n=2048, warnWbw=FALSE)[c("x","y")] #, ...)[c("x","y")]
+                     from=min(patterns.summary$beta), to=max(patterns.summary$beta), n=2048, warnWbw=FALSE, ...)[c("x","y")]
     )
     plotted.min <- min(beta.dens[y>segment.xend]$y)
     beta.dens[y<plotted.min, y:=plotted.min] # beta.dens[y<plotted.min, y:=NA] # 
