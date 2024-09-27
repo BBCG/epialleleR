@@ -73,6 +73,16 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   patterns.selected <- patterns.summary[!is.na(bin)][order(-count), lapply(.SD, head, n=npatterns.per.bin[bin]), by=bin]
   patterns.selected[order(get(order.by), beta, count, decreasing=TRUE), I:=.N-.I]
   
+  if (verbose) {
+    bin.intervals <- levels(cut(bins, bins, include.lowest=TRUE, right=FALSE))
+    stats <- sprintf(
+      "%i patterns supplied\n%i unique\n%i most frequent patterns were selected for plotting using %i beta value bins:\n%s\n%s",
+      nrow(patterns), nrow(patterns.summary), nrow(patterns.selected), nbins, paste(bin.intervals, collapse=" "),
+      do.call("sprintf", c(list(fmt=paste(sprintf("%%%is", nchar(bin.intervals)), collapse=" ")), npatterns.per.bin) )
+    )
+    message(stats)
+  }
+  
   plot.data <- data.table::melt.data.table(
     patterns.selected, measure.vars=base.positions, variable.name="pos", value.name="code", variable.factor=FALSE
   )[!is.na(code)]
@@ -102,7 +112,11 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   
   # get some subtitle stats
   if (is.logical(subtitle) && subtitle==TRUE) {
-    subtitle <- sprintf("%i of %i unique patterns", nrow(patterns.selected), nrow(patterns.summary))
+    if (nrow(patterns.selected)==nrow(patterns.summary)) {
+      subtitle <- sprintf("all %i unique patterns", nrow(patterns.selected))
+    } else {
+      subtitle <- sprintf("%i of %i unique patterns", nrow(patterns.selected), nrow(patterns.summary))
+    }
   }
   
   # # marginal position
