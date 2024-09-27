@@ -150,7 +150,8 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
     main.plot <- main.plot +
       # ggplot2::annotate(geom="label", x=tag.data$pos, y=tag.data$I+1, label=tag.data$label, hjust=0, size=tag.size, color=tag.color, fill=tag.fill) +
       ggplot2::geom_label(data=tag.data, mapping=ggplot2::aes(x=pos, y=factor(I), label=label), hjust=0, size=tag.size, color=tag.color, fill=tag.fill, inherit.aes=FALSE, show.legend=FALSE) +
-      ggplot2::expand_limits(x=scale.range$to+tag.expand) #+
+      ggplot2::expand_limits(x=scale.range$to+tag.expand) +
+      ggplot2::guides(custom=ggplot2::guide_custom(grid::legendGrob(tag, pch=22, do.lines=FALSE, gp=grid::gpar(col=tag.color, fill=tag.fill, cex=3/3.88, lwd=0.75)) , title="tag"))
       # ggplot2::guides(custom=ggplot2::guide_custom(grid::textGrob(tag, gp=grid::gpar(col=tag.color, fill=tag.fill, cex=tag.size/3.88, hjust=1)), title="tag"))
   }
   
