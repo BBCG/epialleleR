@@ -196,7 +196,8 @@ limiting pattern output to the region of interest only.
 \code{\link{generateCytosineReport}} for methylation statistics at the level
 of individual cytosines, \code{\link{generateBedReport}} for genomic
 region-based statistics, \code{\link{extractPatterns}} for exploring
-methylation patterns, \code{\link{generateBedEcdf}} for analysing the
+methylation patterns and \code{\link{plotPatterns}} for pretty plotting
+of its output, \code{\link{generateBedEcdf}} for analysing the
 distribution of per-read beta values, and `epialleleR` vignettes for the
 description of usage and sample data.
 

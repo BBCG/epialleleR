@@ -190,7 +190,8 @@ description of usage and sample data.
 \code{\link{preprocessBam}} for preloading BAM data,
 \code{\link{generateBedReport}} for genomic region-based statistics,
 \code{\link{generateVcfReport}} for evaluating epiallele-SNV associations,
-\code{\link{extractPatterns}} for exploring methylation patterns,
+\code{\link{extractPatterns}} for exploring methylation patterns and
+\code{\link{plotPatterns}} for pretty plotting of its output,
 \code{\link{generateBedEcdf}} for analysing the distribution of per-read
 beta values.
 }
