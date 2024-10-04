@@ -139,15 +139,15 @@ gradient fill of a marginal density plot. Default: c("grey97", "grey10").}
 
 \item{plot}{boolean. If `TRUE` (the default), patterns are plotted, and the
 selected ones are silently returned as a \code{\link[data.table]{data.table}}
-object. If `FALSE`, the \code{\linkS4class{gtable}} object is returned
-instead.}
+object. If `FALSE`, the \code{\link[gtable:gtable]{grob table}} object
+is returned instead.}
 
 \item{verbose}{boolean to report basic info on input and output.}
 }
 \value{
 the plot and (silently) the \code{\link[data.table]{data.table}}
 object containing plotted methylation patterns (if `plot==TRUE`),
-or \code{\linkS4class{gtable}} plot object (if `plot==FALSE`).
+or \code{\link[gtable:gtable]{grob table}} object (if `plot==FALSE`).
 }
 \description{
 This convenience function plots methylation patterns (epialleles) previously

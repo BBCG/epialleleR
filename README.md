@@ -27,12 +27,17 @@ an input. See below for additional functionality.
  *`generateMhlReport`*)
  * extracting methylation patterns for genomic region of interest
  (*`extractPatterns`*)
-* testing for the association between epiallele methylation
+ * visualising methylation patterns (*`plotPatterns`*)
+ * testing for the association between epiallele methylation
  status and sequence variations (*`generateVcfReport`*)
-* assessing the distribution of per-read beta values for genomic regions of
+ * assessing the distribution of per-read beta values for genomic regions of
  interest (*`generateBedEcdf`*)
  
 ### Recent improvements
+
+##### v1.14 [BioC 3.20]
+
+ * creates pretty plots of methylation patterns
 
 ##### v1.12 [BioC 3.19]
 
@@ -122,8 +127,9 @@ amplicon.vcf <- system.file("extdata", "amplicon.vcf.gz", package="epialleleR")
 # preload the data
 bam.data <- preprocessBam(amplicon.bam)
 
-# methylation patterns, check vignettes or method description for plotting them
+# methylation patterns and their plot
 patterns <- extractPatterns(bam=amplicon.bam, bed=amplicon.bed, bed.row=3)
+plotPatterns(patterns)
 
 # CpG VEF report for individual bases
 cg.vef.report <- generateCytosineReport(bam.data)
