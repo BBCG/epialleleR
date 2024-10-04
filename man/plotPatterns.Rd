@@ -22,13 +22,13 @@ plotPatterns(
   ...,
   tag = c("none", "count", "beta", "pattern"),
   tag.size = 2.5,
-  tag.color = "#87654c",
+  tag.colour = "#87654c",
   tag.fill = "lemonchiffon",
   title = TRUE,
   subtitle = TRUE,
   context.size = c(1, 2, 3),
   base.size = 3,
-  colors = c("grey97", "grey10"),
+  methylation.fill = c("grey97", "grey10"),
   plot = TRUE,
   verbose = TRUE
 )
@@ -37,7 +37,117 @@ plotPatterns(
 \item{patterns}{output of \code{\link[epialleleR]{preprocessBam}} function
 (methylation patterns as a \code{\link[data.table]{data.table}} object).}
 
-\item{order.by}{}
+\item{order.by}{string defining order of patterns on the plot (default order
+by: "beta").}
+
+\item{beta.range}{numeric vector of length 2 for the range of average
+pattern beta values represented on the plot (default: [0;1]).}
+
+\item{bin.context}{string defining cytosine methylation context used
+to calculate average beta value of a pattern that is further used to assign
+patterns to bins:
+\itemize{
+  \item "CG" (the default) -- CpG cytosines (called as zZ)
+  \item "CHG" -- CHG cytosines (xX)
+  \item "CHH" -- CHH cytosines (hH)
+  \item "CxG" -- CG and CHG cytosines (zZxX)
+  \item "CX" -- all cytosines
+}}
+
+\item{nbins}{a single integer defining the number of bins (i.e., intervals
+within `beta.range`). Default: 10.}
+
+\item{npatterns.per.bin}{integer vector for the number of the most abundant
+patterns selected from each bin (default: 2). When of length 1, the same
+number of patterns will be taken. When of length `nbins`, allows to
+fine-tune the number of selected patterns from each bin. Setting to `Inf`
+effectively results in plotting all patterns.}
+
+\item{plot.context}{string defining methylation context of cytosines
+included in the plot (default: "CG"; for the range of available values, see
+`bin.context` above).}
+
+\item{genomic.scale}{string for the type of genomic position scale
+of the plot: either "continuous" (the default) or "discrete".}
+
+\item{breaks}{a vector of breaks for the genomic position scale of the plot.
+If "auto" (the default), breaks for continuous scale are computed by the
+default ggplot2 routines, while breaks for discrete scale are a subset of
+plotted positions selected using \code{\link[base]{pretty}}.
+Possible values: \code{\link[ggplot2:waiver]{ggplot2::waiver()}} for ggplot2
+defaults, integer vector of breaks for continuous scale, or character vector
+of breaks for discrete scale.}
+
+\item{marginal}{string for the type of marginal plot: either "density"
+(probability density of average beta values of all patterns; the default)
+or "count" (counts of plotted patterns). "none" is not implemented yet; 
+create an issue if interested.}
+
+\item{marginal.position}{string for the position of marginal plot: either
+"left" (the default) or "right" (not implemented yet; create an issue if
+interested).}
+
+\item{marginal.transform}{string for the transformation of marginal scale
+(default: "identity"). Check
+\code{\link[ggplot2:scale_x_continuous]{ggplot2::scale_x_continuous()}} for
+more details.}
+
+\item{marginal.limits}{limits of marginal scale (default: NULL). Check
+\code{\link[ggplot2:scale_x_continuous]{ggplot2::scale_x_continuous()}} for
+more details.}
+
+\item{marginal.size}{numeric in range (0;1) for the relative width of the
+marginal plot (default: 0.25).}
+
+\item{...}{additional arguments passed to
+\code{\link[stats:density]{stats::density()}} call used in marginal density
+plot. Possible value: \code{adjust=0.25}.}
+
+\item{tag}{string for optional tagging of patterns with their count
+("count"), average beta value ("beta"), or pattern ID ("pattern").
+Default: "none".}
+
+\item{tag.size}{numeric for the font size of the tag text
+(in millimetres; default: 2.5).}
+
+\item{tag.colour}{string for the colour of of the tag text.
+Default: "#87654c".}
+
+\item{tag.fill}{string for the colour of of the tag background.
+Default: "lemonchiffon".}
+
+\item{title}{the title of the plot. When `TRUE` (the default), a genomic
+region from which patterns were extracted. Other possible values: anything
+that can be converted to string, or `NULL` for no title.}
+
+\item{subtitle}{the subtitle of the plot. When `TRUE` (the default), a
+number of patterns plotted. Other possible values: anything
+that can be converted to string, or `NULL` for no subtitle.}
+
+\item{context.size}{a numeric vector with sizes of circles representing
+cytosines within each of three contexts: CHH, CHG, and CG
+(default: c(1, 2, 3)).}
+
+\item{base.size}{numeric for the font size of the text for highlighted bases
+(in millimetres; default: 3).}
+
+\item{methylation.fill}{a vector of length 2 for colours representing
+unmethylated and methylated cytosines, respectively. These colours are also
+mapped to the lowest (0) and highest (1) possible beta values
+to represent average beta values of methylation patterns and create a
+gradient fill of a marginal density plot. Default: c("grey97", "grey10").}
+
+\item{plot}{boolean. If `TRUE` (the default), patterns are plotted, and the
+selected ones are silently returned as a \code{\link[data.table]{data.table}}
+object. If `FALSE`, the \code{\linkS4class{gtable}} object is returned
+instead.}
+
+\item{verbose}{boolean to report basic info on input and output.}
+}
+\value{
+the plot and (silently) the \code{\link[data.table]{data.table}}
+object containing plotted methylation patterns (if `plot==TRUE`),
+or \code{\linkS4class{gtable}} plot object (if `plot==FALSE`).
 }
 \description{
 This convenience function plots methylation patterns (epialleles) previously
@@ -54,6 +164,10 @@ logic is as follows:
   \item most abundant unique methylation patterns from each bin are plotted
   and silently returned
 }
+On the resulting plot, each cytosine is shown as a circle,
+where the size of that circle represents cytosine context
+and the fill encodes methylation status. If available, highlighted bases are
+shown as labels of different colours.
 }
 \examples{
   # amplicon data

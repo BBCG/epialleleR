@@ -97,47 +97,11 @@
 #'   amplicon.bed <- system.file("extdata", "amplicon.bed",
 #'                               package="epialleleR")
 #'   
-#'   # let's get our patterns
+#'   # extract patterns
 #'   patterns <- extractPatterns(bam=amplicon.bam, bed=amplicon.bed, bed.row=3)
-#'   nrow(patterns)  # read pairs overlap genomic region of interest
 #'   
-#'   # these are positions of bases
-#'   base.positions <- grep("^[0-9]+$", colnames(patterns), value=TRUE)
-#'   
-#'   # let's make a summary table with counts of every pattern
-#'   patterns.summary <- patterns[, c(lapply(.SD, unique), .N),
-#'                                by=.(pattern, beta), .SDcols=base.positions]
-#'   nrow(patterns.summary)  # unique methylation patterns
-#'   
-#'   # let's melt and plot them
-#'   plot.data <- data.table::melt.data.table(patterns.summary,
-#'     measure.vars=base.positions, variable.name="pos", value.name="base")
-#'   
-#'   # upset-like plot of all patterns, categorical positions, sorted by counts
-#'   if (require("ggplot2", quietly=TRUE) & require("gridExtra", quietly=TRUE)){
-#'     grid.arrange(
-#'       ggplot(na.omit(plot.data),
-#'              aes(x=pos, y=reorder(pattern,N),
-#'                  color=factor(base, levels=c("z","Z")))) +
-#'         geom_line(color="grey") +
-#'         geom_point() +
-#'         scale_colour_grey(start=0.8, end=0) +
-#'         theme_light() +
-#'         scale_x_discrete(breaks=function(x){x[c(rep(FALSE,5), TRUE)]}) +
-#'         theme(axis.text.y=element_blank(), legend.position="none") +
-#'         labs(x="position", y=NULL, title="epialleles", color="base"),
-#'       
-#'       ggplot(unique(na.omit(plot.data)[, .(pattern, N, beta)]),
-#'              aes(x=N+0.5, y=reorder(pattern,N), alpha=beta, label=N)) +
-#'         geom_col() +
-#'         geom_text(alpha=0.5, nudge_x=0.2, size=3) +
-#'         scale_x_log10() +
-#'         theme_minimal() +
-#'         theme(axis.text.y=element_blank(), legend.position="none") +
-#'         labs(x="count", y=NULL, title=""),
-#'       ncol=2, widths=c(0.75, 0.25)
-#'     )
-#'   }
+#'   # and then plot them
+#'   plotPatterns(patterns)
 #'   
 #' @export
 extractPatterns <- function (bam,
