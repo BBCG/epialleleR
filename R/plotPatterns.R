@@ -3,17 +3,69 @@
 #   [x] strand info is ignored in all methods - be clear on that
 #   [ ] marginal=c("density", "count", "none")
 #   [x] tag=c("none", "count", "beta", "pattern")
-#   [ ] tag guide
+#   [x] tag guide
 #   [x] proper expand for all plots
 #   [x] scale labels too
 #   [?] fill labels? N==NA? That would require that methylation aesthetics to be shape not colour
 #   [x] import only required from ggplot? or fall back on its absence?
-#   [ ] make verbose work
+#   [x] make verbose work
 #   [ ] make "right" work?
-
 
 # WORK IN PROGRESS
 
+
+#' plotPatterns
+#'
+#' @description
+#' This convenience function plots methylation patterns (epialleles) previously
+#' extracted by \code{\link[epialleleR]{extractPatterns}}.
+#'
+#' @details
+#' As the number of methylation patterns can be quite large, by default, the
+#' function plots \strong{the most abundant unique patterns} only. The complete
+#' logic is as follows:
+#' \itemize{
+#'   \item from the input methylation patterns, all unique patterns are
+#'   extracted and counted
+#'   \item unique patterns are split in bins by their average beta value
+#'   \item most abundant unique methylation patterns from each bin are plotted
+#'   and silently returned
+#' }
+#' 
+#' @param patterns output of \code{\link[epialleleR]{preprocessBam}} function
+#' (methylation patterns as a \code{\link[data.table]{data.table}} object).
+#' @param order.by 
+#' 
+#' @seealso \code{\link{extractPatterns}} for extracting methylation patterns,
+#' \code{\link{preprocessBam}} for preloading BAM data,
+#' \code{\link{generateCytosineReport}} for methylation statistics at the level
+#' of individual cytosines, \code{\link{generateBedReport}} for genomic
+#' region-based statistics, \code{\link{generateVcfReport}} for evaluating
+#' epiallele-SNV associations, \code{\link{generateBedEcdf}} for analysing the
+#' distribution of per-read beta values, and `epialleleR` vignettes for the
+#' description of usage and sample data.
+#' @examples
+#'   # amplicon data
+#'   amplicon.bam <- system.file("extdata", "amplicon010meth.bam",
+#'                               package="epialleleR")
+#'   custom.range <- as("chr17:43124861-43125150", "GRanges")
+#'   
+#'   # let's get our patterns
+#'   patterns <- extractPatterns(bam=amplicon.bam, bed=custom.range)
+#'   
+#'   # default plot + silently returned plotted patterns
+#'   selected.patterns <- plotPatterns(patterns)
+#'   
+#'   # all unique patterns with their counts as a margin, categorical positions,
+#'   # tagged with pattern IDs, returned as a `gtable` object
+#'   tbl <- plotPatterns(patterns, npatterns.per.bin=Inf, marginal="count",
+#'                       genomic.scale="discrete", tag="pattern", plot=FALSE)
+#'   
+#'   # which can be plotted later
+#'   grid::grid.newpage()
+#'   grid::grid.draw(tbl)
+#'   
+#' @export
 plotPatterns <- function (patterns, order.by=c("beta", "count"),
                           beta.range=c(0, 1), bin.context=c("CG", "CHG", "CHH", "CxG", "CX"), nbins=10, npatterns.per.bin=2,
                           plot.context=c("CG", "CHG", "CHH", "CxG", "CX"),
@@ -76,7 +128,7 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   if (verbose) {
     bin.intervals <- levels(cut(bins, bins, include.lowest=TRUE, right=FALSE))
     stats <- sprintf(
-      "%i patterns supplied\n%i unique\n%i most frequent patterns were selected for plotting using %i beta value bins:\n%s\n%s",
+      "%i patterns supplied\n%i unique\n%i most frequent unique patterns were selected for plotting using %i beta value bins:\n%s\n%s",
       nrow(patterns), nrow(patterns.summary), nrow(patterns.selected), nbins, paste(bin.intervals, collapse=" "),
       do.call("sprintf", c(list(fmt=paste(sprintf("%%%is", nchar(bin.intervals)), collapse=" ")), npatterns.per.bin) )
     )
@@ -106,12 +158,12 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   }
   
   # get title from bed
-  if (is.logical(title) && title==TRUE) {
+  if (identical(title, TRUE)) {
     title <- attr(patterns, "bed")
   }
   
   # get some subtitle stats
-  if (is.logical(subtitle) && subtitle==TRUE) {
+  if (identical(subtitle, TRUE)) {
     if (nrow(patterns.selected)==nrow(patterns.summary)) {
       subtitle <- sprintf("all %i unique patterns", nrow(patterns.selected))
     } else {
@@ -175,13 +227,12 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
     marg.grob <- ggplot2::ggplotGrob(side.plot + ggplot2::ggtitle(title, subtitle=subtitle))
     marg.grob$widths[[marg.grob$layout[which(marg.grob$layout$name=="panel"), "l"]]] <- grid::unit(marginal.size/(1-marginal.size), "null")
   } else if (marginal=="density") {
-    ### !!! PUT THE DOTS BACK !!! ###
     beta.dens <- data.table::as.data.table(
       stats::density(patterns.summary$beta, weights=patterns.summary$count/sum(patterns.summary$count),
                      from=min(patterns.summary$beta), to=max(patterns.summary$beta), n=2048, warnWbw=FALSE, ...)[c("x","y")]
     )
     plotted.min <- min(beta.dens[y>segment.xend]$y)
-    beta.dens[y<plotted.min, y:=plotted.min] # beta.dens[y<plotted.min, y:=NA] # 
+    beta.dens[y<plotted.min, y:=plotted.min]
     side.plot <- ggplot2::ggplot(beta.dens, ggplot2::aes(x=x, xend=x, y=y, yend=plotted.min, color=x)) +
       ggplot2::geom_segment() + 
       ggplot2::geom_line(color="black", linewidth=0.25) + 
