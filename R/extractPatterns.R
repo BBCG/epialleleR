@@ -9,7 +9,8 @@
 #' pairs as a single entity) to the genomic
 #' region provided in a BED file/\code{\linkS4class{GRanges}} object, extracts
 #' methylation statuses of bases within those reads, and returns a data frame
-#' which can be used for plotting of DNA methylation patterns.
+#' which can be used for further analysis and/or plotting of DNA methylation
+#' patterns by \code{\link[epialleleR]{plotPatterns}} function.
 #' 
 #' @param bam BAM file location string OR preprocessed output of
 #' \code{\link[epialleleR]{preprocessBam}} function. Read more about BAM file
@@ -81,7 +82,8 @@
 #'   methylation call string char, or NA if position is not present in the read
 #'   (pair)
 #' }
-#' @seealso \code{\link{preprocessBam}} for preloading BAM data,
+#' @seealso \code{\link{plotPatterns}} for pretty plotting of the output,
+#' \code{\link{preprocessBam}} for preloading BAM data,
 #' \code{\link{generateCytosineReport}} for methylation statistics at the level
 #' of individual cytosines, \code{\link{generateBedReport}} for genomic
 #' region-based statistics, \code{\link{generateVcfReport}} for evaluating
