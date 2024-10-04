@@ -134,7 +134,6 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
     ggplot2::geom_point(data=plot.data[!is.na(cntx) & cntx %in% plot.context], mapping=ggplot2::aes(size=cntx, fill=meth), shape=21, colour=colors[2]) +
     ggplot2::scale_size_manual(name="context", values=setNames(context.size, c("CHH", "CHG", "CG"))) +
     ggplot2::scale_fill_manual(name="methylated", values=colors, drop=FALSE) +
-    # ggplot2::scale_y_continuous(name=NULL, breaks=NULL, labels=NULL, expand=ggplot2::expansion(0, 0.5)) +
     ggplot2::scale_y_discrete(name=NULL, breaks=NULL, labels=NULL) +
     ggplot2::theme_light() +
     ggplot2::theme(plot.margin=grid::unit(c(5.5, 5.5, 5.5, 0), "points")) +
@@ -146,9 +145,8 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
     if (tag=="beta") tag.data[, label:=sprintf("%.2g", label)]
     scale.range <- plot.data[, .(from=min(as.integer(pos)), to=max(as.integer(pos)))]
     tag.nchar <- max(nchar(as.character(tag.data$label)))
-    tag.expand <- as.numeric(grid::convertX(grid::unit(tag.size*tag.nchar/2, "strwidth", "A"), "npc")) * (scale.range$to - scale.range$from + 1)
+    tag.expand <- as.numeric(grid::convertX(grid::unit(tag.size*tag.nchar/2, "strwidth", "A"), "npc")) * (scale.range$to - scale.range$from + 1) + 1
     main.plot <- main.plot +
-      # ggplot2::annotate(geom="label", x=tag.data$pos, y=tag.data$I+1, label=tag.data$label, hjust=0, size=tag.size, color=tag.color, fill=tag.fill) +
       ggplot2::geom_label(data=tag.data, mapping=ggplot2::aes(x=pos, y=factor(I), label=label), hjust=0, size=tag.size, color=tag.color, fill=tag.fill, inherit.aes=FALSE, show.legend=FALSE) +
       ggplot2::expand_limits(x=scale.range$to+tag.expand) +
       ggplot2::guides(tag=ggplot2::guide_custom(grid::legendGrob(tag, pch=22, do.lines=FALSE, gp=grid::gpar(col=tag.color, fill=tag.fill, cex=3/3.88, lwd=0.75)) , title="tag"))
