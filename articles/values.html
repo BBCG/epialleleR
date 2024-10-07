@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.3</span>
       </span>
     </div>
 
@@ -81,7 +81,7 @@
 <img style="float: right;" src="epialleleR_logo.svg">
 </h1>
             
-            <h4 data-toc-skip class="date">14 July, 2024</h4>
+            <h4 data-toc-skip class="date">07 October, 2024</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BBCG/epialleleR/blob/devel/vignettes/values.Rmd" class="external-link"><code>vignettes/values.Rmd</code></a></small>
       <div class="hidden name"><code>values.Rmd</code></div>
@@ -113,6 +113,7 @@ does - browse a <a href="https://github.com/BBCG/epialleleR/blob/devel/vignettes
 code</a> of this vignette online.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">out.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>pattern<span class="op">=</span><span class="st">"simulated"</span>, fileext<span class="op">=</span><span class="st">".bam"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># no epimutations</span></span>
 <span><span class="fu"><a href="../reference/simulateBam.html">simulateBam</a></span><span class="op">(</span></span>
@@ -125,7 +126,7 @@ code</a> of this vignette online.</p>
 <span>  <span class="op">)</span>,</span>
 <span>  XG<span class="op">=</span><span class="st">"CT"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Writing sample BAM [0.106s]</span></span>
+<span><span class="co">#&gt; Writing sample BAM [0.105s]</span></span>
 <span><span class="co">#&gt; [1] 1000</span></span>
 <span><span class="fu">plotMetrics</span><span class="op">(</span><span class="va">out.bam</span>, <span class="fu">as</span><span class="op">(</span><span class="st">"chrS:1-10"</span>, <span class="st">"GRanges"</span><span class="op">)</span>, <span class="fl">0</span>, title<span class="op">=</span><span class="st">"no epimutations"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="values_files/figure-html/unnamed-chunk-3-1.png" width="100%" height="100%"></p>
@@ -143,7 +144,7 @@ code</a> of this vignette online.</p>
 <span>  <span class="op">)</span>,</span>
 <span>  XG<span class="op">=</span><span class="st">"CT"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Writing sample BAM [0.761s]</span></span>
+<span><span class="co">#&gt; Writing sample BAM [0.129s]</span></span>
 <span><span class="co">#&gt; [1] 1000</span></span>
 <span><span class="fu">plotMetrics</span><span class="op">(</span><span class="va">out.bam</span>, <span class="fu">as</span><span class="op">(</span><span class="st">"chrS:1-10"</span>, <span class="st">"GRanges"</span><span class="op">)</span>, title<span class="op">=</span><span class="st">"one complete epimutation"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="values_files/figure-html/unnamed-chunk-3-2.png" width="100%" height="100%"></p>
@@ -161,7 +162,7 @@ code</a> of this vignette online.</p>
 <span>  <span class="op">)</span>,</span>
 <span>  XG<span class="op">=</span><span class="st">"CT"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Writing sample BAM [0.128s]</span></span>
+<span><span class="co">#&gt; Writing sample BAM [0.120s]</span></span>
 <span><span class="co">#&gt; [1] 1000</span></span>
 <span><span class="fu">plotMetrics</span><span class="op">(</span><span class="va">out.bam</span>, <span class="fu">as</span><span class="op">(</span><span class="st">"chrS:1-10"</span>, <span class="st">"GRanges"</span><span class="op">)</span>, title<span class="op">=</span><span class="st">"one partial epimutation"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="values_files/figure-html/unnamed-chunk-3-3.png" width="100%" height="100%"></p>
@@ -179,7 +180,7 @@ code</a> of this vignette online.</p>
 <span>  <span class="op">)</span>,</span>
 <span>  XG<span class="op">=</span><span class="st">"CT"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Writing sample BAM [0.091s]</span></span>
+<span><span class="co">#&gt; Writing sample BAM [0.097s]</span></span>
 <span><span class="co">#&gt; [1] 1000</span></span>
 <span><span class="fu">plotMetrics</span><span class="op">(</span><span class="va">out.bam</span>, <span class="fu">as</span><span class="op">(</span><span class="st">"chrS:1-10"</span>, <span class="st">"GRanges"</span><span class="op">)</span>, title<span class="op">=</span><span class="st">"another partial epimutation"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="values_files/figure-html/unnamed-chunk-3-4.png" width="100%" height="100%"></p>
@@ -200,7 +201,7 @@ code</a> of this vignette online.</p>
 <span>  <span class="op">)</span>,</span>
 <span>  XG<span class="op">=</span><span class="st">"CT"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Writing sample BAM [0.098s]</span></span>
+<span><span class="co">#&gt; Writing sample BAM [0.104s]</span></span>
 <span><span class="co">#&gt; [1] 1009</span></span>
 <span><span class="fu">plotMetrics</span><span class="op">(</span><span class="va">out.bam</span>, <span class="fu">as</span><span class="op">(</span><span class="st">"chrS:1-10"</span>, <span class="st">"GRanges"</span><span class="op">)</span>, title<span class="op">=</span><span class="st">"several partial epimutations"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="values_files/figure-html/unnamed-chunk-3-5.png" width="100%" height="100%"></p>
@@ -240,7 +241,7 @@ code</a> of this vignette online.</p>
 <span>  <span class="op">)</span>,</span>
 <span>  XG<span class="op">=</span><span class="st">"CT"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Writing sample BAM [0.005s]</span></span>
+<span><span class="co">#&gt; Writing sample BAM [0.003s]</span></span>
 <span><span class="co">#&gt; [1] 20</span></span>
 <span><span class="fu">plotMetrics</span><span class="op">(</span><span class="va">out.bam</span>, <span class="fu">as</span><span class="op">(</span><span class="st">"chrS:1-20"</span>, <span class="st">"GRanges"</span><span class="op">)</span>, title<span class="op">=</span><span class="st">"several overlapping partial epimutations"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="values_files/figure-html/unnamed-chunk-3-7.png" width="100%" height="100%"></p>
@@ -296,14 +297,14 @@ code</a> of this vignette online.</p>
 <code class="sourceCode R"><span></span>
 <span><span class="co"># long-read sequencing, low methylation</span></span>
 <span><span class="va">getXM</span> <span class="op">&lt;-</span> <span class="kw">function</span> <span class="op">(</span><span class="va">p</span><span class="op">)</span> <span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"z"</span>, <span class="st">"Z"</span><span class="op">)</span>, size<span class="op">=</span><span class="fl">1</span>, prob<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">p</span>, <span class="fl">1</span><span class="op">-</span><span class="va">p</span><span class="op">)</span><span class="op">)</span><span class="op">}</span></span>
-<span><span class="va">probs</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="op">+</span><span class="fl">1</span><span class="op">*</span><span class="va">pi</span>, by <span class="op">=</span> <span class="va">pi</span><span class="op">/</span><span class="fl">125</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fl">2</span><span class="op">)</span><span class="op">/</span><span class="fl">3</span></span>
+<span><span class="va">probs</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span><span class="op">*</span><span class="va">pi</span>, <span class="op">+</span><span class="fl">1</span><span class="op">*</span><span class="va">pi</span>, by <span class="op">=</span> <span class="va">pi</span><span class="op">/</span><span class="fl">25</span><span class="op">)</span><span class="op">)</span><span class="op">+</span><span class="fl">2</span><span class="op">)</span><span class="op">/</span><span class="fl">3</span></span>
 <span><span class="fu"><a href="../reference/simulateBam.html">simulateBam</a></span><span class="op">(</span></span>
 <span>  output.bam.file<span class="op">=</span><span class="va">out.bam</span>,</span>
 <span>  pos<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>,</span>
 <span>  XM<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="kw">function</span> <span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">probs</span>, <span class="va">getXM</span><span class="op">)</span>, collapse<span class="op">=</span><span class="st">""</span><span class="op">)</span><span class="op">}</span><span class="op">)</span>,</span>
 <span>  XG<span class="op">=</span><span class="st">"CT"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Writing sample BAM [0.031s]</span></span>
+<span><span class="co">#&gt; Writing sample BAM [0.012s]</span></span>
 <span><span class="co">#&gt; [1] 10</span></span>
 <span><span class="fu">plotMetrics</span><span class="op">(</span><span class="va">out.bam</span>, <span class="fu">as</span><span class="op">(</span><span class="st">"chrS:1-1000"</span>, <span class="st">"GRanges"</span><span class="op">)</span>, title<span class="op">=</span><span class="st">"long-read sequencing, low methylation"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="values_files/figure-html/unnamed-chunk-3-14.png" width="100%" height="100%"></p>
@@ -316,7 +317,7 @@ code</a> of this vignette online.</p>
 <span>  XM<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="kw">function</span> <span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">probs</span>, <span class="va">getXM</span><span class="op">)</span>, collapse<span class="op">=</span><span class="st">""</span><span class="op">)</span><span class="op">}</span><span class="op">)</span>,</span>
 <span>  XG<span class="op">=</span><span class="st">"CT"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Writing sample BAM [0.029s]</span></span>
+<span><span class="co">#&gt; Writing sample BAM [0.010s]</span></span>
 <span><span class="co">#&gt; [1] 10</span></span>
 <span><span class="fu">plotMetrics</span><span class="op">(</span><span class="va">out.bam</span>, <span class="fu">as</span><span class="op">(</span><span class="st">"chrS:1-1000"</span>, <span class="st">"GRanges"</span><span class="op">)</span>, title<span class="op">=</span><span class="st">"long-read sequencing, high methylation"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="values_files/figure-html/unnamed-chunk-3-15.png" width="100%" height="100%"></p>
@@ -327,7 +328,7 @@ code</a> of this vignette online.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.4.1 (2024-06-14)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">#&gt; Running under: Ubuntu 22.04.4 LTS</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 22.04.5 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
@@ -346,40 +347,39 @@ code</a> of this vignette online.</p>
 <span><span class="co">#&gt; [1] stats4    stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] epialleleR_1.13.2    gridExtra_2.3        ggplot2_3.5.1        GenomicRanges_1.57.1</span></span>
-<span><span class="co">#&gt; [5] GenomeInfoDb_1.41.1  IRanges_2.39.1       S4Vectors_0.43.1     BiocGenerics_0.51.0 </span></span>
-<span><span class="co">#&gt; [9] data.table_1.15.4   </span></span>
+<span><span class="co">#&gt; [1] epialleleR_1.13.3    ggplot2_3.5.1        GenomicRanges_1.57.1 GenomeInfoDb_1.41.2 </span></span>
+<span><span class="co">#&gt; [5] IRanges_2.39.2       S4Vectors_0.43.2     BiocGenerics_0.51.3  data.table_1.16.0   </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;  [1] tidyselect_1.2.1            farver_2.1.2                dplyr_1.1.4                </span></span>
-<span><span class="co">#&gt;  [4] blob_1.2.4                  Biostrings_2.73.1           bitops_1.0-7               </span></span>
-<span><span class="co">#&gt;  [7] fastmap_1.2.0               RCurl_1.98-1.16             VariantAnnotation_1.51.0   </span></span>
-<span><span class="co">#&gt; [10] GenomicAlignments_1.41.0    XML_3.99-0.17               digest_0.6.36              </span></span>
+<span><span class="co">#&gt;  [4] blob_1.2.4                  Biostrings_2.73.2           bitops_1.0-9               </span></span>
+<span><span class="co">#&gt;  [7] fastmap_1.2.0               RCurl_1.98-1.16             VariantAnnotation_1.51.1   </span></span>
+<span><span class="co">#&gt; [10] GenomicAlignments_1.41.0    XML_3.99-0.17               digest_0.6.37              </span></span>
 <span><span class="co">#&gt; [13] lifecycle_1.0.4             KEGGREST_1.45.1             RSQLite_2.3.7              </span></span>
 <span><span class="co">#&gt; [16] magrittr_2.0.3              compiler_4.4.1              rlang_1.1.4                </span></span>
 <span><span class="co">#&gt; [19] sass_0.4.9                  tools_4.4.1                 utf8_1.2.4                 </span></span>
-<span><span class="co">#&gt; [22] yaml_2.3.9                  rtracklayer_1.65.0          knitr_1.48                 </span></span>
-<span><span class="co">#&gt; [25] labeling_0.4.3              S4Arrays_1.5.4              htmlwidgets_1.6.4          </span></span>
-<span><span class="co">#&gt; [28] bit_4.0.5                   curl_5.2.1                  DelayedArray_0.31.7        </span></span>
-<span><span class="co">#&gt; [31] RColorBrewer_1.1-3          abind_1.4-5                 BiocParallel_1.39.0        </span></span>
-<span><span class="co">#&gt; [34] withr_3.0.0                 desc_1.4.3                  grid_4.4.1                 </span></span>
-<span><span class="co">#&gt; [37] fansi_1.0.6                 colorspace_2.1-0            scales_1.3.0               </span></span>
-<span><span class="co">#&gt; [40] SummarizedExperiment_1.35.1 cli_3.6.3                   rmarkdown_2.27             </span></span>
-<span><span class="co">#&gt; [43] crayon_1.5.3                ragg_1.3.2                  generics_0.1.3             </span></span>
-<span><span class="co">#&gt; [46] rjson_0.2.21                httr_1.4.7                  DBI_1.2.3                  </span></span>
+<span><span class="co">#&gt; [22] yaml_2.3.10                 rtracklayer_1.65.0          knitr_1.48                 </span></span>
+<span><span class="co">#&gt; [25] labeling_0.4.3              S4Arrays_1.5.10             htmlwidgets_1.6.4          </span></span>
+<span><span class="co">#&gt; [28] bit_4.5.0                   curl_5.2.3                  DelayedArray_0.31.14       </span></span>
+<span><span class="co">#&gt; [31] RColorBrewer_1.1-3          abind_1.4-8                 BiocParallel_1.39.0        </span></span>
+<span><span class="co">#&gt; [34] withr_3.0.1                 desc_1.4.3                  grid_4.4.1                 </span></span>
+<span><span class="co">#&gt; [37] fansi_1.0.6                 colorspace_2.1-1            scales_1.3.0               </span></span>
+<span><span class="co">#&gt; [40] SummarizedExperiment_1.35.3 cli_3.6.3                   rmarkdown_2.28             </span></span>
+<span><span class="co">#&gt; [43] crayon_1.5.3                ragg_1.3.3                  generics_0.1.3             </span></span>
+<span><span class="co">#&gt; [46] httr_1.4.7                  rjson_0.2.23                DBI_1.2.3                  </span></span>
 <span><span class="co">#&gt; [49] cachem_1.1.0                zlibbioc_1.51.1             parallel_4.4.1             </span></span>
 <span><span class="co">#&gt; [52] AnnotationDbi_1.67.0        XVector_0.45.0              restfulr_0.0.15            </span></span>
-<span><span class="co">#&gt; [55] matrixStats_1.3.0           vctrs_0.6.5                 Matrix_1.7-0               </span></span>
-<span><span class="co">#&gt; [58] jsonlite_1.8.8              bit64_4.0.5                 systemfonts_1.1.0          </span></span>
-<span><span class="co">#&gt; [61] GenomicFeatures_1.57.0      jquerylib_0.1.4             glue_1.7.0                 </span></span>
-<span><span class="co">#&gt; [64] pkgdown_2.1.0.9000          codetools_0.2-20            gtable_0.3.5               </span></span>
-<span><span class="co">#&gt; [67] BiocIO_1.15.0               UCSC.utils_1.1.0            munsell_0.5.1              </span></span>
+<span><span class="co">#&gt; [55] matrixStats_1.4.1           vctrs_0.6.5                 Matrix_1.7-0               </span></span>
+<span><span class="co">#&gt; [58] jsonlite_1.8.9              bit64_4.5.2                 systemfonts_1.1.0          </span></span>
+<span><span class="co">#&gt; [61] GenomicFeatures_1.57.1      jquerylib_0.1.4             glue_1.8.0                 </span></span>
+<span><span class="co">#&gt; [64] pkgdown_2.1.1.9000          codetools_0.2-20            gtable_0.3.5               </span></span>
+<span><span class="co">#&gt; [67] BiocIO_1.15.2               UCSC.utils_1.1.0            munsell_0.5.1              </span></span>
 <span><span class="co">#&gt; [70] tibble_3.2.1                pillar_1.9.0                htmltools_0.5.8.1          </span></span>
-<span><span class="co">#&gt; [73] BSgenome_1.73.0             GenomeInfoDbData_1.2.12     R6_2.5.1                   </span></span>
-<span><span class="co">#&gt; [76] textshaping_0.4.0           evaluate_0.24.0             lattice_0.22-6             </span></span>
-<span><span class="co">#&gt; [79] Biobase_2.65.0              highr_0.11                  png_0.1-8                  </span></span>
-<span><span class="co">#&gt; [82] Rsamtools_2.21.0            memoise_2.0.1               bslib_0.7.0                </span></span>
-<span><span class="co">#&gt; [85] Rcpp_1.0.12                 SparseArray_1.5.19          xfun_0.45                  </span></span>
+<span><span class="co">#&gt; [73] BSgenome_1.73.1             GenomeInfoDbData_1.2.13     R6_2.5.1                   </span></span>
+<span><span class="co">#&gt; [76] textshaping_0.4.0           evaluate_1.0.0              lattice_0.22-6             </span></span>
+<span><span class="co">#&gt; [79] Biobase_2.65.1              highr_0.11                  png_0.1-8                  </span></span>
+<span><span class="co">#&gt; [82] Rsamtools_2.21.2            memoise_2.0.1               bslib_0.8.0                </span></span>
+<span><span class="co">#&gt; [85] Rcpp_1.0.13                 SparseArray_1.5.43          xfun_0.48                  </span></span>
 <span><span class="co">#&gt; [88] fs_1.6.4                    MatrixGenerics_1.17.0       pkgconfig_2.0.3</span></span></code></pre></div>
 </div>
 </div>
@@ -400,7 +400,7 @@ code</a> of this vignette online.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
 </div>
 
       </footer>

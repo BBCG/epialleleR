@@ -32,7 +32,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">epialleleR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.3</span>
       </span>
     </div>
 
@@ -81,7 +81,7 @@
 <img style="float: right;" src="epialleleR_logo.svg">
 </h1>
             
-            <h4 data-toc-skip class="date">14 July, 2024</h4>
+            <h4 data-toc-skip class="date">07 October, 2024</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BBCG/epialleleR/blob/devel/vignettes/epialleleR.Rmd" class="external-link"><code>vignettes/epialleleR.Rmd</code></a></small>
       <div class="hidden name"><code>epialleleR.Rmd</code></div>
@@ -172,7 +172,8 @@ supplied genomic regions (<em><code>generateBedReport</code></em>)</li>
 <em><code>generateMhlReport</code></em>) can be used instead of VEF when
 thresholding is not recommended (long-read sequencing)</li>
 <li>DNA methylation patterns of genomic region of interest can be
-explored using <em><code>extractPatterns</code></em>
+explored using <em><code>extractPatterns</code></em> and
+<em><code>plotPatterns</code></em>
 </li>
 <li>The association of methylation with single-nucleotide variations
 within epialleles can be tested using
@@ -449,7 +450,7 @@ modifications</p>
 <span><span class="va">capture.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
 <span><span class="va">bam.data</span>    <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preprocessBam.html">preprocessBam</a></span><span class="op">(</span><span class="va">capture.bam</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
-<span><span class="co">#&gt; Reading paired-end BAM file [0.015s]</span></span>
+<span><span class="co">#&gt; Reading paired-end BAM file [0.014s]</span></span>
 <span></span>
 <span><span class="co"># Specifics of long-read alignment processing</span></span>
 <span><span class="va">out.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>pattern<span class="op">=</span><span class="st">"out-"</span>, fileext<span class="op">=</span><span class="st">".bam"</span><span class="op">)</span></span>
@@ -459,12 +460,12 @@ modifications</p>
 <span>  Ml<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">102</span>,<span class="fl">128</span>,<span class="fl">153</span>,<span class="fl">138</span>,<span class="fl">101</span>,<span class="fl">96</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  output.bam.file<span class="op">=</span><span class="va">out.bam</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="co">#&gt; Writing sample BAM [0.001s]</span></span>
+<span><span class="co">#&gt; Writing sample BAM [0.003s]</span></span>
 <span><span class="co">#&gt; [1] 1</span></span>
 <span><span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">out.bam</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span>, report.context<span class="op">=</span><span class="st">"CX"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking BAM file: long-read, single-end, unsorted alignment detected</span></span>
-<span><span class="co">#&gt; Reading single-end BAM file [0.001s]</span></span>
-<span><span class="co">#&gt; Preparing cytosine report [0.000s]</span></span>
+<span><span class="co">#&gt; Reading single-end BAM file [0.002s]</span></span>
+<span><span class="co">#&gt; Preparing cytosine report [0.001s]</span></span>
 <span><span class="co">#&gt;      rname strand   pos context  meth unmeth</span></span>
 <span><span class="co">#&gt;     &lt;fctr&gt; &lt;fctr&gt; &lt;int&gt;  &lt;fctr&gt; &lt;int&gt;  &lt;int&gt;</span></span>
 <span><span class="co">#&gt;  1:   chrS      +     2      CG     1      0</span></span>
@@ -538,8 +539,8 @@ methylated, will be effectively treated as unmethylated ones.</p>
 <code class="sourceCode R"><span><span class="co"># data.table::data.table object for</span></span>
 <span><span class="co"># CpG VEF report</span></span>
 <span><span class="va">cg.vef.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Thresholding reads [0.001s]</span></span>
-<span><span class="co">#&gt; Preparing cytosine report [0.013s]</span></span>
+<span><span class="co">#&gt; Thresholding reads [0.002s]</span></span>
+<span><span class="co">#&gt; Preparing cytosine report [0.014s]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cg.vef.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     rname strand      pos context  meth unmeth</span></span>
 <span><span class="co">#&gt;    &lt;fctr&gt; &lt;fctr&gt;    &lt;int&gt;  &lt;fctr&gt; &lt;int&gt;  &lt;int&gt;</span></span>
@@ -552,7 +553,7 @@ methylated, will be effectively treated as unmethylated ones.</p>
 <span></span>
 <span><span class="co"># CpG cytosine report</span></span>
 <span><span class="va">cg.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Preparing cytosine report [0.013s]</span></span>
+<span><span class="co">#&gt; Preparing cytosine report [0.014s]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cg.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     rname strand      pos context  meth unmeth</span></span>
 <span><span class="co">#&gt;    &lt;fctr&gt; &lt;fctr&gt;    &lt;int&gt;  &lt;fctr&gt; &lt;int&gt;  &lt;int&gt;</span></span>
@@ -602,9 +603,9 @@ well as two of its aliases, <em><code>generateAmpliconReport</code></em>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Reading BED file [0.038s]</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
-<span><span class="co">#&gt; Reading paired-end BAM file [0.004s]</span></span>
-<span><span class="co">#&gt; Thresholding reads [0.000s]</span></span>
-<span><span class="co">#&gt; Preparing amplicon report [0.047s]</span></span>
+<span><span class="co">#&gt; Reading paired-end BAM file [0.005s]</span></span>
+<span><span class="co">#&gt; Thresholding reads [0.001s]</span></span>
+<span><span class="co">#&gt; Preparing amplicon report [0.045s]</span></span>
 <span><span class="va">amplicon.report</span></span>
 <span><span class="co">#&gt;    seqnames    start      end width strand amplicon nreads+ nreads-        VEF</span></span>
 <span><span class="co">#&gt;      &lt;fctr&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt; &lt;fctr&gt;   &lt;char&gt;   &lt;int&gt;   &lt;int&gt;      &lt;num&gt;</span></span>
@@ -620,9 +621,9 @@ well as two of its aliases, <em><code>generateAmpliconReport</code></em>
 <span>  bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,</span>
 <span>  bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Reading BED file [0.009s]</span></span>
+<span><span class="co">#&gt; Reading BED file [0.010s]</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
-<span><span class="co">#&gt; Reading paired-end BAM file [0.012s]</span></span>
+<span><span class="co">#&gt; Reading paired-end BAM file [0.014s]</span></span>
 <span><span class="co">#&gt; Thresholding reads [0.001s]</span></span>
 <span><span class="co">#&gt; Preparing capture report [0.016s]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">capture.report</span><span class="op">)</span></span>
@@ -641,11 +642,11 @@ well as two of its aliases, <em><code>generateAmpliconReport</code></em>
 <span>  bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,</span>
 <span>  bed.type<span class="op">=</span><span class="st">"capture"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Reading BED file [0.009s]</span></span>
+<span><span class="co">#&gt; Reading BED file [0.007s]</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
-<span><span class="co">#&gt; Reading paired-end BAM file [0.012s]</span></span>
+<span><span class="co">#&gt; Reading paired-end BAM file [0.013s]</span></span>
 <span><span class="co">#&gt; Thresholding reads [0.001s]</span></span>
-<span><span class="co">#&gt; Preparing capture report [0.020s]</span></span>
+<span><span class="co">#&gt; Preparing capture report [0.016s]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">capture.report</span>, <span class="va">bed.report</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
@@ -673,7 +674,7 @@ the <em><code>generateMhlReport</code></em> as well as in the
 <span>  bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
-<span><span class="co">#&gt; Reading paired-end BAM file [0.012s]</span></span>
+<span><span class="co">#&gt; Reading paired-end BAM file [0.019s]</span></span>
 <span><span class="co">#&gt; Preparing lMHL report [0.022s]</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -681,8 +682,9 @@ the <em><code>generateMhlReport</code></em> as well as in the
 </h3>
 <p>Individual epialleles can be extracted and plotted in order to
 visualize methylation patters within a genomic region of interest. For
-this, <em><code>epialleleR</code></em> provides method
-<em><code>extractPatterns</code></em> which can be used as follows:</p>
+this, <em><code>epialleleR</code></em> provides methods
+<em><code>extractPatterns</code></em> and
+<em><code>plotPatterns</code></em> which can be used as follows:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># First, let's extract base methylation information for sequencing reads</span></span>
 <span><span class="co"># of 1:9 mix of methylated and non-methylated control DNA</span></span>
@@ -691,73 +693,22 @@ this, <em><code>epialleleR</code></em> provides method
 <span>  bed<span class="op">=</span><span class="fu">as</span><span class="op">(</span><span class="st">"chr17:43125200-43125600"</span>,<span class="st">"GRanges"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
-<span><span class="co">#&gt; Reading paired-end BAM file [0.004s]</span></span>
-<span><span class="co">#&gt; Extracting methylation patterns [0.019s]</span></span>
+<span><span class="co">#&gt; Reading paired-end BAM file [0.005s]</span></span>
+<span><span class="co">#&gt; Extracting methylation patterns [0.025s]</span></span>
 <span></span>
 <span><span class="co"># that many read pairs overlap genomic region of interest</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">patterns</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 238</span></span>
 <span></span>
-<span><span class="co"># these are positions of bases within relevant read pairs</span></span>
-<span><span class="va">base.positions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"^[0-9]+$"</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">patterns</span><span class="op">)</span>, value<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># let's make a summary table with counts for every pattern</span></span>
-<span><span class="va">patterns.summary</span> <span class="op">&lt;-</span> <span class="va">patterns</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">.SD</span>, <span class="va">unique</span><span class="op">)</span>, <span class="va">.N</span><span class="op">)</span>,</span>
-<span>                             by<span class="op">=</span><span class="fu">.</span><span class="op">(</span><span class="va">pattern</span>, <span class="va">beta</span><span class="op">)</span>, .SDcols<span class="op">=</span><span class="va">base.positions</span><span class="op">]</span></span>
-<span></span>
-<span><span class="co"># that many unique methylation patterns were found</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">patterns.summary</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 45</span></span>
-<span></span>
-<span><span class="co"># let's melt and plot patterns</span></span>
-<span><span class="va">plot.data</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/melt.data.table.html" class="external-link">melt.data.table</a></span><span class="op">(</span><span class="va">patterns.summary</span>,</span>
-<span>  measure.vars<span class="op">=</span><span class="va">base.positions</span>, variable.name<span class="op">=</span><span class="st">"pos"</span>, value.name<span class="op">=</span><span class="st">"base"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># categorical positions, all patterns sorted by beta, with counts on the right</span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">plot.data</span><span class="op">)</span>,</span>
-<span>         <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">pos</span>, y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/reorder.factor.html" class="external-link">reorder</a></span><span class="op">(</span><span class="va">pattern</span>,<span class="va">beta</span><span class="op">)</span>,</span>
-<span>             group<span class="op">=</span><span class="va">pattern</span>, color<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">base</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"grey"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_grey.html" class="external-link">scale_colour_grey</a></span><span class="op">(</span>start<span class="op">=</span><span class="fl">0.8</span>, end<span class="op">=</span><span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle<span class="op">=</span><span class="fl">60</span>, hjust<span class="op">=</span><span class="fl">1</span>, vjust<span class="op">=</span><span class="fl">1</span><span class="op">)</span>,</span>
-<span>          axis.text.y<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x<span class="op">=</span><span class="st">"position"</span>, y<span class="op">=</span><span class="st">"pattern"</span>, title<span class="op">=</span><span class="st">"epialleles"</span>, color<span class="op">=</span><span class="st">"base"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_discrete.html" class="external-link">scale_x_discrete</a></span><span class="op">(</span>expand<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>,<span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span>inherit.aes<span class="op">=</span><span class="cn">FALSE</span>, data<span class="op">=</span><span class="va">patterns.summary</span>,</span>
-<span>              mapping<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="st">"count"</span>, y<span class="op">=</span><span class="va">pattern</span>, label<span class="op">=</span><span class="va">N</span><span class="op">)</span>, size<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<span><span class="co"># now we can plot the most abundant them of them using default parameters</span></span>
+<span><span class="fu"><a href="../reference/plotPatterns.html">plotPatterns</a></span><span class="op">(</span><span class="va">patterns</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 238 patterns supplied</span></span>
+<span><span class="co">#&gt; 45 unique</span></span>
+<span><span class="co">#&gt; 9 most frequent unique patterns were selected for plotting using 10 beta value bins:</span></span>
+<span><span class="co">#&gt; [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]</span></span>
+<span><span class="co">#&gt;       2         2         2         2         2         2         2         2         2       2</span></span></code></pre></div>
 <p><img src="epialleleR_files/figure-html/unnamed-chunk-9-1.png" width="100%" height="100%"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># upset-like plot of all patterns, continuous positions, sorted by counts</span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;</span> <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st">"gridExtra"</span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/gridExtra/man/arrangeGrob.html" class="external-link">grid.arrange</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">plot.data</span><span class="op">)</span>,</span>
-<span>           <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">pos</span><span class="op">)</span><span class="op">)</span>, y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/reorder.factor.html" class="external-link">reorder</a></span><span class="op">(</span><span class="va">pattern</span>,<span class="va">N</span><span class="op">)</span>,</span>
-<span>               color<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">base</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"grey"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_grey.html" class="external-link">scale_colour_grey</a></span><span class="op">(</span>start<span class="op">=</span><span class="fl">0.8</span>, end<span class="op">=</span><span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
-<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.y<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>, legend.position<span class="op">=</span><span class="st">"none"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x<span class="op">=</span><span class="st">"position"</span>, y<span class="op">=</span><span class="cn">NULL</span>, title<span class="op">=</span><span class="st">"epialleles"</span>, color<span class="op">=</span><span class="st">"base"</span><span class="op">)</span>,</span>
-<span>    </span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">plot.data</span><span class="op">)</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">pattern</span>, <span class="va">N</span>, <span class="va">beta</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>           <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">N</span><span class="op">+</span><span class="fl">0.5</span>, y<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/stats/reorder.factor.html" class="external-link">reorder</a></span><span class="op">(</span><span class="va">pattern</span>,<span class="va">N</span><span class="op">)</span>, alpha<span class="op">=</span><span class="va">beta</span>, label<span class="op">=</span><span class="va">N</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span>alpha<span class="op">=</span><span class="fl">0.5</span>, nudge_x<span class="op">=</span><span class="fl">0.2</span>, size<span class="op">=</span><span class="fl">3</span><span class="op">)</span> <span class="op">+</span></span>
-<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.y<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>, legend.position<span class="op">=</span><span class="st">"none"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x<span class="op">=</span><span class="st">"count"</span>, y<span class="op">=</span><span class="cn">NULL</span>, title<span class="op">=</span><span class="st">""</span><span class="op">)</span>,</span>
-<span>    ncol<span class="op">=</span><span class="fl">2</span>, widths<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.75</span>, <span class="fl">0.25</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p><img src="epialleleR_files/figure-html/unnamed-chunk-9-2.png" width="100%" height="100%"></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># now let's explore methylation patterns in RAD51C gene promoter using</span></span>
 <span><span class="co"># methylation capture data</span></span>
@@ -766,24 +717,16 @@ this, <em><code>epialleleR</code></em> provides method
 <span>  bed<span class="op">=</span><span class="fu">as</span><span class="op">(</span><span class="st">"chr17:58691673-58693108"</span>, <span class="st">"GRanges"</span><span class="op">)</span>,</span>
 <span>  verbose<span class="op">=</span><span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">capture.positions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"^[0-9]+$"</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">capture.patterns</span><span class="op">)</span>, value<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="va">capture.summary</span> <span class="op">&lt;-</span></span>
-<span>  <span class="va">capture.patterns</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">.SD</span>, <span class="va">unique</span><span class="op">)</span>, <span class="va">.N</span><span class="op">)</span>,</span>
-<span>                   by<span class="op">=</span><span class="fu">.</span><span class="op">(</span><span class="va">pattern</span>, <span class="va">beta</span><span class="op">)</span>, .SDcols<span class="op">=</span><span class="va">capture.positions</span><span class="op">]</span></span>
-<span><span class="va">capture.data</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/melt.data.table.html" class="external-link">melt.data.table</a></span><span class="op">(</span><span class="va">capture.summary</span>,</span>
-<span>  measure.vars<span class="op">=</span><span class="va">capture.positions</span>, variable.name<span class="op">=</span><span class="st">"pos"</span>, value.name<span class="op">=</span><span class="st">"base"</span><span class="op">)</span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">capture.data</span><span class="op">)</span>,</span>
-<span>       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">pos</span><span class="op">)</span><span class="op">)</span>, y<span class="op">=</span><span class="va">pattern</span>,</span>
-<span>           group<span class="op">=</span><span class="va">pattern</span>, color<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">base</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"grey"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_grey.html" class="external-link">scale_colour_grey</a></span><span class="op">(</span>start<span class="op">=</span><span class="fl">0.8</span>, end<span class="op">=</span><span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.y<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x<span class="op">=</span><span class="st">"position"</span>, y<span class="op">=</span><span class="st">"pattern"</span>, title<span class="op">=</span><span class="st">"RAD51C"</span>, color<span class="op">=</span><span class="st">"base"</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p><img src="epialleleR_files/figure-html/unnamed-chunk-9-3.png" width="100%" height="100%"></p>
+<span></span>
+<span><span class="co"># let's plot all the patterns using discrete genomic scale</span></span>
+<span><span class="fu"><a href="../reference/plotPatterns.html">plotPatterns</a></span><span class="op">(</span><span class="va">capture.patterns</span>, npatterns.per.bin<span class="op">=</span><span class="cn">Inf</span>,</span>
+<span>             genomic.scale<span class="op">=</span><span class="st">"discrete"</span>, context.size<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 59 patterns supplied</span></span>
+<span><span class="co">#&gt; 56 unique</span></span>
+<span><span class="co">#&gt; 56 most frequent unique patterns were selected for plotting using 10 beta value bins:</span></span>
+<span><span class="co">#&gt; [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]</span></span>
+<span><span class="co">#&gt;     Inf       Inf       Inf       Inf       Inf       Inf       Inf       Inf       Inf     Inf</span></span></code></pre></div>
+<p><img src="epialleleR_files/figure-html/unnamed-chunk-9-2.png" width="100%" height="100%"></p>
 </div>
 <div class="section level3">
 <h3 id="exploring-sequence-variants-in-epialleles">Exploring sequence variants in epialleles<a class="anchor" aria-label="anchor" href="#exploring-sequence-variants-in-epialleles"></a>
@@ -809,7 +752,7 @@ only. Also, the default (<code>min.baseq=0</code>) output of
 false SNVs caused by misalignments. Remember to increase
 <code>min.baseq</code> (<code>samtools mplieup -Q</code> default value
 is 13) to obtain results of a higher quality.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># VCF report</span></span>
 <span><span class="va">vcf.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateVcfReport.html">generateVcfReport</a></span><span class="op">(</span></span>
 <span>  bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,</span>
@@ -821,12 +764,12 @@ is 13) to obtain results of a higher quality.</p>
 <span>  <span class="co"># to convert them internally</span></span>
 <span>  vcf.style<span class="op">=</span><span class="st">"NCBI"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Reading BED file [0.008s]</span></span>
-<span><span class="co">#&gt; Reading VCF file [1.137s]</span></span>
+<span><span class="co">#&gt; Reading BED file [0.007s]</span></span>
+<span><span class="co">#&gt; Reading VCF file [1.264s]</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
 <span><span class="co">#&gt; Reading paired-end BAM file [0.004s]</span></span>
-<span><span class="co">#&gt; Thresholding reads [0.001s]</span></span>
-<span><span class="co">#&gt; Extracting base frequences [0.037s]</span></span>
+<span><span class="co">#&gt; Thresholding reads [0.000s]</span></span>
+<span><span class="co">#&gt; Extracting base frequences [0.049s]</span></span>
 <span></span>
 <span><span class="co"># NA values are shown for the C-&gt;T variants on the "+" and G-&gt;A on the "-"</span></span>
 <span><span class="co"># strands, because bisulfite conversion makes their counting impossible</span></span>
@@ -896,23 +839,12 @@ is 13) to obtain results of a higher quality.</p>
 <span>  highlight.positions<span class="op">=</span><span class="fl">61864584</span>,</span>
 <span>  verbose<span class="op">=</span><span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">brip1.positions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"^[0-9]+$"</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">brip1.patterns</span><span class="op">)</span>, value<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="va">brip1.summary</span> <span class="op">&lt;-</span></span>
-<span>  <span class="va">brip1.patterns</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">.SD</span>, <span class="va">unique</span><span class="op">)</span>, <span class="va">.N</span><span class="op">)</span>,</span>
-<span>                 by<span class="op">=</span><span class="fu">.</span><span class="op">(</span><span class="va">pattern</span>, <span class="va">beta</span><span class="op">)</span>, .SDcols<span class="op">=</span><span class="va">brip1.positions</span><span class="op">]</span></span>
-<span><span class="va">brip1.data</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/melt.data.table.html" class="external-link">melt.data.table</a></span><span class="op">(</span><span class="va">brip1.summary</span>,</span>
-<span>  measure.vars<span class="op">=</span><span class="va">brip1.positions</span>, variable.name<span class="op">=</span><span class="st">"pos"</span>, value.name<span class="op">=</span><span class="st">"base"</span><span class="op">)</span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="va">brip1.data</span><span class="op">)</span>,</span>
-<span>       <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">pos</span><span class="op">)</span><span class="op">)</span>, y<span class="op">=</span><span class="va">pattern</span>,</span>
-<span>           group<span class="op">=</span><span class="va">pattern</span>, color<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">base</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"grey"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_colour_manual</a></span><span class="op">(</span>values<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"blue"</span>,<span class="cn">NA</span>,<span class="st">"red"</span>,<span class="st">"grey80"</span>,<span class="st">"black"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_light</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.y<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x<span class="op">=</span><span class="st">"position"</span>, y<span class="op">=</span><span class="st">"pattern"</span>, title<span class="op">=</span><span class="st">"BRIP1"</span>, color<span class="op">=</span><span class="st">"base"</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/plotPatterns.html">plotPatterns</a></span><span class="op">(</span><span class="va">brip1.patterns</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 24 patterns supplied</span></span>
+<span><span class="co">#&gt; 17 unique</span></span>
+<span><span class="co">#&gt; 9 most frequent unique patterns were selected for plotting using 10 beta value bins:</span></span>
+<span><span class="co">#&gt; [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]</span></span>
+<span><span class="co">#&gt;       2         2         2         2         2         2         2         2         2       2</span></span></code></pre></div>
 <p><img src="epialleleR_files/figure-html/unnamed-chunk-10-1.png" width="100%" height="100%"></p>
 </div>
 <div class="section level3">
@@ -932,7 +864,7 @@ observed 1-eCDF(0.5) ≈ 0.1</li>
 <li>and fully methylated DNA — expected VEF = 1, observed 1-eCDF(0.5) ≈
 1</li>
 </ul>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># First, let's visualise eCDFs for within- and out-of-context beta values</span></span>
 <span><span class="co"># for all four amplicons and unmatched reads. Note that within-the-context eCDF</span></span>
 <span><span class="co"># of 0.5 is very close to the expected 1-VEF value (0.1) for all amplicons</span></span>
@@ -944,10 +876,10 @@ observed 1-eCDF(0.5) ≈ 0.1</li>
 <span>  bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,</span>
 <span>  bed.rows<span class="op">=</span><span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Reading BED file [0.007s]</span></span>
+<span><span class="co">#&gt; Reading BED file [0.008s]</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
 <span><span class="co">#&gt; Reading paired-end BAM file [0.004s]</span></span>
-<span><span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.008s]</span></span>
+<span><span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.007s]</span></span>
 <span></span>
 <span><span class="co"># there are 5 items in amplicon.ecdfs, let's plot all of them</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -969,7 +901,7 @@ observed 1-eCDF(0.5) ≈ 0.1</li>
 <span>       verticals<span class="op">=</span><span class="cn">TRUE</span>, do.points<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p><img src="epialleleR_files/figure-html/unnamed-chunk-11-1.png" width="100%" height="100%"></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
 <span><span class="co"># Second, let's compare eCDFs for within-the-context beta values for only one</span></span>
@@ -1046,11 +978,11 @@ Data: <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE243966" cla
 <div class="section level3">
 <h3 id="session-info">Session Info<a class="anchor" aria-label="anchor" href="#session-info"></a>
 </h3>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.4.1 (2024-06-14)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">#&gt; Running under: Ubuntu 22.04.4 LTS</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 22.04.5 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
@@ -1069,40 +1001,40 @@ Data: <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE243966" cla
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] gridExtra_2.3     ggplot2_3.5.1     epialleleR_1.13.2</span></span>
+<span><span class="co">#&gt; [1] ggplot2_3.5.1     epialleleR_1.13.3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;  [1] tidyselect_1.2.1            farver_2.1.2                dplyr_1.1.4                </span></span>
-<span><span class="co">#&gt;  [4] blob_1.2.4                  Biostrings_2.73.1           bitops_1.0-7               </span></span>
-<span><span class="co">#&gt;  [7] fastmap_1.2.0               RCurl_1.98-1.16             VariantAnnotation_1.51.0   </span></span>
-<span><span class="co">#&gt; [10] GenomicAlignments_1.41.0    XML_3.99-0.17               digest_0.6.36              </span></span>
+<span><span class="co">#&gt;  [4] blob_1.2.4                  Biostrings_2.73.2           bitops_1.0-9               </span></span>
+<span><span class="co">#&gt;  [7] fastmap_1.2.0               RCurl_1.98-1.16             VariantAnnotation_1.51.1   </span></span>
+<span><span class="co">#&gt; [10] GenomicAlignments_1.41.0    XML_3.99-0.17               digest_0.6.37              </span></span>
 <span><span class="co">#&gt; [13] lifecycle_1.0.4             KEGGREST_1.45.1             RSQLite_2.3.7              </span></span>
 <span><span class="co">#&gt; [16] magrittr_2.0.3              compiler_4.4.1              rlang_1.1.4                </span></span>
 <span><span class="co">#&gt; [19] sass_0.4.9                  tools_4.4.1                 utf8_1.2.4                 </span></span>
-<span><span class="co">#&gt; [22] yaml_2.3.9                  data.table_1.15.4           rtracklayer_1.65.0         </span></span>
-<span><span class="co">#&gt; [25] knitr_1.48                  labeling_0.4.3              S4Arrays_1.5.4             </span></span>
-<span><span class="co">#&gt; [28] htmlwidgets_1.6.4           bit_4.0.5                   curl_5.2.1                 </span></span>
-<span><span class="co">#&gt; [31] DelayedArray_0.31.7         abind_1.4-5                 BiocParallel_1.39.0        </span></span>
-<span><span class="co">#&gt; [34] withr_3.0.0                 BiocGenerics_0.51.0         desc_1.4.3                 </span></span>
+<span><span class="co">#&gt; [22] yaml_2.3.10                 data.table_1.16.0           rtracklayer_1.65.0         </span></span>
+<span><span class="co">#&gt; [25] knitr_1.48                  labeling_0.4.3              S4Arrays_1.5.10            </span></span>
+<span><span class="co">#&gt; [28] htmlwidgets_1.6.4           bit_4.5.0                   curl_5.2.3                 </span></span>
+<span><span class="co">#&gt; [31] DelayedArray_0.31.14        abind_1.4-8                 BiocParallel_1.39.0        </span></span>
+<span><span class="co">#&gt; [34] withr_3.0.1                 BiocGenerics_0.51.3         desc_1.4.3                 </span></span>
 <span><span class="co">#&gt; [37] grid_4.4.1                  stats4_4.4.1                fansi_1.0.6                </span></span>
-<span><span class="co">#&gt; [40] colorspace_2.1-0            scales_1.3.0                SummarizedExperiment_1.35.1</span></span>
-<span><span class="co">#&gt; [43] cli_3.6.3                   rmarkdown_2.27              crayon_1.5.3               </span></span>
-<span><span class="co">#&gt; [46] generics_0.1.3              ragg_1.3.2                  httr_1.4.7                 </span></span>
-<span><span class="co">#&gt; [49] rjson_0.2.21                DBI_1.2.3                   cachem_1.1.0               </span></span>
+<span><span class="co">#&gt; [40] colorspace_2.1-1            scales_1.3.0                SummarizedExperiment_1.35.3</span></span>
+<span><span class="co">#&gt; [43] cli_3.6.3                   rmarkdown_2.28              crayon_1.5.3               </span></span>
+<span><span class="co">#&gt; [46] generics_0.1.3              ragg_1.3.3                  httr_1.4.7                 </span></span>
+<span><span class="co">#&gt; [49] rjson_0.2.23                DBI_1.2.3                   cachem_1.1.0               </span></span>
 <span><span class="co">#&gt; [52] zlibbioc_1.51.1             parallel_4.4.1              AnnotationDbi_1.67.0       </span></span>
-<span><span class="co">#&gt; [55] XVector_0.45.0              restfulr_0.0.15             matrixStats_1.3.0          </span></span>
-<span><span class="co">#&gt; [58] vctrs_0.6.5                 Matrix_1.7-0                jsonlite_1.8.8             </span></span>
-<span><span class="co">#&gt; [61] IRanges_2.39.1              S4Vectors_0.43.1            bit64_4.0.5                </span></span>
-<span><span class="co">#&gt; [64] systemfonts_1.1.0           GenomicFeatures_1.57.0      jquerylib_0.1.4            </span></span>
-<span><span class="co">#&gt; [67] glue_1.7.0                  pkgdown_2.1.0.9000          codetools_0.2-20           </span></span>
-<span><span class="co">#&gt; [70] gtable_0.3.5                GenomeInfoDb_1.41.1         GenomicRanges_1.57.1       </span></span>
-<span><span class="co">#&gt; [73] BiocIO_1.15.0               UCSC.utils_1.1.0            munsell_0.5.1              </span></span>
+<span><span class="co">#&gt; [55] XVector_0.45.0              restfulr_0.0.15             matrixStats_1.4.1          </span></span>
+<span><span class="co">#&gt; [58] vctrs_0.6.5                 Matrix_1.7-0                jsonlite_1.8.9             </span></span>
+<span><span class="co">#&gt; [61] IRanges_2.39.2              S4Vectors_0.43.2            bit64_4.5.2                </span></span>
+<span><span class="co">#&gt; [64] systemfonts_1.1.0           GenomicFeatures_1.57.1      jquerylib_0.1.4            </span></span>
+<span><span class="co">#&gt; [67] glue_1.8.0                  pkgdown_2.1.1.9000          codetools_0.2-20           </span></span>
+<span><span class="co">#&gt; [70] gtable_0.3.5                GenomeInfoDb_1.41.2         GenomicRanges_1.57.1       </span></span>
+<span><span class="co">#&gt; [73] BiocIO_1.15.2               UCSC.utils_1.1.0            munsell_0.5.1              </span></span>
 <span><span class="co">#&gt; [76] tibble_3.2.1                pillar_1.9.0                htmltools_0.5.8.1          </span></span>
-<span><span class="co">#&gt; [79] GenomeInfoDbData_1.2.12     BSgenome_1.73.0             R6_2.5.1                   </span></span>
-<span><span class="co">#&gt; [82] textshaping_0.4.0           evaluate_0.24.0             lattice_0.22-6             </span></span>
-<span><span class="co">#&gt; [85] Biobase_2.65.0              highr_0.11                  png_0.1-8                  </span></span>
-<span><span class="co">#&gt; [88] Rsamtools_2.21.0            memoise_2.0.1               bslib_0.7.0                </span></span>
-<span><span class="co">#&gt; [91] Rcpp_1.0.12                 SparseArray_1.5.19          xfun_0.45                  </span></span>
+<span><span class="co">#&gt; [79] GenomeInfoDbData_1.2.13     BSgenome_1.73.1             R6_2.5.1                   </span></span>
+<span><span class="co">#&gt; [82] textshaping_0.4.0           evaluate_1.0.0              lattice_0.22-6             </span></span>
+<span><span class="co">#&gt; [85] Biobase_2.65.1              highr_0.11                  png_0.1-8                  </span></span>
+<span><span class="co">#&gt; [88] Rsamtools_2.21.2            memoise_2.0.1               bslib_0.8.0                </span></span>
+<span><span class="co">#&gt; [91] Rcpp_1.0.13                 SparseArray_1.5.43          xfun_0.48                  </span></span>
 <span><span class="co">#&gt; [94] fs_1.6.4                    MatrixGenerics_1.17.0       pkgconfig_2.0.3</span></span></code></pre></div>
 <hr>
 </div>
@@ -1140,7 +1072,7 @@ Data: <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE243966" cla
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
 </div>
 
       </footer>
