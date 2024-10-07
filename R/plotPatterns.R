@@ -191,10 +191,12 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   
   if (verbose) {
     bin.intervals <- levels(cut(bins, bins, include.lowest=TRUE, right=FALSE))
+    nselected.per.bin <- data.table::merge.data.table(patterns.selected[, .N, by=bin], data.table::data.table(bin=seq_len(nbins)), all=TRUE)$N
+    nselected.per.bin[is.na(nselected.per.bin)] <- 0
     stats <- sprintf(
       "%i patterns supplied\n%i unique\n%i most frequent unique patterns were selected for plotting using %i beta value bins:\n%s\n%s",
       nrow(patterns), nrow(patterns.summary), nrow(patterns.selected), nbins, paste(bin.intervals, collapse=" "),
-      do.call("sprintf", c(list(fmt=paste(sprintf("%%%is", nchar(bin.intervals)), collapse=" ")), npatterns.per.bin) )
+      do.call("sprintf", c(list(fmt=paste(sprintf("%%%is", nchar(bin.intervals)), collapse=" ")), nselected.per.bin) )
     )
     message(stats)
   }
