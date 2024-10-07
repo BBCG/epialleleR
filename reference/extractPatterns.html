@@ -221,13 +221,13 @@ description of usage and sample data.</p></div>
 <span class="r-in"><span>  <span class="co"># extract patterns</span></span></span>
 <span class="r-in"><span>  <span class="va">patterns</span> <span class="op">&lt;-</span> <span class="fu">extractPatterns</span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>, bed<span class="op">=</span><span class="va">amplicon.bed</span>, bed.row<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.034s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.036s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.010s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.011s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting methylation patterns </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.028s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.030s]</span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># and then plot them</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="plotPatterns.html">plotPatterns</a></span><span class="op">(</span><span class="va">patterns</span><span class="op">)</span></span></span>
@@ -235,7 +235,7 @@ description of usage and sample data.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 45 unique</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 9 most frequent unique patterns were selected for plotting using 10 beta value bins:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>       2         2         2         2         2         2         2         2         2       2</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>       2         1         1         0         0         0         0         1         2       2</span>
 <span class="r-plt img"><img src="extractPatterns-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span>  </span></span>
 </code></pre></div>

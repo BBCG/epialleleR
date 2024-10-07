@@ -450,7 +450,7 @@ modifications</p>
 <span><span class="va">capture.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
 <span><span class="va">bam.data</span>    <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preprocessBam.html">preprocessBam</a></span><span class="op">(</span><span class="va">capture.bam</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
-<span><span class="co">#&gt; Reading paired-end BAM file [0.014s]</span></span>
+<span><span class="co">#&gt; Reading paired-end BAM file [0.015s]</span></span>
 <span></span>
 <span><span class="co"># Specifics of long-read alignment processing</span></span>
 <span><span class="va">out.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>pattern<span class="op">=</span><span class="st">"out-"</span>, fileext<span class="op">=</span><span class="st">".bam"</span><span class="op">)</span></span>
@@ -567,7 +567,7 @@ methylated, will be effectively treated as unmethylated ones.</p>
 <span><span class="co"># CX cytosine report</span></span>
 <span><span class="va">cx.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span>,</span>
 <span>                                    report.context<span class="op">=</span><span class="st">"CX"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Preparing cytosine report [0.015s]</span></span>
+<span><span class="co">#&gt; Preparing cytosine report [0.016s]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cx.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     rname strand      pos context  meth unmeth</span></span>
 <span><span class="co">#&gt;    &lt;fctr&gt; &lt;fctr&gt;    &lt;int&gt;  &lt;fctr&gt; &lt;int&gt;  &lt;int&gt;</span></span>
@@ -601,11 +601,11 @@ well as two of its aliases, <em><code>generateAmpliconReport</code></em>
 <span>  bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,</span>
 <span>  bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Reading BED file [0.038s]</span></span>
+<span><span class="co">#&gt; Reading BED file [0.039s]</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
-<span><span class="co">#&gt; Reading paired-end BAM file [0.005s]</span></span>
-<span><span class="co">#&gt; Thresholding reads [0.001s]</span></span>
-<span><span class="co">#&gt; Preparing amplicon report [0.045s]</span></span>
+<span><span class="co">#&gt; Reading paired-end BAM file [0.004s]</span></span>
+<span><span class="co">#&gt; Thresholding reads [0.000s]</span></span>
+<span><span class="co">#&gt; Preparing amplicon report [0.047s]</span></span>
 <span><span class="va">amplicon.report</span></span>
 <span><span class="co">#&gt;    seqnames    start      end width strand amplicon nreads+ nreads-        VEF</span></span>
 <span><span class="co">#&gt;      &lt;fctr&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt; &lt;fctr&gt;   &lt;char&gt;   &lt;int&gt;   &lt;int&gt;      &lt;num&gt;</span></span>
@@ -623,9 +623,9 @@ well as two of its aliases, <em><code>generateAmpliconReport</code></em>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Reading BED file [0.010s]</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
-<span><span class="co">#&gt; Reading paired-end BAM file [0.014s]</span></span>
+<span><span class="co">#&gt; Reading paired-end BAM file [0.015s]</span></span>
 <span><span class="co">#&gt; Thresholding reads [0.001s]</span></span>
-<span><span class="co">#&gt; Preparing capture report [0.016s]</span></span>
+<span><span class="co">#&gt; Preparing capture report [0.018s]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">capture.report</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    seqnames    start      end width strand     V4 nreads+ nreads-       VEF</span></span>
 <span><span class="co">#&gt;      &lt;fctr&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt; &lt;fctr&gt; &lt;char&gt;   &lt;int&gt;   &lt;int&gt;     &lt;num&gt;</span></span>
@@ -642,11 +642,11 @@ well as two of its aliases, <em><code>generateAmpliconReport</code></em>
 <span>  bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,</span>
 <span>  bed.type<span class="op">=</span><span class="st">"capture"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Reading BED file [0.007s]</span></span>
+<span><span class="co">#&gt; Reading BED file [0.009s]</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
-<span><span class="co">#&gt; Reading paired-end BAM file [0.013s]</span></span>
+<span><span class="co">#&gt; Reading paired-end BAM file [0.014s]</span></span>
 <span><span class="co">#&gt; Thresholding reads [0.001s]</span></span>
-<span><span class="co">#&gt; Preparing capture report [0.016s]</span></span>
+<span><span class="co">#&gt; Preparing capture report [0.017s]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">capture.report</span>, <span class="va">bed.report</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
@@ -674,7 +674,7 @@ the <em><code>generateMhlReport</code></em> as well as in the
 <span>  bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
-<span><span class="co">#&gt; Reading paired-end BAM file [0.019s]</span></span>
+<span><span class="co">#&gt; Reading paired-end BAM file [0.014s]</span></span>
 <span><span class="co">#&gt; Preparing lMHL report [0.022s]</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -706,7 +706,7 @@ this, <em><code>epialleleR</code></em> provides methods
 <span><span class="co">#&gt; 45 unique</span></span>
 <span><span class="co">#&gt; 9 most frequent unique patterns were selected for plotting using 10 beta value bins:</span></span>
 <span><span class="co">#&gt; [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]</span></span>
-<span><span class="co">#&gt;       2         2         2         2         2         2         2         2         2       2</span></span></code></pre></div>
+<span><span class="co">#&gt;       2         1         1         0         0         0         0         1         2       2</span></span></code></pre></div>
 <p><img src="epialleleR_files/figure-html/unnamed-chunk-9-1.png" width="100%" height="100%"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
@@ -725,7 +725,7 @@ this, <em><code>epialleleR</code></em> provides methods
 <span><span class="co">#&gt; 56 unique</span></span>
 <span><span class="co">#&gt; 56 most frequent unique patterns were selected for plotting using 10 beta value bins:</span></span>
 <span><span class="co">#&gt; [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]</span></span>
-<span><span class="co">#&gt;     Inf       Inf       Inf       Inf       Inf       Inf       Inf       Inf       Inf     Inf</span></span></code></pre></div>
+<span><span class="co">#&gt;      22         3         1         2         3         1         2         0        11      11</span></span></code></pre></div>
 <p><img src="epialleleR_files/figure-html/unnamed-chunk-9-2.png" width="100%" height="100%"></p>
 </div>
 <div class="section level3">
@@ -764,12 +764,12 @@ is 13) to obtain results of a higher quality.</p>
 <span>  <span class="co"># to convert them internally</span></span>
 <span>  vcf.style<span class="op">=</span><span class="st">"NCBI"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Reading BED file [0.007s]</span></span>
-<span><span class="co">#&gt; Reading VCF file [1.264s]</span></span>
+<span><span class="co">#&gt; Reading BED file [0.008s]</span></span>
+<span><span class="co">#&gt; Reading VCF file [1.045s]</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
 <span><span class="co">#&gt; Reading paired-end BAM file [0.004s]</span></span>
 <span><span class="co">#&gt; Thresholding reads [0.000s]</span></span>
-<span><span class="co">#&gt; Extracting base frequences [0.049s]</span></span>
+<span><span class="co">#&gt; Extracting base frequences [0.054s]</span></span>
 <span></span>
 <span><span class="co"># NA values are shown for the C-&gt;T variants on the "+" and G-&gt;A on the "-"</span></span>
 <span><span class="co"># strands, because bisulfite conversion makes their counting impossible</span></span>
@@ -844,7 +844,7 @@ is 13) to obtain results of a higher quality.</p>
 <span><span class="co">#&gt; 17 unique</span></span>
 <span><span class="co">#&gt; 9 most frequent unique patterns were selected for plotting using 10 beta value bins:</span></span>
 <span><span class="co">#&gt; [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]</span></span>
-<span><span class="co">#&gt;       2         2         2         2         2         2         2         2         2       2</span></span></code></pre></div>
+<span><span class="co">#&gt;       2         0         0         1         0         1         2         1         0       2</span></span></code></pre></div>
 <p><img src="epialleleR_files/figure-html/unnamed-chunk-10-1.png" width="100%" height="100%"></p>
 </div>
 <div class="section level3">
@@ -876,7 +876,7 @@ observed 1-eCDF(0.5) ≈ 0.1</li>
 <span>  bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,</span>
 <span>  bed.rows<span class="op">=</span><span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Reading BED file [0.008s]</span></span>
+<span><span class="co">#&gt; Reading BED file [0.007s]</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
 <span><span class="co">#&gt; Reading paired-end BAM file [0.004s]</span></span>
 <span><span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.007s]</span></span>
