@@ -20,6 +20,7 @@
 #' @importFrom SummarizedExperiment rowRanges
 #' @importFrom stats ecdf
 #' @importFrom stats setNames
+#' @importFrom stats density
 #' @importFrom methods is
 #' @importFrom utils globalVariables
 #' @importFrom utils packageVersion
@@ -40,7 +41,9 @@ utils::globalVariables(
     "templid", "FALSE+", "FALSE-", "TRUE+", "TRUE-", "REF", "ALT",
     "M+Ref","U+Ref","M+Alt","U+Alt", "M-Ref","U-Ref","M-Alt","U-Alt",
     "M+A", "M+C", "M+G", "M+T", "M-A", "M-C", "M-G", "M-T",
-    "U+A", "U+C", "U+G", "U+T", "U-A", "U-C", "U-G", "U-T")
+    "U+A", "U+C", "U+G", "U+T", "U-A", "U-C", "U-G", "U-T",
+    ".SD", "bin", "count", "code", "pos", "cntx", "base", "meth", "x", "y",
+    "label")
 )
 
 .onUnload <- function (libpath) {library.dynam.unload("epialleleR", libpath)}
@@ -691,7 +694,8 @@ utils::globalVariables(
   tm <- proc.time()
   
   bed.dt <- data.table::as.data.table(bed)[bed.row]
-  bed.dt[, seqnames := factor(seqnames, levels=levels(bam.processed$rname))]
+  bed.dt[, `:=` (seqnames = factor(seqnames, levels=levels(bam.processed$rname)),
+                 strand = "*")]
   
   highlight.positions <- sort(unique(
     highlight.positions[highlight.positions>=bed.dt$start &
@@ -708,6 +712,7 @@ utils::globalVariables(
                                     highlight.positions)
   data.table::setDT(patterns)
   colnames(patterns) <- sub("^X([0-9]+)$", "\\1", colnames(patterns))
+  data.table::setattr(patterns, "bed", as.character(bed)[bed.row])
   
   if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(patterns)

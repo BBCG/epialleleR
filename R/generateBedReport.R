@@ -56,7 +56,10 @@
 #' @param bed Browser Extensible Data (BED) file location string OR object of
 #' class \code{\link[GenomicRanges]{GRanges}} holding genomic coordinates for
 #' regions of interest. The style of seqlevels of BED file/object must be the
-#' same as the style of seqlevels of BAM file/object used.
+#' same as the style of seqlevels of BAM file/object used. The 
+#' BED/\code{\link[GenomicRanges]{GRanges}} rows are \strong{not} sorted
+#' internally. As of now, the strand information is ignored and reads (read
+#' pairs) matching both strands are separately counted and reported.
 #' @param report.file file location string to write the BED report. If NULL
 #' (the default) then report is returned as a
 #' \code{\link[data.table]{data.table}} object.
@@ -150,7 +153,8 @@
 #' \code{\link{generateCytosineReport}} for methylation statistics at the level
 #' of individual cytosines, \code{\link{generateVcfReport}} for evaluating
 #' epiallele-SNV associations, \code{\link{extractPatterns}} for exploring
-#' methylation patterns, \code{\link{generateBedEcdf}} for analysing the
+#' methylation patterns and \code{\link{plotPatterns}} for pretty plotting
+#' of its output, \code{\link{generateBedEcdf}} for analysing the
 #' distribution of per-read beta values, and `epialleleR` vignettes for the
 #' description of usage and sample data.
 #' 

@@ -1,6 +1,6 @@
 Package: epialleleR
 Title: Fast, Epiallele-Aware Methylation Caller and Reporter
-Version: 1.13.2
+Version: 1.13.3
 Authors@R: 
   person(given = "Oleksii",
     family = "Nikolaienko",
@@ -13,8 +13,8 @@ Description: Epialleles are specific DNA methylation patterns that are
   cytosine methylation as well as frequencies of hypermethylated
   epialleles at the level of genomic regions or individual cytosines
   in next-generation sequencing data using binary alignment map (BAM) files as
-  an input. Among other things, this package can also extract methylation
-  patterns and assess allele specificity of methylation.
+  an input. Among other things, this package can also extract and visualise
+  methylation patterns and assess allele specificity of methylation.
 SystemRequirements: C++17, GNU make
 NeedsCompilation: yes
 Depends:
@@ -38,8 +38,7 @@ Suggests:
   RUnit,
   knitr,
   rmarkdown,
-  ggplot2,
-  gridExtra
+  ggplot2
 License: Artistic-2.0
 URL: https://github.com/BBCG/epialleleR
 BugReports: https://github.com/BBCG/epialleleR/issues

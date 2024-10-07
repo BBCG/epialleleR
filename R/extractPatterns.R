@@ -9,7 +9,8 @@
 #' pairs as a single entity) to the genomic
 #' region provided in a BED file/\code{\linkS4class{GRanges}} object, extracts
 #' methylation statuses of bases within those reads, and returns a data frame
-#' which can be used for plotting of DNA methylation patterns.
+#' which can be used for further analysis and/or plotting of DNA methylation
+#' patterns by \code{\link[epialleleR]{plotPatterns}} function.
 #' 
 #' @param bam BAM file location string OR preprocessed output of
 #' \code{\link[epialleleR]{preprocessBam}} function. Read more about BAM file
@@ -17,10 +18,11 @@
 #' @param bed Browser Extensible Data (BED) file location string OR object of
 #' class \code{\linkS4class{GRanges}} holding genomic coordinates for
 #' regions of interest. It is used to match sequencing reads to the genomic
-#' regions prior to eCDF computation. The style of seqlevels of BED file/object
+#' regions for pattern extraction. The style of seqlevels of BED file/object
 #' must match the style of seqlevels of the BAM file/object used. The 
 #' BED/\code{\link[GenomicRanges]{GRanges}} rows are \strong{not} sorted
-#' internally.
+#' internally. As of now, the strand information is ignored and patterns
+#' matching both strands are extracted.
 #' @param bed.row single non-negative integer specifying what `bed` region
 #' should be included in the output (default: 1).
 #' @param zero.based.bed boolean defining if BED coordinates are zero based
@@ -80,7 +82,8 @@
 #'   methylation call string char, or NA if position is not present in the read
 #'   (pair)
 #' }
-#' @seealso \code{\link{preprocessBam}} for preloading BAM data,
+#' @seealso \code{\link{plotPatterns}} for pretty plotting of the output,
+#' \code{\link{preprocessBam}} for preloading BAM data,
 #' \code{\link{generateCytosineReport}} for methylation statistics at the level
 #' of individual cytosines, \code{\link{generateBedReport}} for genomic
 #' region-based statistics, \code{\link{generateVcfReport}} for evaluating
@@ -94,47 +97,11 @@
 #'   amplicon.bed <- system.file("extdata", "amplicon.bed",
 #'                               package="epialleleR")
 #'   
-#'   # let's get our patterns
+#'   # extract patterns
 #'   patterns <- extractPatterns(bam=amplicon.bam, bed=amplicon.bed, bed.row=3)
-#'   nrow(patterns)  # read pairs overlap genomic region of interest
 #'   
-#'   # these are positions of bases
-#'   base.positions <- grep("^[0-9]+$", colnames(patterns), value=TRUE)
-#'   
-#'   # let's make a summary table with counts of every pattern
-#'   patterns.summary <- patterns[, c(lapply(.SD, unique), .N),
-#'                                by=.(pattern, beta), .SDcols=base.positions]
-#'   nrow(patterns.summary)  # unique methylation patterns
-#'   
-#'   # let's melt and plot them
-#'   plot.data <- data.table::melt.data.table(patterns.summary,
-#'     measure.vars=base.positions, variable.name="pos", value.name="base")
-#'   
-#'   # upset-like plot of all patterns, categorical positions, sorted by counts
-#'   if (require("ggplot2", quietly=TRUE) & require("gridExtra", quietly=TRUE)){
-#'     grid.arrange(
-#'       ggplot(na.omit(plot.data),
-#'              aes(x=pos, y=reorder(pattern,N),
-#'                  color=factor(base, levels=c("z","Z")))) +
-#'         geom_line(color="grey") +
-#'         geom_point() +
-#'         scale_colour_grey(start=0.8, end=0) +
-#'         theme_light() +
-#'         scale_x_discrete(breaks=function(x){x[c(rep(FALSE,5), TRUE)]}) +
-#'         theme(axis.text.y=element_blank(), legend.position="none") +
-#'         labs(x="position", y=NULL, title="epialleles", color="base"),
-#'       
-#'       ggplot(unique(na.omit(plot.data)[, .(pattern, N, beta)]),
-#'              aes(x=N+0.5, y=reorder(pattern,N), alpha=beta, label=N)) +
-#'         geom_col() +
-#'         geom_text(alpha=0.5, nudge_x=0.2, size=3) +
-#'         scale_x_log10() +
-#'         theme_minimal() +
-#'         theme(axis.text.y=element_blank(), legend.position="none") +
-#'         labs(x="count", y=NULL, title=""),
-#'       ncol=2, widths=c(0.75, 0.25)
-#'     )
-#'   }
+#'   # and then plot them
+#'   plotPatterns(patterns)
 #'   
 #' @export
 extractPatterns <- function (bam,
