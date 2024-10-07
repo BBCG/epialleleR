@@ -38,8 +38,7 @@ Suggests:
   RUnit,
   knitr,
   rmarkdown,
-  ggplot2,
-  gridExtra
+  ggplot2
 License: Artistic-2.0
 URL: https://github.com/BBCG/epialleleR
 BugReports: https://github.com/BBCG/epialleleR/issues
