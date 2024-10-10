@@ -157,7 +157,8 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   npatterns.per.bin <- rep(npatterns.per.bin, length.out=nbins)
   context.size <- rep(context.size, length.out=3)
   
-  if (!requireNamespace("ggplot2", quietly=TRUE)) stop("ggplot2 is required for plotting. Please install")
+  if (!requireNamespace("ggplot2", quietly=TRUE))
+    stop("ggplot2 is required for plotting. Please install")
   
   if (plot.context=="CxG") {
     plot.context <- c("CG", "CHG")
