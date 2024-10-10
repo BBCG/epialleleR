@@ -183,6 +183,10 @@ generateVcfReport <- function (bam,
 {
   threshold.context <- match.arg(threshold.context, threshold.context)
   
+  reqd.ns <- c("VariantAnnotation", "SummarizedExperiment", "GenomeInfoDb")
+  if (!all(sapply(reqd.ns, requireNamespace)))
+    stop(paste(reqd.ns, collapse=", "), " are required here. Please install")
+  
   if (!any(methods::is(vcf, "CollapsedVCF"), methods::is(vcf, "ExpandedVCF"))) {
     if (!is.null(bed) & !methods::is(bed, "GRanges"))
       bed <- .readBed(bed.file=bed, zero.based.bed=zero.based.bed,
