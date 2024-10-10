@@ -92,3 +92,6 @@ Changes in version 1.11.9 (2024-03-21)
 
 Changes in version 1.13.3 (2024-10-04)
 + plotPatterns for pretty plotting
+
+Changes in version 1.13.4 (2024-10-10)
++ VariantAnnotation moved to Suggests

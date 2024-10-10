@@ -34,4 +34,10 @@ test_plotPatterns <- function () {
   RUnit::checkTrue(
     inherits(gtable.patterns, "gtable")
   )
+  
+  RUnit::checkException({
+    base::requireNamespace <- function (package, ..., quietly=FALSE) FALSE
+    unloadNamespace("ggplot2")
+    plotPatterns(capture.patterns)
+  })
 }

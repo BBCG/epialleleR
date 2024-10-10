@@ -145,8 +145,7 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
         case BAM_CBACK :
           break;
         default :
-          Rcpp::stop("Unknown CIGAR operation for BAM entry %s",                // unknown CIGAR operation
-                     bam_get_qname(bam_rec));
+          Rcpp::stop("Unknown CIGAR operation for BAM entry %s", bam_get_qname(bam_rec)); // unknown CIGAR operation
       }
     }
     if (templ_width < (int)dest_pos) templ_width = dest_pos;                    // need this to include everything from 'dovetail' alignments
@@ -296,8 +295,7 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
       case BAM_CBACK :
         break;
       default :
-        Rcpp::stop("Unknown CIGAR operation for BAM entry %s",                  // unknown CIGAR operation
-                   bam_get_qname(bam_rec));
+        Rcpp::stop("Unknown CIGAR operation for BAM entry %s", bam_get_qname(bam_rec)); // unknown CIGAR operation
       }
     }
     
@@ -525,8 +523,7 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
       case BAM_CBACK :
         break;
       default :
-        Rcpp::stop("Unknown CIGAR operation for BAM entry %s",                  // unknown CIGAR operation
-                   bam_get_qname(bam_rec));
+        Rcpp::stop("Unknown CIGAR operation for BAM entry %s", bam_get_qname(bam_rec)); // unknown CIGAR operation
       }
     }
 

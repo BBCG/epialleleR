@@ -1,6 +1,6 @@
 Package: epialleleR
 Title: Fast, Epiallele-Aware Methylation Caller and Reporter
-Version: 1.13.3
+Version: 1.13.4
 Authors@R: 
   person(given = "Oleksii",
     family = "Nikolaienko",
@@ -23,18 +23,18 @@ Imports:
   stats,
   methods,
   utils,
-  GenomicRanges,
-  BiocGenerics,
-  GenomeInfoDb,
-  SummarizedExperiment,
-  VariantAnnotation,
   data.table,
+  BiocGenerics,
+  GenomicRanges,
   Rcpp
 LinkingTo:
   Rcpp,
   BH,
   Rhtslib
 Suggests:
+  GenomeInfoDb,
+  SummarizedExperiment,
+  VariantAnnotation,
   RUnit,
   knitr,
   rmarkdown,
