@@ -217,4 +217,17 @@ test_generateVcfReport <- function () {
     sum(quality.report$SumAlt, na.rm=TRUE),
     4
   )
+  
+  libPaths <- .libPaths()
+  RUnit::checkException({
+    unloadNamespace("VariantAnnotation")
+    .libPaths(new="")
+    amplicon.report <- generateVcfReport(
+      bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
+      bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
+      vcf=system.file("extdata", "amplicon.vcf.gz", package="epialleleR"),
+      vcf.style="NCBI", verbose=FALSE
+    )
+  })
+  .libPaths(new=libPaths)
 }

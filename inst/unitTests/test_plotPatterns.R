@@ -34,4 +34,12 @@ test_plotPatterns <- function () {
   RUnit::checkTrue(
     inherits(gtable.patterns, "gtable")
   )
+  
+  libPaths <- .libPaths()
+  RUnit::checkException({
+    unloadNamespace("ggplot2")
+    .libPaths(new="")
+    plotPatterns(capture.patterns)
+  })
+  .libPaths(new=libPaths)
 }
