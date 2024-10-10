@@ -1,5 +1,5 @@
 ---
-title: "The epialleleR output values <img style=\"float: right;\" src=\"epialleleR_logo.svg\"> "
+title: "The epialleleR output values"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 abstract: |
   A comparison and visualisation of epialleleR output values for various input
