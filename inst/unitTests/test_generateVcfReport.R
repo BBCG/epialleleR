@@ -218,10 +218,9 @@ test_generateVcfReport <- function () {
     4
   )
   
-  libPaths <- .libPaths()
   RUnit::checkException({
+    base::requireNamespace <- function (package, ..., quietly=FALSE) FALSE
     unloadNamespace("VariantAnnotation")
-    .libPaths(new="")
     amplicon.report <- generateVcfReport(
       bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
       bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
@@ -229,5 +228,4 @@ test_generateVcfReport <- function () {
       vcf.style="NCBI", verbose=FALSE
     )
   })
-  .libPaths(new=libPaths)
 }
