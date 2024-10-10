@@ -258,7 +258,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         if: github.ref == 'refs/heads/devel' && env.run_covr == 'true' && runner.os == 'Linux'
         run: |
-          covr::codecov(coverage = covr::package_coverage(type = "all"))
+          covr::codecov(coverage = covr::package_coverage(type = "all", token = ${{ secrets.CODECOV_TOKEN }}))
         shell: Rscript {0}
 
       - name: Install package
