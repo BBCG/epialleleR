@@ -21,7 +21,7 @@
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/values.html">The epialleleR output values &lt;img style="float: right;" src="epialleleR_logo.svg"&gt; </a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/values.html">The epialleleR output values</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -236,7 +236,7 @@ beta values.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing lMHL report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.021s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.024s]</span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># lMHL report with a `max.haplotype.window` of 1 is identical to a</span></span></span>
 <span class="r-in"><span>  <span class="co"># conventional cytosine report (or nearly identical when sequencing errors</span></span></span>
@@ -245,16 +245,16 @@ beta values.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.014s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing lMHL report </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.023s]</span>
 <span class="r-in"><span>  <span class="va">cg.report</span>  <span class="op">&lt;-</span> <span class="fu"><a href="generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">capture.bam</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.014s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing cytosine report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.013s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.015s]</span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="va">mhl.report</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">rname</span>, <span class="va">strand</span>, <span class="va">pos</span>, <span class="va">context</span>, value<span class="op">=</span><span class="va">lmhl</span><span class="op">)</span><span class="op">]</span>,</span></span>
 <span class="r-in"><span>    <span class="va">cg.report</span><span class="op">[</span> , <span class="fu">.</span><span class="op">(</span><span class="va">rname</span>, <span class="va">strand</span>, <span class="va">pos</span>, <span class="va">context</span>, value<span class="op">=</span><span class="va">meth</span><span class="op">/</span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span></span>
