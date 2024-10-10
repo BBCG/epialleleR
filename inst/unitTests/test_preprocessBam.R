@@ -137,11 +137,11 @@ test_preprocessBam <- function () {
   )
  
   # internal coverage
-  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon000meth.bam", package="epialleleR"), 5, 5, TRUE, 0, 0, 1)
-  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon010meth.bam", package="epialleleR"), 5, 5, TRUE, 1, 1, 1)
-  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon100meth.bam", package="epialleleR"), 5, 5, TRUE, 2, 2, 1)
-  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "capture.bam", package="epialleleR"), 5, 5, TRUE, 4, 4, 1)
-  nil <- epialleleR:::rcpp_read_bam_mm_single(system.file("extdata", "amplicon100meth.bam", package="epialleleR"), 5, 5, -1, TRUE, TRUE, 4, 4, 1)
-  nil <- epialleleR:::rcpp_read_bam_mm_single(system.file("extdata", "capture.bam", package="epialleleR"), 5, 5, -1, TRUE, TRUE, 4, 4, 1)
+  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon000meth.bam", package="epialleleR"), 5, 5, 2820, 0, 0, 1)
+  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon010meth.bam", package="epialleleR"), 5, 5, 2820, 1, 1, 1)
+  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon100meth.bam", package="epialleleR"), 5, 5, 2820, 2, 2, 1)
+  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "capture.bam", package="epialleleR"), 5, 5, 2820, 4, 4, 1)
+  nil <- epialleleR:::rcpp_read_bam_mm_single(system.file("extdata", "amplicon100meth.bam", package="epialleleR"), 5, 5, -1, TRUE, 2820, 4, 4, 1)
+  nil <- epialleleR:::rcpp_read_bam_mm_single(system.file("extdata", "capture.bam", package="epialleleR"), 5, 5, -1, TRUE, 2820, 4, 4, 1)
 
 }
