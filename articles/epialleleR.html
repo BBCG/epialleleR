@@ -426,7 +426,7 @@ modifications</p>
 <span><span class="va">capture.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
 <span><span class="va">bam.data</span>    <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preprocessBam.html">preprocessBam</a></span><span class="op">(</span><span class="va">capture.bam</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
-<span><span class="co">#&gt; Reading paired-end BAM file [0.013s]</span></span>
+<span><span class="co">#&gt; Reading paired-end BAM file [0.015s]</span></span>
 <span></span>
 <span><span class="co"># Specifics of long-read alignment processing</span></span>
 <span><span class="va">out.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>pattern<span class="op">=</span><span class="st">"out-"</span>, fileext<span class="op">=</span><span class="st">".bam"</span><span class="op">)</span></span>
@@ -440,8 +440,8 @@ modifications</p>
 <span><span class="co">#&gt; [1] 1</span></span>
 <span><span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">out.bam</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span>, report.context<span class="op">=</span><span class="st">"CX"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking BAM file: long-read, single-end, unsorted alignment detected</span></span>
-<span><span class="co">#&gt; Reading single-end BAM file [0.001s]</span></span>
-<span><span class="co">#&gt; Preparing cytosine report [0.001s]</span></span>
+<span><span class="co">#&gt; Reading single-end BAM file [0.002s]</span></span>
+<span><span class="co">#&gt; Preparing cytosine report [0.000s]</span></span>
 <span><span class="co">#&gt;      rname strand   pos context  meth unmeth</span></span>
 <span><span class="co">#&gt;     &lt;fctr&gt; &lt;fctr&gt; &lt;int&gt;  &lt;fctr&gt; &lt;int&gt;  &lt;int&gt;</span></span>
 <span><span class="co">#&gt;  1:   chrS      +     2      CG     1      0</span></span>
@@ -472,12 +472,12 @@ follows:</p>
 <span></span>
 <span><span class="co"># sample reference genome</span></span>
 <span><span class="va">genome</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preprocessGenome.html">preprocessGenome</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"test"</span>, <span class="st">"reference.fasta.gz"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Reading reference genome file [0.001s]</span></span>
+<span><span class="co">#&gt; Reading reference genome file [0.000s]</span></span>
 <span></span>
 <span><span class="co"># calls cytosine methylation and stores it in the output BAM</span></span>
 <span><span class="co"># Input BAM has 100 records of which 73 are mapped to the genome</span></span>
 <span><span class="fu"><a href="../reference/callMethylation.html">callMethylation</a></span><span class="op">(</span><span class="va">input.bam</span>, <span class="va">output.bam</span>, <span class="va">genome</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Making methylation calls [0.022s]</span></span>
+<span><span class="co">#&gt; Making methylation calls [0.021s]</span></span>
 <span><span class="co">#&gt; $nrecs</span></span>
 <span><span class="co">#&gt; [1] 100</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -529,7 +529,7 @@ methylated, will be effectively treated as unmethylated ones.</p>
 <span></span>
 <span><span class="co"># CpG cytosine report</span></span>
 <span><span class="va">cg.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Preparing cytosine report [0.014s]</span></span>
+<span><span class="co">#&gt; Preparing cytosine report [0.013s]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cg.report</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span>, decreasing<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     rname strand      pos context  meth unmeth</span></span>
 <span><span class="co">#&gt;    &lt;fctr&gt; &lt;fctr&gt;    &lt;int&gt;  &lt;fctr&gt; &lt;int&gt;  &lt;int&gt;</span></span>
@@ -577,11 +577,11 @@ well as two of its aliases, <em><code>generateAmpliconReport</code></em>
 <span>  bam<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon010meth.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span>,</span>
 <span>  bed<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"amplicon.bed"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Reading BED file [0.033s]</span></span>
+<span><span class="co">#&gt; Reading BED file [0.032s]</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
-<span><span class="co">#&gt; Reading paired-end BAM file [0.005s]</span></span>
-<span><span class="co">#&gt; Thresholding reads [0.000s]</span></span>
-<span><span class="co">#&gt; Preparing amplicon report [0.038s]</span></span>
+<span><span class="co">#&gt; Reading paired-end BAM file [0.004s]</span></span>
+<span><span class="co">#&gt; Thresholding reads [0.001s]</span></span>
+<span><span class="co">#&gt; Preparing amplicon report [0.039s]</span></span>
 <span><span class="va">amplicon.report</span></span>
 <span><span class="co">#&gt;    seqnames    start      end width strand amplicon nreads+ nreads-        VEF</span></span>
 <span><span class="co">#&gt;      &lt;fctr&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt; &lt;fctr&gt;   &lt;char&gt;   &lt;int&gt;   &lt;int&gt;      &lt;num&gt;</span></span>
@@ -599,9 +599,9 @@ well as two of its aliases, <em><code>generateAmpliconReport</code></em>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Reading BED file [0.008s]</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
-<span><span class="co">#&gt; Reading paired-end BAM file [0.012s]</span></span>
+<span><span class="co">#&gt; Reading paired-end BAM file [0.011s]</span></span>
 <span><span class="co">#&gt; Thresholding reads [0.001s]</span></span>
-<span><span class="co">#&gt; Preparing capture report [0.019s]</span></span>
+<span><span class="co">#&gt; Preparing capture report [0.016s]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">capture.report</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    seqnames    start      end width strand     V4 nreads+ nreads-       VEF</span></span>
 <span><span class="co">#&gt;      &lt;fctr&gt;    &lt;int&gt;    &lt;int&gt; &lt;int&gt; &lt;fctr&gt; &lt;char&gt;   &lt;int&gt;   &lt;int&gt;     &lt;num&gt;</span></span>
@@ -622,7 +622,7 @@ well as two of its aliases, <em><code>generateAmpliconReport</code></em>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
 <span><span class="co">#&gt; Reading paired-end BAM file [0.012s]</span></span>
 <span><span class="co">#&gt; Thresholding reads [0.001s]</span></span>
-<span><span class="co">#&gt; Preparing capture report [0.016s]</span></span>
+<span><span class="co">#&gt; Preparing capture report [0.020s]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">capture.report</span>, <span class="va">bed.report</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>
@@ -651,7 +651,7 @@ the <code>values</code> vignette.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
 <span><span class="co">#&gt; Reading paired-end BAM file [0.012s]</span></span>
-<span><span class="co">#&gt; Preparing lMHL report [0.023s]</span></span></code></pre></div>
+<span><span class="co">#&gt; Preparing lMHL report [0.021s]</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="exploring-dna-methylation-patterns">Exploring DNA methylation patterns<a class="anchor" aria-label="anchor" href="#exploring-dna-methylation-patterns"></a>
@@ -670,7 +670,7 @@ this, <em><code>epialleleR</code></em> provides methods
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
 <span><span class="co">#&gt; Reading paired-end BAM file [0.005s]</span></span>
-<span><span class="co">#&gt; Extracting methylation patterns [0.025s]</span></span>
+<span><span class="co">#&gt; Extracting methylation patterns [0.021s]</span></span>
 <span></span>
 <span><span class="co"># that many read pairs overlap genomic region of interest</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">patterns</span><span class="op">)</span></span>
@@ -742,7 +742,7 @@ is 13) to obtain results of a higher quality.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required namespace: VariantAnnotation</span></span>
 <span><span class="co">#&gt; Reading BED file [0.025s]</span></span>
-<span><span class="co">#&gt; Reading VCF file [1.151s]</span></span>
+<span><span class="co">#&gt; Reading VCF file [1.022s]</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
 <span><span class="co">#&gt; Reading paired-end BAM file [0.004s]</span></span>
 <span><span class="co">#&gt; Thresholding reads [0.000s]</span></span>
@@ -855,8 +855,8 @@ observed 1-eCDF(0.5) ≈ 0.1</li>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Reading BED file [0.008s]</span></span>
 <span><span class="co">#&gt; Checking BAM file: short-read, paired-end, name-sorted alignment detected</span></span>
-<span><span class="co">#&gt; Reading paired-end BAM file [0.005s]</span></span>
-<span><span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.007s]</span></span>
+<span><span class="co">#&gt; Reading paired-end BAM file [0.004s]</span></span>
+<span><span class="co">#&gt; Computing ECDFs for within- and out-of-context per-read beta values [0.008s]</span></span>
 <span></span>
 <span><span class="co"># there are 5 items in amplicon.ecdfs, let's plot all of them</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">amplicon.ecdfs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
