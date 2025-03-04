@@ -184,7 +184,7 @@ generateVcfReport <- function (bam,
   threshold.context <- match.arg(threshold.context, threshold.context)
   
   reqd.ns <- c("VariantAnnotation", "SummarizedExperiment", "GenomeInfoDb")
-  if (!all(sapply(reqd.ns, requireNamespace)))
+  if (!all(sapply(reqd.ns, requireNamespace)) | exists(x="is.test.environment"))
     stop(paste(reqd.ns, collapse=", "), " are required here. Please install")
   
   if (!any(methods::is(vcf, "CollapsedVCF"), methods::is(vcf, "ExpandedVCF"))) {

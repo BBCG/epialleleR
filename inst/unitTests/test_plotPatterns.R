@@ -35,9 +35,14 @@ test_plotPatterns <- function () {
     inherits(gtable.patterns, "gtable")
   )
   
-  RUnit::checkException({
-    base::requireNamespace <- function (package, ..., quietly=FALSE) FALSE
-    unloadNamespace("ggplot2")
-    plotPatterns(capture.patterns)
-  })
+  ### if suggested library is not available
+  test.env <- new.env()
+  assign(x="is.test.environment", value=TRUE, envir=test.env)
+  test.func <- function(f, env, ...) {
+    environment(f) <- env
+    f(...)
+  }
+  RUnit::checkException(
+    test.func(f=plotPatterns, env=test.env, patterns=capture.patterns)
+  )
 }

@@ -218,14 +218,18 @@ test_generateVcfReport <- function () {
     4
   )
   
-  RUnit::checkException({
-    base::requireNamespace <- function (package, ..., quietly=FALSE) FALSE
-    unloadNamespace("VariantAnnotation")
-    amplicon.report <- generateVcfReport(
-      bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
-      bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
-      vcf=system.file("extdata", "amplicon.vcf.gz", package="epialleleR"),
-      vcf.style="NCBI", verbose=FALSE
-    )
-  })
+  ### if suggested library is not available
+  test.env <- new.env()
+  assign(x="is.test.environment", value=TRUE, envir=test.env)
+  test.func <- function(f, env, ...) {
+    environment(f) <- env
+    f(...)
+  }
+  RUnit::checkException(
+    test.func(f=generateVcfReport, env=test.env,
+              bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
+              bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
+              vcf=system.file("extdata", "amplicon.vcf.gz", package="epialleleR"),
+              vcf.style="NCBI", verbose=FALSE)
+  )
 }
