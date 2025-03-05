@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">epialleleR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.15.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.15.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -108,7 +108,7 @@ code</a> of this vignette online.</p>
 <span>  <span class="op">)</span>,</span>
 <span>  XG<span class="op">=</span><span class="st">"CT"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Writing sample BAM [0.144s]</span></span>
+<span><span class="co">#&gt; Writing sample BAM [0.137s]</span></span>
 <span><span class="co">#&gt; [1] 1000</span></span>
 <span><span class="fu">plotMetrics</span><span class="op">(</span><span class="va">out.bam</span>, <span class="fu">as</span><span class="op">(</span><span class="st">"chrS:1-10"</span>, <span class="st">"GRanges"</span><span class="op">)</span>, <span class="fl">0</span>, title<span class="op">=</span><span class="st">"no epimutations"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="values_files/figure-html/unnamed-chunk-3-1.png" width="100%" height="100%"></p>
@@ -126,7 +126,7 @@ code</a> of this vignette online.</p>
 <span>  <span class="op">)</span>,</span>
 <span>  XG<span class="op">=</span><span class="st">"CT"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Writing sample BAM [0.099s]</span></span>
+<span><span class="co">#&gt; Writing sample BAM [0.098s]</span></span>
 <span><span class="co">#&gt; [1] 1000</span></span>
 <span><span class="fu">plotMetrics</span><span class="op">(</span><span class="va">out.bam</span>, <span class="fu">as</span><span class="op">(</span><span class="st">"chrS:1-10"</span>, <span class="st">"GRanges"</span><span class="op">)</span>, title<span class="op">=</span><span class="st">"one complete epimutation"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="values_files/figure-html/unnamed-chunk-3-2.png" width="100%" height="100%"></p>
@@ -162,7 +162,7 @@ code</a> of this vignette online.</p>
 <span>  <span class="op">)</span>,</span>
 <span>  XG<span class="op">=</span><span class="st">"CT"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Writing sample BAM [0.104s]</span></span>
+<span><span class="co">#&gt; Writing sample BAM [0.102s]</span></span>
 <span><span class="co">#&gt; [1] 1000</span></span>
 <span><span class="fu">plotMetrics</span><span class="op">(</span><span class="va">out.bam</span>, <span class="fu">as</span><span class="op">(</span><span class="st">"chrS:1-10"</span>, <span class="st">"GRanges"</span><span class="op">)</span>, title<span class="op">=</span><span class="st">"another partial epimutation"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="values_files/figure-html/unnamed-chunk-3-4.png" width="100%" height="100%"></p>
@@ -183,7 +183,7 @@ code</a> of this vignette online.</p>
 <span>  <span class="op">)</span>,</span>
 <span>  XG<span class="op">=</span><span class="st">"CT"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Writing sample BAM [0.107s]</span></span>
+<span><span class="co">#&gt; Writing sample BAM [0.105s]</span></span>
 <span><span class="co">#&gt; [1] 1009</span></span>
 <span><span class="fu">plotMetrics</span><span class="op">(</span><span class="va">out.bam</span>, <span class="fu">as</span><span class="op">(</span><span class="st">"chrS:1-10"</span>, <span class="st">"GRanges"</span><span class="op">)</span>, title<span class="op">=</span><span class="st">"several partial epimutations"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="values_files/figure-html/unnamed-chunk-3-5.png" width="100%" height="100%"></p>
@@ -204,7 +204,7 @@ code</a> of this vignette online.</p>
 <span>  <span class="op">)</span>,</span>
 <span>  XG<span class="op">=</span><span class="st">"CT"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Writing sample BAM [0.106s]</span></span>
+<span><span class="co">#&gt; Writing sample BAM [0.104s]</span></span>
 <span><span class="co">#&gt; [1] 1009</span></span>
 <span><span class="fu">plotMetrics</span><span class="op">(</span><span class="va">out.bam</span>, <span class="fu">as</span><span class="op">(</span><span class="st">"chrS:1-10"</span>, <span class="st">"GRanges"</span><span class="op">)</span>, title<span class="op">=</span><span class="st">"several short partial epimutations"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="values_files/figure-html/unnamed-chunk-3-6.png" width="100%" height="100%"></p>
@@ -299,7 +299,7 @@ code</a> of this vignette online.</p>
 <span>  XM<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="kw">function</span> <span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">-</span><span class="va">probs</span>, <span class="va">getXM</span><span class="op">)</span>, collapse<span class="op">=</span><span class="st">""</span><span class="op">)</span><span class="op">}</span><span class="op">)</span>,</span>
 <span>  XG<span class="op">=</span><span class="st">"CT"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Writing sample BAM [0.010s]</span></span>
+<span><span class="co">#&gt; Writing sample BAM [0.011s]</span></span>
 <span><span class="co">#&gt; [1] 10</span></span>
 <span><span class="fu">plotMetrics</span><span class="op">(</span><span class="va">out.bam</span>, <span class="fu">as</span><span class="op">(</span><span class="st">"chrS:1-1000"</span>, <span class="st">"GRanges"</span><span class="op">)</span>, title<span class="op">=</span><span class="st">"long-read sequencing, high methylation"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="values_files/figure-html/unnamed-chunk-3-15.png" width="100%" height="100%"></p>
@@ -329,7 +329,7 @@ code</a> of this vignette online.</p>
 <span><span class="co">#&gt; [1] stats4    stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] epialleleR_1.15.2    ggplot2_3.5.1        GenomicRanges_1.59.1 GenomeInfoDb_1.43.4 </span></span>
+<span><span class="co">#&gt; [1] epialleleR_1.15.3    ggplot2_3.5.1        GenomicRanges_1.59.1 GenomeInfoDb_1.43.4 </span></span>
 <span><span class="co">#&gt; [5] IRanges_2.41.3       S4Vectors_0.45.4     BiocGenerics_0.53.6  generics_0.1.3      </span></span>
 <span><span class="co">#&gt; [9] data.table_1.17.0   </span></span>
 <span><span class="co">#&gt; </span></span>
