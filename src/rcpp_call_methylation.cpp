@@ -132,8 +132,7 @@ Rcpp::List rcpp_call_methylation_genome (std::string in_fn,                     
         case BAM_CPAD :                                                         // 'P', 6
         case BAM_CBACK :
           break;
-        default :
-          Rcpp::stop("Unknown CIGAR operation for BAM entry %s", bam_get_qname(in_rec)); // unknown CIGAR operation
+        default : Rcpp::stop("Unknown CIGAR operation for BAM entry %s", bam_get_qname(in_rec)); // unknown CIGAR operation
         }
       }
       rs[0] = in_rec->core.pos>=2 ? refseq[-2] : 'N';                           // -2 base of reference sequence in front of query
