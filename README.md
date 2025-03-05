@@ -160,6 +160,8 @@ Per Eystein Lonning, Oleksii Nikolaienko, Kathy Pan, Allison W. Kurian, Hans Pet
 Oleksii Nikolaienko, Hans P. Eikesdal, Elisabet Ognedal, Bjørnar Gilje, Steinar Lundgren, Egil S. Blix, Helge Espelid, Jürgen Geisler, Stephanie Geisler, Emiel A.M. Janssen, Synnøve Yndestad, Laura Minsaas, Beryl Leirvaag, Reidun Lillestøl, Stian Knappskog, Per E. Lønning. Prenatal *BRCA1* epimutations contribute significantly to triple-negative breast cancer development. *Genome Medicine* 2023. [https://doi.org/10.1186/s13073-023-01262-8](https://doi.org/10.1186/s13073-023-01262-8).
 Data: [GSE243966](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE243966)
 
+Oleksii Nikolaienko, Garnet L Anderson, Rowan T Chlebowski, Su Yon Jung, Holly R Harris, Stian Knappskog, and Per E Lønning. *MGMT* epimutations and risk of incident cancer of the colon, glioblastoma multiforme, and diffuse large B-cell lymphomas. *Clinical Epigenetics* 2025. [https://doi.org/10.1186/s13148-025-01835-x](https://doi.org/10.1186/s13148-025-01835-x)
+
 ### *`epialleleR`* at Bioconductor
 [release](https://bioconductor.org/packages/release/bioc/html/epialleleR.html), 
 [development version](https://bioconductor.org/packages/devel/bioc/html/epialleleR.html)

@@ -99,6 +99,7 @@ Changes in version 1.13.4 (2024-10-10)
 Changes in version 1.15.1 (2024-11-16)
 + can override alignment endness when loading BAM
 
-Changes in version 1.15.2 (2025-03-04)
+Changes in version 1.15.3 (2025-03-05)
 + test coverage for namespaces
++ new ref
 
