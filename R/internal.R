@@ -619,7 +619,7 @@ utils::globalVariables(
                            vapply(as.character(vcf.ranges$ALT),
                                   nchar,
                                   FUN.VALUE=numeric(1), USE.NAMES=FALSE)==1]
-  # GenomeInfoDb::seqlevels(vcf.ranges, pruning.mode="coarse") <-
+  # Seqinfo::seqlevels(vcf.ranges, pruning.mode="coarse") <-
   #   levels(bam.processed$rname)
   vcf.dt <- data.table::as.data.table(vcf.ranges)
   vcf.dt[, seqnames := factor(seqnames, levels=levels(bam.processed$rname))]
