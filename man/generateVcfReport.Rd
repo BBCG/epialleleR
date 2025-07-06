@@ -42,7 +42,7 @@ to the VCF file location and `bed` is not NULL. Possible values:
 }}
 
 \item{bed}{Browser Extensible Data (BED) file location string OR object of
-class \code{\linkS4class{GRanges}} holding genomic coordinates for
+class \code{\link[GenomicRanges]{GRanges}} holding genomic coordinates for
 regions of interest. It is used to include only the specific genomic ranges
 when the VCF file is loaded. This option has no effect when VCF object is
 supplied as a `vcf` parameter. The style of seqlevels of BED file/object

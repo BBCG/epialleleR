@@ -6,8 +6,8 @@
 #'
 #' @details
 #' The function matches reads (for paired-end sequencing alignment files - read
-#' pairs as a single entity) to the genomic
-#' region provided in a BED file/\code{\linkS4class{GRanges}} object, extracts
+#' pairs as a single entity) to the genomic region provided
+#' in a BED file/\code{\link[GenomicRanges]{GRanges}} object, extracts
 #' methylation statuses of bases within those reads, and returns a data frame
 #' which can be used for further analysis and/or plotting of DNA methylation
 #' patterns by \code{\link[epialleleR]{plotPatterns}} function.
@@ -16,7 +16,7 @@
 #' \code{\link[epialleleR]{preprocessBam}} function. Read more about BAM file
 #' requirements and BAM preprocessing at \code{\link{preprocessBam}}.
 #' @param bed Browser Extensible Data (BED) file location string OR object of
-#' class \code{\linkS4class{GRanges}} holding genomic coordinates for
+#' class \code{\link[GenomicRanges]{GRanges}} holding genomic coordinates for
 #' regions of interest. It is used to match sequencing reads to the genomic
 #' regions for pattern extraction. The style of seqlevels of BED file/object
 #' must match the style of seqlevels of the BAM file/object used. The 

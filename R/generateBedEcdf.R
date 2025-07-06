@@ -6,8 +6,8 @@
 #'
 #' @details
 #' The function matches reads (for paired-end sequencing alignment files - read
-#' pairs as a single entity) to the genomic
-#' regions provided in a BED file/\code{\linkS4class{GRanges}} object, computes
+#' pairs as a single entity) to the genomic regions provided
+#' in a BED file/\code{\link[GenomicRanges]{GRanges}} object, computes
 #' average per-read beta values according to the cytosine context parameter
 #' `ecdf.context`, and returns a list of eCDFs for within- and out-of-context
 #' average per-read beta values, which can be used for plotting.
@@ -21,7 +21,7 @@
 #' \code{\link[epialleleR]{preprocessBam}} function. Read more about BAM file
 #' requirements and BAM preprocessing at \code{\link{preprocessBam}}.
 #' @param bed Browser Extensible Data (BED) file location string OR object of
-#' class \code{\linkS4class{GRanges}} holding genomic coordinates for
+#' class \code{\link[GenomicRanges]{GRanges}} holding genomic coordinates for
 #' regions of interest. It is used to match sequencing reads to the genomic
 #' regions prior to eCDF computation. The style of seqlevels of BED file/object
 #' must match the style of seqlevels of the BAM file/object used.
