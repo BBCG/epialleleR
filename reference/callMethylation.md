@@ -1,0 +1,138 @@
+# callMethylation
+
+This function calls cytosine methylation and stores calls in BAM files.
+
+## Usage
+
+``` r
+callMethylation(
+  input.bam.file,
+  output.bam.file,
+  genome,
+  nthreads = 1,
+  verbose = TRUE
+)
+```
+
+## Arguments
+
+- input.bam.file:
+
+  input BAM file location string.
+
+- output.bam.file:
+
+  output BAM file location string.
+
+- genome:
+
+  reference (genomic) sequences file location string or an output of
+  [`preprocessGenome`](preprocessGenome.md).
+
+- nthreads:
+
+  non-negative integer for the number of additional HTSlib threads to be
+  used during file decompression (default: 1).
+
+- verbose:
+
+  boolean to report progress and timings (default: TRUE).
+
+## Value
+
+list object with simple statistics of processed ("nrecs") records and
+calls made ("ncalled"). Even though "ncalled" can be less than "nrecs"
+(e.g., because not all reads are mapped), all records from the input BAM
+are written to the output BAM.
+
+## Details
+
+The function makes cytosine methylation calls for short-read methylation
+(bisulfite/enzymatic) sequencing alignments from input BAM file and
+writes them in the XM tag of the output BAM file. Calls are made on the
+basis of reference (e.g., genomic) sequence and observed sequence and
+cytosine context of reads. Data reading/processing is done by means of
+HTSlib, therefore it is possible to significantly (\>5x) speed up the
+calling using several (4-8) HTSlib decompression threads.
+
+Methylation calling with this function is only possible for sequencing
+data obtained using either bisulfite or other similar sequencing method
+(enzymatic methylation sequencing). Cytosine methylation in long-read,
+native DNA sequencing alignments should be called using other,
+appropriate tools.
+
+It is a requirement that the genomic strand the read was aligned to is
+known. This information is typically stored in XG tag of
+Bismark/Illumina BAM files, or in YD tag of BWA-meth alignment files, or
+in ZS tag of BSMAP alignment files. \`epialleleR\` is aware of that and
+will use the whichever tag is available.
+
+The sequence context of cytosines (h/H for "CHH", x/X for "CHG", z/Z for
+"CG") is determined based on the actual (observed) sequence of the read.
+E.g., if read "ACGT" was aligned to the forward strand of reference
+sequence "ACaaGT" with the CIGAR string "2M2D2M" (2 bases match, 2
+reference bases are deleted, 2 bases match), then methylation call
+string will be ".Z.." (in contrast to the reference's one of ".H....").
+This makes cytosine calls nearly identical to ones produced by Bismark
+Bisulfite Read Mapper and Methylation Caller or Illumina DRAGEN Bio IT
+Platform, however with one important distinction: \`epialleleR\` reports
+sequence context of cytosines followed by unknown bases ("CNN") as "H.."
+instead of "U.." (unknown; as for example Illumina DRAGEN Bio IT
+Platform does). Similarly, forward strand context of "CNG" is reported
+as "X..", forward strand context of "CGN" -\> "Z..", reverse strand
+context of "NNG" -\> "..H", reverse strand context of "CNG" -\> "..X",
+reverse strand context of "NCG" -\> "..Z". Both lowercase and uppercase
+ACGTN symbols in reference sequence are allowed and correctly
+recognised, however all the other symbols (e.g., extended IUPAC symbols,
+MRSVWYHKDB) within sequences are converted to N.
+
+As a reference sequence, the function expects either location of
+(preferably \`bgzip\`ped) FASTA file or an object obtained by
+[`preprocessGenome`](preprocessGenome.md). The latter is recommended if
+methylation calling is to be performed on multiple BAM files.
+
+The alignment records of the output BAM file will contain additional XM
+tag with the methylation call string for every mapped read which did not
+have XM tag available. Besides that, XG tag with reference sequence
+strand ("CT" or "GA") is added to such reads in case it wasn't present.
+
+Please note that for the purpose of methylation calling, the very same
+reference genome must be used for both alignment (when BAM is produced)
+and calling cytosine methylation by `callMethylation` method. Exception
+is thrown if reference sequence header of BAM file doesn't match
+reference sequence data provided (this matching is performed on the
+basis of names and lengths of reference sequences).
+
+## See also
+
+[`preprocessGenome`](preprocessGenome.md) for preloading reference
+sequences and \`epialleleR\` vignettes for the description of usage and
+sample data.
+
+[Bismark](https://www.bioinformatics.babraham.ac.uk/projects/bismark/)
+Bisulfite Read Mapper and Methylation Caller,
+[bwa-meth](https://arxiv.org/abs/1401.1129) for fast and accurate
+alignment of long bisulfite-seq reads,
+[BSMAP](https://doi.org/10.1186/1471-2105-10-232): whole genome
+bisulfite sequence MAPping program, or info on [Illumina DRAGEN Bio IT
+Platform](https://support-docs.illumina.com/SW/dragen_v42/Content/SW/DRAGEN/MPipelineMeth_fDG.htm).
+
+## Examples
+
+``` r
+  callMethylation(
+    input.bam.file=system.file("extdata", "test", "dragen-se-unsort-xg.bam", package="epialleleR"),
+    output.bam.file=tempfile(pattern="output-", fileext=".bam"),
+    genome=system.file("extdata", "test", "reference.fasta.gz", package="epialleleR")
+  )
+#> Reading reference genome file 
+#> [0.000s]
+#> Making methylation calls 
+#> [0.021s]
+#> $nrecs
+#> [1] 100
+#> 
+#> $ncalled
+#> [1] 100
+#> 
+```
