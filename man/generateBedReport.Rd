@@ -12,11 +12,12 @@ generateAmpliconReport(
   report.file = NULL,
   zero.based.bed = FALSE,
   match.tolerance = 1,
+  cytosine.context = c("CG", "CHG", "CHH", "CxG", "CX"),
+  filter.reads = TRUE,
+  max.outofcontext.beta = 0.1,
   threshold.reads = TRUE,
-  threshold.context = c("CG", "CHG", "CHH", "CxG", "CX"),
   min.context.sites = 2,
   min.context.beta = 0.5,
-  max.outofcontext.beta = 0.1,
   ...,
   gzip = FALSE,
   verbose = TRUE
@@ -28,11 +29,12 @@ generateCaptureReport(
   report.file = NULL,
   zero.based.bed = FALSE,
   match.min.overlap = 1,
+  cytosine.context = c("CG", "CHG", "CHH", "CxG", "CX"),
+  filter.reads = TRUE,
+  max.outofcontext.beta = 0.1,
   threshold.reads = TRUE,
-  threshold.context = c("CG", "CHG", "CHH", "CxG", "CX"),
   min.context.sites = 2,
   min.context.beta = 0.5,
-  max.outofcontext.beta = 0.1,
   ...,
   gzip = FALSE,
   verbose = TRUE
@@ -46,11 +48,12 @@ generateBedReport(
   bed.type = c("amplicon", "capture"),
   match.tolerance = 1,
   match.min.overlap = 1,
+  cytosine.context = c("CG", "CHG", "CHH", "CxG", "CX"),
+  filter.reads = TRUE,
+  max.outofcontext.beta = 0.1,
   threshold.reads = TRUE,
-  threshold.context = c("CG", "CHG", "CHH", "CxG", "CX"),
   min.context.sites = 2,
   min.context.beta = 0.5,
-  max.outofcontext.beta = 0.1,
   ...,
   gzip = FALSE,
   verbose = TRUE
@@ -80,6 +83,28 @@ pairs) matching both strands are separately counted and reported.}
 BED \code{\link[GenomicRanges]{GRanges}} start or end positions during
 matching of amplicon-based NGS reads (default: 1).}
 
+\item{cytosine.context}{string defining cytosine methylation context used
+for filtering and/or thresholding the reads:
+\itemize{
+  \item "CG" (the default) -- within-the-context: CpG cytosines (called as
+  zZ), out-of-context: all the other cytosines (hHxX)
+  \item "CHG" -- within-the-context: CHG cytosines (xX), out-of-context: hHzZ
+  \item "CHH" -- within-the-context: CHH cytosines (hH), out-of-context: xXzZ
+  \item "CxG" -- within-the-context: CG and CHG cytosines (zZxX),
+  out-of-context: CHH cytosines (hH)
+  \item "CX" -- all cytosines are considered within-the-context, this
+  effectively results in no thresholding
+}}
+
+\item{filter.reads}{boolean defining if sequence reads with too high
+out-of-context cytosine methylation should be filtered out (e.g.,
+reads resulting from incompletely bisulfite-converted templates).}
+
+\item{max.outofcontext.beta}{real number in the range [0;1] (default: 0.1).
+Reads with average beta value for out-of-context cytosines \strong{above}
+this threshold will not be thresholded and will be ignored in further
+computations. This option has no effect when read filtering is disabled.}
+
 \item{threshold.reads}{boolean defining if sequence reads should be
 thresholded before counting reads belonging to variant epialleles (default:
 TRUE). Disabling thresholding is possible but makes no sense in the context
@@ -90,22 +115,8 @@ confusion). As thresholding is \strong{not} recommended for long-read
 sequencing data, this function is \strong{not} recommended for such data
 either.}
 
-\item{threshold.context}{string defining cytosine methylation context used
-for thresholding the reads:
-\itemize{
-  \item "CG" (the default) -- within-the-context: CpG cytosines (called as
-  zZ), out-of-context: all the other cytosines (hHxX)
-  \item "CHG" -- within-the-context: CHG cytosines (xX), out-of-context: hHzZ
-  \item "CHH" -- within-the-context: CHH cytosines (hH), out-of-context: xXzZ
-  \item "CxG" -- within-the-context: CG and CHG cytosines (zZxX),
-  out-of-context: CHH cytosines (hH)
-  \item "CX" -- all cytosines are considered within-the-context, this
-  effectively results in no thresholding
-}
-This option has no effect when read thresholding is disabled.}
-
 \item{min.context.sites}{non-negative integer for minimum number of cytosines
-within the `threshold.context` (default: 2). Reads containing \strong{fewer}
+within the `cytosine.context` (default: 2). Reads containing \strong{fewer}
 within-the-context cytosines are considered completely unmethylated (thus
 belonging to the reference epiallele). This option has no effect when read
 thresholding is disabled.}
@@ -113,12 +124,6 @@ thresholding is disabled.}
 \item{min.context.beta}{real number in the range [0;1] (default: 0.5). Reads
 with average beta value for within-the-context cytosines \strong{below} this
 threshold are considered completely unmethylated (thus belonging to the
-reference epiallele). This option has no effect when read thresholding is
-disabled.}
-
-\item{max.outofcontext.beta}{real number in the range [0;1] (default: 0.1).
-Reads with average beta value for out-of-context cytosines \strong{above}
-this threshold are considered completely unmethylated (thus belonging to the
 reference epiallele). This option has no effect when read thresholding is
 disabled.}
 
@@ -168,15 +173,21 @@ The report columns are:
   \item strand -- strand
   \item ... -- other columns that were present in BED or metadata columns of
   \code{\link[GenomicRanges]{GRanges}} object 
-  \item nreads+ -- number of reads (pairs) mapped to the forward ("+") strand
-  \item nreads- -- number of reads (pairs) mapped to the reverse ("-") strand
-  \item VEF -- frequency of reads passing the threshold
+  \item nreads+ -- number of valid reads (pairs) mapped to the forward ("+")
+  strand
+  \item nreads- -- number of valid reads (pairs) mapped to the reverse ("-")
+  strand
+  \item nfiltered -- number of invalid reads (pairs) filtered out due to
+  too high out-of-context cytosine methylation
+  (`NA` if filtering was disabled)
+  \item VEF -- fraction of valid reads passing the threshold
+  (`NA` if thresholding was disabled)
 }
 }
 \description{
 `generateBedReport`, `generateAmpliconReport`, `generateCaptureReport` --
 these functions match BAM reads to the set of genomic locations and return
-the fraction of reads with an average methylation level passing an arbitrary
+the fraction of reads with an average methylation level passing certain
 threshold.
 }
 \details{
@@ -190,33 +201,35 @@ bed.type="amplicon") or minimum overlap (`generateCaptureReport` or
 used for amplicon-based NGS data, while the latter -- for the capture-based
 NGS data. The function's logic is explained below.
 
-Let's suppose we have a BAM file with four reads, all mapped to the "+"
+Suppose there is a BAM file with four reads, all mapped to the "+"
 strand of chromosome 1, positions 1-16. The genomic range is supplied as a
 parameter `bed = as("chr1:1-100", "GRanges")`. Assuming the default values
-for the thresholding parameters (threshold.reads = TRUE,
-threshold.context = "CG", min.context.sites = 2, min.context.beta = 0.5,
-max.outofcontext.beta = 0.1), the input and results will look as following:
+for the filtering and thresholding parameters (cytosine.context = "CG",
+filter.reads = TRUE, max.outofcontext.beta = 0.1,
+threshold.reads = TRUE, min.context.sites = 2, min.context.beta = 0.5),
+the input and the output results will look as follows:
 
-\tabular{lll}{
-  methylation string \tab threshold \tab explained \cr
-  ...Z..x+.h..x..h. \tab below \tab min.context.sites < 2 (only one zZ base) \cr
-  ...Z..z.h..x..h.  \tab above \tab pass all criteria \cr
-  ...Z..z.h..X..h.  \tab below \tab max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) \cr
-  ...Z..z.h..z-.h.  \tab below \tab min.context.beta < 0.5 (1Z / 3zZ = 0.33)
+\tabular{llll}{
+  methylation string \tab filter \tab threshold \tab explained \cr
+  ...Z..x+.h..x..h. \tab included \tab below \tab min.context.sites < 2 (only one zZ base) \cr
+  ...Z..z.h..x..h.  \tab included \tab above \tab pass all criteria \cr
+  ...Z..z.h..X..h.  \tab excluded \tab <NA> \tab max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) \cr
+  ...Z..z.h..z-.h.  \tab included \tab below \tab min.context.beta < 0.5 (1Z / 3zZ = 0.33)
 }
 
-Only the second read will satisfy all of the thresholding criteria, leading
-to the following BED report (given that all reads map to chr1:+:1-16):
+Since the read number three is filtered out, and only the second read will
+satisfy all of the thresholding criteria, the following BED report will be 
+produced (again, given that all reads map to chr1:+:1-16):
 
-\tabular{llllllll}{
-  seqnames \tab start \tab end \tab width \tab strand \tab nreads+ \tab nreads- \tab VEF \cr
-  chr1 \tab 1 \tab 100 \tab 100 \tab * \tab 4 \tab 0 \tab 0.25
+\tabular{lllllllll}{
+  seqnames \tab start \tab end \tab width \tab strand \tab nreads+ \tab nreads- \tab nfiltered \tab VEF \cr
+  chr1 \tab 1 \tab 100 \tab 100 \tab * \tab 3 \tab 0 \tab 1 \tab 0.3333
 }
 
 Please note, that read thresholding by an average methylation level
 (as explained above) makes little sense for long-read sequencing alignments,
 as such reads can cover multiple regions with very different DNA methylation
-properties. Instead, please use \code{\link{extractPatterns}}, limiting
+properties. Instead, one should use \code{\link{extractPatterns}}, limiting
 pattern output to the region of interest only.
 }
 \examples{

@@ -61,7 +61,19 @@ rcpp_simulate_bam <- function(header, fields, i_tags, f_tags, s_tags, a_tags, a_
     .Call(`_epialleleR_rcpp_simulate_bam`, header, fields, i_tags, f_tags, s_tags, a_tags, a_types, out_fn)
 }
 
+rcpp_allowall_reads <- function(df, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac) {
+    .Call(`_epialleleR_rcpp_allowall_reads`, df, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac)
+}
+
+rcpp_filter_reads <- function(df, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac) {
+    .Call(`_epialleleR_rcpp_filter_reads`, df, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac)
+}
+
 rcpp_threshold_reads <- function(df, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac) {
     .Call(`_epialleleR_rcpp_threshold_reads`, df, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac)
+}
+
+rcpp_filter_threshold_reads <- function(df, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac) {
+    .Call(`_epialleleR_rcpp_filter_threshold_reads`, df, ctx_meth, ctx_unmeth, ooctx_meth, ooctx_unmeth, min_n_ctx, min_ctx_meth_frac, max_ooctx_meth_frac)
 }
 
