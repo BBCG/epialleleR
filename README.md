@@ -42,7 +42,8 @@ an input. See below for additional functionality.
  * disrupting API changes in `generate*Report` (from version 1.19.1 onwards):
  new parameter `filter.reads` regulates filtering of reads with
  presumable incomplete conversion of cytosines;
- `cytosine.context` parameter instead of `threshold.context`/`haplotype.context`
+ `cytosine.context` parameter instead of
+ `threshold.context`/`haplotype.context`.
  * disrupting change in thresholding logic (from version 1.19.1 onwards):
  reads with out-of-context cytosine methylation higher than
  `max.outofcontext.beta` are filtered out (discarded) instead of being counted
