@@ -32,7 +32,7 @@ for example the most common molecular lesion in cancer cell.[^1] Multiple
 studies suggest that alterations in DNA methylation, despite occurring at a low
 mosaic level, may confer increased risk of cancer later in life.[^2]
 
-The cytosine methylation levels within relatively small regions of the human
+Cytosine methylation levels within relatively narrow regions of the human
 genome are thought to be often concordant, resulting in a limited number of
 distinct methylation patterns of short sequencing reads.[^3] Due to the
 cell-to-cell variations in methylation, DNA purified from tissue samples
@@ -235,7 +235,8 @@ simulateBam(output.bam.file=bam.file, XM=c("ZZzZZ", "zzZzz"), XG="CT")
 ```
 
 Check *`simulateBam`* method help page for more information on parameters and
-their default values.
+their default values. More examples that use *`simulateBam`* can also be found
+in help pages for `generate\*Report` functions.
 
 *****
 
@@ -395,13 +396,11 @@ by default: **methylated** cytosines from reads that do **not** pass the
 threshold (**hypo**methylated reads) are counted as being **un**methylated. In
 order to make a conventional cytosine report, use *`threshold.reads=FALSE`*.
 
-To produce conventional cytosine reports without thresholding by
-within-context methylation level though
-minimally affected by incomplete cytosine conversion, run this method with
-the following parameters: *`threshold.reads=TRUE`*, *`threshold.context="CG"`*,
-*`min.context.sites=0`*, *`min.context.beta=0`*, *`max.outofcontext.beta=0.1`*.
-All cytosines within reads (read pairs) having more than 10% out-of-context
-cytosines methylated, will be effectively treated as unmethylated ones.
+Also, by default, *`generateCytosineReport`* (as well as *`generateBedReport`*,
+*`generateVcfReport`*, *`generateMhlReport`*) silently drops all reads that
+have too high out-of-context cytosine methylation (presumably, resulting from
+incomplete cytosine conversion). To disable this behaviour, run the method with
+the following parameters: *`filter.reads=FALSE`* (although, not recommended).
 
 ```{r}
 # data.table::data.table object for
