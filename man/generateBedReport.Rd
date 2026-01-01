@@ -201,6 +201,9 @@ bed.type="amplicon") or minimum overlap (`generateCaptureReport` or
 used for amplicon-based NGS data, while the latter -- for the capture-based
 NGS data. The function's logic is explained below.
 
+NB: you can modify and/or run this example -- see Examples section at
+the bottom of this page.
+
 Suppose there is a BAM file with four reads, all mapped to the "+"
 strand of chromosome 1, positions 1-16. The genomic range is supplied as a
 parameter `bed = as("chr1:1-100", "GRanges")`. Assuming the default values
@@ -211,10 +214,10 @@ the input and the output results will look as follows:
 
 \tabular{llll}{
   methylation string \tab filter \tab threshold \tab explained \cr
-  ...Z..x+.h..x..h. \tab included \tab below \tab min.context.sites < 2 (only one zZ base) \cr
-  ...Z..z.h..x..h.  \tab included \tab above \tab pass all criteria \cr
+  ...Z..x+.h..x..h. \tab pass \tab below \tab min.context.sites < 2 (only one zZ base) \cr
+  ...Z..z.h..x..h.  \tab pass \tab above \tab pass all criteria \cr
   ...Z..z.h..X..h.  \tab excluded \tab <NA> \tab max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) \cr
-  ...Z..z.h..z-.h.  \tab included \tab below \tab min.context.beta < 0.5 (1Z / 3zZ = 0.33)
+  ...Z..z.h..z-.h.  \tab pass \tab below \tab min.context.beta < 0.5 (1Z / 3zZ = 0.33)
 }
 
 Since the read number three is filtered out, and only the second read will
@@ -223,7 +226,7 @@ produced (again, given that all reads map to chr1:+:1-16):
 
 \tabular{lllllllll}{
   seqnames \tab start \tab end \tab width \tab strand \tab nreads+ \tab nreads- \tab nfiltered \tab VEF \cr
-  chr1 \tab 1 \tab 100 \tab 100 \tab * \tab 3 \tab 0 \tab 1 \tab 0.3333
+  chr1 \tab 1 \tab 100 \tab 100 \tab * \tab 3 \tab 0 \tab 1 \tab 0.3333333
 }
 
 Please note, that read thresholding by an average methylation level
@@ -253,6 +256,18 @@ pattern output to the region of interest only.
   bed.report <- generateBedReport(bam=capture.bam, bed=capture.bed,
                                   bed.type="capture")
   identical(capture.report, bed.report)
+  
+  # toy example from the description
+  temp.bam <- tempfile(fileext=".bam") 
+  simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
+              XM=c("...Z..x+.h..x..h.", "...Z..z.h..x..h.",
+                   "...Z..z.h..X..h.", "...Z..z.h..z-.h."))
+  # with read filtering
+  generateBedReport(bam=temp.bam, bed=as("chr1:1-100", "GRanges"))
+  # without read filtering
+  generateBedReport(bam=temp.bam, bed=as("chr1:1-100", "GRanges"),
+                    filter.reads=FALSE)
+  
 }
 \seealso{
 \code{\link{preprocessBam}} for preloading BAM data,

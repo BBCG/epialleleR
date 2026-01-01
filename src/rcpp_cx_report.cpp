@@ -109,6 +109,9 @@ Rcpp::DataFrame rcpp_cx_report(Rcpp::DataFrame &df,                             
     // checking for the interrupt
     if ((x & 0xFFFF) == 0) Rcpp::checkUserInterrupt();                          // every ~65k reads
     
+    // skip the read if filtered out
+    if (pass[x]==NA_LOGICAL) continue;
+    
     const int start_x = start[x];                                               // start of the current read
     if ((start_x>max_pos) || (rname[x]!=map_val[0])) {                          // if current position is further downstream or another reference
       spit_results;
