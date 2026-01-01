@@ -318,7 +318,7 @@ function for getting or setting the seqlevels style.
   amplicon.report <- generateAmpliconReport(bam=amplicon.bam,
                                             bed=amplicon.bed)
 #> Reading BED file 
-#> [0.008s]
+#> [0.007s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
@@ -326,7 +326,7 @@ function for getting or setting the seqlevels style.
 #> Filtering and thresholding reads 
 #> [0.001s]
 #> Preparing amplicon report 
-#> [0.022s]
+#> [0.018s]
   
   # capture NGS
   capture.bam    <- system.file("extdata", "capture.bam",
@@ -335,11 +335,11 @@ function for getting or setting the seqlevels style.
                                 package="epialleleR")
   capture.report <- generateCaptureReport(bam=capture.bam, bed=capture.bed)
 #> Reading BED file 
-#> [0.008s]
+#> [0.007s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.011s]
+#> [0.013s]
 #> Filtering and thresholding reads 
 #> [0.001s]
 #> Preparing capture report 
@@ -350,11 +350,11 @@ function for getting or setting the seqlevels style.
   bed.report <- generateBedReport(bam=capture.bam, bed=capture.bed,
                                   bed.type="capture")
 #> Reading BED file 
-#> [0.007s]
+#> [0.008s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.010s]
+#> [0.012s]
 #> Filtering and thresholding reads 
 #> [0.001s]
 #> Preparing capture report 
@@ -379,7 +379,7 @@ function for getting or setting the seqlevels style.
 #> Filtering and thresholding reads 
 #> [0.000s]
 #> Preparing amplicon report 
-#> [0.011s]
+#> [0.010s]
 #>    seqnames start   end width strand nreads+ nreads- nfiltered       VEF
 #>      <fctr> <int> <int> <int> <fctr>   <int>   <int>     <int>     <num>
 #> 1:     chr1     1   100   100      *       3       0         1 0.3333333
@@ -393,7 +393,7 @@ function for getting or setting the seqlevels style.
 #> Thresholding reads 
 #> [0.000s]
 #> Preparing amplicon report 
-#> [0.307s]
+#> [0.278s]
 #>    seqnames start   end width strand nreads+ nreads- nfiltered   VEF
 #>      <fctr> <int> <int> <int> <fctr>   <int>   <int>     <int> <num>
 #> 1:     chr1     1   100   100      *       4       0        NA   0.5

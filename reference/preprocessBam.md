@@ -266,7 +266,7 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
     output.bam.file=out.bam
   )
 #> Writing sample BAM 
-#> [0.002s]
+#> [0.003s]
 #> [1] 1
   generateCytosineReport(out.bam, threshold.reads=FALSE, report.context="CX")
 #> Checking BAM file: 
@@ -300,11 +300,11 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 #> Checking BAM file: 
 #> long-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.001s]
+#> [0.002s]
 #> Filtering reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.001s]
+#> [0.000s]
 #>      rname strand   pos context  meth unmeth
 #>     <fctr> <fctr> <int>  <fctr> <int>  <int>
 #>  1:   chrS      +     2      CG     0      1
@@ -335,7 +335,7 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 #> Filtering reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.001s]
+#> [0.000s]
 #>      rname strand   pos context  meth unmeth
 #>     <fctr> <fctr> <int>  <fctr> <int>  <int>
 #>  1:   chrS      +     2      CG     1      0

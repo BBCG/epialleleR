@@ -231,7 +231,7 @@ for analysing the distribution of per-read beta values.
 #> Reading paired-end BAM file 
 #> [0.011s]
 #> Preparing lMHL report 
-#> [0.021s]
+#> [0.019s]
   
   # lMHL report with a `max.haplotype.window` of 1 is identical to a
   # conventional cytosine report (or nearly identical when sequencing errors
@@ -240,18 +240,18 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.011s]
+#> [0.012s]
 #> Preparing lMHL report 
 #> [0.019s]
   cg.report  <- generateCytosineReport(capture.bam, threshold.reads=FALSE)
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.011s]
+#> [0.012s]
 #> Filtering reads 
 #> [0.001s]
 #> Preparing cytosine report 
-#> [0.012s]
+#> [0.010s]
   identical(
     mhl.report[, .(rname, strand, pos, context, value=lmhl)],
     cg.report[ , .(rname, strand, pos, context, value=meth/(meth+unmeth))]
@@ -271,7 +271,7 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.001s]
+#> [0.002s]
 #> Preparing lMHL report 
 #> [0.001s]
 #>     rname strand   pos context coverage length  lmhl
@@ -328,13 +328,13 @@ for analysing the distribution of per-read beta values.
   simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
               XM=c("H..Z..Z.Z..Z...Z.h.", "h..z..Z.z..Z...z.h."))
 #> Writing sample BAM 
-#> [0.003s]
+#> [0.002s]
 #> [1] 2
   generateMhlReport(temp.bam)
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.002s]
+#> [0.001s]
 #> Preparing lMHL report 
 #> [0.001s]
 #>     rname strand   pos context coverage length       lmhl

@@ -177,7 +177,7 @@ vignettes for the description of usage and sample data.
   # extract patterns
   patterns <- extractPatterns(bam=amplicon.bam, bed=amplicon.bed, bed.row=3)
 #> Reading BED file 
-#> [0.033s]
+#> [0.031s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 

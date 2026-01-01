@@ -168,7 +168,7 @@ simulateBam(output.bam.file=bam.file, XM=c("ZZzZZ", "zzZzz"), XG="CT")
 
 Check *`simulateBam`* method help page for more information on
 parameters and their default values. More examples that use
-*`simulateBam`* can also be found in help pages for `generate\*Report`
+*`simulateBam`* can also be found in help pages for `generate*Report`
 functions.
 
 ------------------------------------------------------------------------
@@ -293,11 +293,11 @@ simulateBam(
   Ml=list(as.integer(c(102,128,153,138,101,96))),
   output.bam.file=out.bam
   )
-#> Writing sample BAM [0.003s]
+#> Writing sample BAM [0.002s]
 #> [1] 1
 generateCytosineReport(out.bam, threshold.reads=FALSE, report.context="CX")
 #> Checking BAM file: long-read, single-end, unsorted alignment detected
-#> Reading single-end BAM file [0.003s]
+#> Reading single-end BAM file [0.002s]
 #> Filtering reads [0.000s]
 #> Preparing cytosine report [0.001s]
 #>      rname strand   pos context  meth unmeth
@@ -330,7 +330,7 @@ output.bam <- tempfile(pattern="output-", fileext=".bam")
 
 # sample reference genome
 genome <- preprocessGenome(system.file("extdata", "test", "reference.fasta.gz", package="epialleleR"))
-#> Reading reference genome file [0.000s]
+#> Reading reference genome file [0.001s]
 
 # calls cytosine methylation and stores it in the output BAM
 # Input BAM has 100 records of which 73 are mapped to the genome
@@ -385,7 +385,7 @@ head(cg.vef.report[order(meth+unmeth, decreasing=TRUE)])
 # CpG cytosine report
 cg.report <- generateCytosineReport(bam.data, threshold.reads=FALSE)
 #> Filtering reads [0.001s]
-#> Preparing cytosine report [0.012s]
+#> Preparing cytosine report [0.011s]
 head(cg.report[order(meth+unmeth, decreasing=TRUE)])
 #>     rname strand      pos context  meth unmeth
 #>    <fctr> <fctr>    <int>  <fctr> <int>  <int>
@@ -436,11 +436,11 @@ amplicon.report <- generateAmpliconReport(
   bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
   bed=system.file("extdata", "amplicon.bed", package="epialleleR")
 )
-#> Reading BED file [0.034s]
+#> Reading BED file [0.032s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file [0.004s]
-#> Filtering and thresholding reads [0.000s]
-#> Preparing amplicon report [0.041s]
+#> Filtering and thresholding reads [0.001s]
+#> Preparing amplicon report [0.044s]
 amplicon.report
 #>    seqnames    start      end width strand amplicon nreads+ nreads- nfiltered        VEF
 #>      <fctr>    <int>    <int> <int> <fctr>   <char>   <int>   <int>     <int>      <num>
@@ -458,9 +458,9 @@ capture.report <- generateCaptureReport(
 )
 #> Reading BED file [0.008s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.011s]
+#> Reading paired-end BAM file [0.013s]
 #> Filtering and thresholding reads [0.001s]
-#> Preparing capture report [0.020s]
+#> Preparing capture report [0.022s]
 head(capture.report)
 #>    seqnames    start      end width strand     V4 nreads+ nreads- nfiltered       VEF
 #>      <fctr>    <int>    <int> <int> <fctr> <char>   <int>   <int>     <int>     <num>
@@ -477,11 +477,11 @@ bed.report <- generateBedReport(
   bed=system.file("extdata", "capture.bed", package="epialleleR"),
   bed.type="capture"
 )
-#> Reading BED file [0.008s]
+#> Reading BED file [0.011s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file [0.013s]
 #> Filtering and thresholding reads [0.001s]
-#> Preparing capture report [0.016s]
+#> Preparing capture report [0.022s]
 identical(capture.report, bed.report)
 #> [1] TRUE
 ```
@@ -530,7 +530,7 @@ patterns <- extractPatterns(
 )
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file [0.004s]
-#> Extracting methylation patterns [0.022s]
+#> Extracting methylation patterns [0.021s]
 
 # that many read pairs overlap genomic region of interest
 nrow(patterns)
@@ -610,10 +610,10 @@ vcf.report <- generateVcfReport(
 #> Loading required namespace: VariantAnnotation
 #> Loading required namespace: GenomeInfoDb
 #> Reading BED file [0.023s]
-#> Reading VCF file [0.611s]
+#> Reading VCF file [0.689s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file [0.004s]
-#> Filtering and thresholding reads [0.000s]
+#> Filtering and thresholding reads [0.001s]
 #> Extracting base frequences [0.046s]
 
 # NA values are shown for the C->T variants on the "+" and G->A on the "-"
@@ -723,10 +723,10 @@ amplicon.ecdfs <- generateBedEcdf(
   bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
   bed.rows=NULL
 )
-#> Reading BED file [0.008s]
+#> Reading BED file [0.007s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file [0.004s]
-#> Computing ECDFs for within- and out-of-context per-read beta values [0.008s]
+#> Computing ECDFs for within- and out-of-context per-read beta values [0.007s]
 
 # there are 5 items in amplicon.ecdfs, let's plot all of them
 par(mfrow=c(1,length(amplicon.ecdfs)))
