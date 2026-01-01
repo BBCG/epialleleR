@@ -182,7 +182,6 @@
 #'   # both read filtering and thresholding disabled = similar to other software
 #'   generateCytosineReport(bam=temp.bam, report.context="CX",
 #'                          filter.reads=FALSE, threshold.reads=FALSE)
-#'   
 #' @export
 generateCytosineReport <- function (bam,
                                     report.file=NULL,

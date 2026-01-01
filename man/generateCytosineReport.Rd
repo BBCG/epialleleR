@@ -205,7 +205,6 @@ properties.
   # both read filtering and thresholding disabled = similar to other software
   generateCytosineReport(bam=temp.bam, report.context="CX",
                          filter.reads=FALSE, threshold.reads=FALSE)
-  
 }
 \seealso{
 `values` vignette for a comparison and visualisation of epialleleR

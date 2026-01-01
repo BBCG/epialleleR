@@ -206,7 +206,6 @@
 #'   # without read filtering
 #'   generateBedReport(bam=temp.bam, bed=as("chr1:1-100", "GRanges"),
 #'                     filter.reads=FALSE)
-#'   
 #' @rdname generateBedReport
 #' @export
 generateAmpliconReport <- function (

@@ -268,7 +268,6 @@ pattern output to the region of interest only.
   # without read filtering
   generateBedReport(bam=temp.bam, bed=as("chr1:1-100", "GRanges"),
                     filter.reads=FALSE)
-  
 }
 \seealso{
 \code{\link{preprocessBam}} for preloading BAM data,
