@@ -39,7 +39,7 @@ an input. See below for additional functionality.
 
 ##### v1.20 [BioC 3.23]
 
- * disrupting API changes in `generate\*Report` (from version 1.19.1 onwards):
+ * disrupting API changes in `generate*Report` (from version 1.19.1 onwards):
  new parameter `filter.reads` regulates filtering of reads with
  presumable incomplete conversion of cytosines;
  `cytosine.context` parameter instead of `threshold.context`/`haplotype.context`
