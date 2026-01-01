@@ -130,11 +130,11 @@ produced (given that all reads map to chr1:+:1-16):
 
 \tabular{llllll}{
   rname \tab strand \tab pos \tab context \tab meth \tab unmeth \cr
-  chr1 \tab + \tab 4 \tab CG \tab 1 \tab 3 \cr
-  chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \cr
-  chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \cr
-  chr1 \tab + \tab 12 \tab CHG \tab 0 \tab 3 \cr
-  chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 
+  chr1 \tab + \tab 4 \tab CG \tab 1 \tab 2 \cr
+  chr1 \tab + \tab 7 \tab CG \tab 0 \tab 2 \cr
+  chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 3 \cr
+  chr1 \tab + \tab 12 \tab CHG \tab 0 \tab 2 \cr
+  chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 3 
 }
 
 With the read filtering and thresholding disabled (filter.reads=FALSE,
@@ -188,17 +188,22 @@ properties.
   # toy example from the description
   temp.bam <- tempfile(fileext=".bam") 
   simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
-              XM=c("...Z..x+.h..x..h.", "...Z..z.h..x..h.",
-                   "...Z..z.h..X..h.", "...Z..z.h..z-.h."))
+              seq=c("AAACGTTAGTAATAGTA", "AAACGTTGTAATAGTA",
+                    "AAACGTTGTAACAGTA",  "AAACGTTGTAATGTA"),
+              XM=c( "...Z..x+.h..x..h.", "...Z..z.h..x..h.",
+                    "...Z..z.h..X..h.",  "...Z..z.h..z.h."),
+              cigar=c("7M1I9M", "16M", "16M", "12M1D3M"))
   # with read filtering and thresholding
-  generateCytosineReport(bam=temp.bam)
+  generateCytosineReport(bam=temp.bam, report.context="CX")
   # without read filtering
-  generateCytosineReport(bam=temp.bam, filter.reads=FALSE)
+  generateCytosineReport(bam=temp.bam, report.context="CX",
+                         filter.reads=FALSE)
   # without read thresholding
-  generateCytosineReport(bam=temp.bam, threshold.reads=FALSE)
-  # both read filtering and thresholding disabled = similar to other software
-  generateCytosineReport(bam=temp.bam, filter.reads=FALSE,
+  generateCytosineReport(bam=temp.bam, report.context="CX",
                          threshold.reads=FALSE)
+  # both read filtering and thresholding disabled = similar to other software
+  generateCytosineReport(bam=temp.bam, report.context="CX",
+                         filter.reads=FALSE, threshold.reads=FALSE)
   
 }
 \seealso{

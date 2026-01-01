@@ -199,7 +199,7 @@
 #'   temp.bam <- tempfile(fileext=".bam") 
 #'   simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
 #'               XM=c("...Z..x+.h..x..h.", "...Z..z.h..x..h.",
-#'                    "...Z..z.h..X..h.", "...Z..z.h..z-.h."))
+#'                    "...Z..z.h..X..h.",  "...Z..z.h..z-.h."))
 #'   # with read filtering
 #'   generateBedReport(bam=temp.bam, bed=as("chr1:1-100", "GRanges"))
 #'   # without read filtering
