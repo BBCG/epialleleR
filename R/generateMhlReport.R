@@ -214,8 +214,8 @@ generateMhlReport <- function (bam,
   bam <- preprocessBam(bam.file=bam, ..., verbose=verbose)
   
   if (!filter.reads) {
-    min.haplotype.length=0
-    max.outofcontext.beta=1
+    min.haplotype.length <- 0
+    max.outofcontext.beta <- 1
   }
   
   mhl.report <- .getMhlReport(

@@ -236,7 +236,7 @@ simulateBam(output.bam.file=bam.file, XM=c("ZZzZZ", "zzZzz"), XG="CT")
 
 Check *`simulateBam`* method help page for more information on parameters and
 their default values. More examples that use *`simulateBam`* can also be found
-in help pages for `generate\*Report` functions.
+in help pages for `generate*Report` functions.
 
 *****
 
