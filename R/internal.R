@@ -33,7 +33,7 @@
 
 utils::globalVariables(
   c(".", ".I", ".N", ":=", "bedmatch", "context", "rname", "start", "strand",
-    "templid", "FALSE+", "FALSE-", "TRUE+", "TRUE-", "REF", "ALT",
+    "templid", "FALSE+", "FALSE-", "TRUE+", "TRUE-", "NA+", "NA-", "REF", "ALT",
     "M+Ref","U+Ref","M+Alt","U+Alt", "M-Ref","U-Ref","M-Alt","U-Alt",
     "M+A", "M+C", "M+G", "M+T", "M-A", "M-C", "M-G", "M-T",
     "U+A", "U+C", "U+G", "U+T", "U-A", "U-C", "U-G", "U-T",

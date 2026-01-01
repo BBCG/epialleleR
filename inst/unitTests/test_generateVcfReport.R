@@ -145,7 +145,7 @@ test_generateVcfReport <- function () {
   )
   RUnit::checkEquals(
     amplicon.report[, sum(`SumRef`, na.rm=TRUE), by=.(REF,ALT)][order(REF, ALT)]$V1,
-    c(226, 0, 155, 794, 216, 1766, 0, 609, 587, 311, 466, 152)
+    c(226, 0, 155, 794, 215, 1762, 0, 607, 584, 309, 463, 152)
   )
   RUnit::checkEquals(
     amplicon.report[, sum(`SumAlt`, na.rm=TRUE), by=.(REF,ALT)][order(REF, ALT)]$V1,

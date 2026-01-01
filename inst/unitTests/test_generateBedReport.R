@@ -98,4 +98,9 @@ test_generateBedReport <- function () {
     quality.report$VEF,
     c(0.08333333333, 0.11475409836, 0.05376344086, 0.10714285714, 0.13333333),
   )
+  
+  allowall.report <- generateAmpliconReport(bam=amplicon.bam, bed=amplicon.bed, filter.reads=FALSE, threshold.reads=FALSE)
+  RUnit::checkTrue(
+    all(is.na(c(allowall.report$nfiltered, allowall.report$VEF)))
+  )
 }
