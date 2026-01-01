@@ -67,7 +67,7 @@ int rcpp_simulate_bam (std::vector<std::string> header,                         
   size_t cigar_mem_size = 0;                                                    // allocated number of CIGAR buffer elements
   size_t n_cigar = 0;                                                           // number of CIGAR elements in the current CIGAR
   for (size_t i=0; i<qname.size(); i++) {
-    n_cigar = sam_parse_cigar(cigar[i].c_str(), NULL, &cigar_mem, &cigar_mem_size);// fill CIGAR array
+    n_cigar = sam_parse_cigar(cigar[i].c_str(), NULL, &cigar_mem, &cigar_mem_size); // fill CIGAR array
     if (n_cigar<0) Rcpp::stop("Unable to fill CIGAR array");                    // fall back on error
     
     for (char *q=(char*)qual[i].c_str(); *q!='\0'; q++) *q -= 33;               // remove offset from QUAL string
