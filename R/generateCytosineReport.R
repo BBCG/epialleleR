@@ -166,8 +166,8 @@
 #'   # toy example from the description
 #'   temp.bam <- tempfile(fileext=".bam") 
 #'   simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
-#'               seq=c("AAACGTTAGTAATAGTA", "AAACGTTGTAATAGTA",
-#'                     "AAACGTTGTAACAGTA",  "AAACGTTGTAATGTA"),
+#'               seq=c("AGACGTTAGTAATAGTA", "AAACGTTGTAATAGTA",
+#'                     "AGACGTTGTAACAGTA",  "AAACGTTGTAATGTA"),
 #'               XM=c( "...Z..x+.h..x..h.", "...Z..z.h..x..h.",
 #'                     "...Z..z.h..X..h.",  "...Z..z.h..z.h."),
 #'               cigar=c("7M1I9M", "16M", "16M", "12M1D3M"))

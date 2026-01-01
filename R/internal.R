@@ -645,7 +645,7 @@ utils::globalVariables(
   bf.report <- data.table::data.table(
     name=names(vcf.ranges),
     vcf.dt[,.(seqnames, range=start, REF, ALT)],
-    freqs[,grep("[ACTG]$",colnames(freqs))]
+    freqs[,grep("[ACTG]$",colnames(freqs)), drop=FALSE]
   )
   
   bf.report[REF=="A" & ALT=="C", `:=` (`M+Ref`=`M+A`,       `U+Ref`=`U+A`,       `M-Ref`=`M-A`,       `U-Ref`=`U-A`,

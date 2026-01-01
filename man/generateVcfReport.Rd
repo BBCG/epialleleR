@@ -11,11 +11,12 @@ generateVcfReport(
   bed = NULL,
   report.file = NULL,
   zero.based.bed = FALSE,
+  cytosine.context = c("CG", "CHG", "CHH", "CxG", "CX"),
+  filter.reads = TRUE,
+  max.outofcontext.beta = 0.1,
   threshold.reads = TRUE,
-  threshold.context = c("CG", "CHG", "CHH", "CxG", "CX"),
   min.context.sites = 2,
   min.context.beta = 0.5,
-  max.outofcontext.beta = 0.1,
   ...,
   gzip = FALSE,
   verbose = TRUE
@@ -55,41 +56,6 @@ must match the style of seqlevels of the BAM file/object used.}
 \item{zero.based.bed}{boolean defining if BED coordinates are zero based
 (default: FALSE).}
 
-\item{threshold.reads}{boolean defining if sequence reads should be
-thresholded before counting bases in reference and variant epialleles
-(default: TRUE). Disabling thresholding is possible but makes no sense in
-the context of this function, because
-all the reads will be assigned to the variant epiallele,
-which will result in Fisher's Exact test p-value of 1 (in columns `FEp+` and
-`FEP-`). As thresholding is \strong{not} recommended for long-read
-sequencing data, this function is \strong{not} recommended for such data
-either.}
-
-\item{min.context.sites}{non-negative integer for minimum number of cytosines
-within the `threshold.context` (default: 2). Reads containing \strong{fewer}
-within-the-context cytosines are considered completely unmethylated (thus
-belonging to the reference epiallele). This option has no effect when read
-thresholding is disabled.}
-
-\item{min.context.beta}{real number in the range [0;1] (default: 0.5). Reads
-with average beta value for within-the-context cytosines \strong{below} this
-threshold are considered completely unmethylated (thus belonging to the
-reference epiallele). This option has no effect when read thresholding is
-disabled.}
-
-\item{max.outofcontext.beta}{real number in the range [0;1] (default: 0.1).
-Reads with average beta value for out-of-context cytosines \strong{above}
-this threshold will not be thresholded and will be ignored in further
-computations. This option has no effect when read filtering is disabled.}
-
-\item{...}{other parameters to pass to the
-\code{\link[epialleleR]{preprocessBam}} function.
-Options have no effect if preprocessed BAM data was supplied as an input.}
-
-\item{gzip}{boolean to compress the report (default: FALSE).}
-
-\item{verbose}{boolean to report progress and timings (default: TRUE).}
-
 \item{cytosine.context}{string defining cytosine methylation context used
 for filtering and/or thresholding the reads:
 \itemize{
@@ -107,6 +73,41 @@ for filtering and/or thresholding the reads:
 out-of-context cytosine methylation should be filtered out (e.g.,
 reads resulting from incompletely bisulfite-converted templates).
 Default: TRUE.}
+
+\item{max.outofcontext.beta}{real number in the range [0;1] (default: 0.1).
+Reads with average beta value for out-of-context cytosines \strong{above}
+this threshold will not be thresholded and will be ignored in further
+computations. This option has no effect when read filtering is disabled.}
+
+\item{threshold.reads}{boolean defining if sequence reads should be
+thresholded before counting bases in reference and variant epialleles
+(default: TRUE). Disabling thresholding is possible but makes no sense in
+the context of this function, because
+all the reads will be assigned to the variant epiallele,
+which will result in Fisher's Exact test p-value of 1 (in columns `FEp+` and
+`FEP-`). As thresholding is \strong{not} recommended for long-read
+sequencing data, this function is \strong{not} recommended for such data
+either.}
+
+\item{min.context.sites}{non-negative integer for minimum number of cytosines
+within the `cytosine.context` (default: 2). Reads containing \strong{fewer}
+within-the-context cytosines are considered completely unmethylated (thus
+belonging to the reference epiallele). This option has no effect when read
+thresholding is disabled.}
+
+\item{min.context.beta}{real number in the range [0;1] (default: 0.5). Reads
+with average beta value for within-the-context cytosines \strong{below} this
+threshold are considered completely unmethylated (thus belonging to the
+reference epiallele). This option has no effect when read thresholding is
+disabled.}
+
+\item{...}{other parameters to pass to the
+\code{\link[epialleleR]{preprocessBam}} function.
+Options have no effect if preprocessed BAM data was supplied as an input.}
+
+\item{gzip}{boolean to compress the report (default: FALSE).}
+
+\item{verbose}{boolean to report progress and timings (default: TRUE).}
 }
 \value{
 \code{\link[data.table]{data.table}} object containing VCF report or
@@ -193,6 +194,31 @@ limiting pattern output to the region of interest only.
   # VCF report
   vcf.report <- generateVcfReport(bam=capture.bam, bed=capture.bed,
                                   vcf=capture.vcf)
+  
+  # toy example to illustrate the logic of computations
+  if (requireNamespace("VariantAnnotation", quietly=TRUE)) {
+    # simulate toy BAM
+    temp.bam <- tempfile(fileext=".bam")
+    simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
+                seq=c("AGACGTTAGTAATAGTA", "AAACGTTGTAATAGTA",
+                      "AGACGTTGTAACAGTA",  "AAACGTTGTAATGTA"),
+                XM=c( "...Z..x+.h..x..h.", "...Z..z.h..x..h.",
+                      "...Z..z.h..X..h.",  "...Z..z.h..z.h."),
+                cigar=c("7M1I9M", "16M", "16M", "12M1D3M"))
+    # toy VCF
+    vcf <- VariantAnnotation::VCF(rowRanges=as("chr1:2", "GRanges"),
+                                  collapsed=FALSE)
+    VariantAnnotation::ref(vcf) <- as("A", "DNAStringSet")
+    VariantAnnotation::alt(vcf) <- as("G", "DNAStringSet")
+    
+    # read filtering will exclude third read from BAM file because it has
+    # too many out-of-context methylated cytosines (in position #12).
+    
+    # results with read filtering and thresholding
+    generateVcfReport(bam=temp.bam, vcf=vcf)
+    # results without read filtering
+    generateVcfReport(bam=temp.bam, vcf=vcf, filter.reads=FALSE)
+  }
 }
 \seealso{
 \code{\link{preprocessBam}} for preloading BAM data,

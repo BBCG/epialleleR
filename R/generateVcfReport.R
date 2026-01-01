@@ -97,7 +97,7 @@
 #' sequencing data, this function is \strong{not} recommended for such data
 #' either.
 #' @param min.context.sites non-negative integer for minimum number of cytosines
-#' within the `threshold.context` (default: 2). Reads containing \strong{fewer}
+#' within the `cytosine.context` (default: 2). Reads containing \strong{fewer}
 #' within-the-context cytosines are considered completely unmethylated (thus
 #' belonging to the reference epiallele). This option has no effect when read
 #' thresholding is disabled.
@@ -167,6 +167,31 @@
 #'   # VCF report
 #'   vcf.report <- generateVcfReport(bam=capture.bam, bed=capture.bed,
 #'                                   vcf=capture.vcf)
+#'   
+#'   # toy example to illustrate the logic of computations
+#'   if (requireNamespace("VariantAnnotation", quietly=TRUE)) {
+#'     # simulate toy BAM
+#'     temp.bam <- tempfile(fileext=".bam")
+#'     simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
+#'                 seq=c("AGACGTTAGTAATAGTA", "AAACGTTGTAATAGTA",
+#'                       "AGACGTTGTAACAGTA",  "AAACGTTGTAATGTA"),
+#'                 XM=c( "...Z..x+.h..x..h.", "...Z..z.h..x..h.",
+#'                       "...Z..z.h..X..h.",  "...Z..z.h..z.h."),
+#'                 cigar=c("7M1I9M", "16M", "16M", "12M1D3M"))
+#'     # toy VCF
+#'     vcf <- VariantAnnotation::VCF(rowRanges=as("chr1:2", "GRanges"),
+#'                                   collapsed=FALSE)
+#'     VariantAnnotation::ref(vcf) <- as("A", "DNAStringSet")
+#'     VariantAnnotation::alt(vcf) <- as("G", "DNAStringSet")
+#'     
+#'     # read filtering will exclude third read from BAM file because it has
+#'     # too many out-of-context methylated cytosines (in position #12).
+#'     
+#'     # results with read filtering and thresholding
+#'     generateVcfReport(bam=temp.bam, vcf=vcf)
+#'     # results without read filtering
+#'     generateVcfReport(bam=temp.bam, vcf=vcf, filter.reads=FALSE)
+#'   }
 #' @export
 generateVcfReport <- function (bam,
                                vcf,
@@ -174,16 +199,17 @@ generateVcfReport <- function (bam,
                                bed=NULL,
                                report.file=NULL,
                                zero.based.bed=FALSE,
+                               cytosine.context=c("CG", "CHG", "CHH", "CxG", "CX"),
+                               filter.reads=TRUE,
+                               max.outofcontext.beta=0.1,
                                threshold.reads=TRUE,
-                               threshold.context=c("CG", "CHG", "CHH", "CxG", "CX"),
                                min.context.sites=2,
                                min.context.beta=0.5,
-                               max.outofcontext.beta=0.1,
                                ...,
                                gzip=FALSE,
                                verbose=TRUE)
 {
-  threshold.context <- match.arg(threshold.context, threshold.context)
+  cytosine.context <- match.arg(cytosine.context, cytosine.context)
   
   reqd.ns <- c("VariantAnnotation", "SummarizedExperiment", "GenomeInfoDb")
   if (!all(sapply(reqd.ns, requireNamespace)) | exists(x="is.test.environment"))
@@ -204,21 +230,20 @@ generateVcfReport <- function (bam,
     vcf <- VariantAnnotation::expand(vcf, row.names=TRUE)
   
   bam <- preprocessBam(bam.file=bam, ..., verbose=verbose)
-  if (threshold.reads) {
-    pass <- .thresholdReads(
-      bam.processed=bam,
-      ctx.meth=.context.to.bases[[threshold.context]][["ctx.meth"]],
-      ctx.unmeth=.context.to.bases[[threshold.context]][["ctx.unmeth"]],
-      ooctx.meth=.context.to.bases[[threshold.context]][["ooctx.meth"]],
-      ooctx.unmeth=.context.to.bases[[threshold.context]][["ooctx.unmeth"]],
-      min.context.sites=min.context.sites,
-      min.context.beta=min.context.beta,
-      max.outofcontext.beta=max.outofcontext.beta,
-      verbose=verbose
-    )
-  } else {
-    pass <- rep(TRUE, nrow(bam))
-  }
+  
+  pass <- .filterThresholdReads(
+    bam.processed=bam,
+    ctx.meth=.context.to.bases[[cytosine.context]][["ctx.meth"]],
+    ctx.unmeth=.context.to.bases[[cytosine.context]][["ctx.unmeth"]],
+    ooctx.meth=.context.to.bases[[cytosine.context]][["ooctx.meth"]],
+    ooctx.unmeth=.context.to.bases[[cytosine.context]][["ooctx.unmeth"]],
+    filter.reads=filter.reads,
+    max.outofcontext.beta=max.outofcontext.beta,
+    threshold.reads=threshold.reads,
+    min.context.sites=min.context.sites,
+    min.context.beta=min.context.beta,
+    verbose=verbose
+  )
   
   vcf.report <- .getBaseFreqReport(bam.processed=bam, pass=pass,
                                    vcf=vcf, verbose=verbose)

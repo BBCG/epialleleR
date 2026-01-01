@@ -7,8 +7,9 @@
 generateMhlReport(
   bam,
   report.file = NULL,
-  haplotype.context = c("CG", "CHG", "CHH", "CxG", "CX"),
+  cytosine.context = c("CG", "CHG", "CHH", "CxG", "CX"),
   max.haplotype.window = 0,
+  filter.reads = TRUE,
   min.haplotype.length = 0,
   max.outofcontext.beta = 0.1,
   ...,
@@ -25,7 +26,7 @@ requirements and BAM preprocessing at \code{\link{preprocessBam}}.}
 If NULL (the default) then report is returned as a
 \code{\link[data.table]{data.table}} object.}
 
-\item{haplotype.context}{string for a cytosine context that defines
+\item{cytosine.context}{string for a cytosine context that defines
 a haplotype:
 \itemize{
   \item "CG" (the default) -- CpG cytosines only (called as zZ)
@@ -37,8 +38,8 @@ a haplotype:
 }
 If \eqn{lMHL} calculations are needed for all three possible cytosine
 contexts \emph{independently}, one has to run this function for
-each required `haplotype.context` separately, because
-`haplotype.context`=="CX" assumes that \emph{any} cytosine context
+each required `cytosine.context` separately, because
+`cytosine.context`=="CX" assumes that \emph{any} cytosine context
 is allowed within the same haplotype. This behaviour may change in the
 future.}
 
@@ -59,15 +60,24 @@ advised to limit the `max.haplotype.window` to a number of cytosines in a
 typical hypermethylated region. For thorough
 explanation and more examples, see Details section and vignette.}
 
+\item{filter.reads}{boolean defining if sequence reads with too high
+out-of-context cytosine methylation (specified by `max.outofcontext.beta`)
+or too few within-the-context bases (specified by `min.haplotype.length`)
+should be filtered out. Default: TRUE.}
+
 \item{min.haplotype.length}{non-negative integer for minimum length of a
 haplotype (default: 0 will include haplotypes of any length).
 When `min.haplotype.length`>0, reads
 (read pairs) with fewer than `min.haplotype.length` cytosines
-within the `haplotype.context` are skipped.}
+within the `cytosine.context` are skipped.
+This option has no effect when read filtering is disabled.}
 
 \item{max.outofcontext.beta}{real number in the range [0;1] (default: 0.1).
 Reads (read pairs) with average beta value for out-of-context cytosines
-\strong{above} this threshold are skipped. Set to 1 to disable filtering.}
+\strong{above} this threshold (e.g., reads resulting from incompletely
+bisulfite-converted templates) are skipped. Value of 1 disables filtering by
+out-of-context methylation.
+This option has no effect when read filtering is disabled.}
 
 \item{...}{other parameters to pass to the
 \code{\link[epialleleR]{preprocessBam}} function.
@@ -88,7 +98,7 @@ report columns are:
   \item context -- methylation context
   \item coverage -- number of reads (read pairs) that include this position
   \item length -- average length of a haplotype, i.e.,
-  average number of cytosines within `haplotype.context` for
+  average number of cytosines within `cytosine.context` for
   reads (read pairs) that include this position
   \item lmhl -- \eqn{lMHL} value
 }
@@ -181,6 +191,29 @@ without using the reference genome sequence.
     mhl.report[, .(rname, strand, pos, context, value=lmhl)],
     cg.report[ , .(rname, strand, pos, context, value=meth/(meth+unmeth))]
   )
+  
+  ## toy examples to illustrate the logic of computations
+  temp.bam <- tempfile(fileext=".bam")
+  
+  # case 1: fully methylated haplotype
+  simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
+              XM="h..Z..Z.Z..Z...Z.h.")
+  generateMhlReport(temp.bam)
+  
+  # case 2: incompletely methylated haplotype
+  simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
+              XM="h..Z..Z.z..Z...Z.h.")
+  generateMhlReport(temp.bam)
+  
+  # case 3: hypermethylated read and hypomethylated read 
+  simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
+              XM=c("h..Z..Z.Z..Z...Z.h.", "h..z..Z.z..Z...z.h."))
+  generateMhlReport(temp.bam)
+  
+  # case 4: incompletely bisulfite-converted read and hypomethylated read 
+  simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
+              XM=c("H..Z..Z.Z..Z...Z.h.", "h..z..Z.z..Z...z.h."))
+  generateMhlReport(temp.bam)
 }
 \seealso{
 `values` vignette for a comparison and visualisation of epialleleR
