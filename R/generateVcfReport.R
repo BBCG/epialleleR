@@ -6,8 +6,8 @@
 #'
 #' @details
 #' Using BAM reads and sequence variation information as an input,
-#' `generateVcfReport` function thresholds the reads (for paired-end sequencing
-#' alignment files - read pairs as a single
+#' `generateVcfReport` function filters and thresholds the reads
+#' (for paired-end sequencing alignment files - read pairs as a single
 #' entity) according to supplied parameters and calculates the occurrence of
 #' \strong{Ref}erence and \strong{Alt}ernative bases within reads, taking into
 #' the account DNA strand the read mapped to and average methylation level
@@ -67,17 +67,8 @@
 #' \code{\link[data.table]{data.table}} object.
 #' @param zero.based.bed boolean defining if BED coordinates are zero based
 #' (default: FALSE).
-#' @param threshold.reads boolean defining if sequence reads should be
-#' thresholded before counting bases in reference and variant epialleles
-#' (default: TRUE). Disabling thresholding is possible but makes no sense in
-#' the context of this function, because
-#' all the reads will be assigned to the variant epiallele,
-#' which will result in Fisher's Exact test p-value of 1 (in columns `FEp+` and
-#' `FEP-`). As thresholding is \strong{not} recommended for long-read
-#' sequencing data, this function is \strong{not} recommended for such data
-#' either.
-#' @param threshold.context string defining cytosine methylation context used
-#' for thresholding the reads:
+#' @param cytosine.context string defining cytosine methylation context used
+#' for filtering and/or thresholding the reads:
 #' \itemize{
 #'   \item "CG" (the default) -- within-the-context: CpG cytosines (called as
 #'   zZ), out-of-context: all the other cytosines (hHxX)
@@ -88,7 +79,23 @@
 #'   \item "CX" -- all cytosines are considered within-the-context, this
 #'   effectively results in no thresholding
 #' }
-#' This option has no effect when read thresholding is disabled.
+#' @param filter.reads boolean defining if sequence reads with too high
+#' out-of-context cytosine methylation should be filtered out (e.g.,
+#' reads resulting from incompletely bisulfite-converted templates).
+#' Default: TRUE.
+#' @param max.outofcontext.beta real number in the range [0;1] (default: 0.1).
+#' Reads with average beta value for out-of-context cytosines \strong{above}
+#' this threshold will not be thresholded and will be ignored in further
+#' computations. This option has no effect when read filtering is disabled.
+#' @param threshold.reads boolean defining if sequence reads should be
+#' thresholded before counting bases in reference and variant epialleles
+#' (default: TRUE). Disabling thresholding is possible but makes no sense in
+#' the context of this function, because
+#' all the reads will be assigned to the variant epiallele,
+#' which will result in Fisher's Exact test p-value of 1 (in columns `FEp+` and
+#' `FEP-`). As thresholding is \strong{not} recommended for long-read
+#' sequencing data, this function is \strong{not} recommended for such data
+#' either.
 #' @param min.context.sites non-negative integer for minimum number of cytosines
 #' within the `threshold.context` (default: 2). Reads containing \strong{fewer}
 #' within-the-context cytosines are considered completely unmethylated (thus
@@ -97,11 +104,6 @@
 #' @param min.context.beta real number in the range [0;1] (default: 0.5). Reads
 #' with average beta value for within-the-context cytosines \strong{below} this
 #' threshold are considered completely unmethylated (thus belonging to the
-#' reference epiallele). This option has no effect when read thresholding is
-#' disabled.
-#' @param max.outofcontext.beta real number in the range [0;1] (default: 0.1).
-#' Reads with average beta value for out-of-context cytosines \strong{above}
-#' this threshold are considered completely unmethylated (thus belonging to the
 #' reference epiallele). This option has no effect when read thresholding is
 #' disabled.
 #' @param ... other parameters to pass to the

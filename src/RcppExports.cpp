@@ -82,13 +82,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // rcpp_get_base_freqs
-Rcpp::NumericMatrix rcpp_get_base_freqs(Rcpp::DataFrame& df, std::vector<bool> pass, Rcpp::DataFrame& vcf);
+Rcpp::NumericMatrix rcpp_get_base_freqs(Rcpp::DataFrame& df, Rcpp::LogicalVector& pass, Rcpp::DataFrame& vcf);
 RcppExport SEXP _epialleleR_rcpp_get_base_freqs(SEXP dfSEXP, SEXP passSEXP, SEXP vcfSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type df(dfSEXP);
-    Rcpp::traits::input_parameter< std::vector<bool> >::type pass(passSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector& >::type pass(passSEXP);
     Rcpp::traits::input_parameter< Rcpp::DataFrame& >::type vcf(vcfSEXP);
     rcpp_result_gen = Rcpp::wrap(rcpp_get_base_freqs(df, pass, vcf));
     return rcpp_result_gen;

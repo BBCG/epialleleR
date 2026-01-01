@@ -98,7 +98,8 @@ for filtering and/or thresholding the reads:
 
 \item{filter.reads}{boolean defining if sequence reads with too high
 out-of-context cytosine methylation should be filtered out (e.g.,
-reads resulting from incompletely bisulfite-converted templates).}
+reads resulting from incompletely bisulfite-converted templates).
+Default: TRUE.}
 
 \item{max.outofcontext.beta}{real number in the range [0;1] (default: 0.1).
 Reads with average beta value for out-of-context cytosines \strong{above}

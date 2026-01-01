@@ -65,20 +65,6 @@ which will result in Fisher's Exact test p-value of 1 (in columns `FEp+` and
 sequencing data, this function is \strong{not} recommended for such data
 either.}
 
-\item{threshold.context}{string defining cytosine methylation context used
-for thresholding the reads:
-\itemize{
-  \item "CG" (the default) -- within-the-context: CpG cytosines (called as
-  zZ), out-of-context: all the other cytosines (hHxX)
-  \item "CHG" -- within-the-context: CHG cytosines (xX), out-of-context: hHzZ
-  \item "CHH" -- within-the-context: CHH cytosines (hH), out-of-context: xXzZ
-  \item "CxG" -- within-the-context: CG and CHG cytosines (zZxX),
-  out-of-context: CHH cytosines (hH)
-  \item "CX" -- all cytosines are considered within-the-context, this
-  effectively results in no thresholding
-}
-This option has no effect when read thresholding is disabled.}
-
 \item{min.context.sites}{non-negative integer for minimum number of cytosines
 within the `threshold.context` (default: 2). Reads containing \strong{fewer}
 within-the-context cytosines are considered completely unmethylated (thus
@@ -93,9 +79,8 @@ disabled.}
 
 \item{max.outofcontext.beta}{real number in the range [0;1] (default: 0.1).
 Reads with average beta value for out-of-context cytosines \strong{above}
-this threshold are considered completely unmethylated (thus belonging to the
-reference epiallele). This option has no effect when read thresholding is
-disabled.}
+this threshold will not be thresholded and will be ignored in further
+computations. This option has no effect when read filtering is disabled.}
 
 \item{...}{other parameters to pass to the
 \code{\link[epialleleR]{preprocessBam}} function.
@@ -104,6 +89,24 @@ Options have no effect if preprocessed BAM data was supplied as an input.}
 \item{gzip}{boolean to compress the report (default: FALSE).}
 
 \item{verbose}{boolean to report progress and timings (default: TRUE).}
+
+\item{cytosine.context}{string defining cytosine methylation context used
+for filtering and/or thresholding the reads:
+\itemize{
+  \item "CG" (the default) -- within-the-context: CpG cytosines (called as
+  zZ), out-of-context: all the other cytosines (hHxX)
+  \item "CHG" -- within-the-context: CHG cytosines (xX), out-of-context: hHzZ
+  \item "CHH" -- within-the-context: CHH cytosines (hH), out-of-context: xXzZ
+  \item "CxG" -- within-the-context: CG and CHG cytosines (zZxX),
+  out-of-context: CHH cytosines (hH)
+  \item "CX" -- all cytosines are considered within-the-context, this
+  effectively results in no thresholding
+}}
+
+\item{filter.reads}{boolean defining if sequence reads with too high
+out-of-context cytosine methylation should be filtered out (e.g.,
+reads resulting from incompletely bisulfite-converted templates).
+Default: TRUE.}
 }
 \value{
 \code{\link[data.table]{data.table}} object containing VCF report or
@@ -147,8 +150,8 @@ tests their association with the methylation status of the sequencing reads.
 }
 \details{
 Using BAM reads and sequence variation information as an input,
-`generateVcfReport` function thresholds the reads (for paired-end sequencing
-alignment files - read pairs as a single
+`generateVcfReport` function filters and thresholds the reads
+(for paired-end sequencing alignment files - read pairs as a single
 entity) according to supplied parameters and calculates the occurrence of
 \strong{Ref}erence and \strong{Alt}ernative bases within reads, taking into
 the account DNA strand the read mapped to and average methylation level

@@ -103,6 +103,7 @@
 #' @param filter.reads boolean defining if sequence reads with too high
 #' out-of-context cytosine methylation should be filtered out (e.g.,
 #' reads resulting from incompletely bisulfite-converted templates).
+#' Default: TRUE.
 #' @param max.outofcontext.beta real number in the range [0;1] (default: 0.1).
 #' Reads with average beta value for out-of-context cytosines \strong{above}
 #' this threshold will not be thresholded and will be ignored in further
