@@ -1,4 +1,27 @@
 test_generateCytosineReport <- function () {
+  amplicon.bam    <- system.file("extdata", "amplicon010meth.bam", package="epialleleR")
+  amplicon.filter <- generateCytosineReport(amplicon.bam, verbose=TRUE)
+  amplicon.nofilter <- generateCytosineReport(amplicon.bam, filter.reads=FALSE, verbose=TRUE)
+  amplicon.nothresh <- generateCytosineReport(amplicon.bam, threshold.reads=FALSE, verbose=TRUE)
+  amplicon.donothing <- generateCytosineReport(amplicon.bam, filter.reads=FALSE, threshold.reads=FALSE, verbose=TRUE)
+  
+  RUnit::checkEquals(
+    amplicon.filter[, c(sum(meth), sum(unmeth))],
+    c(632, 6438)
+  )
+  RUnit::checkEquals(
+    amplicon.nofilter[, c(sum(meth), sum(unmeth))],
+    c(635, 6446)
+  )
+  RUnit::checkEquals(
+    amplicon.nothresh[, c(sum(meth), sum(unmeth))],
+    c(680, 6390)
+  )
+  RUnit::checkEquals(
+    amplicon.donothing[, c(sum(meth), sum(unmeth))],
+    c(683, 6398)
+  )
+  
   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
   cg.report   <- generateCytosineReport(capture.bam, verbose=TRUE)
   cx.report   <- generateCytosineReport(capture.bam, threshold.reads=FALSE,
@@ -273,7 +296,7 @@ test_generateCytosineReport <- function () {
     Ml=list(as.integer(c(102,128,153,179,161,187,212,169))),
     output.bam.file=output.bam
   )
-  cx.report <- generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX")
+  cx.report <- generateCytosineReport(output.bam, filter.reads=FALSE, threshold.reads=FALSE, report.context="CX")
   RUnit::checkEquals(
     cx.report[, .(strand, pos, context, meth, unmeth)],
     data.table::data.table(
@@ -285,7 +308,7 @@ test_generateCytosineReport <- function () {
       unmeth=as.integer(c(1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1))
     )
   )
-  cx.report <- generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX",
+  cx.report <- generateCytosineReport(output.bam, filter.reads=FALSE, threshold.reads=FALSE, report.context="CX",
                                       min.prob=160, highest.prob=FALSE)
   RUnit::checkEquals(
     cx.report[, .(strand, pos, context, meth, unmeth)],
@@ -309,7 +332,7 @@ test_generateCytosineReport <- function () {
     Ml=list(as.integer(c(102,128,153,179,161,187,212,169))),
     output.bam.file=output.bam
   )
-  cx.report <- generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX")
+  cx.report <- generateCytosineReport(output.bam, filter.reads=FALSE, threshold.reads=FALSE, report.context="CX")
   RUnit::checkEquals(
     cx.report[, .(strand, pos, context, meth, unmeth)],
     data.table::data.table(
@@ -321,7 +344,7 @@ test_generateCytosineReport <- function () {
       unmeth=as.integer(c(1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0))
     )
   )
-  cx.report <- generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX",
+  cx.report <- generateCytosineReport(output.bam, filter.reads=FALSE, threshold.reads=FALSE, report.context="CX",
                                       min.prob=160)
   RUnit::checkEquals(
     cx.report[, .(strand, pos, context, meth, unmeth)],
@@ -345,7 +368,7 @@ test_generateCytosineReport <- function () {
     Ml=list(as.integer(c(128,153,179,115,141,166,192,102))),
     output.bam.file=output.bam
   )
-  cx.report <- generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX")
+  cx.report <- generateCytosineReport(output.bam, filter.reads=FALSE, threshold.reads=FALSE, report.context="CX")
   RUnit::checkEquals(
     cx.report[meth>0, .(strand, pos, context)],
     data.table::data.table(
@@ -368,7 +391,7 @@ test_generateCytosineReport <- function () {
             as.integer(c(230,204,179,153,128,6,159,240,215))),
     output.bam.file=output.bam
   )
-  cx.report <- generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX")
+  cx.report <- generateCytosineReport(output.bam, filter.reads=FALSE, threshold.reads=FALSE, report.context="CX")
   RUnit::checkEquals(
     unname(unlist(cx.report[strand=="-", .(sum(meth), sum(unmeth))])),
     c(0,8)
@@ -392,7 +415,7 @@ test_generateCytosineReport <- function () {
     Ml=list(as.integer(c(128,153,179,128,153,179))),
     output.bam.file=output.bam
   )
-  cx.report <- generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX")
+  cx.report <- generateCytosineReport(output.bam, filter.reads=FALSE, threshold.reads=FALSE, report.context="CX")
   RUnit::checkEquals(
     dim(cx.report),
     c(20,6)
@@ -417,7 +440,7 @@ test_generateCytosineReport <- function () {
     Ml=list(as.integer(c(128,153,179,128,153,179))),
     output.bam.file=output.bam
   )
-  cx.report <- generateCytosineReport(output.bam, threshold.reads=FALSE, report.context="CX")
+  cx.report <- generateCytosineReport(output.bam, filter.reads=FALSE, threshold.reads=FALSE, report.context="CX")
   RUnit::checkEquals(
     dim(cx.report),
     c(20,6)

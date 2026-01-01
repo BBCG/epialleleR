@@ -91,13 +91,32 @@ test_generateMhlReport <- function () {
   
   # amplicon 100%
   amplicon.bam <- system.file("extdata", "amplicon100meth.bam", package="epialleleR")
-  RUnit::checkEquals(
-    generateMhlReport(amplicon.bam, min.haplotype.length=1, max.haplotype.window=1,
-                      min.mapq=30, min.baseq=20, max.outofcontext.beta=1)[, lmhl],
-    generateCytosineReport(amplicon.bam, threshold.reads=FALSE,
-                           min.mapq=30, min.baseq=20)[, meth/(meth+unmeth)],
-    tolerance=0.022992 # because in lMHL we skip unconverted, while in CX we retain them
+  RUnit::checkTrue(
+    !identical(
+      generateMhlReport(amplicon.bam, filter.reads=TRUE),
+      generateMhlReport(amplicon.bam, filter.reads=FALSE)
+    )
   )
+  RUnit::checkTrue(
+    identical(
+      generateMhlReport(amplicon.bam, min.mapq=30, min.baseq=20, filter.reads=TRUE),
+      generateMhlReport(amplicon.bam, min.mapq=30, min.baseq=20, filter.reads=FALSE)
+    )
+  )
+  RUnit::checkIdentical(
+    generateMhlReport(amplicon.bam, max.haplotype.window=1,
+                      min.mapq=30, min.baseq=20, filter.reads=FALSE),
+    generateMhlReport(amplicon.bam, max.haplotype.window=1,
+                      min.mapq=30, min.baseq=20, min.haplotype.length=0, max.outofcontext.beta=1)
+  )
+  RUnit::checkEquals(
+    generateMhlReport(amplicon.bam, min.haplotype.length=0, max.haplotype.window=1,
+                      min.mapq=30, min.baseq=20, max.outofcontext.beta=1)[, lmhl],
+    generateCytosineReport(amplicon.bam, filter.reads=FALSE, threshold.reads=FALSE,
+                           min.mapq=30, min.baseq=20)[, meth/(meth+unmeth)],
+    tolerance=0.022992 # because amplicon data is a bit noisy?
+  )
+  
   
   # simulated
   out.bam <- tempfile(pattern="simulated", fileext=".bam")

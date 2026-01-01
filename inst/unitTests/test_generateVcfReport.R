@@ -6,6 +6,38 @@ test_generateVcfReport <- function () {
     vcf.style="NCBI", verbose=FALSE
   )
   
+  amplicon.nofilter <- generateVcfReport(
+    bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
+    bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
+    vcf=system.file("extdata", "amplicon.vcf.gz", package="epialleleR"),
+    vcf.style="NCBI", filter.reads=FALSE, verbose=FALSE
+  )
+  
+  RUnit::checkTrue(
+    !identical(
+      colSums(amplicon.report[, -c(1,2,4,5)], na.rm=TRUE),
+      colSums(amplicon.nofilter[, -c(1,2,4,5)], na.rm=TRUE)
+    )
+  )
+  
+  amplicon.quality <- generateVcfReport(
+    bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
+    bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
+    vcf=system.file("extdata", "amplicon.vcf.gz", package="epialleleR"),
+    vcf.style="NCBI", min.mapq=30, min.baseq=30, verbose=FALSE
+  )
+  
+  amplicon.quality.nofilter <- generateVcfReport(
+    bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
+    bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
+    vcf=system.file("extdata", "amplicon.vcf.gz", package="epialleleR"),
+    vcf.style="NCBI", min.mapq=30, min.baseq=30, filter.reads=FALSE, verbose=FALSE
+  )
+  
+  RUnit::checkTrue(
+    identical(amplicon.quality, amplicon.quality.nofilter)
+  )
+  
   capture.vcf <- VariantAnnotation::readVcf(
     system.file("extdata", "capture.vcf.gz", package="epialleleR"))
   
@@ -66,12 +98,12 @@ test_generateVcfReport <- function () {
   
   RUnit::checkEquals(
     sum(amplicon.report$SumRef, na.rm=TRUE),
-    5282
+    5267
   )
   
   RUnit::checkEquals(
     sum(amplicon.report$SumAlt, na.rm=TRUE),
-    14
+    13
   )
   
   # some extended consistency checks
@@ -93,7 +125,7 @@ test_generateVcfReport <- function () {
   )
   RUnit::checkEquals(
     amplicon.report[, sum(`U-Ref`, na.rm=TRUE), by=.(REF,ALT)][order(REF, ALT)]$V1,
-    c(201, 0, 142, 722, 196, 1617, 0, 555, 534, 285, 427, 140)
+    c(201, 0, 142, 722, 195, 1613, 0, 553, 531, 283, 424, 140)
   )
   RUnit::checkEquals(
     amplicon.report[, sum(`M+Alt`, na.rm=TRUE), by=.(REF,ALT)][order(REF, ALT)]$V1,
@@ -109,7 +141,7 @@ test_generateVcfReport <- function () {
   )
   RUnit::checkEquals(
     amplicon.report[, sum(`U-Alt`, na.rm=TRUE), by=.(REF,ALT)][order(REF, ALT)]$V1,
-    c(0, 0, 0, 3, 1, 4, 0, 1, 1, 0, 1, 2)
+    c(0, 0, 0, 3, 1, 3, 0, 1, 1, 0, 1, 2)
   )
   RUnit::checkEquals(
     amplicon.report[, sum(`SumRef`, na.rm=TRUE), by=.(REF,ALT)][order(REF, ALT)]$V1,
@@ -117,7 +149,7 @@ test_generateVcfReport <- function () {
   )
   RUnit::checkEquals(
     amplicon.report[, sum(`SumAlt`, na.rm=TRUE), by=.(REF,ALT)][order(REF, ALT)]$V1,
-    c(0, 0, 0, 4, 1, 4, 0, 1, 1, 0, 1, 2)
+    c(0, 0, 0, 4, 1, 3, 0, 1, 1, 0, 1, 2)
   )
   RUnit::checkEquals(
     amplicon.report[, sum(as.numeric(range)), by=.(REF,ALT)][order(REF,ALT)]$V1,
