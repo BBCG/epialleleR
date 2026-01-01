@@ -15,7 +15,7 @@ tests their association with the methylation status of the sequencing reads."></
 
     <a class="navbar-brand me-2" href="../index.html">epialleleR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.19.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.19.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,11 +59,12 @@ tests their association with the methylation status of the sequencing reads.</p>
 <span>  bed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  report.file <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  zero.based.bed <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  cytosine.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,</span>
+<span>  filter.reads <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  max.outofcontext.beta <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  threshold.reads <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  threshold.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,</span>
 <span>  min.context.sites <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  min.context.beta <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  max.outofcontext.beta <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  gzip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -117,6 +118,33 @@ must match the style of seqlevels of the BAM file/object used.</p></dd>
 (default: FALSE).</p></dd>
 
 
+<dt id="arg-cytosine-context">cytosine.context<a class="anchor" aria-label="anchor" href="#arg-cytosine-context"></a></dt>
+<dd><p>string defining cytosine methylation context used
+for filtering and/or thresholding the reads:</p><ul><li><p>"CG" (the default) – within-the-context: CpG cytosines (called as
+  zZ), out-of-context: all the other cytosines (hHxX)</p></li>
+<li><p>"CHG" – within-the-context: CHG cytosines (xX), out-of-context: hHzZ</p></li>
+<li><p>"CHH" – within-the-context: CHH cytosines (hH), out-of-context: xXzZ</p></li>
+<li><p>"CxG" – within-the-context: CG and CHG cytosines (zZxX),
+  out-of-context: CHH cytosines (hH)</p></li>
+<li><p>"CX" – all cytosines are considered within-the-context, this
+  effectively results in no thresholding</p></li>
+</ul></dd>
+
+
+<dt id="arg-filter-reads">filter.reads<a class="anchor" aria-label="anchor" href="#arg-filter-reads"></a></dt>
+<dd><p>boolean defining if sequence reads with too high
+out-of-context cytosine methylation should be filtered out (e.g.,
+reads resulting from incompletely bisulfite-converted templates).
+Default: TRUE.</p></dd>
+
+
+<dt id="arg-max-outofcontext-beta">max.outofcontext.beta<a class="anchor" aria-label="anchor" href="#arg-max-outofcontext-beta"></a></dt>
+<dd><p>real number in the range [0;1] (default: 0.1).
+Reads with average beta value for out-of-context cytosines <strong>above</strong>
+this threshold will not be thresholded and will be ignored in further
+computations. This option has no effect when read filtering is disabled.</p></dd>
+
+
 <dt id="arg-threshold-reads">threshold.reads<a class="anchor" aria-label="anchor" href="#arg-threshold-reads"></a></dt>
 <dd><p>boolean defining if sequence reads should be
 thresholded before counting bases in reference and variant epialleles
@@ -129,22 +157,9 @@ sequencing data, this function is <strong>not</strong> recommended for such data
 either.</p></dd>
 
 
-<dt id="arg-threshold-context">threshold.context<a class="anchor" aria-label="anchor" href="#arg-threshold-context"></a></dt>
-<dd><p>string defining cytosine methylation context used
-for thresholding the reads:</p><ul><li><p>"CG" (the default) – within-the-context: CpG cytosines (called as
-  zZ), out-of-context: all the other cytosines (hHxX)</p></li>
-<li><p>"CHG" – within-the-context: CHG cytosines (xX), out-of-context: hHzZ</p></li>
-<li><p>"CHH" – within-the-context: CHH cytosines (hH), out-of-context: xXzZ</p></li>
-<li><p>"CxG" – within-the-context: CG and CHG cytosines (zZxX),
-  out-of-context: CHH cytosines (hH)</p></li>
-<li><p>"CX" – all cytosines are considered within-the-context, this
-  effectively results in no thresholding</p></li>
-</ul><p>This option has no effect when read thresholding is disabled.</p></dd>
-
-
 <dt id="arg-min-context-sites">min.context.sites<a class="anchor" aria-label="anchor" href="#arg-min-context-sites"></a></dt>
 <dd><p>non-negative integer for minimum number of cytosines
-within the `threshold.context` (default: 2). Reads containing <strong>fewer</strong>
+within the `cytosine.context` (default: 2). Reads containing <strong>fewer</strong>
 within-the-context cytosines are considered completely unmethylated (thus
 belonging to the reference epiallele). This option has no effect when read
 thresholding is disabled.</p></dd>
@@ -154,14 +169,6 @@ thresholding is disabled.</p></dd>
 <dd><p>real number in the range [0;1] (default: 0.5). Reads
 with average beta value for within-the-context cytosines <strong>below</strong> this
 threshold are considered completely unmethylated (thus belonging to the
-reference epiallele). This option has no effect when read thresholding is
-disabled.</p></dd>
-
-
-<dt id="arg-max-outofcontext-beta">max.outofcontext.beta<a class="anchor" aria-label="anchor" href="#arg-max-outofcontext-beta"></a></dt>
-<dd><p>real number in the range [0;1] (default: 0.1).
-Reads with average beta value for out-of-context cytosines <strong>above</strong>
-this threshold are considered completely unmethylated (thus belonging to the
 reference epiallele). This option has no effect when read thresholding is
 disabled.</p></dd>
 
@@ -208,8 +215,8 @@ NULL if report.file was specified. The report columns are:</p><ul><li><p>name �
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Using BAM reads and sequence variation information as an input,
-`generateVcfReport` function thresholds the reads (for paired-end sequencing
-alignment files - read pairs as a single
+`generateVcfReport` function filters and thresholds the reads
+(for paired-end sequencing alignment files - read pairs as a single
 entity) according to supplied parameters and calculates the occurrence of
 <strong>Ref</strong>erence and <strong>Alt</strong>ernative bases within reads, taking into
 the account DNA strand the read mapped to and average methylation level
@@ -266,17 +273,66 @@ the seqlevels style.</p></div>
 <span class="r-in"><span>                                  vcf<span class="op">=</span><span class="va">capture.vcf</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: VariantAnnotation</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.027s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.026s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading VCF file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [4.928s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [4.491s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.013s]</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.011s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering and thresholding reads </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting base frequences </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.111s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.881s]</span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># toy example to illustrate the logic of computations</span></span></span>
+<span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"VariantAnnotation"</span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="co"># simulate toy BAM</span></span></span>
+<span class="r-in"><span>    <span class="va">temp.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext<span class="op">=</span><span class="st">".bam"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="simulateBam.html">simulateBam</a></span><span class="op">(</span>output.bam.file<span class="op">=</span><span class="va">temp.bam</span>, rname<span class="op">=</span><span class="st">"chr1"</span>, XG<span class="op">=</span><span class="st">"CT"</span>,</span></span>
+<span class="r-in"><span>                seq<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AGACGTTAGTAATAGTA"</span>, <span class="st">"AAACGTTGTAATAGTA"</span>,</span></span>
+<span class="r-in"><span>                      <span class="st">"AGACGTTGTAACAGTA"</span>,  <span class="st">"AAACGTTGTAATGTA"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                XM<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"...Z..x+.h..x..h."</span>, <span class="st">"...Z..z.h..x..h."</span>,</span></span>
+<span class="r-in"><span>                      <span class="st">"...Z..z.h..X..h."</span>,  <span class="st">"...Z..z.h..z.h."</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                cigar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"7M1I9M"</span>, <span class="st">"16M"</span>, <span class="st">"16M"</span>, <span class="st">"12M1D3M"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="co"># toy VCF</span></span></span>
+<span class="r-in"><span>    <span class="va">vcf</span> <span class="op">&lt;-</span> <span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/VCF-class.html" class="external-link">VCF</a></span><span class="op">(</span>rowRanges<span class="op">=</span><span class="fu">as</span><span class="op">(</span><span class="st">"chr1:2"</span>, <span class="st">"GRanges"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                                  collapsed<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/VCF-class.html" class="external-link">ref</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu">as</span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"DNAStringSet"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/VCF-class.html" class="external-link">alt</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu">as</span><span class="op">(</span><span class="st">"G"</span>, <span class="st">"DNAStringSet"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="co"># read filtering will exclude third read from BAM file because it has</span></span></span>
+<span class="r-in"><span>    <span class="co"># too many out-of-context methylated cytosines (in position #12).</span></span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    <span class="co"># results with read filtering and thresholding</span></span></span>
+<span class="r-in"><span>    <span class="fu">generateVcfReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">temp.bam</span>, vcf<span class="op">=</span><span class="va">vcf</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="co"># results without read filtering</span></span></span>
+<span class="r-in"><span>    <span class="fu">generateVcfReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">temp.bam</span>, vcf<span class="op">=</span><span class="va">vcf</span>, filter.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">}</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Writing sample BAM </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering and thresholding reads </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting base frequences </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.032s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting base frequences </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.031s]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    seqnames range    REF    ALT M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt U-Alt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;fctr&gt; &lt;int&gt; &lt;char&gt; &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:     chr1     2      A      G     1     1    NA    NA     1     1    NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    SumRef SumAlt  FEp+  FEp-</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     &lt;num&gt;  &lt;num&gt; &lt;num&gt; &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:      2      2     1    NA</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

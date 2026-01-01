@@ -14,11 +14,12 @@ generateVcfReport(
   bed = NULL,
   report.file = NULL,
   zero.based.bed = FALSE,
+  cytosine.context = c("CG", "CHG", "CHH", "CxG", "CX"),
+  filter.reads = TRUE,
+  max.outofcontext.beta = 0.1,
   threshold.reads = TRUE,
-  threshold.context = c("CG", "CHG", "CHH", "CxG", "CX"),
   min.context.sites = 2,
   min.context.beta = 0.5,
-  max.outofcontext.beta = 0.1,
   ...,
   gzip = FALSE,
   verbose = TRUE
@@ -76,21 +77,10 @@ generateVcfReport(
 
   boolean defining if BED coordinates are zero based (default: FALSE).
 
-- threshold.reads:
+- cytosine.context:
 
-  boolean defining if sequence reads should be thresholded before
-  counting bases in reference and variant epialleles (default: TRUE).
-  Disabling thresholding is possible but makes no sense in the context
-  of this function, because all the reads will be assigned to the
-  variant epiallele, which will result in Fisher's Exact test p-value of
-  1 (in columns \`FEp+\` and \`FEP-\`). As thresholding is **not**
-  recommended for long-read sequencing data, this function is **not**
-  recommended for such data either.
-
-- threshold.context:
-
-  string defining cytosine methylation context used for thresholding the
-  reads:
+  string defining cytosine methylation context used for filtering and/or
+  thresholding the reads:
 
   - "CG" (the default) – within-the-context: CpG cytosines (called as
     zZ), out-of-context: all the other cytosines (hHxX)
@@ -105,12 +95,34 @@ generateVcfReport(
   - "CX" – all cytosines are considered within-the-context, this
     effectively results in no thresholding
 
-  This option has no effect when read thresholding is disabled.
+- filter.reads:
+
+  boolean defining if sequence reads with too high out-of-context
+  cytosine methylation should be filtered out (e.g., reads resulting
+  from incompletely bisulfite-converted templates). Default: TRUE.
+
+- max.outofcontext.beta:
+
+  real number in the range \[0;1\] (default: 0.1). Reads with average
+  beta value for out-of-context cytosines **above** this threshold will
+  not be thresholded and will be ignored in further computations. This
+  option has no effect when read filtering is disabled.
+
+- threshold.reads:
+
+  boolean defining if sequence reads should be thresholded before
+  counting bases in reference and variant epialleles (default: TRUE).
+  Disabling thresholding is possible but makes no sense in the context
+  of this function, because all the reads will be assigned to the
+  variant epiallele, which will result in Fisher's Exact test p-value of
+  1 (in columns \`FEp+\` and \`FEP-\`). As thresholding is **not**
+  recommended for long-read sequencing data, this function is **not**
+  recommended for such data either.
 
 - min.context.sites:
 
   non-negative integer for minimum number of cytosines within the
-  \`threshold.context\` (default: 2). Reads containing **fewer**
+  \`cytosine.context\` (default: 2). Reads containing **fewer**
   within-the-context cytosines are considered completely unmethylated
   (thus belonging to the reference epiallele). This option has no effect
   when read thresholding is disabled.
@@ -122,14 +134,6 @@ generateVcfReport(
   are considered completely unmethylated (thus belonging to the
   reference epiallele). This option has no effect when read thresholding
   is disabled.
-
-- max.outofcontext.beta:
-
-  real number in the range \[0;1\] (default: 0.1). Reads with average
-  beta value for out-of-context cytosines **above** this threshold are
-  considered completely unmethylated (thus belonging to the reference
-  epiallele). This option has no effect when read thresholding is
-  disabled.
 
 - ...:
 
@@ -194,12 +198,12 @@ report columns are:
 ## Details
 
 Using BAM reads and sequence variation information as an input,
-\`generateVcfReport\` function thresholds the reads (for paired-end
-sequencing alignment files - read pairs as a single entity) according to
-supplied parameters and calculates the occurrence of **Ref**erence and
-**Alt**ernative bases within reads, taking into the account DNA strand
-the read mapped to and average methylation level (epiallele status) of
-the read.
+\`generateVcfReport\` function filters and thresholds the reads (for
+paired-end sequencing alignment files - read pairs as a single entity)
+according to supplied parameters and calculates the occurrence of
+**Ref**erence and **Alt**ernative bases within reads, taking into the
+account DNA strand the read mapped to and average methylation level
+(epiallele status) of the read.
 
 The information on sequence variation can be supplied as a Variant Call
 Format (VCF) file location or an object of class VCF, returned by the
@@ -262,15 +266,64 @@ function for getting or setting the seqlevels style.
                                   vcf=capture.vcf)
 #> Loading required namespace: VariantAnnotation
 #> Reading BED file 
-#> [0.027s]
+#> [0.026s]
 #> Reading VCF file 
-#> [4.928s]
+#> [4.491s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.013s]
-#> Thresholding reads 
-#> [0.001s]
+#> [0.011s]
+#> Filtering and thresholding reads 
+#> [0.002s]
 #> Extracting base frequences 
-#> [0.111s]
+#> [0.881s]
+  
+  # toy example to illustrate the logic of computations
+  if (requireNamespace("VariantAnnotation", quietly=TRUE)) {
+    # simulate toy BAM
+    temp.bam <- tempfile(fileext=".bam")
+    simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
+                seq=c("AGACGTTAGTAATAGTA", "AAACGTTGTAATAGTA",
+                      "AGACGTTGTAACAGTA",  "AAACGTTGTAATGTA"),
+                XM=c( "...Z..x+.h..x..h.", "...Z..z.h..x..h.",
+                      "...Z..z.h..X..h.",  "...Z..z.h..z.h."),
+                cigar=c("7M1I9M", "16M", "16M", "12M1D3M"))
+    # toy VCF
+    vcf <- VariantAnnotation::VCF(rowRanges=as("chr1:2", "GRanges"),
+                                  collapsed=FALSE)
+    VariantAnnotation::ref(vcf) <- as("A", "DNAStringSet")
+    VariantAnnotation::alt(vcf) <- as("G", "DNAStringSet")
+    
+    # read filtering will exclude third read from BAM file because it has
+    # too many out-of-context methylated cytosines (in position #12).
+    
+    # results with read filtering and thresholding
+    generateVcfReport(bam=temp.bam, vcf=vcf)
+    # results without read filtering
+    generateVcfReport(bam=temp.bam, vcf=vcf, filter.reads=FALSE)
+  }
+#> Writing sample BAM 
+#> [0.002s]
+#> Checking BAM file: 
+#> short-read, single-end, unsorted alignment detected
+#> Reading single-end BAM file 
+#> [0.002s]
+#> Filtering and thresholding reads 
+#> [0.000s]
+#> Extracting base frequences 
+#> [0.032s]
+#> Checking BAM file: 
+#> short-read, single-end, unsorted alignment detected
+#> Reading single-end BAM file 
+#> [0.002s]
+#> Thresholding reads 
+#> [0.000s]
+#> Extracting base frequences 
+#> [0.031s]
+#>    seqnames range    REF    ALT M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt U-Alt
+#>      <fctr> <int> <char> <char> <num> <num> <num> <num> <num> <num> <num> <num>
+#> 1:     chr1     2      A      G     1     1    NA    NA     1     1    NA    NA
+#>    SumRef SumAlt  FEp+  FEp-
+#>     <num>  <num> <num> <num>
+#> 1:      2      2     1    NA
 ```

@@ -177,13 +177,13 @@ vignettes for the description of usage and sample data.
   # extract patterns
   patterns <- extractPatterns(bam=amplicon.bam, bed=amplicon.bed, bed.row=3)
 #> Reading BED file 
-#> [0.031s]
+#> [0.033s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.010s]
+#> [0.009s]
 #> Extracting methylation patterns 
-#> [0.026s]
+#> [0.027s]
   
   # and then plot them
   plotPatterns(patterns)

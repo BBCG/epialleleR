@@ -15,7 +15,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">epialleleR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.19.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.19.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,8 +55,9 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generateMhlReport</span><span class="op">(</span></span>
 <span>  <span class="va">bam</span>,</span>
 <span>  report.file <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  haplotype.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,</span>
+<span>  cytosine.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,</span>
 <span>  max.haplotype.window <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  filter.reads <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  min.haplotype.length <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  max.outofcontext.beta <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  <span class="va">...</span>,</span>
@@ -81,7 +82,7 @@ If NULL (the default) then report is returned as a
 <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code> object.</p></dd>
 
 
-<dt id="arg-haplotype-context">haplotype.context<a class="anchor" aria-label="anchor" href="#arg-haplotype-context"></a></dt>
+<dt id="arg-cytosine-context">cytosine.context<a class="anchor" aria-label="anchor" href="#arg-cytosine-context"></a></dt>
 <dd><p>string for a cytosine context that defines
 a haplotype:</p><ul><li><p>"CG" (the default) – CpG cytosines only (called as zZ)</p></li>
 <li><p>"CHG" – CHG cytosines only (xX)</p></li>
@@ -91,8 +92,8 @@ a haplotype:</p><ul><li><p>"CG" (the default) – CpG cytosines only (called as 
   may have little sense but still included for consistency</p></li>
 </ul><p>If \(lMHL\) calculations are needed for all three possible cytosine
 contexts <em>independently</em>, one has to run this function for
-each required `haplotype.context` separately, because
-`haplotype.context`=="CX" assumes that <em>any</em> cytosine context
+each required `cytosine.context` separately, because
+`cytosine.context`=="CX" assumes that <em>any</em> cytosine context
 is allowed within the same haplotype. This behaviour may change in the
 future.</p></dd>
 
@@ -116,18 +117,29 @@ typical hypermethylated region. For thorough
 explanation and more examples, see Details section and vignette.</p></dd>
 
 
+<dt id="arg-filter-reads">filter.reads<a class="anchor" aria-label="anchor" href="#arg-filter-reads"></a></dt>
+<dd><p>boolean defining if sequence reads with too high
+out-of-context cytosine methylation (specified by `max.outofcontext.beta`)
+or too few within-the-context bases (specified by `min.haplotype.length`)
+should be filtered out. Default: TRUE.</p></dd>
+
+
 <dt id="arg-min-haplotype-length">min.haplotype.length<a class="anchor" aria-label="anchor" href="#arg-min-haplotype-length"></a></dt>
 <dd><p>non-negative integer for minimum length of a
 haplotype (default: 0 will include haplotypes of any length).
 When `min.haplotype.length`&gt;0, reads
 (read pairs) with fewer than `min.haplotype.length` cytosines
-within the `haplotype.context` are skipped.</p></dd>
+within the `cytosine.context` are skipped.
+This option has no effect when read filtering is disabled.</p></dd>
 
 
 <dt id="arg-max-outofcontext-beta">max.outofcontext.beta<a class="anchor" aria-label="anchor" href="#arg-max-outofcontext-beta"></a></dt>
 <dd><p>real number in the range [0;1] (default: 0.1).
 Reads (read pairs) with average beta value for out-of-context cytosines
-<strong>above</strong> this threshold are skipped. Set to 1 to disable filtering.</p></dd>
+<strong>above</strong> this threshold (e.g., reads resulting from incompletely
+bisulfite-converted templates) are skipped. Value of 1 disables filtering by
+out-of-context methylation.
+This option has no effect when read filtering is disabled.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -154,7 +166,7 @@ report columns are:</p><ul><li><p>rname – reference sequence name (as in BAM)<
 <li><p>context – methylation context</p></li>
 <li><p>coverage – number of reads (read pairs) that include this position</p></li>
 <li><p>length – average length of a haplotype, i.e.,
-  average number of cytosines within `haplotype.context` for
+  average number of cytosines within `cytosine.context` for
   reads (read pairs) that include this position</p></li>
 <li><p>lmhl – \(lMHL\) value</p></li>
 </ul></div>
@@ -240,7 +252,7 @@ beta values.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.011s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing lMHL report </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.021s]</span>
 <span class="r-in"><span>  </span></span>
@@ -251,14 +263,16 @@ beta values.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.011s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing lMHL report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.020s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.019s]</span>
 <span class="r-in"><span>  <span class="va">cg.report</span>  <span class="op">&lt;-</span> <span class="fu"><a href="generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">capture.bam</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.011s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering reads </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing cytosine report </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span></span></span>
@@ -266,6 +280,93 @@ beta values.</p></div>
 <span class="r-in"><span>    <span class="va">cg.report</span><span class="op">[</span> , <span class="fu">.</span><span class="op">(</span><span class="va">rname</span>, <span class="va">strand</span>, <span class="va">pos</span>, <span class="va">context</span>, value<span class="op">=</span><span class="va">meth</span><span class="op">/</span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co">## toy examples to illustrate the logic of computations</span></span></span>
+<span class="r-in"><span>  <span class="va">temp.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext<span class="op">=</span><span class="st">".bam"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># case 1: fully methylated haplotype</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="simulateBam.html">simulateBam</a></span><span class="op">(</span>output.bam.file<span class="op">=</span><span class="va">temp.bam</span>, rname<span class="op">=</span><span class="st">"chr1"</span>, XG<span class="op">=</span><span class="st">"CT"</span>,</span></span>
+<span class="r-in"><span>              XM<span class="op">=</span><span class="st">"h..Z..Z.Z..Z...Z.h."</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Writing sample BAM </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
+<span class="r-in"><span>  <span class="fu">generateMhlReport</span><span class="op">(</span><span class="va">temp.bam</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing lMHL report </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     rname strand   pos context coverage length  lmhl</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;fctr&gt; &lt;fctr&gt; &lt;int&gt;  &lt;fctr&gt;    &lt;int&gt;  &lt;num&gt; &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   chr1      +     4      CG        1      5     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:   chr1      +     7      CG        1      5     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   chr1      +     9      CG        1      5     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:   chr1      +    12      CG        1      5     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:   chr1      +    16      CG        1      5     1</span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># case 2: incompletely methylated haplotype</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="simulateBam.html">simulateBam</a></span><span class="op">(</span>output.bam.file<span class="op">=</span><span class="va">temp.bam</span>, rname<span class="op">=</span><span class="st">"chr1"</span>, XG<span class="op">=</span><span class="st">"CT"</span>,</span></span>
+<span class="r-in"><span>              XM<span class="op">=</span><span class="st">"h..Z..Z.z..Z...Z.h."</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Writing sample BAM </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
+<span class="r-in"><span>  <span class="fu">generateMhlReport</span><span class="op">(</span><span class="va">temp.bam</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing lMHL report </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     rname strand   pos context coverage length      lmhl</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;fctr&gt; &lt;fctr&gt; &lt;int&gt;  &lt;fctr&gt;    &lt;int&gt;  &lt;num&gt;     &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   chr1      +     4      CG        1      5 0.1142857</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:   chr1      +     7      CG        1      5 0.1142857</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   chr1      +     9      CG        1      5 0.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:   chr1      +    12      CG        1      5 0.1142857</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:   chr1      +    16      CG        1      5 0.1142857</span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># case 3: hypermethylated read and hypomethylated read </span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="simulateBam.html">simulateBam</a></span><span class="op">(</span>output.bam.file<span class="op">=</span><span class="va">temp.bam</span>, rname<span class="op">=</span><span class="st">"chr1"</span>, XG<span class="op">=</span><span class="st">"CT"</span>,</span></span>
+<span class="r-in"><span>              XM<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"h..Z..Z.Z..Z...Z.h."</span>, <span class="st">"h..z..Z.z..Z...z.h."</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Writing sample BAM </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
+<span class="r-in"><span>  <span class="fu">generateMhlReport</span><span class="op">(</span><span class="va">temp.bam</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing lMHL report </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     rname strand   pos context coverage length      lmhl</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;fctr&gt; &lt;fctr&gt; &lt;int&gt;  &lt;fctr&gt;    &lt;int&gt;  &lt;num&gt;     &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   chr1      +     4      CG        2      5 0.5000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:   chr1      +     7      CG        2      5 0.5142857</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   chr1      +     9      CG        2      5 0.5000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:   chr1      +    12      CG        2      5 0.5142857</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:   chr1      +    16      CG        2      5 0.5000000</span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># case 4: incompletely bisulfite-converted read and hypomethylated read </span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="simulateBam.html">simulateBam</a></span><span class="op">(</span>output.bam.file<span class="op">=</span><span class="va">temp.bam</span>, rname<span class="op">=</span><span class="st">"chr1"</span>, XG<span class="op">=</span><span class="st">"CT"</span>,</span></span>
+<span class="r-in"><span>              XM<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"H..Z..Z.Z..Z...Z.h."</span>, <span class="st">"h..z..Z.z..Z...z.h."</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Writing sample BAM </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.003s]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
+<span class="r-in"><span>  <span class="fu">generateMhlReport</span><span class="op">(</span><span class="va">temp.bam</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing lMHL report </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     rname strand   pos context coverage length       lmhl</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;fctr&gt; &lt;fctr&gt; &lt;int&gt;  &lt;fctr&gt;    &lt;int&gt;  &lt;num&gt;      &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:   chr1      +     4      CG        1      5 0.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:   chr1      +     7      CG        1      5 0.02857143</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   chr1      +     9      CG        1      5 0.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:   chr1      +    12      CG        1      5 0.02857143</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:   chr1      +    16      CG        1      5 0.00000000</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -128,7 +128,7 @@ Platform](https://support-docs.illumina.com/SW/dragen_v42/Content/SW/DRAGEN/MPip
 #> Reading reference genome file 
 #> [0.000s]
 #> Making methylation calls 
-#> [0.021s]
+#> [0.022s]
 #> $nrecs
 #> [1] 100
 #> 

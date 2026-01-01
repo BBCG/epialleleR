@@ -179,8 +179,10 @@ DNA methylation heterogeneity calculation from bisulfite alignments.
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
 #> [0.002s]
+#> Filtering reads 
+#> [0.000s]
 #> Preparing cytosine report 
-#> [0.001s]
+#> [0.000s]
 #>      rname strand   pos context  meth unmeth
 #>     <fctr> <fctr> <int>  <fctr> <int>  <int>
 #>  1:   chrS      +     1      CG     1      0

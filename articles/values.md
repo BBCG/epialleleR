@@ -39,7 +39,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.143s]
+#> Writing sample BAM [0.106s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), 0, title="no epimutations")
 ```
@@ -61,7 +61,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.089s]
+#> Writing sample BAM [0.104s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="one complete epimutation")
 ```
@@ -83,7 +83,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.088s]
+#> Writing sample BAM [0.100s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="one partial epimutation")
 ```
@@ -105,7 +105,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.090s]
+#> Writing sample BAM [0.104s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="another partial epimutation")
 ```
@@ -130,7 +130,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.091s]
+#> Writing sample BAM [0.110s]
 #> [1] 1009
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="several partial epimutations")
 ```
@@ -155,7 +155,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.096s]
+#> Writing sample BAM [0.102s]
 #> [1] 1009
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="several short partial epimutations")
 ```
@@ -178,7 +178,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.005s]
+#> Writing sample BAM [0.009s]
 #> [1] 20
 plotMetrics(out.bam, as("chrS:1-20", "GRanges"), title="several overlapping partial epimutations")
 ```
@@ -319,7 +319,7 @@ sessionInfo()
 #> [1] stats4    stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] epialleleR_1.19.0    ggplot2_4.0.1        GenomicRanges_1.63.1 Seqinfo_1.1.0       
+#> [1] epialleleR_1.19.1    ggplot2_4.0.1        GenomicRanges_1.63.1 Seqinfo_1.1.0       
 #> [5] IRanges_2.45.0       S4Vectors_0.49.0     BiocGenerics_0.57.0  generics_0.1.4      
 #> [9] data.table_1.18.0   
 #> 

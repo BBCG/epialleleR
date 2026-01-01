@@ -9,8 +9,9 @@ per genomic position.
 generateMhlReport(
   bam,
   report.file = NULL,
-  haplotype.context = c("CG", "CHG", "CHH", "CxG", "CX"),
+  cytosine.context = c("CG", "CHG", "CHH", "CxG", "CX"),
   max.haplotype.window = 0,
+  filter.reads = TRUE,
   min.haplotype.length = 0,
   max.outofcontext.beta = 0.1,
   ...,
@@ -35,7 +36,7 @@ generateMhlReport(
   [`data.table`](https://rdatatable.gitlab.io/data.table/reference/data.table.html)
   object.
 
-- haplotype.context:
+- cytosine.context:
 
   string for a cytosine context that defines a haplotype:
 
@@ -52,8 +53,8 @@ generateMhlReport(
 
   If \\lMHL\\ calculations are needed for all three possible cytosine
   contexts *independently*, one has to run this function for each
-  required \`haplotype.context\` separately, because
-  \`haplotype.context\`=="CX" assumes that *any* cytosine context is
+  required \`cytosine.context\` separately, because
+  \`cytosine.context\`=="CX" assumes that *any* cytosine context is
   allowed within the same haplotype. This behaviour may change in the
   future.
 
@@ -74,19 +75,29 @@ generateMhlReport(
   hypermethylated region. For thorough explanation and more examples,
   see Details section and vignette.
 
+- filter.reads:
+
+  boolean defining if sequence reads with too high out-of-context
+  cytosine methylation (specified by \`max.outofcontext.beta\`) or too
+  few within-the-context bases (specified by \`min.haplotype.length\`)
+  should be filtered out. Default: TRUE.
+
 - min.haplotype.length:
 
   non-negative integer for minimum length of a haplotype (default: 0
   will include haplotypes of any length). When
   \`min.haplotype.length\`\>0, reads (read pairs) with fewer than
-  \`min.haplotype.length\` cytosines within the \`haplotype.context\`
-  are skipped.
+  \`min.haplotype.length\` cytosines within the \`cytosine.context\` are
+  skipped. This option has no effect when read filtering is disabled.
 
 - max.outofcontext.beta:
 
   real number in the range \[0;1\] (default: 0.1). Reads (read pairs)
   with average beta value for out-of-context cytosines **above** this
-  threshold are skipped. Set to 1 to disable filtering.
+  threshold (e.g., reads resulting from incompletely bisulfite-converted
+  templates) are skipped. Value of 1 disables filtering by
+  out-of-context methylation. This option has no effect when read
+  filtering is disabled.
 
 - ...:
 
@@ -119,7 +130,7 @@ The report columns are:
 - coverage – number of reads (read pairs) that include this position
 
 - length – average length of a haplotype, i.e., average number of
-  cytosines within \`haplotype.context\` for reads (read pairs) that
+  cytosines within \`cytosine.context\` for reads (read pairs) that
   include this position
 
 - lmhl – \\lMHL\\ value
@@ -218,7 +229,7 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.012s]
+#> [0.011s]
 #> Preparing lMHL report 
 #> [0.021s]
   
@@ -229,14 +240,16 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.012s]
+#> [0.011s]
 #> Preparing lMHL report 
-#> [0.020s]
+#> [0.019s]
   cg.report  <- generateCytosineReport(capture.bam, threshold.reads=FALSE)
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.012s]
+#> [0.011s]
+#> Filtering reads 
+#> [0.001s]
 #> Preparing cytosine report 
 #> [0.012s]
   identical(
@@ -244,4 +257,91 @@ for analysing the distribution of per-read beta values.
     cg.report[ , .(rname, strand, pos, context, value=meth/(meth+unmeth))]
   )
 #> [1] TRUE
+  
+  ## toy examples to illustrate the logic of computations
+  temp.bam <- tempfile(fileext=".bam")
+  
+  # case 1: fully methylated haplotype
+  simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
+              XM="h..Z..Z.Z..Z...Z.h.")
+#> Writing sample BAM 
+#> [0.002s]
+#> [1] 1
+  generateMhlReport(temp.bam)
+#> Checking BAM file: 
+#> short-read, single-end, unsorted alignment detected
+#> Reading single-end BAM file 
+#> [0.001s]
+#> Preparing lMHL report 
+#> [0.001s]
+#>     rname strand   pos context coverage length  lmhl
+#>    <fctr> <fctr> <int>  <fctr>    <int>  <num> <num>
+#> 1:   chr1      +     4      CG        1      5     1
+#> 2:   chr1      +     7      CG        1      5     1
+#> 3:   chr1      +     9      CG        1      5     1
+#> 4:   chr1      +    12      CG        1      5     1
+#> 5:   chr1      +    16      CG        1      5     1
+  
+  # case 2: incompletely methylated haplotype
+  simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
+              XM="h..Z..Z.z..Z...Z.h.")
+#> Writing sample BAM 
+#> [0.002s]
+#> [1] 1
+  generateMhlReport(temp.bam)
+#> Checking BAM file: 
+#> short-read, single-end, unsorted alignment detected
+#> Reading single-end BAM file 
+#> [0.001s]
+#> Preparing lMHL report 
+#> [0.000s]
+#>     rname strand   pos context coverage length      lmhl
+#>    <fctr> <fctr> <int>  <fctr>    <int>  <num>     <num>
+#> 1:   chr1      +     4      CG        1      5 0.1142857
+#> 2:   chr1      +     7      CG        1      5 0.1142857
+#> 3:   chr1      +     9      CG        1      5 0.0000000
+#> 4:   chr1      +    12      CG        1      5 0.1142857
+#> 5:   chr1      +    16      CG        1      5 0.1142857
+  
+  # case 3: hypermethylated read and hypomethylated read 
+  simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
+              XM=c("h..Z..Z.Z..Z...Z.h.", "h..z..Z.z..Z...z.h."))
+#> Writing sample BAM 
+#> [0.002s]
+#> [1] 2
+  generateMhlReport(temp.bam)
+#> Checking BAM file: 
+#> short-read, single-end, unsorted alignment detected
+#> Reading single-end BAM file 
+#> [0.001s]
+#> Preparing lMHL report 
+#> [0.000s]
+#>     rname strand   pos context coverage length      lmhl
+#>    <fctr> <fctr> <int>  <fctr>    <int>  <num>     <num>
+#> 1:   chr1      +     4      CG        2      5 0.5000000
+#> 2:   chr1      +     7      CG        2      5 0.5142857
+#> 3:   chr1      +     9      CG        2      5 0.5000000
+#> 4:   chr1      +    12      CG        2      5 0.5142857
+#> 5:   chr1      +    16      CG        2      5 0.5000000
+  
+  # case 4: incompletely bisulfite-converted read and hypomethylated read 
+  simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
+              XM=c("H..Z..Z.Z..Z...Z.h.", "h..z..Z.z..Z...z.h."))
+#> Writing sample BAM 
+#> [0.003s]
+#> [1] 2
+  generateMhlReport(temp.bam)
+#> Checking BAM file: 
+#> short-read, single-end, unsorted alignment detected
+#> Reading single-end BAM file 
+#> [0.002s]
+#> Preparing lMHL report 
+#> [0.001s]
+#>     rname strand   pos context coverage length       lmhl
+#>    <fctr> <fctr> <int>  <fctr>    <int>  <num>      <num>
+#> 1:   chr1      +     4      CG        1      5 0.00000000
+#> 2:   chr1      +     7      CG        1      5 0.02857143
+#> 3:   chr1      +     9      CG        1      5 0.00000000
+#> 4:   chr1      +    12      CG        1      5 0.02857143
+#> 5:   chr1      +    16      CG        1      5 0.00000000
 ```
