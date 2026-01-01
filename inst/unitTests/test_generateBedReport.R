@@ -3,6 +3,7 @@ test_generateBedReport <- function () {
   amplicon.bed    <- system.file("extdata", "amplicon.bed", package="epialleleR")
   amplicon.report <- generateAmpliconReport(bam=amplicon.bam, bed=amplicon.bed, verbose=FALSE)
   
+  nofilter.report <- generateAmpliconReport(bam=amplicon.bam, bed=amplicon.bed, filter.reads=FALSE, verbose=TRUE)
   nothreshold.report <- generateAmpliconReport(bam=amplicon.bam, bed=amplicon.bed, threshold.reads=FALSE, verbose=TRUE)
   
   capture.bam    <- system.file("extdata", "capture.bam", package="epialleleR")
@@ -11,27 +12,47 @@ test_generateBedReport <- function () {
   
   RUnit::checkEquals(
     dim(amplicon.report),
-    c(5,9)
+    c(5,10)
   )
   
   RUnit::checkEquals(
     dim(capture.report),
-    c(565,9)
+    c(565,10)
   )
   
   RUnit::checkEquals(
     sum(amplicon.report$`nreads-`),
-    440
+    437
   )
   
   RUnit::checkEquals(
     sum(amplicon.report[,.(`nreads+`,`nreads-`)]),
-    500
+    491
+  )
+  
+  RUnit::checkEquals(
+    sum(amplicon.report[,.(nfiltered)]),
+    9
   )
   
   RUnit::checkEquals(
     amplicon.report$VEF,
-    c(0.08333333333, 0.11475409836, 0.05376344086, 0.10714285714, 0.13207547170),
+    c(0.08387097, 0.11475409836, 0.05376344086, 0.10714285714, 0.14285714),
+  )
+  
+  RUnit::checkEquals(
+    sum(nofilter.report$`nreads-`),
+    440
+  )
+  
+  RUnit::checkEquals(
+    sum(nofilter.report[,.(`nreads+`,`nreads-`)]),
+    500
+  )
+  
+  RUnit::checkEquals(
+    nofilter.report$VEF,
+    c(0.08333333333, 0.11475409836, 0.05376344086, 0.10714285714, 0.15094340),
   )
   
   RUnit::checkEquals(
@@ -46,11 +67,15 @@ test_generateBedReport <- function () {
   
   RUnit::checkEquals(
     dim(nothreshold.report),
-    c(5,9)
+    c(5,10)
   )
   
   RUnit::checkTrue(
     all(is.na(nothreshold.report$VEF))
+  )
+  
+  RUnit::checkTrue(
+    all(is.na(nofilter.report$nfiltered))
   )
   
   generateAmpliconReport(bam=amplicon.bam, bed=amplicon.bed, report.file=tempfile())
@@ -66,19 +91,16 @@ test_generateBedReport <- function () {
   
   RUnit::checkEquals(
     sum(quality.report[,.(`nreads+`,`nreads-`)]),
-    485
-  )
-  
-  RUnit::checkTrue(
-    sum(amplicon.report[1:4]$VEF) == sum(quality.report[1:4]$VEF)
-  )
-  
-  RUnit::checkTrue(
-    amplicon.report[5]$VEF != quality.report[5]$VEF
+    484
   )
   
   RUnit::checkEquals(
     quality.report$VEF,
-    c(0.08333333333, 0.11475409836, 0.05376344086, 0.10714285714, 0.13186813187),
+    c(0.08333333333, 0.11475409836, 0.05376344086, 0.10714285714, 0.13333333),
+  )
+  
+  allowall.report <- generateAmpliconReport(bam=amplicon.bam, bed=amplicon.bed, filter.reads=FALSE, threshold.reads=FALSE)
+  RUnit::checkTrue(
+    all(is.na(c(allowall.report$nfiltered, allowall.report$VEF)))
   )
 }

@@ -79,7 +79,7 @@
 #' @param report.file file location string to write the \eqn{lMHL} report.
 #' If NULL (the default) then report is returned as a
 #' \code{\link[data.table]{data.table}} object.
-#' @param haplotype.context string for a cytosine context that defines
+#' @param cytosine.context string for a cytosine context that defines
 #' a haplotype:
 #' \itemize{
 #'   \item "CG" (the default) -- CpG cytosines only (called as zZ)
@@ -91,8 +91,8 @@
 #' }
 #' If \eqn{lMHL} calculations are needed for all three possible cytosine
 #' contexts \emph{independently}, one has to run this function for
-#' each required `haplotype.context` separately, because
-#' `haplotype.context`=="CX" assumes that \emph{any} cytosine context
+#' each required `cytosine.context` separately, because
+#' `cytosine.context`=="CX" assumes that \emph{any} cytosine context
 #' is allowed within the same haplotype. This behaviour may change in the
 #' future.
 #' @param max.haplotype.window non-negative integer for maximum value of
@@ -111,14 +111,22 @@
 #' advised to limit the `max.haplotype.window` to a number of cytosines in a
 #' typical hypermethylated region. For thorough
 #' explanation and more examples, see Details section and vignette.
+#' @param filter.reads boolean defining if sequence reads with too high
+#' out-of-context cytosine methylation (specified by `max.outofcontext.beta`)
+#' or too few within-the-context bases (specified by `min.haplotype.length`)
+#' should be filtered out. Default: TRUE.
 #' @param min.haplotype.length non-negative integer for minimum length of a
 #' haplotype (default: 0 will include haplotypes of any length).
 #' When `min.haplotype.length`>0, reads
 #' (read pairs) with fewer than `min.haplotype.length` cytosines
-#' within the `haplotype.context` are skipped.
+#' within the `cytosine.context` are skipped.
+#' This option has no effect when read filtering is disabled.
 #' @param max.outofcontext.beta real number in the range [0;1] (default: 0.1).
 #' Reads (read pairs) with average beta value for out-of-context cytosines
-#' \strong{above} this threshold are skipped. Set to 1 to disable filtering.
+#' \strong{above} this threshold (e.g., reads resulting from incompletely
+#' bisulfite-converted templates) are skipped. Value of 1 disables filtering by
+#' out-of-context methylation.
+#' This option has no effect when read filtering is disabled.
 #' @param ... other parameters to pass to the
 #' \code{\link[epialleleR]{preprocessBam}} function.
 #' Options have no effect if preprocessed BAM data was supplied as an input.
@@ -134,7 +142,7 @@
 #'   \item context -- methylation context
 #'   \item coverage -- number of reads (read pairs) that include this position
 #'   \item length -- average length of a haplotype, i.e.,
-#'   average number of cytosines within `haplotype.context` for
+#'   average number of cytosines within `cytosine.context` for
 #'   reads (read pairs) that include this position
 #'   \item lmhl -- \eqn{lMHL} value
 #' }
@@ -166,24 +174,53 @@
 #'     mhl.report[, .(rname, strand, pos, context, value=lmhl)],
 #'     cg.report[ , .(rname, strand, pos, context, value=meth/(meth+unmeth))]
 #'   )
+#'   
+#'   ## toy examples to illustrate the logic of computations
+#'   temp.bam <- tempfile(fileext=".bam")
+#'   
+#'   # case 1: fully methylated haplotype
+#'   simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
+#'               XM="h..Z..Z.Z..Z...Z.h.")
+#'   generateMhlReport(temp.bam)
+#'   
+#'   # case 2: incompletely methylated haplotype
+#'   simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
+#'               XM="h..Z..Z.z..Z...Z.h.")
+#'   generateMhlReport(temp.bam)
+#'   
+#'   # case 3: hypermethylated read and hypomethylated read 
+#'   simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
+#'               XM=c("h..Z..Z.Z..Z...Z.h.", "h..z..Z.z..Z...z.h."))
+#'   generateMhlReport(temp.bam)
+#'   
+#'   # case 4: incompletely bisulfite-converted read and hypomethylated read 
+#'   simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
+#'               XM=c("H..Z..Z.Z..Z...Z.h.", "h..z..Z.z..Z...z.h."))
+#'   generateMhlReport(temp.bam)
 #' @export
 generateMhlReport <- function (bam,
                                report.file=NULL,
-                               haplotype.context=c("CG", "CHG", "CHH", "CxG", "CX"),
+                               cytosine.context=c("CG", "CHG", "CHH", "CxG", "CX"),
                                max.haplotype.window=0,
+                               filter.reads=TRUE,
                                min.haplotype.length=0,
                                max.outofcontext.beta=0.1,
                                ...,
                                gzip=FALSE,
                                verbose=TRUE)
 {
-  haplotype.context <- match.arg(haplotype.context, haplotype.context)
+  cytosine.context <- match.arg(cytosine.context, cytosine.context)
   
   bam <- preprocessBam(bam.file=bam, ..., verbose=verbose)
   
+  if (!filter.reads) {
+    min.haplotype.length=0
+    max.outofcontext.beta=1
+  }
+  
   mhl.report <- .getMhlReport(
     bam.processed=bam, 
-    ctx=paste(.context.to.bases[[haplotype.context]][c("ctx.meth", "ctx.unmeth")], collapse=""),
+    ctx=paste(.context.to.bases[[cytosine.context]][c("ctx.meth", "ctx.unmeth")], collapse=""),
     max.window=max.haplotype.window, min.length=min.haplotype.length,
     max.ooctx.beta=max.outofcontext.beta,
     verbose=verbose

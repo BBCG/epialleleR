@@ -33,7 +33,7 @@
 
 utils::globalVariables(
   c(".", ".I", ".N", ":=", "bedmatch", "context", "rname", "start", "strand",
-    "templid", "FALSE+", "FALSE-", "TRUE+", "TRUE-", "REF", "ALT",
+    "templid", "FALSE+", "FALSE-", "TRUE+", "TRUE-", "NA+", "NA-", "REF", "ALT",
     "M+Ref","U+Ref","M+Alt","U+Alt", "M-Ref","U-Ref","M-Alt","U-Alt",
     "M+A", "M+C", "M+G", "M+T", "M-A", "M-C", "M-G", "M-T",
     "U+A", "U+C", "U+G", "U+T", "U-A", "U-C", "U-G", "U-T",
@@ -433,23 +433,29 @@ utils::globalVariables(
 
 ################################################################################
 
-# descr: apply thresholding criteria to processed BAM reads
-# value: bool vector with true for reads passing the threshold
+# descr: apply filtering and thresholding criteria to processed BAM reads
+# value: bool vector with true for reads passing threshold, NA for filtered out
 
-.thresholdReads <- function (bam.processed,
-                             ctx.meth, ctx.unmeth, ooctx.meth, ooctx.unmeth,
-                             min.context.sites, min.context.beta,
-                             max.outofcontext.beta, verbose)
+.filterThresholdReads <- function (
+    bam.processed, ctx.meth, ctx.unmeth, ooctx.meth, ooctx.unmeth,
+    filter.reads, max.outofcontext.beta, 
+    threshold.reads, min.context.sites, min.context.beta, verbose)
 {
-  if (verbose) message("Thresholding reads ", appendLF=FALSE)
+  path <- list(
+    c(fun="rcpp_allowall_reads", msg="Skipping filtering/thresholding "),
+    c(fun="rcpp_threshold_reads", msg="Thresholding reads "),
+    c(fun="rcpp_filter_reads", msg="Filtering reads "),
+    c(fun="rcpp_filter_threshold_reads",msg="Filtering and thresholding reads ")
+  )[[filter.reads * 2 + threshold.reads + 1]]
+  
+  if (verbose) message(path["msg"], appendLF=FALSE)
   tm <- proc.time()
   
-  # fast thresholding, vectorised
-  pass <- rcpp_threshold_reads(
+  pass <- do.call(what=path["fun"], args=list(
     bam.processed,
     ctx.meth, ctx.unmeth, ooctx.meth, ooctx.unmeth,
     min.context.sites, min.context.beta, max.outofcontext.beta
-  )
+  ))
   
   if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
   return(pass)
@@ -538,7 +544,7 @@ utils::globalVariables(
     bedmatch=.matchTarget(bam.processed=bam.processed, bed=bed,
                           bed.type=bed.type, match.tolerance=match.tolerance,
                           match.min.overlap=match.min.overlap),
-    pass=factor(pass, levels=c(TRUE,FALSE))
+    pass=factor(pass, levels=c(TRUE, FALSE, NA), exclude=c())
   )
   data.table::setkey(bam.subset, bedmatch)
   bam.dt <- data.table::dcast(
@@ -547,6 +553,7 @@ utils::globalVariables(
   )
   bam.dt[,`:=` (`nreads+`=`FALSE+`+`TRUE+`,
                 `nreads-`=`FALSE-`+`TRUE-`,
+                nfiltered=`NA+`+`NA-`,
                 VEF=(`TRUE+`+`TRUE-`)/(`FALSE+`+`TRUE+`+`FALSE-`+`TRUE-`) )]
   bed.dt <- data.table::as.data.table(bed)
   # bed.cl <- colnames(bed.dt)
@@ -555,9 +562,11 @@ utils::globalVariables(
                                              all=TRUE)[order(bedmatch)]
   
   if (verbose) message(sprintf("[%.3fs]",(proc.time()-tm)[3]), appendLF=TRUE)
-  return(bed.report[,setdiff(names(bed.report),
-                             c("bedmatch","FALSE+","FALSE-","TRUE+","TRUE-")),
-                    with=FALSE])
+  return(
+    bed.report[,setdiff(names(bed.report), c("bedmatch","FALSE+","FALSE-",
+                                             "TRUE+","TRUE-","NA+","NA-")),
+               with=FALSE]
+  )
 }
 
 ################################################################################
@@ -636,7 +645,7 @@ utils::globalVariables(
   bf.report <- data.table::data.table(
     name=names(vcf.ranges),
     vcf.dt[,.(seqnames, range=start, REF, ALT)],
-    freqs[,grep("[ACTG]$",colnames(freqs))]
+    freqs[,grep("[ACTG]$",colnames(freqs)), drop=FALSE]
   )
   
   bf.report[REF=="A" & ALT=="C", `:=` (`M+Ref`=`M+A`,       `U+Ref`=`U+A`,       `M-Ref`=`M-A`,       `U-Ref`=`U-A`,

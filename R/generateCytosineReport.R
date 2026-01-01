@@ -13,36 +13,42 @@
 #' hypermethylated variant epiallele frequency (VEF) being reported instead of
 #' beta value. The function's logic is explained below.
 #' 
+#' NB: you can modify and/or run this example -- see Examples section at
+#' the bottom of this page.
+#' 
 #' Let's suppose we have a BAM file with four reads, all mapped to the "+"
 #' strand of chromosome 1, positions 1-16. Assuming the default values
-#' for the thresholding parameters (threshold.reads = TRUE,
-#' threshold.context = "CG", min.context.sites = 2, min.context.beta = 0.5,
-#' max.outofcontext.beta = 0.1), the input and results will look as following:
+#' for the thresholding parameters (cytosine.context = "CG",
+#' filter.reads=TRUE, max.outofcontext.beta = 0.1,
+#' threshold.reads = TRUE, min.context.sites = 2, min.context.beta = 0.5),
+#' the input and results will look as following:
 #' 
-#' \tabular{llll}{
-#'   methylation string \tab threshold \tab explained \tab methylation reported \cr
-#'   ...Z..x+.h..x..h. \tab below \tab min.context.sites < 2 (only one zZ base) \tab all cytosines unmethylated \cr
-#'   ...Z..z.h..x..h.  \tab above \tab pass all criteria \tab only C4 (Z at position 4) is methylated \cr
-#'   ...Z..z.h..X..h.  \tab below \tab max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) \tab all cytosines unmethylated \cr
-#'   ...Z..z.h..z-.h.  \tab below \tab min.context.beta < 0.5 (1Z / 3zZ = 0.33) \tab all cytosines unmethylated
+#' \tabular{lllll}{
+#'   methylation string \tab filter \tab threshold \tab explained \tab methylation reported \cr
+#'   ...Z..x+.h..x..h. \tab pass \tab below \tab min.context.sites < 2 (only one zZ base) \tab all cytosines unmethylated \cr
+#'   ...Z..z.h..x..h.  \tab pass \tab above \tab pass all criteria \tab only C4 (Z at position 4) is methylated \cr
+#'   ...Z..z.h..X..h.  \tab excluded \tab below \tab max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) \tab read excluded from reporting \cr
+#'   ...Z..z.h..z-.h.  \tab pass \tab below \tab min.context.beta < 0.5 (1Z / 3zZ = 0.33) \tab all cytosines unmethylated
 #' }
 #' 
-#' Only the second read will satisfy all of the thresholding criteria, leading
-#' to the following CX report (given that all reads map to chr1:+:1-16):
+#' Since the read number three is filtered out, and only the second read will
+#' satisfy all of the thresholding criteria, the following CX report will be
+#' produced (given that all reads map to chr1:+:1-16):
 #' 
 #' \tabular{llllll}{
 #'   rname \tab strand \tab pos \tab context \tab meth \tab unmeth \cr
-#'   chr1 \tab + \tab 4 \tab CG \tab 1 \tab 3 \cr
-#'   chr1 \tab + \tab 7 \tab CG \tab 0 \tab 3 \cr
-#'   chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 4 \cr
-#'   chr1 \tab + \tab 12 \tab CHG \tab 0 \tab 3 \cr
-#'   chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 4 
+#'   chr1 \tab + \tab 4 \tab CG \tab 1 \tab 2 \cr
+#'   chr1 \tab + \tab 7 \tab CG \tab 0 \tab 2 \cr
+#'   chr1 \tab + \tab 9 \tab CHH \tab 0 \tab 3 \cr
+#'   chr1 \tab + \tab 12 \tab CHG \tab 0 \tab 2 \cr
+#'   chr1 \tab + \tab 15 \tab CHH \tab 0 \tab 3 
 #' }
 #' 
-#' With the thresholding disabled (threshold.reads = FALSE) all methylated bases
-#' will retain their status, so the CX report will be similar to the reports
-#' produced by other methylation callers (such as Bismark or Illumina DRAGEN Bio
-#' IT Platform):
+#' With the read filtering and thresholding disabled (filter.reads=FALSE,
+#' threshold.reads = FALSE) all reads will be included and all methylated bases
+#' will retain their status, so the CX report will be very similar
+#' (nearly identical) to the reports produced by other methylation callers
+#' (such as Bismark or Illumina DRAGEN Bio IT Platform):
 #' 
 #' \tabular{llllll}{
 #'   rname \tab strand \tab pos \tab context \tab meth \tab unmeth \cr
@@ -54,14 +60,6 @@
 #' }
 #' 
 #' Other notes:
-#' 
-#' To produce conventional cytosine reports without thresholding by
-#' within-context methylation level though
-#' minimally affected by incomplete cytosine conversion, run this method with
-#' the following parameters: `threshold.reads=TRUE`, `threshold.context="CG"`,
-#' `min.context.sites=0`, `min.context.beta=0`, `max.outofcontext.beta=0.1`.
-#' All cytosines within reads (read pairs) having more than 10% out-of-context
-#' cytosines methylated, will be effectively treated as unmethylated ones.
 #' 
 #' Methylation string bases in unknown context ("uU") are simply ignored, which,
 #' to the best of our knowledge, is consistent with the behaviour of other
@@ -90,27 +88,35 @@
 #' @param report.file file location string to write the cytosine report. If NULL
 #' (the default) then report is returned as a
 #' \code{\link[data.table]{data.table}} object.
+#' @param cytosine.context string defining cytosine methylation context used
+#' for filtering and/or thresholding the reads:
+#' \itemize{
+#'   \item "CG" (the default) -- within-the-context: CpG cytosines (called as
+#'   zZ), out-of-context: all the other cytosines (hHxX)
+#'   \item "CHG" -- within-the-context: CHG cytosines (xX), out-of-context: hHzZ
+#'   \item "CHH" -- within-the-context: CHH cytosines (hH), out-of-context: xXzZ
+#'   \item "CxG" -- within-the-context: CG and CHG cytosines (zZxX),
+#'   out-of-context: CHH cytosines (hH)
+#'   \item "CX" -- all cytosines are considered within-the-context, this
+#'   effectively results in no thresholding
+#' }
+#' @param filter.reads boolean defining if sequence reads with too high
+#' out-of-context cytosine methylation should be filtered out (e.g.,
+#' reads resulting from incompletely bisulfite-converted templates).
+#' Default: TRUE.
+#' @param max.outofcontext.beta real number in the range [0;1] (default: 0.1).
+#' Reads with average beta value for out-of-context cytosines \strong{above}
+#' this threshold will not be thresholded and will be ignored in further
+#' computations. This option has no effect when read filtering is disabled.
 #' @param threshold.reads boolean defining if sequence reads (read pairs) should
 #' be thresholded before counting methylated cytosines (default: TRUE).
-#' Disabling thresholding makes the report virtually indistinguishable from the
+#' Disabling thresholding (together with filtering)
+#' makes the report virtually indistinguishable from the
 #' ones generated by other software, such as Bismark or Illumina DRAGEN Bio IT
 #' Platform. Thresholding is \strong{not} recommended for long-read sequencing
 #' data.
-#' @param threshold.context string defining cytosine methylation context used
-#' for thresholding the reads:
-#' \itemize{
-#'   \item "CG" (the default) --- within-the-context: CpG cytosines (called as
-#'   zZ), out-of-context: all the other cytosines (hHxX)
-#'   \item "CHG" --- within-the-context: CHG cytosines (xX), out-of-context: hHzZ
-#'   \item "CHH" --- within-the-context: CHH cytosines (hH), out-of-context: xXzZ
-#'   \item "CxG" --- within-the-context: CG and CHG cytosines (zZxX),
-#'   out-of-context: CHH cytosines (hH)
-#'   \item "CX" --- all cytosines are considered within-the-context, this
-#'   effectively results in no thresholding
-#' }
-#' This option has no effect when read thresholding is disabled.
 #' @param min.context.sites non-negative integer for minimum number of cytosines
-#' within the `threshold.context` (default: 2). Reads containing \strong{fewer}
+#' within the `cytosine.context` (default: 2). Reads containing \strong{fewer}
 #' within-the-context cytosines are considered completely unmethylated (all C
 #' are counted as T). This option has no effect when read thresholding is
 #' disabled.
@@ -118,12 +124,8 @@
 #' with average beta value for within-the-context cytosines \strong{below} this
 #' threshold are considered completely unmethylated (all C are counted as T).
 #' This option has no effect when read thresholding is disabled.
-#' @param max.outofcontext.beta real number in the range [0;1] (default: 0.1).
-#' Reads with average beta value for out-of-context cytosines \strong{above}
-#' this threshold are considered completely unmethylated (all C are counted as
-#' T). This option has no effect when read thresholding is disabled.
 #' @param report.context string defining cytosine methylation context to report
-#' (default: value of `threshold.context`).
+#' (default: value of `cytosine.context`).
 #' @param ... other parameters to pass to the
 #' \code{\link[epialleleR]{preprocessBam}} function.
 #' Options have no effect if preprocessed BAM data was supplied as an input.
@@ -160,39 +162,58 @@
 #'   # CX report without thresholding
 #'   cx.report <- generateCytosineReport(capture.bam, threshold.reads=FALSE,
 #'                report.context="CX")
+#'   
+#'   # toy example from the description
+#'   temp.bam <- tempfile(fileext=".bam") 
+#'   simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
+#'               seq=c("AGACGTTAGTAATAGTA", "AAACGTTGTAATAGTA",
+#'                     "AGACGTTGTAACAGTA",  "AAACGTTGTAATGTA"),
+#'               XM=c( "...Z..x+.h..x..h.", "...Z..z.h..x..h.",
+#'                     "...Z..z.h..X..h.",  "...Z..z.h..z.h."),
+#'               cigar=c("7M1I9M", "16M", "16M", "12M1D3M"))
+#'   # with read filtering and thresholding
+#'   generateCytosineReport(bam=temp.bam, report.context="CX")
+#'   # without read filtering
+#'   generateCytosineReport(bam=temp.bam, report.context="CX",
+#'                          filter.reads=FALSE)
+#'   # without read thresholding
+#'   generateCytosineReport(bam=temp.bam, report.context="CX",
+#'                          threshold.reads=FALSE)
+#'   # both read filtering and thresholding disabled = similar to other software
+#'   generateCytosineReport(bam=temp.bam, report.context="CX",
+#'                          filter.reads=FALSE, threshold.reads=FALSE)
 #' @export
 generateCytosineReport <- function (bam,
                                     report.file=NULL,
+                                    cytosine.context=c("CG", "CHG", "CHH", "CxG", "CX"),
+                                    filter.reads=TRUE,
+                                    max.outofcontext.beta=0.1,
                                     threshold.reads=TRUE,
-                                    threshold.context=c("CG", "CHG", "CHH", "CxG", "CX"),
                                     min.context.sites=2,
                                     min.context.beta=0.5,
-                                    max.outofcontext.beta=0.1,
-                                    report.context=threshold.context,
+                                    report.context=cytosine.context,
                                     ...,
                                     gzip=FALSE,
                                     verbose=TRUE)
 {
-  threshold.context <- match.arg(threshold.context, threshold.context)
+  cytosine.context <- match.arg(cytosine.context, cytosine.context)
   report.context    <- match.arg(report.context, report.context)
   
   bam <- preprocessBam(bam.file=bam, ..., verbose=verbose)
   
-  if (threshold.reads) {
-    pass <- .thresholdReads(
-      bam.processed=bam,
-      ctx.meth=.context.to.bases[[threshold.context]][["ctx.meth"]],
-      ctx.unmeth=.context.to.bases[[threshold.context]][["ctx.unmeth"]],
-      ooctx.meth=.context.to.bases[[threshold.context]][["ooctx.meth"]],
-      ooctx.unmeth=.context.to.bases[[threshold.context]][["ooctx.unmeth"]],
-      min.context.sites=min.context.sites,
-      min.context.beta=min.context.beta,
-      max.outofcontext.beta=max.outofcontext.beta,
-      verbose=verbose
-    )
-  } else {
-    pass <- rep(TRUE, nrow(bam))
-  }
+  pass <- .filterThresholdReads(
+    bam.processed=bam,
+    ctx.meth=.context.to.bases[[cytosine.context]][["ctx.meth"]],
+    ctx.unmeth=.context.to.bases[[cytosine.context]][["ctx.unmeth"]],
+    ooctx.meth=.context.to.bases[[cytosine.context]][["ooctx.meth"]],
+    ooctx.unmeth=.context.to.bases[[cytosine.context]][["ooctx.unmeth"]],
+    filter.reads=filter.reads,
+    max.outofcontext.beta=max.outofcontext.beta,
+    threshold.reads=threshold.reads,
+    min.context.sites=min.context.sites,
+    min.context.beta=min.context.beta,
+    verbose=verbose
+  )
   
   cx.report <- .getCytosineReport(
     bam.processed=bam, pass=pass,

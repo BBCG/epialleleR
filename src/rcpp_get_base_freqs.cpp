@@ -13,7 +13,7 @@
 // fast, vectorised
 // [[Rcpp::export("rcpp_get_base_freqs")]]
 Rcpp::NumericMatrix rcpp_get_base_freqs(Rcpp::DataFrame &df,                    // BAM data
-                                        std::vector<bool> pass,                 // read passes the threshold?
+                                        Rcpp::LogicalVector &pass,              // read passes the threshold?
                                         Rcpp::DataFrame &vcf)                   // VCF data
 {
   Rcpp::IntegerVector read_rname = df["rname"];                                 // template rname
@@ -31,6 +31,9 @@ Rcpp::NumericMatrix rcpp_get_base_freqs(Rcpp::DataFrame &df,                    
   for (unsigned int x=0; x<read_start.size(); x++) {
     // checking for the interrupt
     if ((x & 0xFFFFF) == 0) Rcpp::checkUserInterrupt();
+    
+    // skip the read if filtered out
+    if (pass[x]==NA_LOGICAL) continue;
     
     const int read_rname_x = read_rname[x];
     const int read_start_x = read_start[x];

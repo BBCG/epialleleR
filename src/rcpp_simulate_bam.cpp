@@ -64,10 +64,11 @@ int rcpp_simulate_bam (std::vector<std::string> header,                         
   int call_res;                                                                 // result of HTSlib call
   bam1_t *out_rec = bam_init1();                                                // create BAM alignment structure
   uint32_t *cigar_mem = NULL;                                                   // destination uint32_t CIGAR buffer
-  size_t n_cigar = 0;                                                           // allocated number of CIGAR buffer elements
+  size_t cigar_mem_size = 0;                                                    // allocated number of CIGAR buffer elements
+  size_t n_cigar = 0;                                                           // number of CIGAR elements in the current CIGAR
   for (size_t i=0; i<qname.size(); i++) {
-    call_res = sam_parse_cigar(cigar[i].c_str(), NULL, &cigar_mem, &n_cigar);   // fill CIGAR array
-    if (call_res<0) Rcpp::stop("Unable to fill CIGAR array");                   // fall back on error
+    n_cigar = sam_parse_cigar(cigar[i].c_str(), NULL, &cigar_mem, &cigar_mem_size); // fill CIGAR array
+    if (n_cigar<0) Rcpp::stop("Unable to fill CIGAR array");                    // fall back on error
     
     for (char *q=(char*)qual[i].c_str(); *q!='\0'; q++) *q -= 33;               // remove offset from QUAL string
       
@@ -79,7 +80,7 @@ int rcpp_simulate_bam (std::vector<std::string> header,                         
       seq[i].size(), seq[i].c_str(), qual[i].c_str(),
       0
     );
-    if (call_res<0) Rcpp::stop("Unable to fill BAM record");                    // fall back on error
+    if (call_res<0) Rcpp::stop("Unable to fill BAM record #%i", i);             // fall back on error
     
     for (size_t c=0; c<i_cols.size(); c++) {                                    // add integer tags
       int tag = ((Rcpp::IntegerVector)(i_tags[c]))[i];                          // tag value
