@@ -65,8 +65,7 @@ T_granges load_intervals (Rcpp::DataFrame &bed,                                 
 // SHORT-READ PAIRED-END BAM
 
 // [[Rcpp::export]]
-Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           // BAM file name
-                                      Rcpp::DataFrame &bed,                     // BED data.table
+Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           // BAM file name Rcpp::DataFrame &bed,                     // BED data.table
                                       const int min_mapq,                       // min read mapping quality
                                       int min__baseq,                           // min base quality
                                       const uint16_t skip_flags,                // BAM flags to skip (duplicates, etc)
@@ -92,7 +91,7 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   bam1_t *bam_rec = bam_init1();                                                // create BAM alignment structure
   
   // read BED into a set of intervals
-  T_granges granges = load_intervals(bed, bam_hdr);
+  // T_granges granges = load_intervals(bed, bam_hdr);
   
   // main containers
   std::vector<std::string>* seqxm = new std::vector<std::string>;               // SEQXM, leftmost 4 bits are SEQ and rightmost 4 are XM
