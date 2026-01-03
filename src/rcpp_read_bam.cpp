@@ -1,4 +1,6 @@
 #include <Rcpp.h>
+#include <boost/icl/interval.hpp>
+#include <boost/icl/interval_set.hpp>
 #include <htslib/hts.h>
 #include <htslib/sam.h>
 #include <htslib/thread_pool.h>
@@ -12,11 +14,59 @@
 // [+] rec_seq_rs and rec_xm_rs as char*
 // [?] reverse QNAME
 // [ ] free resources on interrupt
+// [ ] overlap with BED / clip to BED
+// [ ] overlap with BED using BAM index?
+
+
+// This one loads data.frame BED into a set of intervals.
+// Gotta check if boost::icl::interval_set is good enough, other options may
+// include boost::container::flat_map.
+typedef boost::icl::interval<int> T_irange;                                     // <start,end> interval
+typedef std::vector<boost::icl::interval_set<int>> T_granges;                   // chr->{<start,end>, ...}
+T_granges load_intervals (Rcpp::DataFrame &bed,                                 // BED data.table from as.data.table(.readBed(...))
+                          const bam_hdr_t *bam_header)                          // BAM header structure
+{
+  Rcpp::IntegerVector seqnames       = bed["seqnames"];                         // BED seqnames: factor with levels that differ from BAM
+  std::vector<std::string> seqlevels = seqnames.attr("levels");                 // BED seqlevels
+  Rcpp::IntegerVector start          = bed["start"];                            // BED start
+  Rcpp::IntegerVector end            = bed["end"];                              // BED end
+
+  std::vector<int> bed2bam (seqlevels.size(), -1);                              // index = BED seqlevel, value = BAM seqlevel
+  for (int i=0; i<seqlevels.size(); i++) {                                      // for every BED seqlevel
+    for (int j=0; j<bam_header->n_targets; j++) {                               // compare with every BAM level
+      if (!strcmp(seqlevels[i].c_str(), bam_header->target_name[j])) {          // when equal
+        bed2bam[i] = j;                                                         // store index
+        break;                                                                  // break out
+      }
+    }
+  }
+  
+  T_granges granges (bam_header->n_targets);                                    // vector of interval sets
+  for (int i=0; i<seqnames.size(); i++) {                                       // for every BED entry
+    if (bed2bam[seqnames[i]-1] >= 0)                                            // if present in BAM
+      granges[bed2bam[seqnames[i]-1]] += T_irange::closed(start[i], end[i]);    // add interval
+  }
+  
+  // for (int i=0; i<bed2bam.size(); i++) {
+  //   Rcpp::Rcout << seqlevels[i] << " is #" <<  bed2bam[i] << " in BAM = " <<  (bed2bam[i]>=0?bam_header->target_name[bed2bam[i]]:"NA") << ", ";
+  // }
+  // Rcpp::Rcout << "\n";
+  
+  for (int i=0; i<granges.size(); i++) {
+    if (granges[i].size()>0) {
+      Rcpp::Rcout << i << ": " << bam_header->target_name[i] << "\n";
+      Rcpp::Rcout << "\t" << granges[i] << "\n";
+    }
+  }
+  
+  return granges;
+}
 
 // SHORT-READ PAIRED-END BAM
 
 // [[Rcpp::export]]
-Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           // file name
+Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           // BAM file name
+                                      Rcpp::DataFrame &bed,                     // BED data.table
                                       const int min_mapq,                       // min read mapping quality
                                       int min__baseq,                           // min base quality
                                       const uint16_t skip_flags,                // BAM flags to skip (duplicates, etc)
@@ -40,6 +90,9 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   bam_hdr_t *bam_hdr = sam_hdr_read(bam_fp);                                    // try read file header
   if (!bam_hdr) Rcpp::stop("Unable to read BAM header");                        // fall back if error  
   bam1_t *bam_rec = bam_init1();                                                // create BAM alignment structure
+  
+  // read BED into a set of intervals
+  T_granges granges = load_intervals(bed, bam_hdr);
   
   // main containers
   std::vector<std::string>* seqxm = new std::vector<std::string>;               // SEQXM, leftmost 4 bits are SEQ and rightmost 4 are XM
