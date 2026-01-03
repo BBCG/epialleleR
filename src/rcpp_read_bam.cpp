@@ -17,9 +17,24 @@
 // [ ] overlap with BED / clip to BED
 // [ ] overlap with BED using BAM index?
 
+// Briefly on the possibility to use BAM index:
+// Unsorted files cannot be indexed, which prevents *newly name-sorted* files
+// to be subsetted. If that wasn't the case, one could use 'sam_itr_regarray'
+// to get a multi-region iterator.
+// This issue is mainly important for paired-end alignment loading, as overlap
+// check cannot be performed *before both reads are processed* - for some
+// assays (e.g., EpiMutTsg), DRAGEN creates dovetail alignments with TLEN
+// smaller than the actual length of observed template. ("Why?" - is another
+// question. Seemingly, by some stupid mistake) Therefore, for paired-end files
+// we resort to overlap check during 'push_template'.
+// For single-end alignments, the check can be performed early, saving time on
+// not filling template holders.
+// In the future, 'try load index' can be default, falling back to checking
+// every read if index isn't available.
 
-// This one loads data.frame BED into a set of intervals.
-// Gotta check if boost::icl::interval_set is good enough, other options may
+
+// This function loads data.frame BED into a set of intervals.
+// First check is if boost::icl::interval_set is good enough, other options may
 // include boost::container::flat_map.
 typedef boost::icl::interval<int> T_irange;                                     // <start,end> interval
 typedef std::vector<boost::icl::interval_set<int>> T_granges;                   // chr->{<start,end>, ...}
@@ -62,10 +77,12 @@ T_granges load_intervals (Rcpp::DataFrame &bed,                                 
   return granges;
 }
 
+
 // SHORT-READ PAIRED-END BAM
 
 // [[Rcpp::export]]
-Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           // BAM file name Rcpp::DataFrame &bed,                     // BED data.table
+Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           // BAM file name
+                                      Rcpp::DataFrame &bed,                     // BED data.table
                                       const int min_mapq,                       // min read mapping quality
                                       int min__baseq,                           // min base quality
                                       const uint16_t skip_flags,                // BAM flags to skip (duplicates, etc)
@@ -91,7 +108,7 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   bam1_t *bam_rec = bam_init1();                                                // create BAM alignment structure
   
   // read BED into a set of intervals
-  // T_granges granges = load_intervals(bed, bam_hdr);
+  T_granges granges = load_intervals(bed, bam_hdr);
   
   // main containers
   std::vector<std::string>* seqxm = new std::vector<std::string>;               // SEQXM, leftmost 4 bits are SEQ and rightmost 4 are XM
@@ -199,6 +216,7 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
         default : Rcpp::stop("Unknown CIGAR operation for BAM entry %s", bam_get_qname(bam_rec)); // unknown CIGAR operation
       }
     }
+    // if (templ_width < (int)dest_pos) {Rcpp::stop(templ_qname);}              // enable to check 'dovetail' alignments
     if (templ_width < (int)dest_pos) templ_width = dest_pos;                    // need this to include everything from 'dovetail' alignments
   }
   
