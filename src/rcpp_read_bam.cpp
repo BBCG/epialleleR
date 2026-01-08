@@ -12,7 +12,7 @@
 // [ ] OpenMP SIMD?
 // [+] HTSlib threads
 // [+] rec_seq_rs and rec_xm_rs as char*
-// [?] reverse QNAME
+// [?] reverse QNAME - no changes in speed
 // [ ] free resources on interrupt
 // [ ] overlap with BED / clip to BED
 // [ ] overlap with BED using BAM index?
@@ -37,7 +37,8 @@
 // First check is if boost::icl::interval_set is good enough, other options may
 // include boost::container::flat_map.
 typedef boost::icl::interval<int> T_irange;                                     // <start,end> interval
-typedef std::vector<boost::icl::interval_set<int>> T_granges;                   // chr->{<start,end>, ...}
+typedef boost::icl::interval_set<int> T_irangeset;                              // chr->{<start,end>, ...}
+typedef std::vector<T_irangeset> T_granges;                                     // chr->{<start,end>, ...}
 T_granges load_intervals (Rcpp::DataFrame &bed,                                 // BED data.table from as.data.table(.readBed(...))
                           const bam_hdr_t *bam_header)                          // BAM header structure
 {
@@ -59,7 +60,7 @@ T_granges load_intervals (Rcpp::DataFrame &bed,                                 
   T_granges granges (bam_header->n_targets);                                    // vector of interval sets
   for (int i=0; i<seqnames.size(); i++) {                                       // for every BED entry
     if (bed2bam[seqnames[i]-1] >= 0)                                            // if present in BAM
-      granges[bed2bam[seqnames[i]-1]] += T_irange::closed(start[i], end[i]);    // add interval
+      granges[bed2bam[seqnames[i]-1]] += T_irange::closed(start[i]-1, end[i]-1);// add interval, 0-based
   }
   
   // for (int i=0; i<bed2bam.size(); i++) {
@@ -80,7 +81,7 @@ T_granges load_intervals (Rcpp::DataFrame &bed,                                 
 
 // SHORT-READ PAIRED-END BAM
 
-// [[Rcpp::export]]
+template<int usebed>                                                            // 0 to not use BED; 1 for simple overlap; 2 for clipping to BED
 Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           // BAM file name
                                       Rcpp::DataFrame &bed,                     // BED data.table
                                       const int min_mapq,                       // min read mapping quality
@@ -107,8 +108,10 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   if (!bam_hdr) Rcpp::stop("Unable to read BAM header");                        // fall back if error  
   bam1_t *bam_rec = bam_init1();                                                // create BAM alignment structure
   
-  // read BED into a set of intervals
-  T_granges granges = load_intervals(bed, bam_hdr);
+  T_granges granges;                                                            // define granges class
+  if (usebed>0) {                                                               // if use BED data for overlap/clip
+    granges = load_intervals(bed, bam_hdr);                                     // read BED into a set of intervals
+  }
   
   // main containers
   std::vector<std::string>* seqxm = new std::vector<std::string>;               // SEQXM, leftmost 4 bits are SEQ and rightmost 4 are XM
@@ -127,14 +130,42 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   std::memset(templ_seqxm_rs, 0b11111011, max_templ_width);                     // prefill SEQXM holder with 'N-', i.e., '15,11'
   int templ_rname = 0, templ_start = 0, templ_strand = 0, templ_width = 0;      // template RNAME, POS, STRAND, ISIZE
   
-  #define push_template {                                        /* pushing template data to vectors */ \
-    rname.push_back(templ_rname + 1);                                                     /* RNAME+1 */ \
-    strand.push_back(templ_strand);                                                        /* STRAND */ \
-    start.push_back(templ_start + trim5 + 1);                                               /* POS+1 */ \
-    seqxm->emplace_back((const char*) templ_seqxm_rs + trim5, templ_width - (trim5+trim3)); /* SEQXM */ \
-    std::memset(templ_qual_rs, (uint8_t) min_baseq, templ_width); /* fill QUAL holder with min_baseq */ \
-    std::memset(templ_seqxm_rs, 0b11111011, templ_width);     /* fill SEQXM with 'N-', i.e., '15,11' */ \
-    ntempls++;                                                                                 /* +1 */ \
+  #define push_template {                                                                    /* pushing template data to vectors */ \
+    if (usebed==0) {                                                                       /* usebed==0, not use BED data at all */ \
+      rname.push_back(templ_rname + 1);                                                                               /* RNAME+1 */ \
+      strand.push_back(templ_strand);                                                                                  /* STRAND */ \
+      start.push_back(templ_start + trim5 + 1);                                                                         /* POS+1 */ \
+      seqxm->emplace_back((const char*) templ_seqxm_rs + trim5, templ_width - (trim5+trim3));                           /* SEQXM */ \
+      ntempls++;                                                                                                           /* +1 */ \
+    } else if (usebed==1) {                                                                /* usebed==1, simple overlap with BED */ \
+      int irange_start = templ_start + trim5;                                                    /* start of the irange, 0-based */ \
+      int irange_end = irange_start + templ_width - trim3;                                         /* end of the irange, 0-based */ \
+      if (intersects(granges[templ_rname], T_irange::closed(irange_start, irange_end))) {                           /* overlaps? */ \
+        rname.push_back(templ_rname + 1);                                                                             /* RNAME+1 */ \
+        strand.push_back(templ_strand);                                                                                /* STRAND */ \
+        start.push_back(templ_start + trim5 + 1);                                                                       /* POS+1 */ \
+        seqxm->emplace_back((const char*) templ_seqxm_rs + trim5, templ_width - (trim5+trim3));                         /* SEQXM */ \
+        ntempls++;                                                                                                         /* +1 */ \
+      }                                                                                                                             \
+    } else {                                                                          /* usebed==2, clipping the template to BED */ \
+      int irange_start = templ_start + trim5;                                                    /* start of the irange, 0-based */ \
+      int irange_end = irange_start + templ_width - trim3;                                         /* end of the irange, 0-based */ \
+      auto irange = T_irange::closed(irange_start, irange_end);                                             /* the irange itself */ \
+      if (intersects(granges[templ_rname], irange)) {                                                               /* overlaps? */ \
+        T_irangeset overlaps = granges[templ_rname] & irange;                                          /* these are the overlaps */ \
+        for (T_irangeset::const_iterator it = overlaps.begin(); it != overlaps.end(); ++it) {                   /* cycle through */ \
+          int overlap_start = it->lower();                                                               /* start of the overlap */ \
+          int overlap_end = it->upper();                                                                   /* end of the overlap */ \
+          rname.push_back(templ_rname + 1);                                                                           /* RNAME+1 */ \
+          strand.push_back(templ_strand);                                                                              /* STRAND */ \
+          start.push_back(overlap_start + 1);                                                                           /* POS+1 */ \
+          seqxm->emplace_back((const char*) templ_seqxm_rs + (overlap_start-templ_start), overlap_end-overlap_start+1); /* SEQXM */ \
+          ntempls++;                                                                                                       /* +1 */ \
+        }                                                                                                                           \
+      }                                                                                                                             \
+    }                                                                                                              /* now, clean */ \
+    std::memset(templ_qual_rs, (uint8_t) min_baseq, templ_width);                             /* fill QUAL holder with min_baseq */ \
+    std::memset(templ_seqxm_rs, 0b11111011, templ_width);                                 /* fill SEQXM with 'N-', i.e., '15,11' */ \
   }
   
   // process alignments
@@ -258,6 +289,37 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   res.attr("npushed") = ntempls;                                                // number of templates pushed to data.frame
   
   return(res);
+}
+
+
+// [[Rcpp::export]]
+Rcpp::DataFrame rcpp_read_bam_paired_all (
+    std::string fn, Rcpp::DataFrame &bed, const int min_mapq, int min__baseq,
+    const uint16_t skip_flags, const int trim5, const int trim3,
+    const int nthreads)
+{
+  return rcpp_read_bam_paired<0>(fn, bed, min_mapq, min__baseq,
+                                 skip_flags, trim5, trim3, nthreads);
+}
+
+// [[Rcpp::export]]
+Rcpp::DataFrame rcpp_read_bam_paired_usebed (
+    std::string fn, Rcpp::DataFrame &bed, const int min_mapq, int min__baseq,
+    const uint16_t skip_flags, const int trim5, const int trim3,
+    const int nthreads)
+{
+  return rcpp_read_bam_paired<1>(fn, bed, min_mapq, min__baseq,
+                                 skip_flags, trim5, trim3, nthreads);
+}
+
+// [[Rcpp::export]]
+Rcpp::DataFrame rcpp_read_bam_paired_cliptobed (
+    std::string fn, Rcpp::DataFrame &bed, const int min_mapq, int min__baseq,
+    const uint16_t skip_flags, const int trim5, const int trim3,
+    const int nthreads)
+{
+  return rcpp_read_bam_paired<2>(fn, bed, min_mapq, min__baseq,
+                                 skip_flags, trim5, trim3, nthreads);
 }
 
 // #############################################################################
