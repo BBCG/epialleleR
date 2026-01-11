@@ -9,7 +9,6 @@
 // [[Rcpp::depends(Rhtslib)]]
 
 // An optimised attempt to read and preprocess BAM in place. To do:
-// [ ] OpenMP SIMD?
 // [+] HTSlib threads
 // [+] rec_seq_rs and rec_xm_rs as char*
 // [?] reverse QNAME - no changes in speed
@@ -25,17 +24,25 @@
 // check cannot be performed *before both reads are processed* - for some
 // assays (e.g., EpiMutTsg), DRAGEN creates dovetail alignments with TLEN
 // smaller than the actual length of observed template. ("Why?" - is another
-// question. Seemingly, by some stupid mistake) Therefore, for paired-end files
+// question. Seemingly, by some stupid mistake.) Therefore, for paired-end files
 // we resort to overlap check during 'push_template'.
 // For single-end alignments, the check can be performed early, saving time on
 // not filling template holders.
-// In the future, 'try load index' can be default, falling back to checking
+// In the future, 'try load index' can be the default, falling back to checking
 // every read if index isn't available.
 
 
 // This function loads data.frame BED into a set of intervals.
-// First check is if boost::icl::interval_set is good enough, other options may
-// include boost::container::flat_map.
+// Apparently, boost::icl::interval_set is pretty quick for a simple check if
+// there's an overlap. (And by "quick" I mean that the overhead of checking
+// is similar to the overhead of pushing the template into holders.)
+// When it comes to getting the list of intersections - there it slows
+// everything down ~4 times. Probably due to memory allocation when a new
+// interval set is created.
+// It is affordable at this moment, but one may:
+//   [ ] get pointers to the overlapping regions (save on memory allocation),
+//   [ ] check alternatives,
+//   [ ] create an alternative using boost::container::flat_map<int, int>.
 typedef boost::icl::interval<int> T_irange;                                     // <start,end> interval
 typedef boost::icl::interval_set<int> T_irangeset;                              // chr->{<start,end>, ...}
 typedef std::vector<T_irangeset> T_granges;                                     // chr->{<start,end>, ...}
@@ -63,17 +70,12 @@ T_granges load_intervals (Rcpp::DataFrame &bed,                                 
       granges[bed2bam[seqnames[i]-1]] += T_irange::closed(start[i]-1, end[i]-1);// add interval, 0-based
   }
   
-  // for (int i=0; i<bed2bam.size(); i++) {
-  //   Rcpp::Rcout << seqlevels[i] << " is #" <<  bed2bam[i] << " in BAM = " <<  (bed2bam[i]>=0?bam_header->target_name[bed2bam[i]]:"NA") << ", ";
+  // for (int i=0; i<granges.size(); i++) {
+  //   if (granges[i].size()>0) {
+  //     Rcpp::Rcout << i << ": " << bam_header->target_name[i] << "\n";
+  //     Rcpp::Rcout << "\t" << granges[i] << "\n";
+  //   }
   // }
-  // Rcpp::Rcout << "\n";
-  
-  for (int i=0; i<granges.size(); i++) {
-    if (granges[i].size()>0) {
-      Rcpp::Rcout << i << ": " << bam_header->target_name[i] << "\n";
-      Rcpp::Rcout << "\t" << granges[i] << "\n";
-    }
-  }
   
   return granges;
 }
