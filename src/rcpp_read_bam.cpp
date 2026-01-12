@@ -25,7 +25,7 @@
 // assays (e.g., EpiMutTsg), DRAGEN creates dovetail alignments with TLEN
 // smaller than the actual length of observed template. ("Why?" - is another
 // question. Seemingly, by some stupid mistake.) Therefore, for paired-end files
-// we resort to overlap check during 'push_template'.
+// I resort to overlap check during 'push_template'.
 // For single-end alignments, the check can be performed early, saving time on
 // not filling template holders.
 // In the future, 'try load index' can be the default, falling back to checking
@@ -36,7 +36,7 @@
 // Apparently, boost::icl::interval_set is pretty quick for a simple check if
 // there's an overlap (negligible overhead).
 // When it comes to getting the list of intersections (by &) - there it slows
-// everything down ~2 times (for EpiMutTsg BAM, where almost every template
+// everything down ~2-3 times (for EpiMutTsg BAM, where almost every template
 // needs to be trimmed using BED of 600 targets). This is probably due to
 // memory allocation when a new interval set is created.
 // For the first working implementation using boost::icl::interval_set,
@@ -44,8 +44,8 @@
 // For complete implementation of intersections in all three template functions,
 // see commit 3b194f78a48f3d2ea1dc4266046897f05e471684.
 // To save on memory allocation, a correct alternative was implemented using
-// find() of this interval_set. For this implementation, see commit
-// 
+// find() in this interval_set. For this implementation, see commit
+// 5e97115dc3b88a942aabc3b85bacbcf85fcadb54.
 typedef boost::icl::interval<int> T_irange;                                     // <start,end> interval
 typedef boost::icl::interval_set<int> T_irangeset;                              // chr->{<start,end>, ...}
 typedef std::vector<T_irangeset> T_granges;                                     // chr->{<start,end>, ...}
@@ -72,13 +72,6 @@ T_granges load_intervals (Rcpp::DataFrame &bed,                                 
     if (bed2bam[seqnames[i]-1] >= 0)                                            // if present in BAM
       targets[bed2bam[seqnames[i]-1]] += T_irange::closed(start[i]-1, end[i]-1);// add interval, 0-based
   }
-  
-  // for (int i=0; i<targets.size(); i++) {
-  //   if (targets[i].size()>0) {
-  //     Rcpp::Rcout << i << ": " << bam_header->target_name[i] << "\n";
-  //     Rcpp::Rcout << "\t" << targets[i] << "\n";
-  //   }
-  // }
   
   return targets;
 }
