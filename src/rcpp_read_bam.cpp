@@ -13,7 +13,7 @@
 // [+] rec_seq_rs and rec_xm_rs as char*
 // [?] reverse QNAME - no changes in speed
 // [ ] free resources on interrupt
-// [ ] overlap with BED / clip to BED
+// [x] overlap with BED / clip to BED
 // [ ] overlap with BED using BAM index?
 
 // Briefly on the possibility to use BAM index:
@@ -73,6 +73,8 @@ T_granges load_intervals (Rcpp::DataFrame &bed,                                 
   return targets;
 }
 
+
+// #############################################################################
 
 // SHORT-READ PAIRED-END BAM
 
