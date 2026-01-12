@@ -35,14 +35,17 @@
 // This function loads data.frame BED into a set of intervals.
 // Apparently, boost::icl::interval_set is pretty quick for a simple check if
 // there's an overlap (negligible overhead).
-// When it comes to getting the list of intersections - there it slows
+// When it comes to getting the list of intersections (by &) - there it slows
 // everything down ~2 times (for EpiMutTsg BAM, where almost every template
 // needs to be trimmed using BED of 600 targets). This is probably due to
 // memory allocation when a new interval set is created.
 // For the first working implementation using boost::icl::interval_set,
 // see commit 8a9125411f89a22c39d5a3c65847a0089f95f2ca.
-// To save on memory allocation, an alternative can be implemented using
-// lower_bound() of this interval_set - possible as the set is stored sorted.
+// For complete implementation of intersections in all three template functions,
+// see commit 3b194f78a48f3d2ea1dc4266046897f05e471684.
+// To save on memory allocation, a correct alternative was implemented using
+// find() of this interval_set. For this implementation, see commit
+// 
 typedef boost::icl::interval<int> T_irange;                                     // <start,end> interval
 typedef boost::icl::interval_set<int> T_irangeset;                              // chr->{<start,end>, ...}
 typedef std::vector<T_irangeset> T_granges;                                     // chr->{<start,end>, ...}
@@ -69,6 +72,13 @@ T_granges load_intervals (Rcpp::DataFrame &bed,                                 
     if (bed2bam[seqnames[i]-1] >= 0)                                            // if present in BAM
       targets[bed2bam[seqnames[i]-1]] += T_irange::closed(start[i]-1, end[i]-1);// add interval, 0-based
   }
+  
+  // for (int i=0; i<targets.size(); i++) {
+  //   if (targets[i].size()>0) {
+  //     Rcpp::Rcout << i << ": " << bam_header->target_name[i] << "\n";
+  //     Rcpp::Rcout << "\t" << targets[i] << "\n";
+  //   }
+  // }
   
   return targets;
 }
@@ -147,18 +157,15 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
     } else {                                                                          /* usebed==2, clipping the template to BED */ \
       const int irange_start = templ_start + trim5;                                              /* start of the irange, 0-based */ \
       const int irange_end = irange_start + templ_width - trim3;                                   /* end of the irange, 0-based */ \
-      auto irange = T_irange::closed(irange_start, irange_end);                                             /* the irange itself */ \
-      if (intersects(targets[templ_rname], irange)) {                                                               /* overlaps? */ \
-        T_irangeset overlaps = targets[templ_rname] & irange;                                          /* these are the overlaps */ \
-        for (T_irangeset::const_iterator it = overlaps.begin(); it != overlaps.end(); ++it) {                   /* cycle through */ \
-          const int overlap_start = it->lower();                                                         /* start of the overlap */ \
-          const int overlap_end = it->upper();                                                             /* end of the overlap */ \
-          rname.push_back(templ_rname + 1);                                                                           /* RNAME+1 */ \
-          strand.push_back(templ_strand);                                                                              /* STRAND */ \
-          start.push_back(overlap_start + 1);                                                                           /* POS+1 */ \
-          seqxm->emplace_back((const char*) templ_seqxm_rs + (overlap_start-templ_start), overlap_end-overlap_start+1); /* SEQXM */ \
-          ntempls++;                                                                                                       /* +1 */ \
-        }                                                                                                                           \
+      for (T_irangeset::const_iterator it = find(targets[templ_rname], T_irange::closed(irange_start, irange_end));                 \
+           it != targets[templ_rname].end() && it->lower() <= irange_end; ++it) {        /* iterate over all overlapping regions */ \
+        const int overlap_start = std::max(it->lower(), irange_start);                                   /* start of the overlap */ \
+        const int overlap_end = std::min(it->upper(), irange_end);                                         /* end of the overlap */ \
+        rname.push_back(templ_rname + 1);                                                                             /* RNAME+1 */ \
+        strand.push_back(templ_strand);                                                                                /* STRAND */ \
+        start.push_back(overlap_start + 1);                                                                             /* POS+1 */ \
+        seqxm->emplace_back((const char*) templ_seqxm_rs + (overlap_start-templ_start), overlap_end-overlap_start+1);   /* SEQXM */ \
+        ntempls++;                                                                                                         /* +1 */ \
       }                                                                                                                             \
     }                                                                                                              /* now, clean */ \
     std::memset(templ_qual_rs, (uint8_t) min_baseq, templ_width);                             /* fill QUAL holder with min_baseq */ \
@@ -449,10 +456,10 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
     } else {                                                                    // clip to BED
       const int irange_start = bam_rec->core.pos + trim5;                       // start of the irange, 0-based
       const int irange_end = irange_start + dest_pos - trim3;                   // end of the irange, 0-based
-      T_irangeset overlaps = targets[bam_rec->core.tid] & T_irange::closed(irange_start, irange_end); // these are the overlaps
-      for (T_irangeset::const_iterator it = overlaps.begin(); it != overlaps.end(); ++it) { // cycle through
-        const int overlap_start = it->lower();                                  // start of the overlap
-        const int overlap_end = it->upper();                                    // end of the overlap
+      for (T_irangeset::const_iterator it = find(targets[bam_rec->core.tid], T_irange::closed(irange_start, irange_end));
+           it != targets[bam_rec->core.tid].end() && it->lower() <= irange_end; ++it) { // iterate over all overlapping regions
+        const int overlap_start = std::max(it->lower(), irange_start);          // start of the overlap
+        const int overlap_end = std::min(it->upper(), irange_end);              // end of the overlap
         rname.push_back(bam_rec->core.tid + 1);                                 // RNAME+1 
         strand.push_back(( record_strand[1] == 'C' ) ? 1 : 2);                  // STRAND is 1 if "ZCT"/"+", 2 if "ZGA"/"-"
         start.push_back(overlap_start + 1);                                     // POS+1
@@ -740,10 +747,10 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
     } else {                                                                    // clip to BED
       const int irange_start = bam_rec->core.pos + trim5;                       // start of the irange, 0-based
       const int irange_end = irange_start + dest_pos - trim3;                   // end of the irange, 0-based
-      T_irangeset overlaps = targets[bam_rec->core.tid] & T_irange::closed(irange_start, irange_end); // these are the overlaps
-      for (T_irangeset::const_iterator it = overlaps.begin(); it != overlaps.end(); ++it) { // cycle through
-        const int overlap_start = it->lower();                                  // start of the overlap
-        const int overlap_end = it->upper();                                    // end of the overlap
+      for (T_irangeset::const_iterator it = find(targets[bam_rec->core.tid], T_irange::closed(irange_start, irange_end));
+           it != targets[bam_rec->core.tid].end() && it->lower() <= irange_end; ++it) { // iterate over all overlapping regions
+        const int overlap_start = std::max(it->lower(), irange_start);          // start of the overlap
+        const int overlap_end = std::min(it->upper(), irange_end);              // end of the overlap
         for (int s=0; s<2; s++) {
           if (strand_has_mods[s]) {
             rname.push_back(bam_rec->core.tid + 1);                             // RNAME+1
