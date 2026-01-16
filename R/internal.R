@@ -162,6 +162,8 @@ utils::globalVariables(
                       skip.qcfail,
                       skip.supplementary,
                       trim,
+                      targets,
+                      clip.to.targets,
                       nthreads,
                       verbose)
 {
@@ -169,25 +171,38 @@ utils::globalVariables(
                        "-end BAM file ", appendLF=FALSE)
   tm <- proc.time()
   
+  if (!is.null(targets)) {
+    dt.targets <- data.table::as.data.table(targets)
+    fn.suffix <- ifelse(clip.to.targets, "_cliptobed", "_usebed")
+  } else {
+    dt.targets <- data.table::data.table()
+    fn.suffix <- "_all"
+  }
+  
   bam.file <- path.expand(bam.file)
   skip.flags <- sum(c(4, 256, 512, 1024, 2048)[                  # 4==BAM_FUNMAP
     c(TRUE, skip.secondary, skip.qcfail, skip.duplicates, skip.supplementary)])
   if (bam.check$tagged=="XM") {                           # short-read alignment
     if (bam.check$paired) {                                         # paired-end
       skip.flags <- skip.flags + 8                              # 8==BAM_FMUNMAP
-      bam.processed <- rcpp_read_bam_paired(bam.file, min.mapq, min.baseq, 
-                                            skip.flags, trim[1], trim[2],
-                                            nthreads)
+      bam.processed <- do.call(
+        what=paste0("rcpp_read_bam_paired", fn.suffix),
+        args=list(bam.file, dt.targets, min.mapq, min.baseq, 
+                  skip.flags, trim[1], trim[2], nthreads)
+      )
     } else {                                                        # single-end
-      bam.processed <- rcpp_read_bam_single(bam.file, min.mapq, min.baseq, 
-                                            skip.flags, trim[1], trim[2],
-                                            nthreads)
+      bam.processed <- do.call(
+        what=paste0("rcpp_read_bam_single", fn.suffix),
+        args=list(bam.file, dt.targets, min.mapq, min.baseq, 
+                  skip.flags, trim[1], trim[2], nthreads)
+      )
     }
   } else {                                                 # long-read alignment
-    bam.processed <- rcpp_read_bam_mm_single(bam.file, min.mapq, min.baseq,
-                                             min.prob, highest.prob,
-                                             skip.flags, trim[1], trim[2],
-                                             nthreads)
+    bam.processed <- do.call(
+      what=paste0("rcpp_read_bam_mm_single", fn.suffix),
+      args=list(bam.file, dt.targets, min.mapq, min.baseq, 
+                min.prob, highest.prob, skip.flags, trim[1], trim[2], nthreads)
+    )
   }
   
   data.table::setDT(bam.processed)
