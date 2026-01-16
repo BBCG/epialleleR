@@ -228,8 +228,19 @@ opposite strand (e.g., `G-m`). The logic of their processing is as follows
 }
 
 \examples{
-  capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
-  bam.data    <- preprocessBam(capture.bam)
+  # short-read sequencing
+  capture.data <- preprocessBam(
+    system.file("extdata", "capture.bam", package="epialleleR"),
+    targets=as("chr17:43120000-43130000", "GRanges")
+  )
+  generateCytosineReport(capture.data, threshold.reads=TRUE)
+  
+  # long-read sequencing
+  longread.data <- preprocessBam(
+    system.file("extdata", "longread.bam", package="epialleleR"),
+    min.mapq=30, min.baseq=20, min.prob=178
+  )
+  generateCytosineReport(longread.data, threshold.reads=FALSE)
   
   # Specifics of long-read alignment processing
   out.bam <- tempfile(pattern="out-", fileext=".bam")

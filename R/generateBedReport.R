@@ -196,6 +196,21 @@
 #'                                   bed.type="capture")
 #'   identical(capture.report, bed.report)
 #'   
+#'   # long-read data clipped to a narrow target area
+#'   long.bam <- system.file("extdata", "longread.bam", package="epialleleR")
+#'   long.bed <- as("chr17:43124909-43125554", "GRanges")
+#'   long.data <- preprocessBam(
+#'     bam=long.bam, targets=long.bed, clip.to.targets=TRUE,
+#'     min.mapq=30, min.baseq=20, min.prob=178
+#'   )
+#'   long.report <- generateBedReport(
+#'     bam=long.data, bed=long.bed, bed.type="capture", filter.reads=FALSE
+#'   )
+#'   plotPatterns(
+#'     extractPatterns(bam=long.data, bed=long.bed),
+#'     npatterns.per.bin=Inf
+#'   )
+#'   
 #'   # toy example from the description
 #'   temp.bam <- tempfile(fileext=".bam") 
 #'   simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",

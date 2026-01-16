@@ -258,6 +258,20 @@ pattern output to the region of interest only.
                                   bed.type="capture")
   identical(capture.report, bed.report)
   
+  # long-read data clipped to a narrow target area
+  long.bam <- system.file("extdata", "longread.bam", package="epialleleR")
+  long.bed <- as("chr17:43124909-43125554", "GRanges")
+  long.report <- generateBedReport(
+    bam=long.bam, bed=long.bed, bed.type="capture",
+    targets=long.bed, clip.to.targets=TRUE,
+    min.mapq=30, min.baseq=20, min.prob=178
+  )
+  plotPatterns(extractPatterns(
+    bam=long.bam, bed=long.bed, clip.patterns=TRUE,
+    targets=long.bed, clip.to.targets=TRUE,
+    min.mapq=30, min.baseq=20, min.prob=178
+  ), npatterns.per.bin=Inf)
+  
   # toy example from the description
   temp.bam <- tempfile(fileext=".bam") 
   simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
