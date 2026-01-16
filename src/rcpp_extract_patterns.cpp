@@ -124,7 +124,7 @@ Rcpp::DataFrame rcpp_extract_patterns(Rcpp::DataFrame &df,                      
         const char* seqxm_x = seqxm->at(templid[x]).c_str();                    // seqxm->at(templid[x]) is a reference to a corresponding SEQXM string
         const unsigned int offset_x = strand[x]==2 ? reverse_offset : 0;        // offset coordinates of reverse strand for symmetric methylation
         const unsigned int begin_i = clip ? (over_start_x - start_x) : 0;       // clip the XM?
-        const unsigned int end_i = clip ? overlap : size_x;                     // clip the XM?
+        const unsigned int end_i = clip ? (begin_i + overlap) : size_x;         // clip the XM?
         unsigned int meth = 0, total = 0;                                       // counters for methylated and total within context
         uint64_t fnv = offset_basis;                                            // FNV-1a hash of current pattern
         for (unsigned int i=begin_i; i<end_i; i++) {                            // char by char - it's faster this way than using std::string in the cycle
