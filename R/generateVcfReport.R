@@ -31,7 +31,7 @@
 #' with single-base REF and ALT alleles. Also, the default (`min.baseq=0`)
 #' output of `generateVcfReport` is equivalent to the one of
 #' `samtools mplieup -Q 0 ...`, and therefore may result in false SNVs caused
-#' by misalignments. Remember to increase `min.baseq` (`samtools mplieup -Q`
+#' by misalignments. Remember to increase `min.baseq` (`samtools mpileup -Q`
 #' default value is 13) to obtain higher-quality results.
 #'
 #' Read thresholding by an average methylation level used in this function
