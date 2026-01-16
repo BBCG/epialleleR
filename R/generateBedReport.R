@@ -68,7 +68,7 @@
 #' @param report.file file location string to write the BED report. If NULL
 #' (the default) then report is returned as a
 #' \code{\link[data.table]{data.table}} object.
-#' @param zero.based.bed boolean defining if BED coordinates are zero based
+#' @param zero.based.bed boolean defining if BED coordinates are zero-based
 #' (default: FALSE).
 #' @param bed.type character string for the type of assay that was used to
 #' produce sequencing reads:

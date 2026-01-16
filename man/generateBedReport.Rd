@@ -76,7 +76,7 @@ pairs) matching both strands are separately counted and reported.}
 (the default) then report is returned as a
 \code{\link[data.table]{data.table}} object.}
 
-\item{zero.based.bed}{boolean defining if BED coordinates are zero based
+\item{zero.based.bed}{boolean defining if BED coordinates are zero-based
 (default: FALSE).}
 
 \item{match.tolerance}{integer for the largest difference between read's and
