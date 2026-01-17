@@ -44,8 +44,8 @@ require("GenomicRanges", quietly=TRUE)
 require("ggplot2", quietly=TRUE)
 require("epialleleR", quietly=TRUE)
   
-plotMetrics <- function (bam.file, range, min.n=0, title="epialleles") {
-  bam <- preprocessBam(bam.file=bam.file, verbose=FALSE)
+plotMetrics <- function (bam.file, range, clip.to.targets=FALSE, min.n=0, title="epialleles") {
+  bam <- preprocessBam(bam.file=bam.file, min.mapq=30, min.baseq=20, min.prob=178, targets=range, clip.to.targets=clip.to.targets, verbose=FALSE)
   cg.beta <- generateCytosineReport(bam, threshold.reads=FALSE, verbose=FALSE)
   cg.vef  <- generateCytosineReport(bam, threshold.reads=TRUE, verbose=FALSE)
   cg.mhl  <- generateMhlReport(bam, max.haplotype.window=20, verbose=FALSE)
@@ -197,6 +197,27 @@ simulateBam(
 )
 plotMetrics(out.bam, as("chrS:1-20", "GRanges"), title="several overlapping partial epimutations")
 
+
+# simulated long-read sequencing, low methylation
+getXM <- function (p) {sample(x=c("z", "Z"), size=1, prob=c(p, 1-p))}
+probs <- (sin(seq(-2*pi, +1*pi, by = pi/25))+2)/3
+simulateBam(
+  output.bam.file=out.bam,
+  pos=1:10,
+  XM=sapply(1:10, function (i) {paste(sapply(probs, getXM), collapse="")}),
+  XG="CT"
+)
+plotMetrics(out.bam, as("chrS:1-1000", "GRanges"), title="simulated long-read sequencing, low methylation")
+
+# simulated long-read sequencing, high methylation
+simulateBam(
+  output.bam.file=out.bam,
+  pos=1:10,
+  XM=sapply(1:10, function (i) {paste(sapply(1-probs, getXM), collapse="")}),
+  XG="CT"
+)
+plotMetrics(out.bam, as("chrS:1-1000", "GRanges"), title="simulated long-read sequencing, high methylation")
+
 # amplicon 0%
 plotMetrics(
   system.file("extdata", "amplicon000meth.bam", package="epialleleR"),
@@ -233,25 +254,17 @@ plotMetrics(
   as("chr17:58691673-58693108:-", "GRanges"), title="sample capture, RAD51C, - strand"
 )
 
-# long-read sequencing, low methylation
-getXM <- function (p) {sample(x=c("z", "Z"), size=1, prob=c(p, 1-p))}
-probs <- (sin(seq(-2*pi, +1*pi, by = pi/25))+2)/3
-simulateBam(
-  output.bam.file=out.bam,
-  pos=1:10,
-  XM=sapply(1:10, function (i) {paste(sapply(probs, getXM), collapse="")}),
-  XG="CT"
+# long-read sequencing, BRCA1
+plotMetrics(
+  system.file("extdata", "longread.bam", package="epialleleR"),
+  as("chr17:43125000-43127000:+", "GRanges"), title="long-read sequencing, BRCA1, + strand", clip.to.targets=TRUE
 )
-plotMetrics(out.bam, as("chrS:1-1000", "GRanges"), title="long-read sequencing, low methylation")
 
-# long-read sequencing, high methylation
-simulateBam(
-  output.bam.file=out.bam,
-  pos=1:10,
-  XM=sapply(1:10, function (i) {paste(sapply(1-probs, getXM), collapse="")}),
-  XG="CT"
+# long-read sequencing, BRCA1
+plotMetrics(
+  system.file("extdata", "longread.bam", package="epialleleR"),
+  as("chr17:43125000-43127000:-", "GRanges"), title="long-read sequencing, BRCA1, - strand", clip.to.targets=TRUE
 )
-plotMetrics(out.bam, as("chrS:1-1000", "GRanges"), title="long-read sequencing, high methylation")
 
 ```
 

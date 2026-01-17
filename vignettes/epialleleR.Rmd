@@ -218,6 +218,17 @@ related files are:
 | capture.vcf.gz | VCF | a relevant subset of sequence variations |
 | capture.vcf.gz.tbi | tabix | tabix file for the capture.vcf.gz |
 
+### Long-read native NGS data
+
+The blood DNA was fragmented, ligated with adapters, and sequenced using 
+Oxford Nanopore PromethION P2 Solo system. Base calling and CpG cytosine
+modification analysis was performed in MinKNOW v25.09.16 using high
+accuracy model v5.2.0. The file is:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| longread.bam | BAM | a subset of reads covering BRCA1 promoter area |
+
 ### Manually creating sample BAM files
 
 For the purposes of testing this package's methods or other tools for
