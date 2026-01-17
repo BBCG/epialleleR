@@ -40,14 +40,17 @@ an input. See below for additional functionality.
 ##### v1.20 [BioC 3.23]
 
  * disrupting API changes in `generate*Report` (from version 1.19.1 onwards):
- new parameter `filter.reads` regulates filtering of reads with
- presumable incomplete conversion of cytosines;
+ new parameter `filter.reads` regulates filtering of reads with too few
+ cytosines or presumable incomplete conversion of cytosines;
  `cytosine.context` parameter instead of
- `threshold.context`/`haplotype.context`.
+ `threshold.context`/`haplotype.context`
  * disrupting change in thresholding logic (from version 1.19.1 onwards):
- reads with out-of-context cytosine methylation higher than
+ reads with too few within-the-context cytosines or
+ out-of-context cytosine methylation higher than
  `max.outofcontext.beta` are filtered out (discarded) instead of being counted
- as hypomethylated reads (as was in v1.19.0 and earlier).
+ as hypomethylated reads (as was in v1.19.0 and earlier)
+ * using genomic coordinates of targets, only a subset of BAM reads or only
+ fragments of BAM reads that are overlapping the targets can now be loaded
 
 ##### v1.14 [BioC 3.20]
 

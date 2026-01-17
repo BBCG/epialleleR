@@ -106,4 +106,5 @@ Changes in version 1.15.3 (2025-03-05)
 Changes in version 1.19.1 (2026-01-02)
 + API change for thresholding in all 'generate*Report' functions
 + Filtered out reads are dropped and not counted as hypomethylated anymore
++ limit/clip reads during BAM loading to targets
 
