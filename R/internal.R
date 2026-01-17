@@ -453,8 +453,8 @@ utils::globalVariables(
 
 .filterThresholdReads <- function (
     bam.processed, ctx.meth, ctx.unmeth, ooctx.meth, ooctx.unmeth,
-    filter.reads, max.outofcontext.beta, 
-    threshold.reads, min.context.sites, min.context.beta, verbose)
+    filter.reads, min.context.sites, max.outofcontext.beta, 
+    threshold.reads, min.context.beta, verbose)
 {
   path <- list(
     c(fun="rcpp_allowall_reads", msg="Skipping filtering/thresholding "),
