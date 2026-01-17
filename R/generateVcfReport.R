@@ -37,8 +37,10 @@
 #' Read thresholding by an average methylation level used in this function
 #' makes little sense for long-read sequencing alignments,
 #' as such reads can cover multiple regions with very different DNA methylation
-#' properties. Instead, please use \code{\link{extractPatterns}},
-#' limiting pattern output to the region of interest only.
+#' properties. If necessary, one could either clip long sequencing reads to
+#' narrow `targets` in \code{\link{preprocessBam}} function during BAM loading
+#' or use \code{\link{extractPatterns}}, limiting
+#' pattern output to the region of interest only.
 #'
 #' @param bam BAM file location string OR preprocessed output of
 #' \code{\link[epialleleR]{preprocessBam}} function. Read more about BAM file
@@ -79,10 +81,15 @@
 #'   \item "CX" -- all cytosines are considered within-the-context, this
 #'   effectively results in no thresholding
 #' }
-#' @param filter.reads boolean defining if sequence reads with too high
-#' out-of-context cytosine methylation should be filtered out (e.g.,
-#' reads resulting from incompletely bisulfite-converted templates).
+#' @param filter.reads boolean defining if sequence reads with too few context
+#' bases or too high out-of-context cytosine methylation should be filtered
+#' out (e.g., reads resulting from incompletely bisulfite-converted templates).
 #' Default: TRUE.
+#' @param min.context.sites non-negative integer for minimum number of cytosines
+#' within the `cytosine.context` (default: 2). Reads containing \strong{fewer}
+#' within-the-context cytosines will not be thresholded and will be ignored
+#' in further computations.
+#' This option has no effect when read filtering is disabled.
 #' @param max.outofcontext.beta real number in the range [0;1] (default: 0.1).
 #' Reads with average beta value for out-of-context cytosines \strong{above}
 #' this threshold will not be thresholded and will be ignored in further
@@ -93,14 +100,7 @@
 #' the context of this function, because
 #' all the reads will be assigned to the variant epiallele,
 #' which will result in Fisher's Exact test p-value of 1 (in columns `FEp+` and
-#' `FEP-`). As thresholding is \strong{not} recommended for long-read
-#' sequencing data, this function is \strong{not} recommended for such data
-#' either.
-#' @param min.context.sites non-negative integer for minimum number of cytosines
-#' within the `cytosine.context` (default: 2). Reads containing \strong{fewer}
-#' within-the-context cytosines are considered completely unmethylated (thus
-#' belonging to the reference epiallele). This option has no effect when read
-#' thresholding is disabled.
+#' `FEP-`).
 #' @param min.context.beta real number in the range [0;1] (default: 0.5). Reads
 #' with average beta value for within-the-context cytosines \strong{below} this
 #' threshold are considered completely unmethylated (thus belonging to the
@@ -173,8 +173,8 @@
 #'     # simulate toy BAM
 #'     temp.bam <- tempfile(fileext=".bam")
 #'     simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
-#'                 seq=c("AGACGTTAGTAATAGTA", "AAACGTTGTAATAGTA",
-#'                       "AGACGTTGTAACAGTA",  "AAACGTTGTAATGTA"),
+#'                 seq=c("AGACGTTAGTAATAGTA", "AGACGTTGTAATAGTA",
+#'                       "AAACGTTGTAACAGTA",  "AAACGTTGTAATGTA"),
 #'                 XM=c( "...Z..x+.h..x..h.", "...Z..z.h..x..h.",
 #'                       "...Z..z.h..X..h.",  "...Z..z.h..z.h."),
 #'                 cigar=c("7M1I9M", "16M", "16M", "12M1D3M"))
@@ -184,8 +184,9 @@
 #'     VariantAnnotation::ref(vcf) <- as("A", "DNAStringSet")
 #'     VariantAnnotation::alt(vcf) <- as("G", "DNAStringSet")
 #'     
-#'     # read filtering will exclude third read from BAM file because it has
-#'     # too many out-of-context methylated cytosines (in position #12).
+#'     # read filtering will exclude the first and the third reads from this
+#'     # BAM file because they have too few context bases or
+#'     # too many out-of-context methylated cytosines, respectively.
 #'     
 #'     # results with read filtering and thresholding
 #'     generateVcfReport(bam=temp.bam, vcf=vcf)
@@ -201,9 +202,9 @@ generateVcfReport <- function (bam,
                                zero.based.bed=FALSE,
                                cytosine.context=c("CG", "CHG", "CHH", "CxG", "CX"),
                                filter.reads=TRUE,
+                               min.context.sites=2,
                                max.outofcontext.beta=0.1,
                                threshold.reads=TRUE,
-                               min.context.sites=2,
                                min.context.beta=0.5,
                                ...,
                                gzip=FALSE,
@@ -238,9 +239,9 @@ generateVcfReport <- function (bam,
     ooctx.meth=.context.to.bases[[cytosine.context]][["ooctx.meth"]],
     ooctx.unmeth=.context.to.bases[[cytosine.context]][["ooctx.unmeth"]],
     filter.reads=filter.reads,
+    min.context.sites=min.context.sites,
     max.outofcontext.beta=max.outofcontext.beta,
     threshold.reads=threshold.reads,
-    min.context.sites=min.context.sites,
     min.context.beta=min.context.beta,
     verbose=verbose
   )
