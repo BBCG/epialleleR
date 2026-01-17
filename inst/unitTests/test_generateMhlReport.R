@@ -7,7 +7,7 @@ test_generateMhlReport <- function () {
   RUnit::checkTrue(
     identical(
       generateMhlReport(capture.bam, max.haplotype.window=1)[, lmhl],
-      generateCytosineReport(capture.bam, threshold.reads=FALSE)[, meth/(meth+unmeth)]
+      generateCytosineReport(capture.bam, filter.reads=FALSE, threshold.reads=FALSE)[, meth/(meth+unmeth)]
     )
   )
   

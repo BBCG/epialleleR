@@ -177,7 +177,7 @@ test_generateVcfReport <- function () {
   )
   RUnit::checkEquals(
     capture.report[, sum(`U+Ref`, na.rm=TRUE), by=.(REF,ALT)][order(REF, ALT)]$V1,
-    c(175, 707, 181, 356, 434, 0, 1215, 412, 399, 169, 0, 258)
+    c(109, 390, 95, 277, 347, 0, 947, 321, 313, 102, 0, 150)
   )
   RUnit::checkEquals(
     capture.report[, sum(`M-Ref`, na.rm=TRUE), by=.(REF,ALT)][order(REF, ALT)]$V1,
@@ -185,7 +185,7 @@ test_generateVcfReport <- function () {
   )
   RUnit::checkEquals(
     capture.report[, sum(`U-Ref`, na.rm=TRUE), by=.(REF,ALT)][order(REF, ALT)]$V1,
-    c(181, 0, 184, 384, 462, 1183, 0, 398, 389, 160, 727, 274)
+    c(101, 0, 106, 288, 377, 901, 0, 311, 318, 101, 454, 168)
   )
   RUnit::checkEquals(
     capture.report[, sum(`M+Alt`, `U+Alt`, `M-Alt`, `U-Alt`, `SumAlt`, na.rm=TRUE), by=.(REF,ALT)][order(REF, ALT)]$V1,
@@ -193,7 +193,7 @@ test_generateVcfReport <- function () {
   )
   RUnit::checkEquals(
     capture.report[, sum(`SumRef`, na.rm=TRUE), by=.(REF,ALT)][order(REF, ALT)]$V1,
-    c(492, 1047, 519, 1100, 1264, 1941, 1951, 1137, 1137, 495, 1029, 771)
+    c(346, 730, 355, 925, 1092, 1659, 1683, 959, 980, 369, 756, 557)
   )
   RUnit::checkEquals(
     capture.report[, sum(as.numeric(range)), by=.(REF,ALT)][order(REF,ALT)]$V1,

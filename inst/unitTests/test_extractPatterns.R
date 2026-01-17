@@ -59,7 +59,7 @@ test_extractPatterns <- function () {
   
   RUnit::checkEquals(
     sum(clip.patterns$nbase),
-    2186
+    2465
   )
   
   RUnit::checkEquals(
@@ -69,12 +69,12 @@ test_extractPatterns <- function () {
   
   RUnit::checkEquals(
     sum(clip.patterns=="z", na.rm=TRUE),
-    2006
+    2270
   )
   
   RUnit::checkEquals(
     sum(clip.patterns=="Z", na.rm=TRUE),
-    180
+    195
   )
   
   exact.patterns <- extractPatterns(
@@ -138,7 +138,7 @@ test_extractPatterns <- function () {
   
   RUnit::checkEquals(
     length(unique(cx.patterns$pattern)),
-    135
+    140
   )
   
   RUnit::checkEquals(
@@ -148,22 +148,22 @@ test_extractPatterns <- function () {
   
   RUnit::checkEquals(
     sum(cx.patterns=="h", na.rm=TRUE),
-    18944
+    19253
   )
   
   RUnit::checkEquals(
     sum(cx.patterns=="H", na.rm=TRUE),
-    38
+    49
   )
   
   RUnit::checkEquals(
     sum(cx.patterns=="x", na.rm=TRUE),
-    8801
+    9049
   )
   
   RUnit::checkEquals(
     sum(cx.patterns=="X", na.rm=TRUE),
-    26
+    27
   )
   
   RUnit::checkEquals(
@@ -173,7 +173,7 @@ test_extractPatterns <- function () {
   
   RUnit::checkEquals(
     sum(cx.patterns=="Z", na.rm=TRUE),
-    565
+    570
   )
   
   
@@ -307,3 +307,4 @@ test_extractPatterns <- function () {
     check.attributes=FALSE
   )
 }
+
