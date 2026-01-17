@@ -192,6 +192,14 @@ without using the reference genome sequence.
     cg.report[ , .(rname, strand, pos, context, value=meth/(meth+unmeth))]
   )
   
+  # Long-read sequencing with filtering disabled, using window of 10 CpGs
+  long.bam <- system.file("extdata", "longread.bam", package="epialleleR")
+  long.data <- preprocessBam(bam=long.bam, min.mapq=30, min.baseq=20,
+                             min.prob=178)
+  mhl.report <- generateMhlReport(bam=long.data, max.haplotype.window=10,
+                                  filter.reads=FALSE)
+  plot(mhl.report[, .(pos, lmhl=data.table::frollmean(lmhl, 100))], type="l")
+  
   ## toy examples to illustrate the logic of computations
   temp.bam <- tempfile(fileext=".bam")
   
