@@ -73,13 +73,13 @@ Rcpp::LogicalVector rcpp_fltthrshld_reads(Rcpp::DataFrame &df,                  
         for (unsigned int i=0; i<ooctx_unmeth_size; i++)
           n_ooctx_unmeth += ctx_map[ctx_to_idx(ooctx_unmeth_cstr[i])];          // count ooctx-unmethylated bases
         const unsigned int n_ooctx_all = n_ooctx_meth + n_ooctx_unmeth;         // all bases outside of ctx
-        const double ooctx_meth_frac = (double)n_ooctx_meth / n_ooctx_all;
+        const double ooctx_meth_frac = (double)n_ooctx_meth / std::max(n_ooctx_all, 1U); // account for possible 0 ooctx sites
         if (ooctx_meth_frac>max_ooctx_meth_frac) continue;                      // next read (keep NA_LOGICAL) if average out-of-context beta is higher than max_ooctx_meth_frac
       }
     }
     
     if (threshold) {
-      double ctx_meth_frac = (double)n_ctx_meth / n_ctx_all;
+      double ctx_meth_frac = (double)n_ctx_meth / std::max(n_ctx_all, 1U);      // account for possible 0 ctx sites
       res[x] = (ctx_meth_frac>=min_ctx_meth_frac);                              // true if average context beta is more or equal to min_ctx_meth_frac, false otherwise
     } else {
       res[x] = true;
