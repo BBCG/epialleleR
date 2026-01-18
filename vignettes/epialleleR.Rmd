@@ -311,7 +311,9 @@ unless its quality is less than *`min.baseq`*, which results in no information
 for that particular position ("-"/"N"). These **merged reads** are then
 processed as a **single entity** in all *`epialleleR`* methods. Due to merging,
 overlapping bases in read pairs are counted only once, and the base with the
-highest quality is taken. It is a requirement currently that paired-end BAM
+highest quality is taken.
+
+It is currently a requirement that paired-end BAM
 file must be sorted by QNAME instead
 of genomic location (i.e., "unsorted") to perform merging of paired-end
 reads. Error message is shown if it is sorted by genomic location, in this
@@ -329,6 +331,11 @@ performed at the level of a template (i.e., read pair for paired-end BAM or
 individual read for single-end BAM). This ensures that only necessary parts
 (real ends of sequenced fragment) are removed for paired-end sequencing
 reads.
+
+It is also possible to load only a subset of reads (read pairs) of interest
+or only fragments of such reads by supplying a list of targets (see description
+of *`targets`* and other related options in the help page for *`preprocessBam`*
+function). The subsetting is performed without using BAM index.
 
 ### Specific considerations for long-read sequencing data:
 
@@ -356,8 +363,17 @@ opposite strand (e.g., `G-m`). The logic of their processing is as follows
 ```{r}
 library(epialleleR)
 
+# short-read sequencing
 capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
 bam.data    <- preprocessBam(capture.bam)
+generateCytosineReport(bam.data)
+
+# long-read sequencing
+longread.data <- preprocessBam(
+  system.file("extdata", "longread.bam", package="epialleleR"),
+  min.mapq=30, min.baseq=20, min.prob=178
+)
+generateCytosineReport(longread.data, threshold.reads=FALSE)
 
 # Specifics of long-read alignment processing
 out.bam <- tempfile(pattern="out-", fileext=".bam")
@@ -409,7 +425,8 @@ order to make a conventional cytosine report, use *`threshold.reads=FALSE`*.
 
 Also, by default, *`generateCytosineReport`* (as well as *`generateBedReport`*,
 *`generateVcfReport`*, *`generateMhlReport`*) silently drops all reads that
-have too high out-of-context cytosine methylation (presumably, resulting from
+have too few cytosines within the context or too high out-of-context
+cytosine methylation (presumably, resulting from
 incomplete cytosine conversion). To disable this behaviour, run the method with
 the following parameters: *`filter.reads=FALSE`* (although, not recommended).
 
