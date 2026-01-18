@@ -295,10 +295,10 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.012s]
+#> [0.013s]
   generateCytosineReport(capture.data, threshold.reads=TRUE)
 #> Filtering and thresholding reads 
-#> [0.001s]
+#> [0.000s]
 #> Preparing cytosine report 
 #> [0.001s]
 #>      rname strand      pos context  meth unmeth
@@ -360,12 +360,12 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 #> Checking BAM file: 
 #> long-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.004s]
+#> [0.006s]
   generateCytosineReport(longread.data, threshold.reads=FALSE)
 #> Filtering reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.025s]
+#> [0.028s]
 #>       rname strand      pos context  meth unmeth
 #>      <fctr> <fctr>    <int>  <fctr> <int>  <int>
 #>   1:  chr17      - 43115270      CG     1      0
@@ -418,7 +418,7 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
     output.bam.file=out.bam
   )
 #> Writing sample BAM 
-#> [0.002s]
+#> [0.003s]
 #> [1] 1
   generateCytosineReport(out.bam, threshold.reads=FALSE, report.context="CX")
 #> Checking BAM file: 
@@ -428,7 +428,7 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 #> Filtering reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.001s]
+#> [0.000s]
 #>      rname strand   pos context  meth unmeth
 #>     <fctr> <fctr> <int>  <fctr> <int>  <int>
 #>  1:   chrS      +     2      CG     0      1
@@ -455,11 +455,11 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 #> Checking BAM file: 
 #> long-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.001s]
+#> [0.002s]
 #> Filtering reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.001s]
+#> [0.000s]
 #>      rname strand   pos context  meth unmeth
 #>     <fctr> <fctr> <int>  <fctr> <int>  <int>
 #>  1:   chrS      +     2      CG     1      0

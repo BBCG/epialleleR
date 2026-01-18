@@ -9,14 +9,14 @@ r-universe](https://bioc.r-universe.dev/epialleleR/badges/version)](https://bioc
 ## Introduction
 
 *`epialleleR`* is an R package for calling and reporting cytosine DNA
-methylation in many useful ways. Developed to help identify and quantify
-epimutations (aberrant DNA methylation), it has now acquired multiple
-additional functions to dissect DNA methylation. But the main feature of
-the package is to report frequencies of epimutations (variant epiallele
-frequencies, VEF) at the level of genomic regions or individual
-cytosines. All you need in order to use it is a binary alignment map
-(BAM) file from basically any next-generation (methylation or native)
-sequencing experiment.
+methylation. Developed to help identify and quantify epimutations
+(aberrant DNA methylation events), it has now acquired multiple
+additional functions to dissect DNA methylation in many useful ways. But
+the main feature of the package is to report frequencies of epimutations
+(variant epiallele frequencies, VEF) at the level of genomic regions or
+individual cytosines. All you need in order to use it, is a binary
+alignment map (BAM) file from basically any next-generation (methylation
+or native) sequencing experiment.
 
 ![](./articles/epialleles.png)
 

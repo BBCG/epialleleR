@@ -39,7 +39,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.110s]
+#> Writing sample BAM [0.111s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), 0, title="no epimutations")
 ```
@@ -83,7 +83,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.110s]
+#> Writing sample BAM [0.108s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="one partial epimutation")
 ```
@@ -105,7 +105,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.150s]
+#> Writing sample BAM [0.152s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="another partial epimutation")
 ```
@@ -130,7 +130,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.112s]
+#> Writing sample BAM [0.114s]
 #> [1] 1009
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="several partial epimutations")
 ```
@@ -155,7 +155,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.103s]
+#> Writing sample BAM [0.104s]
 #> [1] 1009
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="several short partial epimutations")
 ```
@@ -178,7 +178,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.005s]
+#> Writing sample BAM [0.004s]
 #> [1] 20
 plotMetrics(out.bam, as("chrS:1-20", "GRanges"), title="several overlapping partial epimutations")
 ```
@@ -198,7 +198,7 @@ simulateBam(
   XM=sapply(1:10, function (i) {paste(sapply(probs, getXM), collapse="")}),
   XG="CT"
 )
-#> Writing sample BAM [0.014s]
+#> Writing sample BAM [0.012s]
 #> [1] 10
 plotMetrics(out.bam, as("chrS:1-1000", "GRanges"), title="simulated long-read sequencing, low methylation")
 ```
@@ -215,7 +215,7 @@ simulateBam(
   XM=sapply(1:10, function (i) {paste(sapply(1-probs, getXM), collapse="")}),
   XG="CT"
 )
-#> Writing sample BAM [0.012s]
+#> Writing sample BAM [0.011s]
 #> [1] 10
 plotMetrics(out.bam, as("chrS:1-1000", "GRanges"), title="simulated long-read sequencing, high methylation")
 ```
