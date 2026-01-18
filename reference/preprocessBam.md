@@ -18,6 +18,9 @@ preprocessBam(
   skip.qcfail = TRUE,
   skip.supplementary = TRUE,
   trim = 0,
+  targets = NULL,
+  zero.based.targets = FALSE,
+  clip.to.targets = FALSE,
   nthreads = 1,
   verbose = TRUE
 )
@@ -41,25 +44,27 @@ preprocessBam(
 
 - min.mapq:
 
-  non-negative integer threshold for minimum read mapping quality
-  (default: 0).
+  non-negative integer threshold for minimum read mapping quality.
+  Default is 0, however a higher value (e.g., 30) is recommended.
 
 - min.baseq:
 
-  non-negative integer threshold for minimum nucleotide base quality
-  (default: 0).
+  non-negative integer threshold for minimum nucleotide base quality.
+  Default is 0, however a higher value (e.g., at least 13 as in
+  \`samtools mpileup\`) is recommended.
 
 - min.prob:
 
   integer threshold for minimum scaled probability of modification
-  (methylation) to consider. Affects processing long-read sequencing
+  (methylation) to consider. Affects processing of long-read sequencing
   alignments only. According to SAM/BAM specification, the continuous
   base modification probability range 0.0 to 1.0 is remapped in equal
-  sized portions to the discrete integers 0 to 255 inclusively. If
-  default (-1), then all C+m and G-m cytosine methylation modifications
-  recorded in MM/Mm tag will be included, even if ML/Ml tag with
-  probabilities is absent (in such case, probability of modification
-  equals -1).
+  sized portions to the discrete integers 0 to 255 inclusively. Default
+  is -1, however a higher value (e.g., 178 which corresponds to a
+  modification probability of ~0.7) is recommended. Also, when default
+  (-1), all C+m and G-m cytosine methylation modifications recorded in
+  MM/Mm tag will be included, even if ML/Ml tag with probabilities is
+  absent (in such case, probability of modification equals -1).
 
 - highest.prob:
 
@@ -102,11 +107,34 @@ preprocessBam(
   \`trim=c(1,2)\` will result in removing of a single base from 5' end
   and 2 bases from 3' end.
 
+- targets:
+
+  Browser Extensible Data (BED) file location string OR object of class
+  [`GRanges`](https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html)
+  holding genomic coordinates for regions of interest. The style of
+  seqlevels of BED file/object must be the same as the style of
+  seqlevels of BAM file. During targets loading, the genomic regions are
+  reduced (i.e., overlapping regions are merged), and the strand
+  information is discarded. These reduced regions are then used to only
+  load overlapping reads (merged read pairs for paired-end sequencing).
+
+- zero.based.targets:
+
+  boolean defining if BED file coordinates are zero-based (default:
+  FALSE).
+
+- clip.to.targets:
+
+  boolean defining if overlapping reads (merged read pairs in case of
+  paired-end sequencing) should be clipped to retain only fragments
+  overlapping with \`targets\` (default: FALSE). If a read overlaps with
+  two or more targets, all overlapping fragments will be retained.
+
 - nthreads:
 
   non-negative integer for the number of additional HTSlib threads to be
   used during BAM file decompression (default: 1). Two threads (and
-  usually no more than two) make sense for the files larger than 100 MB.
+  usually no more than four) make sense for files larger than 100 MB.
 
 - verbose:
 
@@ -116,6 +144,11 @@ preprocessBam(
 
 [`data.table`](https://rdatatable.gitlab.io/data.table/reference/data.table.html)
 object containing preprocessed BAM data.
+
+NB: most of the BAM data is stored not in the data.table *per se*, but
+as an external object linked to this data.table. Therefore,
+saving/loading this data.table cannot be used to save/recover
+preprocessed BAM data.
 
 ## Details
 
@@ -174,6 +207,12 @@ entity in all \`epialleleR\` methods. Due to merging, overlapping bases
 in read pairs are counted only once, and the base with the highest
 quality is taken.
 
+It is currently a requirement that paired-end BAM file must be sorted by
+QNAME instead of genomic location (i.e., "unsorted") to perform merging
+of paired-end reads. Error message is shown if it is sorted by genomic
+location, in this case please sort it by QNAME using 'samtools sort -n
+-o out.bam in.bam'.
+
 During preprocessing of single-end alignments, no read merging is
 performed. Only bases with quality of at least \`min.baseq\` are
 considered. Lower base quality results in no information for that
@@ -187,11 +226,10 @@ paired-end BAM or individual read for single-end BAM). This ensures that
 only necessary parts (real ends of sequenced fragment) are removed for
 paired-end sequencing reads.
 
-It is also a requirement currently that paired-end BAM file must be
-sorted by QNAME instead of genomic location (i.e., "unsorted") to
-perform merging of paired-end reads. Error message is shown if it is
-sorted by genomic location, in this case please sort it by QNAME using
-'samtools sort -n -o out.bam in.bam'.
+It is also possible to load only a subset of reads (read pairs) of
+interest or only fragments of such reads by supplying a list of targets
+(see description of \`targets\` and other related options). The
+subsetting is performed without using BAM index.
 
 ## Specific considerations for long-read sequencing data
 
@@ -249,12 +287,98 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 ## Examples
 
 ``` r
-  capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
-  bam.data    <- preprocessBam(capture.bam)
+  # short-read sequencing
+  capture.data <- preprocessBam(
+    system.file("extdata", "capture.bam", package="epialleleR"),
+    targets=as("chr17:43120000-43130000", "GRanges")
+  )
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.011s]
+#> [0.012s]
+  generateCytosineReport(capture.data, threshold.reads=TRUE)
+#> Filtering and thresholding reads 
+#> [0.001s]
+#> Preparing cytosine report 
+#> [0.001s]
+#>      rname strand      pos context  meth unmeth
+#>     <fctr> <fctr>    <int>  <fctr> <int>  <int>
+#>  1:  chr17      - 43123785      CG     1      0
+#>  2:  chr17      + 43124075      CG     1      0
+#>  3:  chr17      + 43124077      CG     1      0
+#>  4:  chr17      - 43124568      CG     0      1
+#>  5:  chr17      - 43124590      CG     0      1
+#>  6:  chr17      - 43124611      CG     0      1
+#>  7:  chr17      - 43124625      CG     0      1
+#>  8:  chr17      + 43125677      CG     0      1
+#>  9:  chr17      + 43125690      CG     0      1
+#> 10:  chr17      + 43125713      CG     0      1
+#> 11:  chr17      + 43125745      CG     0      1
+#> 12:  chr17      + 43125769      CG     0      1
+#> 13:  chr17      + 43125830      CG     0      1
+#> 14:  chr17      + 43125835      CG     0      1
+#> 15:  chr17      + 43125851      CG     0      2
+#> 16:  chr17      + 43125908      CG     0      2
+#> 17:  chr17      + 43125923      CG     0      2
+#> 18:  chr17      + 43125955      CG     0      2
+#> 19:  chr17      + 43125957      CG     0      2
+#> 20:  chr17      + 43126252      CG     0      1
+#> 21:  chr17      + 43126255      CG     0      1
+#> 22:  chr17      + 43126258      CG     0      1
+#> 23:  chr17      + 43126264      CG     0      1
+#> 24:  chr17      + 43126286      CG     0      1
+#> 25:  chr17      + 43126324      CG     0      1
+#> 26:  chr17      + 43126330      CG     0      1
+#> 27:  chr17      + 43126332      CG     0      1
+#> 28:  chr17      + 43126340      CG     0      1
+#> 29:  chr17      + 43126363      CG     0      1
+#> 30:  chr17      + 43126393      CG     0      1
+#> 31:  chr17      + 43126408      CG     0      1
+#> 32:  chr17      + 43126412      CG     0      1
+#> 33:  chr17      - 43126869      CG     1      0
+#> 34:  chr17      - 43126871      CG     1      0
+#> 35:  chr17      - 43126876      CG     1      0
+#> 36:  chr17      - 43126880      CG     1      0
+#> 37:  chr17      - 43126890      CG     1      0
+#> 38:  chr17      - 43126892      CG     1      0
+#> 39:  chr17      - 43126907      CG     1      0
+#> 40:  chr17      - 43126909      CG     1      0
+#> 41:  chr17      - 43126918      CG     1      0
+#> 42:  chr17      - 43126925      CG     1      0
+#> 43:  chr17      - 43126933      CG     1      0
+#> 44:  chr17      - 43126939      CG     1      0
+#> 45:  chr17      - 43126962      CG     1      0
+#> 46:  chr17      - 43126985      CG     1      0
+#>      rname strand      pos context  meth unmeth
+#>     <fctr> <fctr>    <int>  <fctr> <int>  <int>
+  
+  # long-read sequencing
+  longread.data <- preprocessBam(
+    system.file("extdata", "longread.bam", package="epialleleR"),
+    min.mapq=30, min.baseq=20, min.prob=178
+  )
+#> Checking BAM file: 
+#> long-read, single-end, unsorted alignment detected
+#> Reading single-end BAM file 
+#> [0.004s]
+  generateCytosineReport(longread.data, threshold.reads=FALSE)
+#> Filtering reads 
+#> [0.000s]
+#> Preparing cytosine report 
+#> [0.025s]
+#>       rname strand      pos context  meth unmeth
+#>      <fctr> <fctr>    <int>  <fctr> <int>  <int>
+#>   1:  chr17      - 43115270      CG     1      0
+#>   2:  chr17      - 43115300      CG     1      0
+#>   3:  chr17      - 43115371      CG     1      0
+#>   4:  chr17      - 43115417      CG     1      0
+#>   5:  chr17      - 43115427      CG     1      0
+#>  ---                                            
+#> 909:  chr17      + 43136994      CG     0      1
+#> 910:  chr17      + 43137174      CG     1      0
+#> 911:  chr17      + 43137332      CG     1      0
+#> 912:  chr17      + 43137364      CG     1      0
+#> 913:  chr17      + 43137391      CG     1      0
   
   # Specifics of long-read alignment processing
   out.bam <- tempfile(pattern="out-", fileext=".bam")
@@ -266,7 +390,7 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
     output.bam.file=out.bam
   )
 #> Writing sample BAM 
-#> [0.003s]
+#> [0.002s]
 #> [1] 1
   generateCytosineReport(out.bam, threshold.reads=FALSE, report.context="CX")
 #> Checking BAM file: 
@@ -300,11 +424,11 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 #> Checking BAM file: 
 #> long-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.002s]
+#> [0.001s]
 #> Filtering reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.000s]
+#> [0.001s]
 #>      rname strand   pos context  meth unmeth
 #>     <fctr> <fctr> <int>  <fctr> <int>  <int>
 #>  1:   chrS      +     2      CG     0      1
@@ -335,7 +459,7 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 #> Filtering reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.000s]
+#> [0.001s]
 #>      rname strand   pos context  meth unmeth
 #>     <fctr> <fctr> <int>  <fctr> <int>  <int>
 #>  1:   chrS      +     2      CG     1      0

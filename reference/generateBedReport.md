@@ -16,9 +16,9 @@ generateAmpliconReport(
   match.tolerance = 1,
   cytosine.context = c("CG", "CHG", "CHH", "CxG", "CX"),
   filter.reads = TRUE,
+  min.context.sites = 0,
   max.outofcontext.beta = 0.1,
   threshold.reads = TRUE,
-  min.context.sites = 2,
   min.context.beta = 0.5,
   ...,
   gzip = FALSE,
@@ -33,9 +33,9 @@ generateCaptureReport(
   match.min.overlap = 1,
   cytosine.context = c("CG", "CHG", "CHH", "CxG", "CX"),
   filter.reads = TRUE,
+  min.context.sites = 0,
   max.outofcontext.beta = 0.1,
   threshold.reads = TRUE,
-  min.context.sites = 2,
   min.context.beta = 0.5,
   ...,
   gzip = FALSE,
@@ -52,9 +52,9 @@ generateBedReport(
   match.min.overlap = 1,
   cytosine.context = c("CG", "CHG", "CHH", "CxG", "CX"),
   filter.reads = TRUE,
+  min.context.sites = 0,
   max.outofcontext.beta = 0.1,
   threshold.reads = TRUE,
-  min.context.sites = 2,
   min.context.beta = 0.5,
   ...,
   gzip = FALSE,
@@ -92,7 +92,7 @@ generateBedReport(
 
 - zero.based.bed:
 
-  boolean defining if BED coordinates are zero based (default: FALSE).
+  boolean defining if BED coordinates are zero-based (default: FALSE).
 
 - match.tolerance:
 
@@ -121,9 +121,21 @@ generateBedReport(
 
 - filter.reads:
 
-  boolean defining if sequence reads with too high out-of-context
-  cytosine methylation should be filtered out (e.g., reads resulting
-  from incompletely bisulfite-converted templates). Default: TRUE.
+  boolean defining if sequence reads with too few context bases or too
+  high out-of-context cytosine methylation should be filtered out (e.g.,
+  reads resulting from incompletely bisulfite-converted templates).
+  Default: TRUE. Filtering is strongly recommended for short-read
+  sequencing (bisulfite or enzymatic) because it removes reads from
+  incompletely converted DNA molecules.
+
+- min.context.sites:
+
+  non-negative integer for minimum number of cytosines within the
+  \`cytosine.context\` (default: 0, i.e., all reads will satisfy this
+  criterion). When \`min.context.sites\`\>0, reads containing **fewer**
+  within-the-context cytosines will not be thresholded and will be
+  ignored in further computations. This option has no effect when read
+  filtering is disabled.
 
 - max.outofcontext.beta:
 
@@ -139,17 +151,7 @@ generateBedReport(
   Disabling thresholding is possible but makes no sense in the context
   of this function, because all the reads will be assigned to the
   variant epiallele, which will result in VEF==1 (in such case \`NA\`
-  VEF values are returned in order to avoid confusion). As thresholding
-  is **not** recommended for long-read sequencing data, this function is
-  **not** recommended for such data either.
-
-- min.context.sites:
-
-  non-negative integer for minimum number of cytosines within the
-  \`cytosine.context\` (default: 2). Reads containing **fewer**
-  within-the-context cytosines are considered completely unmethylated
-  (thus belonging to the reference epiallele). This option has no effect
-  when read thresholding is disabled.
+  VEF values are returned in order to avoid confusion).
 
 - min.context.beta:
 
@@ -237,8 +239,8 @@ seqnames, start and end equal to NA). The report columns are:
   strand
 
 - nfiltered – number of invalid reads (pairs) filtered out due to too
-  high out-of-context cytosine methylation (\`NA\` if filtering was
-  disabled)
+  few context bases or too high out-of-context cytosine methylation
+  (\`NA\` if filtering was disabled)
 
 - VEF – fraction of valid reads passing the threshold (\`NA\` if
   thresholding was disabled)
@@ -260,33 +262,36 @@ bottom of this page.
 
 Suppose there is a BAM file with four reads, all mapped to the "+"
 strand of chromosome 1, positions 1-16. The genomic range is supplied as
-a parameter \`bed = as("chr1:1-100", "GRanges")\`. Assuming the default
-values for the filtering and thresholding parameters (cytosine.context =
-"CG", filter.reads = TRUE, max.outofcontext.beta = 0.1, threshold.reads
-= TRUE, min.context.sites = 2, min.context.beta = 0.5), the input and
-the output results will look as follows:
+a parameter \`bed = as("chr1:1-100", "GRanges")\`. Assuming the
+following values for the filtering and thresholding parameters
+(cytosine.context = "CG", filter.reads = TRUE, min.context.sites = 2,
+max.outofcontext.beta = 0.1, threshold.reads = TRUE, min.context.beta =
+0.5), the input and the output results will look as follows:
 
 |  |  |  |  |
 |----|----|----|----|
 | methylation string | filter | threshold | explained |
-| ...Z..x+.h..x..h. | pass | below | min.context.sites \< 2 (only one zZ base) |
+| ...Z..x+.h..x..h. | excluded | \<NA\> | min.context.sites \< 2 (only one zZ base) |
 | ...Z..z.h..x..h. | pass | above | pass all criteria |
 | ...Z..z.h..X..h. | excluded | \<NA\> | max.outofcontext.beta \> 0.1 (1XH / 3xXhH = 0.33) |
 | ...Z..z.h..z-.h. | pass | below | min.context.beta \< 0.5 (1Z / 3zZ = 0.33) |
 
-Since the read number three is filtered out, and only the second read
-will satisfy all of the thresholding criteria, the following BED report
-will be produced (again, given that all reads map to chr1:+:1-16):
+Since the reads number one and three are filtered out, and only the
+second read will satisfy the thresholding criteria, the following BED
+report will be produced (again, given that all reads map to
+chr1:+:1-16):
 
-|          |       |     |       |        |         |         |           |           |
-|----------|-------|-----|-------|--------|---------|---------|-----------|-----------|
-| seqnames | start | end | width | strand | nreads+ | nreads- | nfiltered | VEF       |
-| chr1     | 1     | 100 | 100   | \*     | 3       | 0       | 1         | 0.3333333 |
+|          |       |     |       |        |         |         |           |     |
+|----------|-------|-----|-------|--------|---------|---------|-----------|-----|
+| seqnames | start | end | width | strand | nreads+ | nreads- | nfiltered | VEF |
+| chr1     | 1     | 100 | 100   | \*     | 2       | 0       | 2         | 0.5 |
 
 Please note, that read thresholding by an average methylation level (as
 explained above) makes little sense for long-read sequencing alignments,
 as such reads can cover multiple regions with very different DNA
-methylation properties. Instead, one should use
+methylation properties. If necessary, one could either clip long
+sequencing reads to narrow \`targets\` in
+[`preprocessBam`](preprocessBam.md) function during BAM loading or use
 [`extractPatterns`](extractPatterns.md), limiting pattern output to the
 region of interest only.
 
@@ -318,15 +323,34 @@ function for getting or setting the seqlevels style.
   amplicon.report <- generateAmpliconReport(bam=amplicon.bam,
                                             bed=amplicon.bed)
 #> Reading BED file 
-#> [0.007s]
+#> [0.008s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
 #> [0.004s]
 #> Filtering and thresholding reads 
-#> [0.001s]
+#> [0.000s]
 #> Preparing amplicon report 
-#> [0.018s]
+#> [0.013s]
+  plotPatterns(
+    extractPatterns(
+      bam=amplicon.bam, bed=amplicon.bed, match.min.overlap=100
+    ), npatterns.per.bin=Inf
+  )
+#> Reading BED file 
+#> [0.007s]
+#> Checking BAM file: 
+#> short-read, paired-end, name-sorted alignment detected
+#> Reading paired-end BAM file 
+#> [0.004s]
+#> Extracting methylation patterns 
+#> [0.011s]
+#> 156 patterns supplied
+#> 10 unique
+#> 10 most frequent unique patterns were selected for plotting using 10 beta value bins:
+#> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]
+#>       6         0         0         0         1         0         0         0         1       2
+
   
   # capture NGS
   capture.bam    <- system.file("extdata", "capture.bam",
@@ -335,43 +359,78 @@ function for getting or setting the seqlevels style.
                                 package="epialleleR")
   capture.report <- generateCaptureReport(bam=capture.bam, bed=capture.bed)
 #> Reading BED file 
-#> [0.007s]
+#> [0.008s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.013s]
+#> [0.011s]
 #> Filtering and thresholding reads 
 #> [0.001s]
 #> Preparing capture report 
-#> [0.016s]
+#> [0.018s]
   
   # generateAmpliconReport and generateCaptureReport are just aliases
   # of the generateBedReport
   bed.report <- generateBedReport(bam=capture.bam, bed=capture.bed,
                                   bed.type="capture")
 #> Reading BED file 
-#> [0.008s]
+#> [0.007s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.012s]
+#> [0.013s]
 #> Filtering and thresholding reads 
-#> [0.001s]
+#> [0.002s]
 #> Preparing capture report 
-#> [0.016s]
+#> [0.017s]
   identical(capture.report, bed.report)
 #> [1] TRUE
   
+  # long-read data can be used if clipped to a narrow target area(s)
+  long.bam <- system.file("extdata", "longread.bam", package="epialleleR")
+  long.bed <- as("chr17:43124909-43125554", "GRanges")
+  long.data <- preprocessBam(
+    bam=long.bam, targets=long.bed, clip.to.targets=TRUE,
+    min.mapq=30, min.baseq=20, min.prob=178
+  )
+#> Checking BAM file: 
+#> long-read, single-end, unsorted alignment detected
+#> Reading single-end BAM file 
+#> [0.006s]
+  long.report <- generateBedReport(
+    bam=long.data, bed=long.bed, bed.type="capture", filter.reads=FALSE
+  )
+#> Thresholding reads 
+#> [0.000s]
+#> Preparing capture report 
+#> [0.013s]
+  plotPatterns(
+    extractPatterns(bam=long.data, bed=long.bed),
+    npatterns.per.bin=Inf
+  )
+#> Extracting methylation patterns 
+#> [0.017s]
+#> 20 patterns supplied
+#> 20 unique
+#> 20 most frequent unique patterns were selected for plotting using 10 beta value bins:
+#> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]
+#>      16         1         0         0         0         0         0         1         2       0
+
+  
   # toy example from the description
-  temp.bam <- tempfile(fileext=".bam") 
+  temp.bam <- tempfile(fileext=".bam")
+  temp.bed <- as("chr1:1-100", "GRanges")
   simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
-              XM=c("...Z..x+.h..x..h.", "...Z..z.h..x..h.",
-                   "...Z..z.h..X..h.",  "...Z..z.h..z-.h."))
+              seq=c("AGACGTTAGTAATAGTA", "AAACGTTGTAATAGTA",
+                    "AGACGTTGTAACAGTA",  "AAACGTTGTAATGTA"),
+              XM=c( "...Z..x+.h..x..h.", "...Z..z.h..x..h.",
+                    "...Z..z.h..X..h.",  "...Z..z.h..z.h."),
+              cigar=c("7M1I9M", "16M", "16M", "12M1D3M"))
 #> Writing sample BAM 
 #> [0.002s]
 #> [1] 4
   # with read filtering
-  generateBedReport(bam=temp.bam, bed=as("chr1:1-100", "GRanges"))
+  generateBedReport(bam=temp.bam, bed=temp.bed, min.context.sites=2)
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
@@ -380,21 +439,36 @@ function for getting or setting the seqlevels style.
 #> [0.000s]
 #> Preparing amplicon report 
 #> [0.010s]
-#>    seqnames start   end width strand nreads+ nreads- nfiltered       VEF
-#>      <fctr> <int> <int> <int> <fctr>   <int>   <int>     <int>     <num>
-#> 1:     chr1     1   100   100      *       3       0         1 0.3333333
+#>    seqnames start   end width strand nreads+ nreads- nfiltered   VEF
+#>      <fctr> <int> <int> <int> <fctr>   <int>   <int>     <int> <num>
+#> 1:     chr1     1   100   100      *       2       0         2   0.5
   # without read filtering
-  generateBedReport(bam=temp.bam, bed=as("chr1:1-100", "GRanges"),
-                    filter.reads=FALSE)
+  generateBedReport(bam=temp.bam, bed=temp.bed, filter.reads=FALSE)
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.001s]
+#> [0.002s]
 #> Thresholding reads 
 #> [0.000s]
 #> Preparing amplicon report 
-#> [0.278s]
+#> [0.011s]
 #>    seqnames start   end width strand nreads+ nreads- nfiltered   VEF
 #>      <fctr> <int> <int> <int> <fctr>   <int>   <int>     <int> <num>
-#> 1:     chr1     1   100   100      *       4       0        NA   0.5
+#> 1:     chr1     1   100   100      *       4       0        NA  0.75
+  # patterns plotted
+  plotPatterns(
+    extractPatterns(bam=temp.bam, bed=temp.bed, extract.context="CX"),
+    plot.context="CX", npatterns.per.bin=Inf
+  )
+#> Checking BAM file: 
+#> short-read, single-end, unsorted alignment detected
+#> Reading single-end BAM file 
+#> [0.002s]
+#> Extracting methylation patterns 
+#> [0.007s]
+#> 4 patterns supplied
+#> 4 unique
+#> 4 most frequent unique patterns were selected for plotting using 10 beta value bins:
+#> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]
+#>       0         0         0         1         0         2         0         0         0       1
 ```

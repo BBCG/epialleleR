@@ -19,7 +19,7 @@ threshold."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">epialleleR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.19.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.19.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,9 +66,9 @@ threshold.</p>
 <span>  match.tolerance <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  cytosine.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,</span>
 <span>  filter.reads <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  min.context.sites <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  max.outofcontext.beta <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  threshold.reads <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  min.context.sites <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  min.context.beta <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  gzip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -83,9 +83,9 @@ threshold.</p>
 <span>  match.min.overlap <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  cytosine.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,</span>
 <span>  filter.reads <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  min.context.sites <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  max.outofcontext.beta <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  threshold.reads <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  min.context.sites <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  min.context.beta <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  gzip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -102,9 +102,9 @@ threshold.</p>
 <span>  match.min.overlap <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  cytosine.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,</span>
 <span>  filter.reads <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  min.context.sites <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  max.outofcontext.beta <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  threshold.reads <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  min.context.sites <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  min.context.beta <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  gzip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -139,7 +139,7 @@ pairs) matching both strands are separately counted and reported.</p></dd>
 
 
 <dt id="arg-zero-based-bed">zero.based.bed<a class="anchor" aria-label="anchor" href="#arg-zero-based-bed"></a></dt>
-<dd><p>boolean defining if BED coordinates are zero based
+<dd><p>boolean defining if BED coordinates are zero-based
 (default: FALSE).</p></dd>
 
 
@@ -163,10 +163,21 @@ for filtering and/or thresholding the reads:</p><ul><li><p>"CG" (the default) �
 
 
 <dt id="arg-filter-reads">filter.reads<a class="anchor" aria-label="anchor" href="#arg-filter-reads"></a></dt>
-<dd><p>boolean defining if sequence reads with too high
-out-of-context cytosine methylation should be filtered out (e.g.,
-reads resulting from incompletely bisulfite-converted templates).
-Default: TRUE.</p></dd>
+<dd><p>boolean defining if sequence reads with too few context
+bases or too high out-of-context cytosine methylation should be filtered
+out (e.g., reads resulting from incompletely bisulfite-converted templates).
+Default: TRUE. Filtering is strongly recommended for short-read sequencing
+(bisulfite or enzymatic) because it removes reads from incompletely
+converted DNA molecules.</p></dd>
+
+
+<dt id="arg-min-context-sites">min.context.sites<a class="anchor" aria-label="anchor" href="#arg-min-context-sites"></a></dt>
+<dd><p>non-negative integer for minimum number of cytosines
+within the `cytosine.context` (default: 0, i.e., all reads will satisfy this
+criterion). When `min.context.sites`&gt;0, reads containing <strong>fewer</strong>
+within-the-context cytosines
+will not be thresholded and will be ignored in further computations.
+This option has no effect when read filtering is disabled.</p></dd>
 
 
 <dt id="arg-max-outofcontext-beta">max.outofcontext.beta<a class="anchor" aria-label="anchor" href="#arg-max-outofcontext-beta"></a></dt>
@@ -183,17 +194,7 @@ TRUE). Disabling thresholding is possible but makes no sense in the context
 of this function, because
 all the reads will be assigned to the variant epiallele, which will result
 in VEF==1 (in such case `NA` VEF values are returned in order to avoid
-confusion). As thresholding is <strong>not</strong> recommended for long-read
-sequencing data, this function is <strong>not</strong> recommended for such data
-either.</p></dd>
-
-
-<dt id="arg-min-context-sites">min.context.sites<a class="anchor" aria-label="anchor" href="#arg-min-context-sites"></a></dt>
-<dd><p>non-negative integer for minimum number of cytosines
-within the `cytosine.context` (default: 2). Reads containing <strong>fewer</strong>
-within-the-context cytosines are considered completely unmethylated (thus
-belonging to the reference epiallele). This option has no effect when read
-thresholding is disabled.</p></dd>
+confusion).</p></dd>
 
 
 <dt id="arg-min-context-beta">min.context.beta<a class="anchor" aria-label="anchor" href="#arg-min-context-beta"></a></dt>
@@ -262,7 +263,7 @@ The report columns are:</p><ul><li><p>seqnames – reference sequence name</p></
 <li><p>nreads- – number of valid reads (pairs) mapped to the reverse ("-")
   strand</p></li>
 <li><p>nfiltered – number of invalid reads (pairs) filtered out due to
-  too high out-of-context cytosine methylation
+  too few context bases or too high out-of-context cytosine methylation
   (`NA` if filtering was disabled)</p></li>
 <li><p>VEF – fraction of valid reads passing the threshold
   (`NA` if thresholding was disabled)</p></li>
@@ -282,18 +283,20 @@ NGS data. The function's logic is explained below.</p>
 the bottom of this page.</p>
 <p>Suppose there is a BAM file with four reads, all mapped to the "+"
 strand of chromosome 1, positions 1-16. The genomic range is supplied as a
-parameter `bed = as("chr1:1-100", "GRanges")`. Assuming the default values
+parameter `bed = as("chr1:1-100", "GRanges")`. Assuming the following values
 for the filtering and thresholding parameters (cytosine.context = "CG",
-filter.reads = TRUE, max.outofcontext.beta = 0.1,
-threshold.reads = TRUE, min.context.sites = 2, min.context.beta = 0.5),
+filter.reads = TRUE, min.context.sites = 2, max.outofcontext.beta = 0.1,
+threshold.reads = TRUE, min.context.beta = 0.5),
 the input and the output results will look as follows:</p>
-<table class="table table"><tr><td>methylation string</td><td>filter</td><td>threshold</td><td>explained</td></tr><tr><td>...Z..x+.h..x..h.</td><td>pass</td><td>below</td><td>min.context.sites &lt; 2 (only one zZ base)</td></tr><tr><td>...Z..z.h..x..h.</td><td>pass</td><td>above</td><td>pass all criteria</td></tr><tr><td>...Z..z.h..X..h.</td><td>excluded</td><td>&lt;NA&gt;</td><td>max.outofcontext.beta &gt; 0.1 (1XH / 3xXhH = 0.33)</td></tr><tr><td>...Z..z.h..z-.h.</td><td>pass</td><td>below</td><td>min.context.beta &lt; 0.5 (1Z / 3zZ = 0.33)</td></tr></table><p>Since the read number three is filtered out, and only the second read will
-satisfy all of the thresholding criteria, the following BED report will be
-produced (again, given that all reads map to chr1:+:1-16):</p>
-<table class="table table"><tr><td>seqnames</td><td>start</td><td>end</td><td>width</td><td>strand</td><td>nreads+</td><td>nreads-</td><td>nfiltered</td><td>VEF</td></tr><tr><td>chr1</td><td>1</td><td>100</td><td>100</td><td>*</td><td>3</td><td>0</td><td>1</td><td>0.3333333</td></tr></table><p>Please note, that read thresholding by an average methylation level
+<table class="table table"><tr><td>methylation string</td><td>filter</td><td>threshold</td><td>explained</td></tr><tr><td>...Z..x+.h..x..h.</td><td>excluded</td><td>&lt;NA&gt;</td><td>min.context.sites &lt; 2 (only one zZ base)</td></tr><tr><td>...Z..z.h..x..h.</td><td>pass</td><td>above</td><td>pass all criteria</td></tr><tr><td>...Z..z.h..X..h.</td><td>excluded</td><td>&lt;NA&gt;</td><td>max.outofcontext.beta &gt; 0.1 (1XH / 3xXhH = 0.33)</td></tr><tr><td>...Z..z.h..z-.h.</td><td>pass</td><td>below</td><td>min.context.beta &lt; 0.5 (1Z / 3zZ = 0.33)</td></tr></table><p>Since the reads number one and three are filtered out, and only the second
+read will satisfy the thresholding criteria, the following BED report
+will be produced (again, given that all reads map to chr1:+:1-16):</p>
+<table class="table table"><tr><td>seqnames</td><td>start</td><td>end</td><td>width</td><td>strand</td><td>nreads+</td><td>nreads-</td><td>nfiltered</td><td>VEF</td></tr><tr><td>chr1</td><td>1</td><td>100</td><td>100</td><td>*</td><td>2</td><td>0</td><td>2</td><td>0.5</td></tr></table><p>Please note, that read thresholding by an average methylation level
 (as explained above) makes little sense for long-read sequencing alignments,
 as such reads can cover multiple regions with very different DNA methylation
-properties. Instead, one should use <code><a href="extractPatterns.html">extractPatterns</a></code>, limiting
+properties. If necessary, one could either clip long sequencing reads to
+narrow `targets` in <code><a href="preprocessBam.html">preprocessBam</a></code> function during BAM loading
+or use <code><a href="extractPatterns.html">extractPatterns</a></code>, limiting
 pattern output to the region of interest only.</p>
     </div>
     <div class="section level2">
@@ -321,15 +324,34 @@ the seqlevels style.</p></div>
 <span class="r-in"><span>  <span class="va">amplicon.report</span> <span class="op">&lt;-</span> <span class="fu">generateAmpliconReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>,</span></span>
 <span class="r-in"><span>                                            bed<span class="op">=</span><span class="va">amplicon.bed</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.007s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.008s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.004s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering and thresholding reads </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing amplicon report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.018s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.013s]</span>
+<span class="r-in"><span>  <span class="fu"><a href="plotPatterns.html">plotPatterns</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="extractPatterns.html">extractPatterns</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      bam<span class="op">=</span><span class="va">amplicon.bam</span>, bed<span class="op">=</span><span class="va">amplicon.bed</span>, match.min.overlap<span class="op">=</span><span class="fl">100</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span>, npatterns.per.bin<span class="op">=</span><span class="cn">Inf</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.007s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.004s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting methylation patterns </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.011s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 156 patterns supplied</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 10 unique</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 10 most frequent unique patterns were selected for plotting using 10 beta value bins:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>       6         0         0         0         1         0         0         0         1       2</span>
+<span class="r-plt img"><img src="generateBedReport-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># capture NGS</span></span></span>
 <span class="r-in"><span>  <span class="va">capture.bam</span>    <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"capture.bam"</span>,</span></span>
@@ -338,43 +360,78 @@ the seqlevels style.</p></div>
 <span class="r-in"><span>                                package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">capture.report</span> <span class="op">&lt;-</span> <span class="fu">generateCaptureReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.007s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.008s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.013s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.011s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering and thresholding reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing capture report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.016s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.018s]</span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># generateAmpliconReport and generateCaptureReport are just aliases</span></span></span>
 <span class="r-in"><span>  <span class="co"># of the generateBedReport</span></span></span>
 <span class="r-in"><span>  <span class="va">bed.report</span> <span class="op">&lt;-</span> <span class="fu">generateBedReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span>,</span></span>
 <span class="r-in"><span>                                  bed.type<span class="op">=</span><span class="st">"capture"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.008s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.007s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.013s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering and thresholding reads </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing capture report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.016s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.017s]</span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">capture.report</span>, <span class="va">bed.report</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># long-read data can be used if clipped to a narrow target area(s)</span></span></span>
+<span class="r-in"><span>  <span class="va">long.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"longread.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">long.bed</span> <span class="op">&lt;-</span> <span class="fu">as</span><span class="op">(</span><span class="st">"chr17:43124909-43125554"</span>, <span class="st">"GRanges"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">long.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="preprocessBam.html">preprocessBam</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    bam<span class="op">=</span><span class="va">long.bam</span>, targets<span class="op">=</span><span class="va">long.bed</span>, clip.to.targets<span class="op">=</span><span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>    min.mapq<span class="op">=</span><span class="fl">30</span>, min.baseq<span class="op">=</span><span class="fl">20</span>, min.prob<span class="op">=</span><span class="fl">178</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> long-read, single-end, unsorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.006s]</span>
+<span class="r-in"><span>  <span class="va">long.report</span> <span class="op">&lt;-</span> <span class="fu">generateBedReport</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    bam<span class="op">=</span><span class="va">long.data</span>, bed<span class="op">=</span><span class="va">long.bed</span>, bed.type<span class="op">=</span><span class="st">"capture"</span>, filter.reads<span class="op">=</span><span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing capture report </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.013s]</span>
+<span class="r-in"><span>  <span class="fu"><a href="plotPatterns.html">plotPatterns</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="extractPatterns.html">extractPatterns</a></span><span class="op">(</span>bam<span class="op">=</span><span class="va">long.data</span>, bed<span class="op">=</span><span class="va">long.bed</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    npatterns.per.bin<span class="op">=</span><span class="cn">Inf</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting methylation patterns </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.017s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 20 patterns supplied</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 20 unique</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 20 most frequent unique patterns were selected for plotting using 10 beta value bins:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>      16         1         0         0         0         0         0         1         2       0</span>
+<span class="r-plt img"><img src="generateBedReport-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># toy example from the description</span></span></span>
-<span class="r-in"><span>  <span class="va">temp.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext<span class="op">=</span><span class="st">".bam"</span><span class="op">)</span> </span></span>
+<span class="r-in"><span>  <span class="va">temp.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext<span class="op">=</span><span class="st">".bam"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">temp.bed</span> <span class="op">&lt;-</span> <span class="fu">as</span><span class="op">(</span><span class="st">"chr1:1-100"</span>, <span class="st">"GRanges"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="simulateBam.html">simulateBam</a></span><span class="op">(</span>output.bam.file<span class="op">=</span><span class="va">temp.bam</span>, rname<span class="op">=</span><span class="st">"chr1"</span>, XG<span class="op">=</span><span class="st">"CT"</span>,</span></span>
-<span class="r-in"><span>              XM<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"...Z..x+.h..x..h."</span>, <span class="st">"...Z..z.h..x..h."</span>,</span></span>
-<span class="r-in"><span>                   <span class="st">"...Z..z.h..X..h."</span>,  <span class="st">"...Z..z.h..z-.h."</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>              seq<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AGACGTTAGTAATAGTA"</span>, <span class="st">"AAACGTTGTAATAGTA"</span>,</span></span>
+<span class="r-in"><span>                    <span class="st">"AGACGTTGTAACAGTA"</span>,  <span class="st">"AAACGTTGTAATGTA"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>              XM<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"...Z..x+.h..x..h."</span>, <span class="st">"...Z..z.h..x..h."</span>,</span></span>
+<span class="r-in"><span>                    <span class="st">"...Z..z.h..X..h."</span>,  <span class="st">"...Z..z.h..z.h."</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>              cigar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"7M1I9M"</span>, <span class="st">"16M"</span>, <span class="st">"16M"</span>, <span class="st">"12M1D3M"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Writing sample BAM </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 4</span>
 <span class="r-in"><span>  <span class="co"># with read filtering</span></span></span>
-<span class="r-in"><span>  <span class="fu">generateBedReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">temp.bam</span>, bed<span class="op">=</span><span class="fu">as</span><span class="op">(</span><span class="st">"chr1:1-100"</span>, <span class="st">"GRanges"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">generateBedReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">temp.bam</span>, bed<span class="op">=</span><span class="va">temp.bed</span>, min.context.sites<span class="op">=</span><span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
@@ -383,23 +440,39 @@ the seqlevels style.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing amplicon report </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.010s]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    seqnames start   end width strand nreads+ nreads- nfiltered       VEF</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;fctr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;fctr&gt;   &lt;int&gt;   &lt;int&gt;     &lt;int&gt;     &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:     chr1     1   100   100      *       3       0         1 0.3333333</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    seqnames start   end width strand nreads+ nreads- nfiltered   VEF</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;fctr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;fctr&gt;   &lt;int&gt;   &lt;int&gt;     &lt;int&gt; &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:     chr1     1   100   100      *       2       0         2   0.5</span>
 <span class="r-in"><span>  <span class="co"># without read filtering</span></span></span>
-<span class="r-in"><span>  <span class="fu">generateBedReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">temp.bam</span>, bed<span class="op">=</span><span class="fu">as</span><span class="op">(</span><span class="st">"chr1:1-100"</span>, <span class="st">"GRanges"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                    filter.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">generateBedReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">temp.bam</span>, bed<span class="op">=</span><span class="va">temp.bed</span>, filter.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing amplicon report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.278s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.011s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    seqnames start   end width strand nreads+ nreads- nfiltered   VEF</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;fctr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;fctr&gt;   &lt;int&gt;   &lt;int&gt;     &lt;int&gt; &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:     chr1     1   100   100      *       4       0        NA   0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:     chr1     1   100   100      *       4       0        NA  0.75</span>
+<span class="r-in"><span>  <span class="co"># patterns plotted</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="plotPatterns.html">plotPatterns</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="extractPatterns.html">extractPatterns</a></span><span class="op">(</span>bam<span class="op">=</span><span class="va">temp.bam</span>, bed<span class="op">=</span><span class="va">temp.bed</span>, extract.context<span class="op">=</span><span class="st">"CX"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    plot.context<span class="op">=</span><span class="st">"CX"</span>, npatterns.per.bin<span class="op">=</span><span class="cn">Inf</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting methylation patterns </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.007s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 4 patterns supplied</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 4 unique</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 4 most frequent unique patterns were selected for plotting using 10 beta value bins:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>       0         0         0         1         0         2         0         0         0       1</span>
+<span class="r-plt img"><img src="generateBedReport-3.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -259,7 +259,7 @@ vignettes for the description of usage and sample data.
 #> Reading paired-end BAM file 
 #> [0.004s]
 #> Extracting methylation patterns 
-#> [0.013s]
+#> [0.014s]
   
   # default plot + silently returned plotted patterns
   selected.patterns <- plotPatterns(patterns)

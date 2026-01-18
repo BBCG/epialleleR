@@ -146,6 +146,17 @@ MiSeq system. The related files are:
 | capture.vcf.gz     | VCF   | a relevant subset of sequence variations      |
 | capture.vcf.gz.tbi | tabix | tabix file for the capture.vcf.gz             |
 
+#### Long-read native NGS data (adaptive sampling)
+
+The blood DNA was fragmented, ligated with adapters, and sequenced using
+Oxford Nanopore PromethION P2 Solo system. Base calling and CpG cytosine
+modification analysis was performed in MinKNOW v25.09.16 using high
+accuracy model v5.2.0. The file is:
+
+| Name         | Type | Description                                    |
+|--------------|------|------------------------------------------------|
+| longread.bam | BAM  | a subset of reads covering BRCA1 promoter area |
+
 #### Manually creating sample BAM files
 
 For the purposes of testing this package’s methods or other tools for
@@ -179,7 +190,7 @@ functions.
 
 As mentioned earlier, *`epialleleR`* uses data stored in Binary
 Alignment Map (BAM) files as its input and currently allows to load both
-short-read (e.g., bisulfite) and long-read (native) sequencing
+short-read (e.g., bisulfite or EM-seq) and long-read (native) sequencing
 alignments. Specific requirements for these types of data are given
 below. Additionally, please check the *`preprocessBam`* function help
 file for a full description of available parameters, as well as
@@ -221,7 +232,7 @@ BAM file location string is supplied as an input for other
 *`epialleleR`* methods.
 
 *`preprocessBam`* automatically determines if BAM file contains paired-
-or single-end alignments and has all the necessary tags (XM/XG)
+or single-end alignments and has all the necessary tags (XM+XG, MM+ML)
 available. It is recommended to use *`verbose`* processing and check
 messages for correct identification of alignment endness. Otherwise, if
 the *`paired`* parameter is set explicitly, exception (or warning if
@@ -235,11 +246,13 @@ in the QUAL string is taken, unless its quality is less than
 position (“-”/“N”). These **merged reads** are then processed as a
 **single entity** in all *`epialleleR`* methods. Due to merging,
 overlapping bases in read pairs are counted only once, and the base with
-the highest quality is taken. It is a requirement currently that
-paired-end BAM file must be sorted by QNAME instead of genomic location
-(i.e., “unsorted”) to perform merging of paired-end reads. Error message
-is shown if it is sorted by genomic location, in this case please sort
-it by QNAME using ‘samtools sort -n -o out.bam in.bam’.
+the highest quality is taken.
+
+It is currently a requirement that paired-end BAM file must be sorted by
+QNAME instead of genomic location (i.e., “unsorted”) to perform merging
+of paired-end reads. Error message is shown if it is sorted by genomic
+location, in this case please sort it by QNAME using ‘samtools sort -n
+-o out.bam in.bam’.
 
 During preprocessing of single-end alignments, no read merging is
 performed. Only bases with quality of at least *`min.baseq`* are
@@ -253,6 +266,12 @@ trimming is performed at the level of a template (i.e., read pair for
 paired-end BAM or individual read for single-end BAM). This ensures that
 only necessary parts (real ends of sequenced fragment) are removed for
 paired-end sequencing reads.
+
+It is also possible to load only a subset of reads (read pairs) of
+interest or only fragments of such reads by supplying a list of targets
+(see description of *`targets`* and other related options in the help
+page for *`preprocessBam`* function). Currently, the subsetting is
+performed without using BAM index.
 
 #### Specific considerations for long-read sequencing data:
 
@@ -280,10 +299,53 @@ strands having cytosine modifications
 
 library(epialleleR)
 
+# short-read sequencing
 capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
-bam.data    <- preprocessBam(capture.bam)
+capture.bed <- system.file("extdata", "capture.bed", package="epialleleR")
+bam.data    <- preprocessBam(capture.bam, targets=capture.bed)
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.012s]
+#> Reading BED file [0.036s]
+#> Reading paired-end BAM file [0.019s]
+generateCytosineReport(bam.data)
+#> Filtering and thresholding reads [0.001s]
+#> Preparing cytosine report [0.011s]
+#>         rname strand       pos context  meth unmeth
+#>        <fctr> <fctr>     <int>  <fctr> <int>  <int>
+#>     1:   chr1      -   3067907      CG     1      0
+#>     2:   chr1      -   3067912      CG     1      0
+#>     3:   chr1      -   3067934      CG     1      0
+#>     4:   chr1      -   3067962      CG     1      0
+#>     5:   chr1      -   3067973      CG     1      0
+#>    ---                                             
+#> 15404:   chrX      + 136196775      CG     1      1
+#> 15405:   chrX      - 136196776      CG     1      0
+#> 15406:   chrX      + 136196793      CG     1      0
+#> 15407:   chrX      - 136196794      CG     1      0
+#> 15408:   chrX      + 136197192      CG     0      1
+
+# long-read sequencing
+longread.data <- preprocessBam(
+  system.file("extdata", "longread.bam", package="epialleleR"),
+  min.mapq=30, min.baseq=20, min.prob=178
+)
+#> Checking BAM file: long-read, single-end, unsorted alignment detected
+#> Reading single-end BAM file [0.005s]
+generateCytosineReport(longread.data, threshold.reads=FALSE)
+#> Filtering reads [0.001s]
+#> Preparing cytosine report [0.027s]
+#>       rname strand      pos context  meth unmeth
+#>      <fctr> <fctr>    <int>  <fctr> <int>  <int>
+#>   1:  chr17      - 43115270      CG     1      0
+#>   2:  chr17      - 43115300      CG     1      0
+#>   3:  chr17      - 43115371      CG     1      0
+#>   4:  chr17      - 43115417      CG     1      0
+#>   5:  chr17      - 43115427      CG     1      0
+#>  ---                                            
+#> 909:  chr17      + 43136994      CG     0      1
+#> 910:  chr17      + 43137174      CG     1      0
+#> 911:  chr17      + 43137332      CG     1      0
+#> 912:  chr17      + 43137364      CG     1      0
+#> 913:  chr17      + 43137391      CG     1      0
 
 # Specifics of long-read alignment processing
 out.bam <- tempfile(pattern="out-", fileext=".bam")
@@ -330,7 +392,7 @@ output.bam <- tempfile(pattern="output-", fileext=".bam")
 
 # sample reference genome
 genome <- preprocessGenome(system.file("extdata", "test", "reference.fasta.gz", package="epialleleR"))
-#> Reading reference genome file [0.001s]
+#> Reading reference genome file [0.000s]
 
 # calls cytosine methylation and stores it in the output BAM
 # Input BAM has 100 records of which 73 are mapped to the genome
@@ -360,22 +422,26 @@ pass the threshold (**hypo**methylated reads) are counted as being
 
 Also, by default, *`generateCytosineReport`* (as well as
 *`generateBedReport`*, *`generateVcfReport`*, *`generateMhlReport`*)
-silently drops all reads that have too high out-of-context cytosine
-methylation (presumably, resulting from incomplete cytosine conversion).
-To disable this behaviour, run the method with the following parameters:
-*`filter.reads=FALSE`* (although, not recommended).
+silently drops all reads that have too few cytosines within the context
+or too high out-of-context cytosine methylation (presumably, resulting
+from incomplete cytosine conversion). To disable this behaviour, run the
+method with the following parameters: *`filter.reads=FALSE`*.
+
+Please note that the iltering is strongly recommended for short-read
+sequencing (bisulfite or enzymatic) because it removes reads from
+incompletely converted DNA molecules.
 
 ``` r
 
 # data.table::data.table object for
 # CpG VEF report
 cg.vef.report <- generateCytosineReport(bam.data)
-#> Filtering and thresholding reads [0.002s]
+#> Filtering and thresholding reads [0.001s]
 #> Preparing cytosine report [0.011s]
 head(cg.vef.report[order(meth+unmeth, decreasing=TRUE)])
 #>     rname strand      pos context  meth unmeth
 #>    <fctr> <fctr>    <int>  <fctr> <int>  <int>
-#> 1:  chr17      + 61864475      CG     7      9
+#> 1:  chr17      + 61864475      CG     8      8
 #> 2:  chr17      + 61864486      CG    10      6
 #> 3:  chr17      + 61864504      CG     9      7
 #> 4:  chr20      - 57267455      CG    13      1
@@ -400,7 +466,7 @@ head(cg.report[order(meth+unmeth, decreasing=TRUE)])
 cx.report <- generateCytosineReport(bam.data, threshold.reads=FALSE,
                                     report.context="CX")
 #> Filtering reads [0.001s]
-#> Preparing cytosine report [0.013s]
+#> Preparing cytosine report [0.012s]
 head(cx.report[order(meth+unmeth, decreasing=TRUE)])
 #>     rname strand      pos context  meth unmeth
 #>    <fctr> <fctr>    <int>  <fctr> <int>  <int>
@@ -436,11 +502,11 @@ amplicon.report <- generateAmpliconReport(
   bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
   bed=system.file("extdata", "amplicon.bed", package="epialleleR")
 )
-#> Reading BED file [0.032s]
+#> Reading BED file [0.008s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.004s]
+#> Reading paired-end BAM file [0.005s]
 #> Filtering and thresholding reads [0.001s]
-#> Preparing amplicon report [0.044s]
+#> Preparing amplicon report [0.038s]
 amplicon.report
 #>    seqnames    start      end width strand amplicon nreads+ nreads- nfiltered        VEF
 #>      <fctr>    <int>    <int> <int> <fctr>   <char>   <int>   <int>     <int>      <num>
@@ -448,7 +514,7 @@ amplicon.report
 #> 2:    chr17 43125270 43125640   371      * CpG14-31       0      61         0 0.11475410
 #> 3:    chr17 43125171 43125550   380      * CpG17-34       0      93         0 0.05376344
 #> 4:    chr17 43124861 43125249   389      * CpG33-49       0      84         0 0.10714286
-#> 5:     <NA>       NA       NA    NA   <NA>     <NA>      54      44         8 0.14285714
+#> 5:     <NA>       NA       NA    NA   <NA>     <NA>      54      44         8 0.15306122
 
 # report for capture-based data
 # matching is done by overlap
@@ -459,8 +525,8 @@ capture.report <- generateCaptureReport(
 #> Reading BED file [0.008s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file [0.013s]
-#> Filtering and thresholding reads [0.001s]
-#> Preparing capture report [0.022s]
+#> Filtering and thresholding reads [0.002s]
+#> Preparing capture report [0.017s]
 head(capture.report)
 #>    seqnames    start      end width strand     V4 nreads+ nreads- nfiltered       VEF
 #>      <fctr>    <int>    <int> <int> <fctr> <char>   <int>   <int>     <int>     <num>
@@ -477,11 +543,11 @@ bed.report <- generateBedReport(
   bed=system.file("extdata", "capture.bed", package="epialleleR"),
   bed.type="capture"
 )
-#> Reading BED file [0.011s]
+#> Reading BED file [0.008s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file [0.013s]
 #> Filtering and thresholding reads [0.001s]
-#> Preparing capture report [0.022s]
+#> Preparing capture report [0.018s]
 identical(capture.report, bed.report)
 #> [1] TRUE
 ```
@@ -509,7 +575,7 @@ mhl.report <- generateMhlReport(
   bam=system.file("extdata", "capture.bam", package="epialleleR")
 )
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.010s]
+#> Reading paired-end BAM file [0.013s]
 #> Preparing lMHL report [0.019s]
 ```
 
@@ -530,7 +596,7 @@ patterns <- extractPatterns(
 )
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file [0.004s]
-#> Extracting methylation patterns [0.021s]
+#> Extracting methylation patterns [0.022s]
 
 # that many read pairs overlap genomic region of interest
 nrow(patterns)
@@ -570,6 +636,32 @@ plotPatterns(capture.patterns, npatterns.per.bin=Inf,
 
 ![](epialleleR_files/figure-html/unnamed-chunk-9-2.png)
 
+``` r
+
+
+# patterns from long-read data
+long.bam <- system.file("extdata", "longread.bam", package="epialleleR")
+long.bed <- as("chr17:43124909-43125554", "GRanges")
+long.data <- preprocessBam(
+  bam=long.bam, targets=long.bed, clip.to.targets=TRUE,
+  min.mapq=30, min.baseq=20, min.prob=178
+)
+#> Checking BAM file: long-read, single-end, unsorted alignment detected
+#> Reading single-end BAM file [0.006s]
+plotPatterns(
+  extractPatterns(bam=long.data, bed=long.bed),
+  npatterns.per.bin=Inf
+)
+#> Extracting methylation patterns [0.018s]
+#> 20 patterns supplied
+#> 20 unique
+#> 20 most frequent unique patterns were selected for plotting using 10 beta value bins:
+#> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]
+#>      16         1         0         0         0         0         0         1         2       0
+```
+
+![](epialleleR_files/figure-html/unnamed-chunk-9-3.png)
+
 ### Exploring sequence variants in epialleles
 
 It is known that sequence variants can affect the methylation status of
@@ -601,16 +693,16 @@ vcf.report <- generateVcfReport(
   bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
   bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
   vcf=system.file("extdata", "amplicon.vcf.gz", package="epialleleR"),
-  # thresholds on alignment and base quality
-  min.mapq=30, min.baseq=13,
+  # higher thresholds on alignment and base quality
+  min.mapq=30, min.baseq=20,
   # when VCF seqlevels are different from BED and BAM it is possible
   # to convert them internally
   vcf.style="NCBI"
 )
 #> Loading required namespace: VariantAnnotation
 #> Loading required namespace: GenomeInfoDb
-#> Reading BED file [0.023s]
-#> Reading VCF file [0.689s]
+#> Reading BED file [0.024s]
+#> Reading VCF file [0.725s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file [0.004s]
 #> Filtering and thresholding reads [0.001s]
@@ -619,61 +711,61 @@ vcf.report <- generateVcfReport(
 # NA values are shown for the C->T variants on the "+" and G->A on the "-"
 # strands, because bisulfite conversion makes their counting impossible
 head(vcf.report)
-#>           name seqnames    range    REF    ALT M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt U-Alt
-#>         <char>   <fctr>    <int> <char> <char> <num> <num> <num> <num> <num> <num> <num> <num>
-#> 1: rs546660277    chr17 43124874      A      C     0     0     9    74     0     0     0     0
-#> 2: rs574263814    chr17 43124891      G      A     0     0    NA    NA     0     0    NA    NA
-#> 3:   rs8176076    chr17 43124935      G      A     0     0    NA    NA     0     0    NA    NA
-#> 4: rs535977743    chr17 43125016      C      T    NA    NA     9    73    NA    NA     0     0
-#> 5: rs191784032    chr17 43125050      C      A     0     0     9    73     0     0     0     1
-#> 6: rs111956204    chr17 43125083      C      A     0     0     9    74     0     0     0     0
-#>    SumRef SumAlt  FEp+  FEp-
-#>     <num>  <num> <num> <num>
-#> 1:     83      0     1     1
-#> 2:      0      0     1    NA
-#> 3:      0      0     1    NA
-#> 4:     82      0    NA     1
-#> 5:     82      1     1     1
-#> 6:     83      0     1     1
+#>           name seqnames    range    REF    ALT nfiltered M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt
+#>         <char>   <fctr>    <int> <char> <char>     <num> <num> <num> <num> <num> <num> <num> <num>
+#> 1: rs546660277    chr17 43124874      A      C         0     0     0     9    74     0     0     0
+#> 2: rs574263814    chr17 43124891      G      A         0     0     0    NA    NA     0     0    NA
+#> 3:   rs8176076    chr17 43124935      G      A         0     0     0    NA    NA     0     0    NA
+#> 4: rs535977743    chr17 43125016      C      T         0    NA    NA     9    72    NA    NA     0
+#> 5: rs191784032    chr17 43125050      C      A         0     0     0     8    71     0     0     0
+#> 6: rs111956204    chr17 43125083      C      A         0     0     0     8    68     0     0     0
+#>    U-Alt SumRef SumAlt  FEp+  FEp-
+#>    <num>  <num>  <num> <num> <num>
+#> 1:     0     83      0     1     1
+#> 2:    NA      0      0     1    NA
+#> 3:    NA      0      0     1    NA
+#> 4:     0     81      0    NA     1
+#> 5:     1     79      1     1     1
+#> 6:     0     76      0     1     1
 
 # let's sort the report by increasing Fisher's exact test's p-values.
 # the p-values are given separately for reads that map to the "+"
 head(vcf.report[order(`FEp-`, na.last=TRUE)])
-#>           name seqnames    range    REF    ALT M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt U-Alt
-#>         <char>   <fctr>    <int> <char> <char> <num> <num> <num> <num> <num> <num> <num> <num>
-#> 1: rs546660277    chr17 43124874      A      C     0     0     9    74     0     0     0     0
-#> 2: rs535977743    chr17 43125016      C      T    NA    NA     9    73    NA    NA     0     0
-#> 3: rs191784032    chr17 43125050      C      A     0     0     9    73     0     0     0     1
-#> 4: rs111956204    chr17 43125083      C      A     0     0     9    74     0     0     0     0
-#> 5:  rs55680227    chr17 43125086      A      C     0     0     8    64     0     0     0     0
-#> 6: rs539733232    chr17 43125088      C      A     0     0     8    71     0     0     0     0
-#>    SumRef SumAlt  FEp+  FEp-
-#>     <num>  <num> <num> <num>
-#> 1:     83      0     1     1
-#> 2:     82      0    NA     1
-#> 3:     82      1     1     1
-#> 4:     83      0     1     1
-#> 5:     72      0     1     1
-#> 6:     79      0     1     1
+#>           name seqnames    range    REF    ALT nfiltered M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt
+#>         <char>   <fctr>    <int> <char> <char>     <num> <num> <num> <num> <num> <num> <num> <num>
+#> 1: rs546660277    chr17 43124874      A      C         0     0     0     9    74     0     0     0
+#> 2: rs535977743    chr17 43125016      C      T         0    NA    NA     9    72    NA    NA     0
+#> 3: rs191784032    chr17 43125050      C      A         0     0     0     8    71     0     0     0
+#> 4: rs111956204    chr17 43125083      C      A         0     0     0     8    68     0     0     0
+#> 5:  rs55680227    chr17 43125086      A      C         0     0     0     7    59     0     0     0
+#> 6: rs539733232    chr17 43125088      C      A         0     0     0     8    69     0     0     0
+#>    U-Alt SumRef SumAlt  FEp+  FEp-
+#>    <num>  <num>  <num> <num> <num>
+#> 1:     0     83      0     1     1
+#> 2:     0     81      0    NA     1
+#> 3:     1     79      1     1     1
+#> 4:     0     76      0     1     1
+#> 5:     0     66      0     1     1
+#> 6:     0     77      0     1     1
 
 # and to the "-" strand
 head(vcf.report[order(`FEp+`, na.last=TRUE)])
-#>           name seqnames    range    REF    ALT M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt U-Alt
-#>         <char>   <fctr>    <int> <char> <char> <num> <num> <num> <num> <num> <num> <num> <num>
-#> 1: rs546660277    chr17 43124874      A      C     0     0     9    74     0     0     0     0
-#> 2: rs574263814    chr17 43124891      G      A     0     0    NA    NA     0     0    NA    NA
-#> 3:   rs8176076    chr17 43124935      G      A     0     0    NA    NA     0     0    NA    NA
-#> 4: rs191784032    chr17 43125050      C      A     0     0     9    73     0     0     0     1
-#> 5: rs111956204    chr17 43125083      C      A     0     0     9    74     0     0     0     0
-#> 6:  rs55680227    chr17 43125086      A      C     0     0     8    64     0     0     0     0
-#>    SumRef SumAlt  FEp+  FEp-
-#>     <num>  <num> <num> <num>
-#> 1:     83      0     1     1
-#> 2:      0      0     1    NA
-#> 3:      0      0     1    NA
-#> 4:     82      1     1     1
-#> 5:     83      0     1     1
-#> 6:     72      0     1     1
+#>           name seqnames    range    REF    ALT nfiltered M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt
+#>         <char>   <fctr>    <int> <char> <char>     <num> <num> <num> <num> <num> <num> <num> <num>
+#> 1: rs546660277    chr17 43124874      A      C         0     0     0     9    74     0     0     0
+#> 2: rs574263814    chr17 43124891      G      A         0     0     0    NA    NA     0     0    NA
+#> 3:   rs8176076    chr17 43124935      G      A         0     0     0    NA    NA     0     0    NA
+#> 4: rs191784032    chr17 43125050      C      A         0     0     0     8    71     0     0     0
+#> 5: rs111956204    chr17 43125083      C      A         0     0     0     8    68     0     0     0
+#> 6:  rs55680227    chr17 43125086      A      C         0     0     0     7    59     0     0     0
+#>    U-Alt SumRef SumAlt  FEp+  FEp-
+#>    <num>  <num>  <num> <num> <num>
+#> 1:     0     83      0     1     1
+#> 2:    NA      0      0     1    NA
+#> 3:    NA      0      0     1    NA
+#> 4:     1     79      1     1     1
+#> 5:     0     76      0     1     1
+#> 6:     0     66      0     1     1
 
 # and finally, let's plot methylation patterns overlapping one of the most
 # covered SNPs in the methylation capture test data set - rs573296191
@@ -723,10 +815,10 @@ amplicon.ecdfs <- generateBedEcdf(
   bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
   bed.rows=NULL
 )
-#> Reading BED file [0.007s]
+#> Reading BED file [0.008s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.004s]
-#> Computing ECDFs for within- and out-of-context per-read beta values [0.007s]
+#> Reading paired-end BAM file [0.005s]
+#> Computing ECDFs for within- and out-of-context per-read beta values [0.008s]
 
 # there are 5 items in amplicon.ecdfs, let's plot all of them
 par(mfrow=c(1,length(amplicon.ecdfs)))
@@ -839,7 +931,7 @@ diffuse large B-cell lymphomas. *Clinical Epigenetics* 2025.
 ``` r
 
 sessionInfo()
-#> R Under development (unstable) (2025-12-28 r89254)
+#> R Under development (unstable) (2026-01-15 r89304)
 #> Platform: x86_64-pc-linux-gnu
 #> Running under: Ubuntu 24.04.3 LTS
 #> 
@@ -860,16 +952,16 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] ggplot2_4.0.1     epialleleR_1.19.1
+#> [1] ggplot2_4.0.1     epialleleR_1.19.2
 #> 
 #> loaded via a namespace (and not attached):
 #>  [1] tidyselect_1.2.1            dplyr_1.1.4                 farver_2.1.2               
-#>  [4] blob_1.2.4                  Biostrings_2.79.3           S7_0.2.1                   
+#>  [4] blob_1.3.0                  Biostrings_2.79.4           S7_0.2.1                   
 #>  [7] bitops_1.0-9                fastmap_1.2.0               RCurl_1.98-1.17            
 #> [10] VariantAnnotation_1.57.1    GenomicAlignments_1.47.0    XML_3.99-0.20              
-#> [13] digest_0.6.39               lifecycle_1.0.4             KEGGREST_1.51.1            
+#> [13] digest_0.6.39               lifecycle_1.0.5             KEGGREST_1.51.1            
 #> [16] RSQLite_2.4.5               magrittr_2.0.4              compiler_4.6.0             
-#> [19] rlang_1.1.6                 sass_0.4.10                 tools_4.6.0                
+#> [19] rlang_1.1.7                 sass_0.4.10                 tools_4.6.0                
 #> [22] yaml_2.3.12                 data.table_1.18.0           rtracklayer_1.71.3         
 #> [25] knitr_1.51                  S4Arrays_1.11.1             labeling_0.4.3             
 #> [28] htmlwidgets_1.6.4           bit_4.6.0                   curl_7.0.0                 
@@ -881,19 +973,19 @@ sessionInfo()
 #> [46] generics_0.1.4              otel_0.2.0                  httr_1.4.7                 
 #> [49] rjson_0.2.23                DBI_1.2.3                   cachem_1.1.0               
 #> [52] parallel_4.6.0              AnnotationDbi_1.73.0        XVector_0.51.0             
-#> [55] restfulr_0.0.16             matrixStats_1.5.0           vctrs_0.6.5                
+#> [55] restfulr_0.0.16             matrixStats_1.5.0           vctrs_0.7.0                
 #> [58] Matrix_1.7-4                jsonlite_2.0.0              IRanges_2.45.0             
 #> [61] S4Vectors_0.49.0            bit64_4.6.0-1               systemfonts_1.3.1          
 #> [64] GenomicFeatures_1.63.1      jquerylib_0.1.4             glue_1.8.0                 
 #> [67] pkgdown_2.2.0.9000          codetools_0.2-20            gtable_0.3.6               
 #> [70] GenomeInfoDb_1.47.2         UCSC.utils_1.7.1            GenomicRanges_1.63.1       
-#> [73] BiocIO_1.21.0               tibble_3.3.0                pillar_1.11.1              
+#> [73] BiocIO_1.21.0               tibble_3.3.1                pillar_1.11.1              
 #> [76] htmltools_0.5.9             Seqinfo_1.1.0               BSgenome_1.79.1            
 #> [79] R6_2.6.1                    textshaping_1.0.4           evaluate_1.0.5             
 #> [82] lattice_0.22-7              Biobase_2.71.0              png_0.1-8                  
 #> [85] Rsamtools_2.27.0            cigarillo_1.1.0             memoise_2.0.1              
-#> [88] bslib_0.9.0                 Rcpp_1.1.0.8.1              SparseArray_1.11.10        
-#> [91] xfun_0.55                   fs_1.6.6                    MatrixGenerics_1.23.0      
+#> [88] bslib_0.9.0                 Rcpp_1.1.1                  SparseArray_1.11.10        
+#> [91] xfun_0.56                   fs_1.6.6                    MatrixGenerics_1.23.0      
 #> [94] pkgconfig_2.0.3
 ```
 

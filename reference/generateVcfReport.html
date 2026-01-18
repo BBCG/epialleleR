@@ -15,7 +15,7 @@ tests their association with the methylation status of the sequencing reads."></
 
     <a class="navbar-brand me-2" href="../index.html">epialleleR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.19.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.19.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,9 +61,9 @@ tests their association with the methylation status of the sequencing reads.</p>
 <span>  zero.based.bed <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  cytosine.context <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CG"</span>, <span class="st">"CHG"</span>, <span class="st">"CHH"</span>, <span class="st">"CxG"</span>, <span class="st">"CX"</span><span class="op">)</span>,</span>
 <span>  filter.reads <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  min.context.sites <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  max.outofcontext.beta <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  threshold.reads <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  min.context.sites <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  min.context.beta <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  gzip <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -132,10 +132,21 @@ for filtering and/or thresholding the reads:</p><ul><li><p>"CG" (the default) �
 
 
 <dt id="arg-filter-reads">filter.reads<a class="anchor" aria-label="anchor" href="#arg-filter-reads"></a></dt>
-<dd><p>boolean defining if sequence reads with too high
-out-of-context cytosine methylation should be filtered out (e.g.,
-reads resulting from incompletely bisulfite-converted templates).
-Default: TRUE.</p></dd>
+<dd><p>boolean defining if sequence reads with too few context
+bases or too high out-of-context cytosine methylation should be filtered
+out (e.g., reads resulting from incompletely bisulfite-converted templates).
+Default: TRUE. Filtering is strongly recommended for short-read sequencing
+(bisulfite or enzymatic) because it removes reads from incompletely
+converted DNA molecules.</p></dd>
+
+
+<dt id="arg-min-context-sites">min.context.sites<a class="anchor" aria-label="anchor" href="#arg-min-context-sites"></a></dt>
+<dd><p>non-negative integer for minimum number of cytosines
+within the `cytosine.context` (default: 0, i.e., all reads will satisfy this
+criterion). When `min.context.sites`&gt;0, reads containing <strong>fewer</strong>
+within-the-context cytosines
+will not be thresholded and will be ignored in further computations.
+This option has no effect when read filtering is disabled.</p></dd>
 
 
 <dt id="arg-max-outofcontext-beta">max.outofcontext.beta<a class="anchor" aria-label="anchor" href="#arg-max-outofcontext-beta"></a></dt>
@@ -152,17 +163,7 @@ thresholded before counting bases in reference and variant epialleles
 the context of this function, because
 all the reads will be assigned to the variant epiallele,
 which will result in Fisher's Exact test p-value of 1 (in columns `FEp+` and
-`FEP-`). As thresholding is <strong>not</strong> recommended for long-read
-sequencing data, this function is <strong>not</strong> recommended for such data
-either.</p></dd>
-
-
-<dt id="arg-min-context-sites">min.context.sites<a class="anchor" aria-label="anchor" href="#arg-min-context-sites"></a></dt>
-<dd><p>non-negative integer for minimum number of cytosines
-within the `cytosine.context` (default: 2). Reads containing <strong>fewer</strong>
-within-the-context cytosines are considered completely unmethylated (thus
-belonging to the reference epiallele). This option has no effect when read
-thresholding is disabled.</p></dd>
+`FEP-`).</p></dd>
 
 
 <dt id="arg-min-context-beta">min.context.beta<a class="anchor" aria-label="anchor" href="#arg-min-context-beta"></a></dt>
@@ -195,6 +196,7 @@ NULL if report.file was specified. The report columns are:</p><ul><li><p>name �
 <li><p>range – genomic coordinates of the variation</p></li>
 <li><p>REF – base at the reference allele</p></li>
 <li><p>ALT – base at the alternative allele</p></li>
+<li><p>nfiltered – number of filtered out reads</p></li>
 <li><p>[M|U][+|-][Ref|Alt] – number of <strong>Ref</strong>erence or
   <strong>Alt</strong>ernative bases that were found at this particular position
   within <strong>M</strong>ethylated (above threshold) or <strong>U</strong>nmethylated
@@ -237,13 +239,15 @@ mapped to <strong>"+"</strong> (forward) and <strong>"-"</strong> (reverse) DNA 
 with single-base REF and ALT alleles. Also, the default (`min.baseq=0`)
 output of `generateVcfReport` is equivalent to the one of
 `samtools mplieup -Q 0 ...`, and therefore may result in false SNVs caused
-by misalignments. Remember to increase `min.baseq` (`samtools mplieup -Q`
+by misalignments. Remember to increase `min.baseq` (`samtools mpileup -Q`
 default value is 13) to obtain higher-quality results.</p>
 <p>Read thresholding by an average methylation level used in this function
 makes little sense for long-read sequencing alignments,
 as such reads can cover multiple regions with very different DNA methylation
-properties. Instead, please use <code><a href="extractPatterns.html">extractPatterns</a></code>,
-limiting pattern output to the region of interest only.</p>
+properties. If necessary, one could either clip long sequencing reads to
+narrow `targets` in <code><a href="preprocessBam.html">preprocessBam</a></code> function during BAM loading
+or use <code><a href="extractPatterns.html">extractPatterns</a></code>, limiting
+pattern output to the region of interest only.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -275,23 +279,23 @@ the seqlevels style.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.024s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading VCF file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [4.330s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [4.647s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.011s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering and thresholding reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting base frequences </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.109s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.134s]</span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># toy example to illustrate the logic of computations</span></span></span>
 <span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"VariantAnnotation"</span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>    <span class="co"># simulate toy BAM</span></span></span>
 <span class="r-in"><span>    <span class="va">temp.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext<span class="op">=</span><span class="st">".bam"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="simulateBam.html">simulateBam</a></span><span class="op">(</span>output.bam.file<span class="op">=</span><span class="va">temp.bam</span>, rname<span class="op">=</span><span class="st">"chr1"</span>, XG<span class="op">=</span><span class="st">"CT"</span>,</span></span>
-<span class="r-in"><span>                seq<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AGACGTTAGTAATAGTA"</span>, <span class="st">"AAACGTTGTAATAGTA"</span>,</span></span>
-<span class="r-in"><span>                      <span class="st">"AGACGTTGTAACAGTA"</span>,  <span class="st">"AAACGTTGTAATGTA"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                seq<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AGACGTTAGTAATAGTA"</span>, <span class="st">"AGACGTTGTAATAGTA"</span>,</span></span>
+<span class="r-in"><span>                      <span class="st">"AAACGTTGTAACAGTA"</span>,  <span class="st">"AAACGTTGTAATGTA"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                XM<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"...Z..x+.h..x..h."</span>, <span class="st">"...Z..z.h..x..h."</span>,</span></span>
 <span class="r-in"><span>                      <span class="st">"...Z..z.h..X..h."</span>,  <span class="st">"...Z..z.h..z.h."</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                cigar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"7M1I9M"</span>, <span class="st">"16M"</span>, <span class="st">"16M"</span>, <span class="st">"12M1D3M"</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -301,8 +305,9 @@ the seqlevels style.</p></div>
 <span class="r-in"><span>    <span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/VCF-class.html" class="external-link">ref</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu">as</span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"DNAStringSet"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="fu">VariantAnnotation</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/VariantAnnotation/man/VCF-class.html" class="external-link">alt</a></span><span class="op">(</span><span class="va">vcf</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu">as</span><span class="op">(</span><span class="st">"G"</span>, <span class="st">"DNAStringSet"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    </span></span>
-<span class="r-in"><span>    <span class="co"># read filtering will exclude third read from BAM file because it has</span></span></span>
-<span class="r-in"><span>    <span class="co"># too many out-of-context methylated cytosines (in position #12).</span></span></span>
+<span class="r-in"><span>    <span class="co"># when default values of filtering and thresholding parameters are used,</span></span></span>
+<span class="r-in"><span>    <span class="co"># read filtering will exclude the third read from this BAM file</span></span></span>
+<span class="r-in"><span>    <span class="co"># because it has too many outside-of-context methylated cytosines.</span></span></span>
 <span class="r-in"><span>    </span></span>
 <span class="r-in"><span>    <span class="co"># results with read filtering and thresholding</span></span></span>
 <span class="r-in"><span>    <span class="fu">generateVcfReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">temp.bam</span>, vcf<span class="op">=</span><span class="va">vcf</span><span class="op">)</span></span></span>
@@ -310,7 +315,7 @@ the seqlevels style.</p></div>
 <span class="r-in"><span>    <span class="fu">generateVcfReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">temp.bam</span>, vcf<span class="op">=</span><span class="va">vcf</span>, filter.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Writing sample BAM </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.003s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
@@ -318,21 +323,21 @@ the seqlevels style.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering and thresholding reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting base frequences </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.030s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.031s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting base frequences </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.031s]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    seqnames range    REF    ALT M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt U-Alt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;fctr&gt; &lt;int&gt; &lt;char&gt; &lt;char&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:     chr1     2      A      G     1     1    NA    NA     1     1    NA    NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    SumRef SumAlt  FEp+  FEp-</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     &lt;num&gt;  &lt;num&gt; &lt;num&gt; &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:      2      2     1    NA</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.033s]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    seqnames range    REF    ALT nfiltered M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;fctr&gt; &lt;int&gt; &lt;char&gt; &lt;char&gt;    &lt;lgcl&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:     chr1     2      A      G        NA     1     1    NA    NA     2     0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    M-Alt U-Alt SumRef SumAlt  FEp+  FEp-</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;num&gt; &lt;num&gt;  &lt;num&gt;  &lt;num&gt; &lt;num&gt; &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:    NA    NA      2      2     1    NA</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

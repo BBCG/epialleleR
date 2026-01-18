@@ -15,7 +15,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">epialleleR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.19.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.19.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -121,7 +121,10 @@ explanation and more examples, see Details section and vignette.</p></dd>
 <dd><p>boolean defining if sequence reads with too high
 out-of-context cytosine methylation (specified by `max.outofcontext.beta`)
 or too few within-the-context bases (specified by `min.haplotype.length`)
-should be filtered out. Default: TRUE.</p></dd>
+should be filtered out. Default: TRUE.
+Filtering is strongly recommended for short-read sequencing
+(bisulfite or enzymatic) because it removes reads from incompletely
+converted DNA molecules.</p></dd>
 
 
 <dt id="arg-min-haplotype-length">min.haplotype.length<a class="anchor" aria-label="anchor" href="#arg-min-haplotype-length"></a></dt>
@@ -252,9 +255,9 @@ beta values.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.011s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.013s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing lMHL report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.019s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.021s]</span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># lMHL report with a `max.haplotype.window` of 1 is identical to a</span></span></span>
 <span class="r-in"><span>  <span class="co"># conventional cytosine report (or nearly identical when sequencing errors</span></span></span>
@@ -265,7 +268,7 @@ beta values.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing lMHL report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.019s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.021s]</span>
 <span class="r-in"><span>  <span class="va">cg.report</span>  <span class="op">&lt;-</span> <span class="fu"><a href="generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">capture.bam</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
@@ -274,12 +277,27 @@ beta values.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing cytosine report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.010s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="va">mhl.report</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">rname</span>, <span class="va">strand</span>, <span class="va">pos</span>, <span class="va">context</span>, value<span class="op">=</span><span class="va">lmhl</span><span class="op">)</span><span class="op">]</span>,</span></span>
 <span class="r-in"><span>    <span class="va">cg.report</span><span class="op">[</span> , <span class="fu">.</span><span class="op">(</span><span class="va">rname</span>, <span class="va">strand</span>, <span class="va">pos</span>, <span class="va">context</span>, value<span class="op">=</span><span class="va">meth</span><span class="op">/</span><span class="op">(</span><span class="va">meth</span><span class="op">+</span><span class="va">unmeth</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span>  <span class="co"># Long-read sequencing with filtering disabled, using window of 10 CpGs</span></span></span>
+<span class="r-in"><span>  <span class="va">long.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"longread.bam"</span>, package<span class="op">=</span><span class="st">"epialleleR"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">long.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="preprocessBam.html">preprocessBam</a></span><span class="op">(</span>bam<span class="op">=</span><span class="va">long.bam</span>, min.mapq<span class="op">=</span><span class="fl">30</span>, min.baseq<span class="op">=</span><span class="fl">20</span>,</span></span>
+<span class="r-in"><span>                             min.prob<span class="op">=</span><span class="fl">178</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> long-read, single-end, unsorted alignment detected</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.005s]</span>
+<span class="r-in"><span>  <span class="va">mhl.report</span> <span class="op">&lt;-</span> <span class="fu">generateMhlReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">long.data</span>, max.haplotype.window<span class="op">=</span><span class="fl">10</span>,</span></span>
+<span class="r-in"><span>                                  filter.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing lMHL report </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.050s]</span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">mhl.report</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">pos</span>, lmhl<span class="op">=</span><span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/froll.html" class="external-link">frollmean</a></span><span class="op">(</span><span class="va">lmhl</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span><span class="op">]</span>, type<span class="op">=</span><span class="st">"l"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="generateMhlReport-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co">## toy examples to illustrate the logic of computations</span></span></span>
 <span class="r-in"><span>  <span class="va">temp.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext<span class="op">=</span><span class="st">".bam"</span><span class="op">)</span></span></span>
@@ -309,7 +327,7 @@ beta values.</p></div>
 <span class="r-in"><span>  <span class="fu"><a href="simulateBam.html">simulateBam</a></span><span class="op">(</span>output.bam.file<span class="op">=</span><span class="va">temp.bam</span>, rname<span class="op">=</span><span class="st">"chr1"</span>, XG<span class="op">=</span><span class="st">"CT"</span>,</span></span>
 <span class="r-in"><span>              XM<span class="op">=</span><span class="st">"h..Z..Z.z..Z...Z.h."</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Writing sample BAM </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.003s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 <span class="r-in"><span>  <span class="fu">generateMhlReport</span><span class="op">(</span><span class="va">temp.bam</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
@@ -317,7 +335,7 @@ beta values.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing lMHL report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     rname strand   pos context coverage length      lmhl</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;fctr&gt; &lt;fctr&gt; &lt;int&gt;  &lt;fctr&gt;    &lt;int&gt;  &lt;num&gt;     &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:   chr1      +     4      CG        1      5 0.1142857</span>
@@ -336,7 +354,7 @@ beta values.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing lMHL report </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     rname strand   pos context coverage length      lmhl</span>
@@ -357,7 +375,7 @@ beta values.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing lMHL report </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     rname strand   pos context coverage length       lmhl</span>

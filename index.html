@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">epialleleR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.19.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.19.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,18 +62,27 @@
 <div class="page-header"><h1 id="fast-epiallele-aware-methylation--caller-and-reporter-">Fast, epiallele-aware methylation<br> caller and reporter <a href="https://github.com/BBCG/epialleleR" class="external-link"><img src="articles/epialleleR_logo.svg" alt="logo" align="right" height="50%" class="pull-right"></a>
 <a class="anchor" aria-label="anchor" href="#fast-epiallele-aware-methylation--caller-and-reporter-"></a>
 </h1></div>
-<p><a href="https://github.com/BBCG/epialleleR/actions" class="external-link"><img src="https://github.com/BBCG/epialleleR/workflows/R-CMD-check-bioc/badge.svg"></a> <a href="https://app.codecov.io/gh/BBCG/epialleleR/tree/devel" class="external-link"><img src="https://codecov.io/gh/BBCG/epialleleR/branch/devel/graph/badge.svg"></a> <a href="https://bioconductor.org/packages/release/bioc/html/epialleleR.html" class="external-link"><img src="https://bioconductor.org/shields/years-in-bioc/epialleleR.svg"></a> <a href="http://bioconda.github.io/recipes/bioconductor-epialleler/README.html" class="external-link"><img src="https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat" alt="install with bioconda"></a></p>
+<p><a href="https://github.com/BBCG/epialleleR/actions" class="external-link"><img src="https://github.com/BBCG/epialleleR/workflows/R-CMD-check-bioc/badge.svg"></a> <a href="https://app.codecov.io/gh/BBCG/epialleleR/tree/devel" class="external-link"><img src="https://codecov.io/gh/BBCG/epialleleR/branch/devel/graph/badge.svg"></a> <a href="https://bioconductor.org/packages/release/bioc/html/epialleleR.html" class="external-link"><img src="https://bioconductor.org/shields/years-in-bioc/epialleleR.svg"></a> <a href="https://bioc.r-universe.dev/epialleleR" class="external-link"><img src="https://bioc.r-universe.dev/epialleleR/badges/version" alt="install from r-universe"></a></p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p><em><code>epialleleR</code></em> is an R package for calling and reporting cytosine methylation and hypermethylated variant epiallele frequencies (VEF) at the level of genomic regions or individual cytosines in next-generation sequencing data using binary alignment map (BAM) files as an input. See below for additional functionality.</p>
+<p><em><code>epialleleR</code></em> is an R package for calling and reporting cytosine DNA methylation in many useful ways. Developed to help identify and quantify epimutations (aberrant DNA methylation), it has now acquired multiple additional functions to dissect DNA methylation. But the main feature of the package is to report frequencies of epimutations (variant epiallele frequencies, VEF) at the level of genomic regions or individual cytosines. All you need in order to use it is a binary alignment map (BAM) file from basically any next-generation (methylation or native) sequencing experiment.</p>
 <p><img src="./articles/epialleles.png"></p>
+<div class="section level3">
+<h3 id="input-data">Input Data<a class="anchor" aria-label="anchor" href="#input-data"></a>
+</h3>
+<ul>
+<li>short-read and long-read (native)</li>
+<li>paired-end and single-end</li>
+<li>whole-genome, genome-wide (e.g., hybridization capture or adaptive sampling), and narrowly targeted (e.g., amplicon panels)</li>
+</ul>
+</div>
 <div class="section level3">
 <h3 id="current-features">Current Features<a class="anchor" aria-label="anchor" href="#current-features"></a>
 </h3>
 <ul>
-<li>calling cytosine methylation and saving calls in BAM file (<em><code>callMethylation</code></em>)</li>
-<li>creating sample BAM files given mandatory and optional BAM fields (<em><code>simulateBam</code></em>)</li>
+<li>calling cytosine methylation and saving calls in a new BAM file (<em><code>callMethylation</code></em>)</li>
+<li>creating sample BAM files from scratch given mandatory and optional BAM fields (<em><code>simulateBam</code></em>)</li>
 <li>conventional reporting of cytosine methylation (<em><code>generateCytosineReport</code></em>)</li>
 <li>reporting the hypermethylated variant epiallele frequency (VEF) at the level of genomic regions (<em><code>generate[Bed|Amplicon|Capture]Report</code></em>) or individual cytosines (<em><code>generateCytosineReport</code></em>)</li>
 <li>reporting linearised Methylated Haplotype Load (lMHL, <em><code>generateMhlReport</code></em>)</li>
@@ -90,8 +99,18 @@
 <h5 id="v120-bioc-323">v1.20 [BioC 3.23]<a class="anchor" aria-label="anchor" href="#v120-bioc-323"></a>
 </h5>
 <ul>
-<li>disrupting API changes in <code>generate*Report</code> (from version 1.19.1 onwards): new parameter <code>filter.reads</code> regulates filtering of reads with presumable incomplete conversion of cytosines; <code>cytosine.context</code> parameter instead of <code>threshold.context</code>/<code>haplotype.context</code>.</li>
-<li>disrupting change in thresholding logic (from version 1.19.1 onwards): reads with out-of-context cytosine methylation higher than <code>max.outofcontext.beta</code> are filtered out (discarded) instead of being counted as hypomethylated reads (as was in v1.19.0 and earlier).</li>
+<li>using genomic coordinates of targets, only a subset of BAM reads or only fragments of BAM reads that are overlapping the targets can now be loaded</li>
+<li>disrupting changes in all <code>generate*Report</code> functions (from version 1.19.1 onwards):
+<ul>
+<li>
+<code>cytosine.context</code> parameter instead of <code>threshold.context</code>/<code>haplotype.context</code>
+</li>
+<li>new parameter <code>filter.reads</code> regulates filtering of reads with too few cytosines or presumable incomplete conversion of cytosines</li>
+<li>reads with too few within-the-context cytosines (less than <code>min.context.sites</code>) or out-of-context cytosine methylation higher than <code>max.outofcontext.beta</code> are filtered out (discarded) instead of being counted as hypomethylated reads (as was in v1.19.0 and earlier)</li>
+<li>new default value of 0 for <code>min.context.sites</code>
+</li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="section level5">
@@ -196,6 +215,10 @@
 <span><span class="co"># methylation patterns and their plot</span></span>
 <span><span class="va">patterns</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/extractPatterns.html">extractPatterns</a></span><span class="op">(</span>bam<span class="op">=</span><span class="va">amplicon.bam</span>, bed<span class="op">=</span><span class="va">amplicon.bed</span>, bed.row<span class="op">=</span><span class="fl">3</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/plotPatterns.html">plotPatterns</a></span><span class="op">(</span><span class="va">patterns</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># conventional cytosine report</span></span>
+<span><span class="va">cx.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span>, filter.reads<span class="op">=</span><span class="cn">FALSE</span>,</span>
+<span>                                    threshold.reads<span class="op">=</span><span class="cn">FALSE</span>, report.context<span class="op">=</span><span class="st">"CX"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># CpG VEF report for individual bases</span></span>
 <span><span class="va">cg.vef.report</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">bam.data</span><span class="op">)</span></span>

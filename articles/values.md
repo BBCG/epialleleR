@@ -39,7 +39,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.104s]
+#> Writing sample BAM [0.110s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), 0, title="no epimutations")
 ```
@@ -61,7 +61,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.102s]
+#> Writing sample BAM [0.107s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="one complete epimutation")
 ```
@@ -83,7 +83,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.099s]
+#> Writing sample BAM [0.110s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="one partial epimutation")
 ```
@@ -105,7 +105,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.103s]
+#> Writing sample BAM [0.150s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="another partial epimutation")
 ```
@@ -130,7 +130,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.109s]
+#> Writing sample BAM [0.112s]
 #> [1] 1009
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="several partial epimutations")
 ```
@@ -155,7 +155,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.105s]
+#> Writing sample BAM [0.103s]
 #> [1] 1009
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="several short partial epimutations")
 ```
@@ -178,12 +178,49 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.004s]
+#> Writing sample BAM [0.005s]
 #> [1] 20
 plotMetrics(out.bam, as("chrS:1-20", "GRanges"), title="several overlapping partial epimutations")
 ```
 
 ![](values_files/figure-html/unnamed-chunk-3-7.png)
+
+``` r
+
+
+
+# simulated long-read sequencing, low methylation
+getXM <- function (p) {sample(x=c("z", "Z"), size=1, prob=c(p, 1-p))}
+probs <- (sin(seq(-2*pi, +1*pi, by = pi/25))+2)/3
+simulateBam(
+  output.bam.file=out.bam,
+  pos=1:10,
+  XM=sapply(1:10, function (i) {paste(sapply(probs, getXM), collapse="")}),
+  XG="CT"
+)
+#> Writing sample BAM [0.014s]
+#> [1] 10
+plotMetrics(out.bam, as("chrS:1-1000", "GRanges"), title="simulated long-read sequencing, low methylation")
+```
+
+![](values_files/figure-html/unnamed-chunk-3-8.png)
+
+``` r
+
+
+# simulated long-read sequencing, high methylation
+simulateBam(
+  output.bam.file=out.bam,
+  pos=1:10,
+  XM=sapply(1:10, function (i) {paste(sapply(1-probs, getXM), collapse="")}),
+  XG="CT"
+)
+#> Writing sample BAM [0.012s]
+#> [1] 10
+plotMetrics(out.bam, as("chrS:1-1000", "GRanges"), title="simulated long-read sequencing, high methylation")
+```
+
+![](values_files/figure-html/unnamed-chunk-3-9.png)
 
 ``` r
 
@@ -195,7 +232,7 @@ plotMetrics(
 )
 ```
 
-![](values_files/figure-html/unnamed-chunk-3-8.png)
+![](values_files/figure-html/unnamed-chunk-3-10.png)
 
 ``` r
 
@@ -207,7 +244,7 @@ plotMetrics(
 )
 ```
 
-![](values_files/figure-html/unnamed-chunk-3-9.png)
+![](values_files/figure-html/unnamed-chunk-3-11.png)
 
 ``` r
 
@@ -219,7 +256,7 @@ plotMetrics(
 )
 ```
 
-![](values_files/figure-html/unnamed-chunk-3-10.png)
+![](values_files/figure-html/unnamed-chunk-3-12.png)
 
 ``` r
 
@@ -231,7 +268,7 @@ plotMetrics(
 )
 ```
 
-![](values_files/figure-html/unnamed-chunk-3-11.png)
+![](values_files/figure-html/unnamed-chunk-3-13.png)
 
 ``` r
 
@@ -243,7 +280,7 @@ plotMetrics(
 )
 ```
 
-![](values_files/figure-html/unnamed-chunk-3-12.png)
+![](values_files/figure-html/unnamed-chunk-3-14.png)
 
 ``` r
 
@@ -255,50 +292,38 @@ plotMetrics(
 )
 ```
 
-![](values_files/figure-html/unnamed-chunk-3-13.png)
-
-``` r
-
-
-# long-read sequencing, low methylation
-getXM <- function (p) {sample(x=c("z", "Z"), size=1, prob=c(p, 1-p))}
-probs <- (sin(seq(-2*pi, +1*pi, by = pi/25))+2)/3
-simulateBam(
-  output.bam.file=out.bam,
-  pos=1:10,
-  XM=sapply(1:10, function (i) {paste(sapply(probs, getXM), collapse="")}),
-  XG="CT"
-)
-#> Writing sample BAM [0.013s]
-#> [1] 10
-plotMetrics(out.bam, as("chrS:1-1000", "GRanges"), title="long-read sequencing, low methylation")
-```
-
-![](values_files/figure-html/unnamed-chunk-3-14.png)
-
-``` r
-
-
-# long-read sequencing, high methylation
-simulateBam(
-  output.bam.file=out.bam,
-  pos=1:10,
-  XM=sapply(1:10, function (i) {paste(sapply(1-probs, getXM), collapse="")}),
-  XG="CT"
-)
-#> Writing sample BAM [0.010s]
-#> [1] 10
-plotMetrics(out.bam, as("chrS:1-1000", "GRanges"), title="long-read sequencing, high methylation")
-```
-
 ![](values_files/figure-html/unnamed-chunk-3-15.png)
+
+``` r
+
+
+# long-read sequencing, BRCA1
+plotMetrics(
+  system.file("extdata", "longread.bam", package="epialleleR"),
+  as("chr17:43125000-43127000:+", "GRanges"), title="long-read sequencing, BRCA1, + strand", clip.to.targets=TRUE
+)
+```
+
+![](values_files/figure-html/unnamed-chunk-3-16.png)
+
+``` r
+
+
+# long-read sequencing, BRCA1
+plotMetrics(
+  system.file("extdata", "longread.bam", package="epialleleR"),
+  as("chr17:43125000-43127000:-", "GRanges"), title="long-read sequencing, BRCA1, - strand", clip.to.targets=TRUE
+)
+```
+
+![](values_files/figure-html/unnamed-chunk-3-17.png)
 
 ### Session Info
 
 ``` r
 
 sessionInfo()
-#> R Under development (unstable) (2025-12-28 r89254)
+#> R Under development (unstable) (2026-01-15 r89304)
 #> Platform: x86_64-pc-linux-gnu
 #> Running under: Ubuntu 24.04.3 LTS
 #> 
@@ -319,18 +344,18 @@ sessionInfo()
 #> [1] stats4    stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] epialleleR_1.19.1    ggplot2_4.0.1        GenomicRanges_1.63.1 Seqinfo_1.1.0       
+#> [1] epialleleR_1.19.2    ggplot2_4.0.1        GenomicRanges_1.63.1 Seqinfo_1.1.0       
 #> [5] IRanges_2.45.0       S4Vectors_0.49.0     BiocGenerics_0.57.0  generics_0.1.4      
 #> [9] data.table_1.18.0   
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] gtable_0.3.6       jsonlite_2.0.0     dplyr_1.1.4        compiler_4.6.0     Rcpp_1.1.0.8.1    
+#>  [1] gtable_0.3.6       jsonlite_2.0.0     dplyr_1.1.4        compiler_4.6.0     Rcpp_1.1.1        
 #>  [6] tidyselect_1.2.1   jquerylib_0.1.4    systemfonts_1.3.1  scales_1.4.0       textshaping_1.0.4 
 #> [11] yaml_2.3.12        fastmap_1.2.0      R6_2.6.1           labeling_0.4.3     knitr_1.51        
-#> [16] htmlwidgets_1.6.4  tibble_3.3.0       desc_1.4.3         pillar_1.11.1      bslib_0.9.0       
-#> [21] RColorBrewer_1.1-3 rlang_1.1.6        cachem_1.1.0       xfun_0.55          fs_1.6.6          
+#> [16] htmlwidgets_1.6.4  tibble_3.3.1       desc_1.4.3         pillar_1.11.1      bslib_0.9.0       
+#> [21] RColorBrewer_1.1-3 rlang_1.1.7        cachem_1.1.0       xfun_0.56          fs_1.6.6          
 #> [26] sass_0.4.10        S7_0.2.1           otel_0.2.0         cli_3.6.5          withr_3.0.2       
-#> [31] pkgdown_2.2.0.9000 magrittr_2.0.4     digest_0.6.39      grid_4.6.0         lifecycle_1.0.4   
-#> [36] vctrs_0.6.5        evaluate_1.0.5     glue_1.8.0         farver_2.1.2       ragg_1.5.0        
+#> [31] pkgdown_2.2.0.9000 magrittr_2.0.4     digest_0.6.39      grid_4.6.0         lifecycle_1.0.5   
+#> [36] vctrs_0.7.0        evaluate_1.0.5     glue_1.8.0         farver_2.1.2       ragg_1.5.0        
 #> [41] rmarkdown_2.30     pkgconfig_2.0.3    tools_4.6.0        htmltools_0.5.9
 ```

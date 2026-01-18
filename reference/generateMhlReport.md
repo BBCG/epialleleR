@@ -80,7 +80,9 @@ generateMhlReport(
   boolean defining if sequence reads with too high out-of-context
   cytosine methylation (specified by \`max.outofcontext.beta\`) or too
   few within-the-context bases (specified by \`min.haplotype.length\`)
-  should be filtered out. Default: TRUE.
+  should be filtered out. Default: TRUE. Filtering is strongly
+  recommended for short-read sequencing (bisulfite or enzymatic) because
+  it removes reads from incompletely converted DNA molecules.
 
 - min.haplotype.length:
 
@@ -229,9 +231,9 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.011s]
+#> [0.013s]
 #> Preparing lMHL report 
-#> [0.019s]
+#> [0.021s]
   
   # lMHL report with a `max.haplotype.window` of 1 is identical to a
   # conventional cytosine report (or nearly identical when sequencing errors
@@ -242,7 +244,7 @@ for analysing the distribution of per-read beta values.
 #> Reading paired-end BAM file 
 #> [0.012s]
 #> Preparing lMHL report 
-#> [0.019s]
+#> [0.021s]
   cg.report  <- generateCytosineReport(capture.bam, threshold.reads=FALSE)
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
@@ -251,12 +253,27 @@ for analysing the distribution of per-read beta values.
 #> Filtering reads 
 #> [0.001s]
 #> Preparing cytosine report 
-#> [0.010s]
+#> [0.012s]
   identical(
     mhl.report[, .(rname, strand, pos, context, value=lmhl)],
     cg.report[ , .(rname, strand, pos, context, value=meth/(meth+unmeth))]
   )
 #> [1] TRUE
+  
+  # Long-read sequencing with filtering disabled, using window of 10 CpGs
+  long.bam <- system.file("extdata", "longread.bam", package="epialleleR")
+  long.data <- preprocessBam(bam=long.bam, min.mapq=30, min.baseq=20,
+                             min.prob=178)
+#> Checking BAM file: 
+#> long-read, single-end, unsorted alignment detected
+#> Reading single-end BAM file 
+#> [0.005s]
+  mhl.report <- generateMhlReport(bam=long.data, max.haplotype.window=10,
+                                  filter.reads=FALSE)
+#> Preparing lMHL report 
+#> [0.050s]
+  plot(mhl.report[, .(pos, lmhl=data.table::frollmean(lmhl, 100))], type="l")
+
   
   ## toy examples to illustrate the logic of computations
   temp.bam <- tempfile(fileext=".bam")
@@ -286,7 +303,7 @@ for analysing the distribution of per-read beta values.
   simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
               XM="h..Z..Z.z..Z...Z.h.")
 #> Writing sample BAM 
-#> [0.002s]
+#> [0.003s]
 #> [1] 1
   generateMhlReport(temp.bam)
 #> Checking BAM file: 
@@ -294,7 +311,7 @@ for analysing the distribution of per-read beta values.
 #> Reading single-end BAM file 
 #> [0.001s]
 #> Preparing lMHL report 
-#> [0.000s]
+#> [0.001s]
 #>     rname strand   pos context coverage length      lmhl
 #>    <fctr> <fctr> <int>  <fctr>    <int>  <num>     <num>
 #> 1:   chr1      +     4      CG        1      5 0.1142857
@@ -313,7 +330,7 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.001s]
+#> [0.002s]
 #> Preparing lMHL report 
 #> [0.000s]
 #>     rname strand   pos context coverage length      lmhl
@@ -334,7 +351,7 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.001s]
+#> [0.002s]
 #> Preparing lMHL report 
 #> [0.001s]
 #>     rname strand   pos context coverage length       lmhl
