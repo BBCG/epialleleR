@@ -36,7 +36,7 @@ utils::globalVariables(
     "templid", "FALSE+", "FALSE-", "TRUE+", "TRUE-", "NA+", "NA-", "REF", "ALT",
     "M+Ref","U+Ref","M+Alt","U+Alt", "M-Ref","U-Ref","M-Alt","U-Alt",
     "M+A", "M+C", "M+G", "M+T", "M-A", "M-C", "M-G", "M-T",
-    "U+A", "U+C", "U+G", "U+T", "U-A", "U-C", "U-G", "U-T",
+    "U+A", "U+C", "U+G", "U+T", "U-A", "U-C", "U-G", "U-T", "nfiltered",
     ".SD", "bin", "count", "code", "pos", "cntx", "base", "meth", "x", "y",
     "label")
 )
@@ -162,6 +162,8 @@ utils::globalVariables(
                       skip.qcfail,
                       skip.supplementary,
                       trim,
+                      targets,
+                      clip.to.targets,
                       nthreads,
                       verbose)
 {
@@ -169,25 +171,38 @@ utils::globalVariables(
                        "-end BAM file ", appendLF=FALSE)
   tm <- proc.time()
   
+  if (!is.null(targets)) {
+    dt.targets <- data.table::as.data.table(targets)
+    fn.suffix <- ifelse(clip.to.targets, "_cliptobed", "_usebed")
+  } else {
+    dt.targets <- data.table::data.table()
+    fn.suffix <- "_all"
+  }
+  
   bam.file <- path.expand(bam.file)
   skip.flags <- sum(c(4, 256, 512, 1024, 2048)[                  # 4==BAM_FUNMAP
     c(TRUE, skip.secondary, skip.qcfail, skip.duplicates, skip.supplementary)])
   if (bam.check$tagged=="XM") {                           # short-read alignment
     if (bam.check$paired) {                                         # paired-end
       skip.flags <- skip.flags + 8                              # 8==BAM_FMUNMAP
-      bam.processed <- rcpp_read_bam_paired(bam.file, min.mapq, min.baseq, 
-                                            skip.flags, trim[1], trim[2],
-                                            nthreads)
+      bam.processed <- do.call(
+        what=paste0("rcpp_read_bam_paired", fn.suffix),
+        args=list(bam.file, dt.targets, min.mapq, min.baseq, 
+                  skip.flags, trim[1], trim[2], nthreads)
+      )
     } else {                                                        # single-end
-      bam.processed <- rcpp_read_bam_single(bam.file, min.mapq, min.baseq, 
-                                            skip.flags, trim[1], trim[2],
-                                            nthreads)
+      bam.processed <- do.call(
+        what=paste0("rcpp_read_bam_single", fn.suffix),
+        args=list(bam.file, dt.targets, min.mapq, min.baseq, 
+                  skip.flags, trim[1], trim[2], nthreads)
+      )
     }
   } else {                                                 # long-read alignment
-    bam.processed <- rcpp_read_bam_mm_single(bam.file, min.mapq, min.baseq,
-                                             min.prob, highest.prob,
-                                             skip.flags, trim[1], trim[2],
-                                             nthreads)
+    bam.processed <- do.call(
+      what=paste0("rcpp_read_bam_mm_single", fn.suffix),
+      args=list(bam.file, dt.targets, min.mapq, min.baseq, 
+                min.prob, highest.prob, skip.flags, trim[1], trim[2], nthreads)
+    )
   }
   
   data.table::setDT(bam.processed)
@@ -438,8 +453,8 @@ utils::globalVariables(
 
 .filterThresholdReads <- function (
     bam.processed, ctx.meth, ctx.unmeth, ooctx.meth, ooctx.unmeth,
-    filter.reads, max.outofcontext.beta, 
-    threshold.reads, min.context.sites, min.context.beta, verbose)
+    filter.reads, min.context.sites, max.outofcontext.beta, 
+    threshold.reads, min.context.beta, verbose)
 {
   path <- list(
     c(fun="rcpp_allowall_reads", msg="Skipping filtering/thresholding "),
@@ -640,12 +655,13 @@ utils::globalVariables(
   colnames(freqs) <- c("U+A","U+C","U+G","U+T","U+N",
                        "U-A","U-C","U-G","U-T","U-N",
                        "M+A","M+C","M+G","M+T","M+N",
-                       "M-A","M-C","M-G","M-T","M-N")
+                       "M-A","M-C","M-G","M-T","M-N",
+                       "nfiltered")
   
   bf.report <- data.table::data.table(
     name=names(vcf.ranges),
     vcf.dt[,.(seqnames, range=start, REF, ALT)],
-    freqs[,grep("[ACTG]$",colnames(freqs)), drop=FALSE]
+    freqs[,grep("[ACTGd]$",colnames(freqs)), drop=FALSE]
   )
   
   bf.report[REF=="A" & ALT=="C", `:=` (`M+Ref`=`M+A`,       `U+Ref`=`U+A`,       `M-Ref`=`M-A`,       `U-Ref`=`U-A`,

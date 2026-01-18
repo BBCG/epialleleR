@@ -59,6 +59,12 @@
 #' merging, overlapping bases in read pairs are counted only once, and the base
 #' with the highest quality is taken.
 #' 
+#' It is currently a requirement that paired-end BAM file must be sorted by
+#' QNAME instead
+#' of genomic location (i.e., "unsorted") to perform merging of paired-end
+#' reads. Error message is shown if it is sorted by genomic location, in this
+#' case please sort it by QNAME using 'samtools sort -n -o out.bam in.bam'.
+#' 
 #' During preprocessing of single-end alignments, no read merging is
 #' performed. Only bases with quality of at least `min.baseq` are considered.
 #' Lower base quality results in no information for that particular position
@@ -72,11 +78,10 @@
 #' (real ends of sequenced fragment) are removed for paired-end sequencing
 #' reads.
 #' 
-#' It is also a requirement currently that paired-end BAM file must be sorted by
-#' QNAME instead
-#' of genomic location (i.e., "unsorted") to perform merging of paired-end
-#' reads. Error message is shown if it is sorted by genomic location, in this
-#' case please sort it by QNAME using 'samtools sort -n -o out.bam in.bam'.
+#' It is also possible to load only a subset of reads (read pairs) of interest
+#' or only fragments of such reads by supplying
+#' a list of targets (see description of `targets` and other related options).
+#' The subsetting is performed without using BAM index.
 #' 
 #' @section Specific considerations for long-read sequencing data:
 #' 
@@ -111,15 +116,18 @@
 #' @param override.check boolean to use supplied endness (`paired` parameter)
 #' even if it is different from the autodetected one (default: FALSE).
 #' @param min.mapq non-negative integer threshold for minimum read mapping
-#' quality (default: 0).
+#' quality. Default is 0, however a higher value (e.g., 30) is recommended.
 #' @param min.baseq non-negative integer threshold for minimum nucleotide base
-#' quality (default: 0).
+#' quality. Default is 0, however a higher value (e.g., at least 13 as in
+#' `samtools mpileup`) is recommended.
 #' @param min.prob integer threshold for minimum scaled probability of
-#' modification (methylation) to consider. Affects processing long-read
+#' modification (methylation) to consider. Affects processing of long-read
 #' sequencing alignments only. According to SAM/BAM specification, the
 #' continuous base modification probability range 0.0 to 1.0 is
 #' remapped in equal sized portions to the discrete integers 0 to 255
-#' inclusively. If default (-1), then all C+m and G-m cytosine
+#' inclusively. Default is -1, however a higher value (e.g., 178 which
+#' corresponds to a modification probability of ~0.7) is recommended.
+#' Also, when default (-1), all C+m and G-m cytosine
 #' methylation modifications recorded in MM/Mm tag will be included, even if
 #' ML/Ml tag with probabilities is absent (in such case, probability of
 #' modification equals -1).
@@ -144,12 +152,30 @@
 #' Default: 0 for no trimming. Specifying `trim=1` will result in removing of
 #' a single base from both ends, while specifying `trim=c(1,2)` will
 #' result in removing of a single base from 5' end and 2 bases from 3' end.
+#' @param targets Browser Extensible Data (BED) file location string OR object
+#' of class \code{\link[GenomicRanges]{GRanges}} holding genomic coordinates for
+#' regions of interest. The style of seqlevels of BED file/object must be the
+#' same as the style of seqlevels of BAM file. During targets loading, the 
+#' genomic regions are reduced (i.e., overlapping regions are merged),
+#' and the strand information is discarded. These reduced regions are then used
+#' to only load overlapping reads (merged read pairs for paired-end sequencing).
+#' @param zero.based.targets boolean defining if BED file coordinates are
+#' zero-based (default: FALSE).
+#' @param clip.to.targets boolean defining if overlapping reads (merged read
+#' pairs in case of paired-end sequencing) should be clipped to retain only
+#' fragments overlapping with `targets` (default: FALSE). If a read overlaps
+#' with two or more targets, all overlapping fragments will be retained.
 #' @param nthreads non-negative integer for the number of additional HTSlib
 #' threads to be used during BAM file decompression (default: 1). Two threads
-#' (and usually no more than two) make sense for the files larger than 100 MB.
+#' (and usually no more than four) make sense for files larger than 100 MB.
 #' @param verbose boolean to report progress and timings (default: TRUE).
 #' @return \code{\link[data.table]{data.table}} object containing preprocessed
 #' BAM data.
+#' 
+#' NB: most of the BAM data is stored not in the data.table
+#' \emph{per se}, but as an external object linked to this data.table.
+#' Therefore, saving/loading this data.table cannot
+#' be used to save/recover preprocessed BAM data.
 #' @seealso \code{\link{preprocessGenome}} for preloading reference
 #' sequences and \code{\link{callMethylation}} for methylation calling.
 #' 
@@ -167,8 +193,19 @@
 #' duplicate alignments marking by \href{http://www.htslib.org/doc/samtools-markdup.html}{Samtools}
 #' and \href{https://support.illumina.com/content/dam/illumina-support/help/Illumina_DRAGEN_Bio_IT_Platform_v3_7_1000000141465/Content/SW/Informatics/Dragen/DuplicateMarking_fDG.htm}{Illumina DRAGEN Bio IT Platform}.
 #' @examples
-#'   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
-#'   bam.data    <- preprocessBam(capture.bam)
+#'   # short-read sequencing
+#'   capture.data <- preprocessBam(
+#'     system.file("extdata", "capture.bam", package="epialleleR"),
+#'     targets=as("chr17:43120000-43130000", "GRanges")
+#'   )
+#'   generateCytosineReport(capture.data, threshold.reads=TRUE)
+#'   
+#'   # long-read sequencing
+#'   longread.data <- preprocessBam(
+#'     system.file("extdata", "longread.bam", package="epialleleR"),
+#'     min.mapq=30, min.baseq=20, min.prob=178
+#'   )
+#'   generateCytosineReport(longread.data, threshold.reads=FALSE)
 #'   
 #'   # Specifics of long-read alignment processing
 #'   out.bam <- tempfile(pattern="out-", fileext=".bam")
@@ -210,6 +247,9 @@ preprocessBam <- function (bam.file,
                            skip.qcfail=TRUE,
                            skip.supplementary=TRUE,
                            trim=0,
+                           targets=NULL,
+                           zero.based.targets=FALSE,
+                           clip.to.targets=FALSE,
                            nthreads=1,
                            verbose=TRUE)
 {
@@ -224,6 +264,10 @@ preprocessBam <- function (bam.file,
              " override with 'override.check=TRUE'", call.=FALSE)
       }
     }
+    
+    if (!is.null(targets) && !methods::is(targets, "GRanges"))
+      targets <- .readBed(bed.file=targets, zero.based.bed=zero.based.targets,
+                          verbose=verbose)
       
     trim <- rep_len(trim, length.out=2)
     bam.processed <- .readBam(
@@ -232,7 +276,8 @@ preprocessBam <- function (bam.file,
       min.prob=min.prob, highest.prob=highest.prob,
       skip.duplicates=skip.duplicates, skip.secondary=skip.secondary,
       skip.qcfail=skip.qcfail, skip.supplementary=skip.supplementary,
-      trim=trim, nthreads=nthreads, verbose=verbose
+      trim=trim, targets=targets, clip.to.targets=clip.to.targets,
+      nthreads=nthreads, verbose=verbose
     )
     return(bam.processed)
   } else {
@@ -242,7 +287,8 @@ preprocessBam <- function (bam.file,
              missing(min.prob), missing(highest.prob),
              missing(skip.duplicates), missing(skip.secondary),
              missing(skip.qcfail), missing(skip.supplementary),
-             missing(trim), missing(nthreads))) 
+             missing(trim), missing(targets), missing(zero.based.targets),
+             missing(clip.to.targets), missing(nthreads))) 
       message("Already preprocessed BAM supplied as an input. Explicitly set",
               " 'preprocessBam' options will have no effect.")
     return(bam.file)

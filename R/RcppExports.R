@@ -41,16 +41,40 @@ rcpp_mhl_report <- function(df, ctx, hmax, hmin, max_ooctx_meth_frac) {
     .Call(`_epialleleR_rcpp_mhl_report`, df, ctx, hmax, hmin, max_ooctx_meth_frac)
 }
 
-rcpp_read_bam_paired <- function(fn, min_mapq, min__baseq, skip_flags, trim5, trim3, nthreads) {
-    .Call(`_epialleleR_rcpp_read_bam_paired`, fn, min_mapq, min__baseq, skip_flags, trim5, trim3, nthreads)
+rcpp_read_bam_paired_all <- function(fn, bed, min_mapq, min__baseq, skip_flags, trim5, trim3, nthreads) {
+    .Call(`_epialleleR_rcpp_read_bam_paired_all`, fn, bed, min_mapq, min__baseq, skip_flags, trim5, trim3, nthreads)
 }
 
-rcpp_read_bam_single <- function(fn, min_mapq, min_baseq, skip_flags, trim5, trim3, nthreads) {
-    .Call(`_epialleleR_rcpp_read_bam_single`, fn, min_mapq, min_baseq, skip_flags, trim5, trim3, nthreads)
+rcpp_read_bam_paired_usebed <- function(fn, bed, min_mapq, min__baseq, skip_flags, trim5, trim3, nthreads) {
+    .Call(`_epialleleR_rcpp_read_bam_paired_usebed`, fn, bed, min_mapq, min__baseq, skip_flags, trim5, trim3, nthreads)
 }
 
-rcpp_read_bam_mm_single <- function(fn, min_mapq, min_baseq, min_prob, highest_prob, skip_flags, trim5, trim3, nthreads) {
-    .Call(`_epialleleR_rcpp_read_bam_mm_single`, fn, min_mapq, min_baseq, min_prob, highest_prob, skip_flags, trim5, trim3, nthreads)
+rcpp_read_bam_paired_cliptobed <- function(fn, bed, min_mapq, min__baseq, skip_flags, trim5, trim3, nthreads) {
+    .Call(`_epialleleR_rcpp_read_bam_paired_cliptobed`, fn, bed, min_mapq, min__baseq, skip_flags, trim5, trim3, nthreads)
+}
+
+rcpp_read_bam_single_all <- function(fn, bed, min_mapq, min_baseq, skip_flags, trim5, trim3, nthreads) {
+    .Call(`_epialleleR_rcpp_read_bam_single_all`, fn, bed, min_mapq, min_baseq, skip_flags, trim5, trim3, nthreads)
+}
+
+rcpp_read_bam_single_usebed <- function(fn, bed, min_mapq, min_baseq, skip_flags, trim5, trim3, nthreads) {
+    .Call(`_epialleleR_rcpp_read_bam_single_usebed`, fn, bed, min_mapq, min_baseq, skip_flags, trim5, trim3, nthreads)
+}
+
+rcpp_read_bam_single_cliptobed <- function(fn, bed, min_mapq, min_baseq, skip_flags, trim5, trim3, nthreads) {
+    .Call(`_epialleleR_rcpp_read_bam_single_cliptobed`, fn, bed, min_mapq, min_baseq, skip_flags, trim5, trim3, nthreads)
+}
+
+rcpp_read_bam_mm_single_all <- function(fn, bed, min_mapq, min_baseq, min_prob, highest_prob, skip_flags, trim5, trim3, nthreads) {
+    .Call(`_epialleleR_rcpp_read_bam_mm_single_all`, fn, bed, min_mapq, min_baseq, min_prob, highest_prob, skip_flags, trim5, trim3, nthreads)
+}
+
+rcpp_read_bam_mm_single_usebed <- function(fn, bed, min_mapq, min_baseq, min_prob, highest_prob, skip_flags, trim5, trim3, nthreads) {
+    .Call(`_epialleleR_rcpp_read_bam_mm_single_usebed`, fn, bed, min_mapq, min_baseq, min_prob, highest_prob, skip_flags, trim5, trim3, nthreads)
+}
+
+rcpp_read_bam_mm_single_cliptobed <- function(fn, bed, min_mapq, min_baseq, min_prob, highest_prob, skip_flags, trim5, trim3, nthreads) {
+    .Call(`_epialleleR_rcpp_read_bam_mm_single_cliptobed`, fn, bed, min_mapq, min_baseq, min_prob, highest_prob, skip_flags, trim5, trim3, nthreads)
 }
 
 rcpp_read_genome <- function(fn, nthreads) {

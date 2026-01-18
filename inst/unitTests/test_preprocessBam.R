@@ -97,6 +97,19 @@ test_preprocessBam <- function () {
   )
   
   # long-read, single-ended, unsorted
+  longread.bam <- system.file("extdata", "longread.bam", package="epialleleR")
+  RUnit::checkTrue(
+    methods::is(
+      preprocessBam(longread.bam, verbose=TRUE),
+      "data.table"
+    )
+  )
+  RUnit::checkIdentical(
+    epialleleR:::.checkBam(longread.bam, TRUE)[c("paired", "sorted", "tagged")],
+    list(paired=FALSE, sorted=FALSE, tagged="MM")
+  )
+  
+  # simulated long-read, single-ended, unsorted
   out.bam <- tempfile(pattern="simulated", fileext=".bam")
   simulateBam(
     output.bam.file=out.bam,
@@ -110,6 +123,54 @@ test_preprocessBam <- function () {
     epialleleR:::.checkBam(out.bam, TRUE)[c("paired", "sorted", "tagged")],
     list(paired=FALSE, sorted=FALSE, tagged="MM")
   )
+  
+  
+  bed <- as("chr17:43124900-43125250", "GRanges")
+  # bed file usage
+  bam <- preprocessBam(bam=amplicon.bam, targets=system.file("extdata", "amplicon.bed", package="epialleleR"))
+  RUnit::checkIdentical(
+    as.integer(unname(bam[, summary(start)])),
+    as.integer(c(43124861, 43125171, 43125270, 43125299, 43125624, 43125633))
+  )
+  
+  # paired-end, targets
+  bam <- preprocessBam(bam=amplicon.bam, targets=bed)
+  RUnit::checkIdentical(
+    as.integer(unname(bam[, summary(start)])),
+    as.integer(c(43124861, 43124861, 43125171, 43125023, 43125171, 43125173))
+  )
+  # paired-end, targets, clipped
+  bam <- preprocessBam(bam=amplicon.bam, targets=bed, clip.to.targets=TRUE)
+  RUnit::checkIdentical(
+    as.integer(unname(bam[, summary(start)])),
+    as.integer(c(43124900, 43124900, 43125171, 43125042, 43125171, 43125173))
+  )
+  # single-end, targets
+  bam <- preprocessBam(bam=amplicon.bam, paired=FALSE, override.check=TRUE, targets=bed)
+  RUnit::checkIdentical(
+    as.integer(unname(bam[, summary(start)])),
+    as.integer(c(43124861, 43124861, 43125024, 43125024, 43125171, 43125173))
+  )
+  # single-end, targets, clipped
+  bam <- preprocessBam(bam=amplicon.bam, paired=FALSE, override.check=TRUE, targets=bed, clip.to.targets=TRUE)
+  RUnit::checkIdentical(
+    as.integer(unname(bam[, summary(start)])),
+    as.integer(c(43124900, 43124900, 43125024, 43125036, 43125171, 43125173))
+  )
+  # long-read, targets
+  bam <- preprocessBam(bam=longread.bam, min.mapq=30, min.baseq=20, min.prob=178, targets=bed)
+  RUnit::checkIdentical(
+    as.integer(unname(bam[, summary(start)])),
+    as.integer(c(43115251, 43119249, 43122146, 43121293, 43123662, 43125166))
+  )
+  
+  # long-read, targets, clipped
+  bam <- preprocessBam(bam=longread.bam, min.mapq=30, min.baseq=20, min.prob=178, targets=bed, clip.to.targets=TRUE)
+  RUnit::checkIdentical(
+    as.integer(unname(bam[, summary(start)])),
+    as.integer(c(43124900, 43124900, 43124900, 43124921, 43124900, 43125166))
+  )
+  
   
   # single-ended, unsorted, no XG but there's YD
   RUnit::checkException(
@@ -140,11 +201,11 @@ test_preprocessBam <- function () {
   )
  
   # internal coverage
-  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon000meth.bam", package="epialleleR"), 5, 5, 2820, 0, 0, 1)
-  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon010meth.bam", package="epialleleR"), 5, 5, 2820, 1, 1, 1)
-  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "amplicon100meth.bam", package="epialleleR"), 5, 5, 2820, 2, 2, 1)
-  nil <- epialleleR:::rcpp_read_bam_single(system.file("extdata", "capture.bam", package="epialleleR"), 5, 5, 2820, 4, 4, 1)
-  nil <- epialleleR:::rcpp_read_bam_mm_single(system.file("extdata", "amplicon100meth.bam", package="epialleleR"), 5, 5, -1, TRUE, 2820, 4, 4, 1)
-  nil <- epialleleR:::rcpp_read_bam_mm_single(system.file("extdata", "capture.bam", package="epialleleR"), 5, 5, -1, TRUE, 2820, 4, 4, 1)
+  nil <- epialleleR:::rcpp_read_bam_single_all(system.file("extdata", "amplicon000meth.bam", package="epialleleR"), data.table::data.table(), 5, 5, 2820, 0, 0, 1)
+  nil <- epialleleR:::rcpp_read_bam_single_all(system.file("extdata", "amplicon010meth.bam", package="epialleleR"), data.table::data.table(), 5, 5, 2820, 1, 1, 1)
+  nil <- epialleleR:::rcpp_read_bam_single_all(system.file("extdata", "amplicon100meth.bam", package="epialleleR"), data.table::data.table(), 5, 5, 2820, 2, 2, 1)
+  nil <- epialleleR:::rcpp_read_bam_single_all(system.file("extdata", "capture.bam", package="epialleleR"), data.table::data.table(), 5, 5, 2820, 4, 4, 1)
+  nil <- epialleleR:::rcpp_read_bam_mm_single_all(system.file("extdata", "amplicon100meth.bam", package="epialleleR"), data.table::data.table(), 5, 5, -1, TRUE, 2820, 4, 4, 1)
+  nil <- epialleleR:::rcpp_read_bam_mm_single_all(system.file("extdata", "capture.bam", package="epialleleR"), data.table::data.table(), 5, 5, -1, TRUE, 2820, 4, 4, 1)
 
 }

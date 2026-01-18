@@ -37,7 +37,7 @@ test_generateBedReport <- function () {
   
   RUnit::checkEquals(
     amplicon.report$VEF,
-    c(0.08387097, 0.11475409836, 0.05376344086, 0.10714285714, 0.14285714),
+    c(0.08387097, 0.11475409836, 0.05376344086, 0.10714285714, 0.15306122),
   )
   
   RUnit::checkEquals(
@@ -52,7 +52,7 @@ test_generateBedReport <- function () {
   
   RUnit::checkEquals(
     nofilter.report$VEF,
-    c(0.08333333333, 0.11475409836, 0.05376344086, 0.10714285714, 0.15094340),
+    c(0.08333333333, 0.11475409836, 0.05376344086, 0.10714285714, 0.16037736),
   )
   
   RUnit::checkEquals(
@@ -96,7 +96,7 @@ test_generateBedReport <- function () {
   
   RUnit::checkEquals(
     quality.report$VEF,
-    c(0.08333333333, 0.11475409836, 0.05376344086, 0.10714285714, 0.13333333),
+    c(0.08333333333, 0.11475409836, 0.05376344086, 0.10714285714, 0.14444444),
   )
   
   allowall.report <- generateAmpliconReport(bam=amplicon.bam, bed=amplicon.bed, filter.reads=FALSE, threshold.reads=FALSE)

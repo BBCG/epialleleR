@@ -1,4 +1,6 @@
 #include <Rcpp.h>
+#include <boost/icl/interval.hpp>
+#include <boost/icl/interval_set.hpp>
 #include <htslib/hts.h>
 #include <htslib/sam.h>
 #include <htslib/thread_pool.h>
@@ -7,16 +9,81 @@
 // [[Rcpp::depends(Rhtslib)]]
 
 // An optimised attempt to read and preprocess BAM in place. To do:
-// [ ] OpenMP SIMD?
 // [+] HTSlib threads
 // [+] rec_seq_rs and rec_xm_rs as char*
-// [?] reverse QNAME
+// [?] reverse QNAME - no changes in speed
 // [ ] free resources on interrupt
+// [x] overlap with BED / clip to BED
+// [ ] overlap with BED using BAM index?
+
+// Briefly on the possibility to use BAM index:
+// Unsorted files cannot be indexed, which prevents *newly name-sorted* files
+// to be subsetted. If that wasn't the case, one could use 'sam_itr_regarray'
+// to get a multi-region iterator.
+// This issue is mainly important for paired-end alignment loading, as overlap
+// check cannot be performed *before both reads are processed* - for some
+// assays (e.g., EpiMutTsg), DRAGEN creates dovetail alignments with TLEN
+// smaller than the actual length of observed template. ("Why?" - is another
+// question. Seemingly, by some stupid mistake.) Therefore, for paired-end files
+// I resort to overlap check during 'push_template'.
+// For single-end alignments, the check can be performed early, saving time on
+// not filling template holders.
+// In the future, 'try load index' can be the default, falling back to checking
+// every read if index isn't available.
+
+
+// This function loads data.frame BED into a set of intervals.
+// Apparently, boost::icl::interval_set is pretty quick for a simple check if
+// there's an overlap (negligible overhead).
+// When it comes to getting the list of intersections (by &) - there it slows
+// everything down ~2-3 times (for EpiMutTsg BAM, where almost every template
+// needs to be trimmed using BED of 600 targets). This is probably due to
+// memory allocation when a new interval set is created.
+// For the first working implementation using boost::icl::interval_set,
+// see commit 8a9125411f89a22c39d5a3c65847a0089f95f2ca.
+// For complete implementation of intersections in all three template functions,
+// see commit 3b194f78a48f3d2ea1dc4266046897f05e471684.
+// To save on memory allocation, a correct alternative was implemented using
+// find() in this interval_set. For this implementation, see commit
+// 5e97115dc3b88a942aabc3b85bacbcf85fcadb54.
+typedef boost::icl::interval<int> T_irange;                                     // <start,end> interval
+typedef boost::icl::interval_set<int> T_irangeset;                              // chr->{<start,end>, ...}
+typedef std::vector<T_irangeset> T_granges;                                     // chr->{<start,end>, ...}
+T_granges load_intervals (Rcpp::DataFrame &bed,                                 // BED data.table from as.data.table(.readBed(...))
+                          const bam_hdr_t *bam_header)                          // BAM header structure
+{
+  Rcpp::IntegerVector seqnames       = bed["seqnames"];                         // BED seqnames: factor with levels that differ from BAM
+  std::vector<std::string> seqlevels = seqnames.attr("levels");                 // BED seqlevels
+  Rcpp::IntegerVector start          = bed["start"];                            // BED start
+  Rcpp::IntegerVector end            = bed["end"];                              // BED end
+
+  std::vector<int> bed2bam (seqlevels.size(), -1);                              // index = BED seqlevel, value = BAM seqlevel
+  for (int i=0; i<seqlevels.size(); i++) {                                      // for every BED seqlevel
+    for (int j=0; j<bam_header->n_targets; j++) {                               // compare with every BAM level
+      if (!strcmp(seqlevels[i].c_str(), bam_header->target_name[j])) {          // when equal
+        bed2bam[i] = j;                                                         // store index
+        break;                                                                  // break out
+      }
+    }
+  }
+  
+  T_granges targets (bam_header->n_targets);                                    // vector of interval sets
+  for (int i=0; i<seqnames.size(); i++) {                                       // for every BED entry
+    if (bed2bam[seqnames[i]-1] >= 0)                                            // if present in BAM
+      targets[bed2bam[seqnames[i]-1]] += T_irange::closed(start[i]-1, end[i]-1);// add interval, 0-based
+  }
+  
+  return targets;
+}
+
+
+// #############################################################################
 
 // SHORT-READ PAIRED-END BAM
 
-// [[Rcpp::export]]
-Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           // file name
+template<int usebed>                                                            // 0 to not use BED; 1 for simple overlap; 2 for clipping to BED
+Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           // BAM file name
+                                      Rcpp::DataFrame &bed,                     // BED data.table
                                       const int min_mapq,                       // min read mapping quality
                                       int min__baseq,                           // min base quality
                                       const uint16_t skip_flags,                // BAM flags to skip (duplicates, etc)
@@ -41,6 +108,11 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   if (!bam_hdr) Rcpp::stop("Unable to read BAM header");                        // fall back if error  
   bam1_t *bam_rec = bam_init1();                                                // create BAM alignment structure
   
+  T_granges targets;                                                            // define targets object
+  if (usebed>0) {                                                               // if use BED data for overlap/clip
+    targets = load_intervals(bed, bam_hdr);                                     // read BED into a set of intervals
+  }
+  
   // main containers
   std::vector<std::string>* seqxm = new std::vector<std::string>;               // SEQXM, leftmost 4 bits are SEQ and rightmost 4 are XM
   std::vector<int> rname, strand, start;                                        // id for RNAME, id for CT==1/GA==2, POS
@@ -58,14 +130,39 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   std::memset(templ_seqxm_rs, 0b11111011, max_templ_width);                     // prefill SEQXM holder with 'N-', i.e., '15,11'
   int templ_rname = 0, templ_start = 0, templ_strand = 0, templ_width = 0;      // template RNAME, POS, STRAND, ISIZE
   
-  #define push_template {                                        /* pushing template data to vectors */ \
-    rname.push_back(templ_rname + 1);                                                     /* RNAME+1 */ \
-    strand.push_back(templ_strand);                                                        /* STRAND */ \
-    start.push_back(templ_start + trim5 + 1);                                               /* POS+1 */ \
-    seqxm->emplace_back((const char*) templ_seqxm_rs + trim5, templ_width - (trim5+trim3)); /* SEQXM */ \
-    std::memset(templ_qual_rs, (uint8_t) min_baseq, templ_width); /* fill QUAL holder with min_baseq */ \
-    std::memset(templ_seqxm_rs, 0b11111011, templ_width);     /* fill SEQXM with 'N-', i.e., '15,11' */ \
-    ntempls++;                                                                                 /* +1 */ \
+  #define push_template {                                                                    /* pushing template data to vectors */ \
+    if (usebed==0) {                                                                       /* usebed==0, not use BED data at all */ \
+      rname.push_back(templ_rname + 1);                                                                               /* RNAME+1 */ \
+      strand.push_back(templ_strand);                                                                                  /* STRAND */ \
+      start.push_back(templ_start + trim5 + 1);                                                                         /* POS+1 */ \
+      seqxm->emplace_back((const char*) templ_seqxm_rs + trim5, templ_width - (trim5+trim3));                           /* SEQXM */ \
+      ntempls++;                                                                                                           /* +1 */ \
+    } else if (usebed==1) {                                                                /* usebed==1, simple overlap with BED */ \
+      const int irange_start = templ_start + trim5;                                              /* start of the irange, 0-based */ \
+      const int irange_end = irange_start + templ_width - trim3;                                   /* end of the irange, 0-based */ \
+      if (intersects(targets[templ_rname], T_irange::closed(irange_start, irange_end))) {                           /* overlaps? */ \
+        rname.push_back(templ_rname + 1);                                                                             /* RNAME+1 */ \
+        strand.push_back(templ_strand);                                                                                /* STRAND */ \
+        start.push_back(templ_start + trim5 + 1);                                                                       /* POS+1 */ \
+        seqxm->emplace_back((const char*) templ_seqxm_rs + trim5, templ_width - (trim5+trim3));                         /* SEQXM */ \
+        ntempls++;                                                                                                         /* +1 */ \
+      }                                                                                                                             \
+    } else {                                                                          /* usebed==2, clipping the template to BED */ \
+      const int irange_start = templ_start + trim5;                                              /* start of the irange, 0-based */ \
+      const int irange_end = irange_start + templ_width - trim3;                                   /* end of the irange, 0-based */ \
+      for (T_irangeset::const_iterator it = find(targets[templ_rname], T_irange::closed(irange_start, irange_end));                 \
+           it != targets[templ_rname].end() && it->lower() <= irange_end; ++it) {        /* iterate over all overlapping regions */ \
+        const int overlap_start = std::max(it->lower(), irange_start);                                   /* start of the overlap */ \
+        const int overlap_end = std::min(it->upper(), irange_end);                                         /* end of the overlap */ \
+        rname.push_back(templ_rname + 1);                                                                             /* RNAME+1 */ \
+        strand.push_back(templ_strand);                                                                                /* STRAND */ \
+        start.push_back(overlap_start + 1);                                                                             /* POS+1 */ \
+        seqxm->emplace_back((const char*) templ_seqxm_rs + (overlap_start-templ_start), overlap_end-overlap_start+1);   /* SEQXM */ \
+        ntempls++;                                                                                                         /* +1 */ \
+      }                                                                                                                             \
+    }                                                                                                              /* now, clean */ \
+    std::memset(templ_qual_rs, (uint8_t) min_baseq, templ_width);                             /* fill QUAL holder with min_baseq */ \
+    std::memset(templ_seqxm_rs, 0b11111011, templ_width);                                 /* fill SEQXM with 'N-', i.e., '15,11' */ \
   }
   
   // process alignments
@@ -147,6 +244,7 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
         default : Rcpp::stop("Unknown CIGAR operation for BAM entry %s", bam_get_qname(bam_rec)); // unknown CIGAR operation
       }
     }
+    // if (templ_width < (int)dest_pos) {Rcpp::stop(templ_qname);}              // enable to check 'dovetail' alignments
     if (templ_width < (int)dest_pos) templ_width = dest_pos;                    // need this to include everything from 'dovetail' alignments
   }
   
@@ -190,12 +288,44 @@ Rcpp::DataFrame rcpp_read_bam_paired (std::string fn,                           
   return(res);
 }
 
+
+// [[Rcpp::export]]
+Rcpp::DataFrame rcpp_read_bam_paired_all (
+    std::string fn, Rcpp::DataFrame &bed, const int min_mapq, int min__baseq,
+    const uint16_t skip_flags, const int trim5, const int trim3,
+    const int nthreads)
+{
+  return rcpp_read_bam_paired<0>(fn, bed, min_mapq, min__baseq,
+                                 skip_flags, trim5, trim3, nthreads);
+}
+
+// [[Rcpp::export]]
+Rcpp::DataFrame rcpp_read_bam_paired_usebed (
+    std::string fn, Rcpp::DataFrame &bed, const int min_mapq, int min__baseq,
+    const uint16_t skip_flags, const int trim5, const int trim3,
+    const int nthreads)
+{
+  return rcpp_read_bam_paired<1>(fn, bed, min_mapq, min__baseq,
+                                 skip_flags, trim5, trim3, nthreads);
+}
+
+// [[Rcpp::export]]
+Rcpp::DataFrame rcpp_read_bam_paired_cliptobed (
+    std::string fn, Rcpp::DataFrame &bed, const int min_mapq, int min__baseq,
+    const uint16_t skip_flags, const int trim5, const int trim3,
+    const int nthreads)
+{
+  return rcpp_read_bam_paired<2>(fn, bed, min_mapq, min__baseq,
+                                 skip_flags, trim5, trim3, nthreads);
+}
+
 // #############################################################################
 
 // SHORT-READ SINGLE-END BAM
 
-// [[Rcpp::export]]
+template<int usebed>                                                            // 0 to not use BED; 1 for simple overlap; 2 for clipping to BED
 Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           // file name
+                                      Rcpp::DataFrame &bed,                     // BED data.table
                                       const int min_mapq,                       // min read mapping quality
                                       const int min_baseq,                      // min base quality
                                       const uint16_t skip_flags,                // BAM flags to skip (duplicates, etc)
@@ -217,6 +347,11 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
   bam_hdr_t *bam_hdr = sam_hdr_read(bam_fp);                                    // try read file header
   if (!bam_hdr) Rcpp::stop("Unable to read BAM header");                        // fall back if error  
   bam1_t *bam_rec = bam_init1();                                                // create BAM alignment structure
+  
+  T_granges targets;                                                            // define targets object
+  if (usebed>0) {                                                               // if use BED data for overlap/clip
+    targets = load_intervals(bed, bam_hdr);                                     // read BED into a set of intervals
+  }
   
   // main containers
   std::vector<std::string>* seqxm = new std::vector<std::string>;               // SEQXM, leftmost 4 bits are SEQ and rightmost 4 are XM
@@ -252,6 +387,13 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
     uint32_t n_cigar = bam_rec->core.n_cigar;                                   // number of CIGAR operations
     uint32_t *record_cigar = bam_get_cigar(bam_rec);                            // CIGAR array
     record_width = bam_cigar2rlen(n_cigar, record_cigar);                       // reference length for the current query
+    
+    if (usebed>0) {                                                             // valid for both simple overlap and clipping
+      const int irange_start = bam_rec->core.pos + trim5;                       // start of the irange, 0-based
+      const int irange_end = irange_start + record_width - trim3;               // end of the irange, 0-based
+      if (!intersects(targets[bam_rec->core.tid], T_irange::closed(irange_start, irange_end))) // if does not overlap
+        continue;                                                               // next record
+    }
     
     // resize containers if necessary
     if (record_width > max_record_width) {
@@ -298,11 +440,26 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
     }
     
     // pushing record data to vectors
-    rname.push_back(bam_rec->core.tid + 1);                                     // RNAME+1 
-    strand.push_back(( record_strand[1] == 'C' ) ? 1 : 2);                      // STRAND is 1 if "ZCT"/"+", 2 if "ZGA"/"-"
-    start.push_back(bam_rec->core.pos + trim5 +1);                              // POS+1 
-    seqxm->emplace_back((const char*) record_seqxm_rs + trim5, dest_pos - (trim5+trim3)); // SEQXM
-    npushed++;                                                                  // +1 
+    if (usebed<2) {                                                             // valid for both skip-BED and simple overlap
+      rname.push_back(bam_rec->core.tid + 1);                                   // RNAME+1 
+      strand.push_back(( record_strand[1] == 'C' ) ? 1 : 2);                    // STRAND is 1 if "ZCT"/"+", 2 if "ZGA"/"-"
+      start.push_back(bam_rec->core.pos + trim5 +1);                            // POS+1 
+      seqxm->emplace_back((const char*) record_seqxm_rs + trim5, dest_pos - (trim5+trim3)); // SEQXM
+      npushed++;                                                                // +1
+    } else {                                                                    // clip to BED
+      const int irange_start = bam_rec->core.pos + trim5;                       // start of the irange, 0-based
+      const int irange_end = irange_start + dest_pos - trim3;                   // end of the irange, 0-based
+      for (T_irangeset::const_iterator it = find(targets[bam_rec->core.tid], T_irange::closed(irange_start, irange_end));
+           it != targets[bam_rec->core.tid].end() && it->lower() <= irange_end; ++it) { // iterate over all overlapping regions
+        const int overlap_start = std::max(it->lower(), irange_start);          // start of the overlap
+        const int overlap_end = std::min(it->upper(), irange_end);              // end of the overlap
+        rname.push_back(bam_rec->core.tid + 1);                                 // RNAME+1 
+        strand.push_back(( record_strand[1] == 'C' ) ? 1 : 2);                  // STRAND is 1 if "ZCT"/"+", 2 if "ZGA"/"-"
+        start.push_back(overlap_start + 1);                                     // POS+1
+        seqxm->emplace_back((const char*) record_seqxm_rs + (overlap_start - bam_rec->core.pos), overlap_end-overlap_start+1); // SEQXM
+        npushed++;                                                              // +1
+      }
+    }
   }
   
   // cleaning
@@ -341,6 +498,37 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
 }
 
 
+
+// [[Rcpp::export]]
+Rcpp::DataFrame rcpp_read_bam_single_all (
+    std::string fn, Rcpp::DataFrame &bed, const int min_mapq,
+    const int min_baseq, const uint16_t skip_flags, const int trim5,
+    const int trim3, const int nthreads)
+{
+  return rcpp_read_bam_single<0>(fn, bed, min_mapq, min_baseq,
+                                 skip_flags, trim5, trim3, nthreads);
+}
+
+// [[Rcpp::export]]
+Rcpp::DataFrame rcpp_read_bam_single_usebed (
+    std::string fn, Rcpp::DataFrame &bed, const int min_mapq,
+    const int min_baseq, const uint16_t skip_flags, const int trim5,
+    const int trim3, const int nthreads)
+{
+  return rcpp_read_bam_single<1>(fn, bed, min_mapq, min_baseq,
+                                 skip_flags, trim5, trim3, nthreads);
+}
+
+// [[Rcpp::export]]
+Rcpp::DataFrame rcpp_read_bam_single_cliptobed (
+    std::string fn, Rcpp::DataFrame &bed, const int min_mapq,
+    const int min_baseq, const uint16_t skip_flags, const int trim5,
+    const int trim3, const int nthreads)
+{
+  return rcpp_read_bam_single<2>(fn, bed, min_mapq, min_baseq,
+                                 skip_flags, trim5, trim3, nthreads);
+}
+
 // #############################################################################
 
 // LONG-READ SINGLE-END BAM
@@ -358,8 +546,9 @@ Rcpp::DataFrame rcpp_read_bam_single (std::string fn,                           
 // tables, HTSlib codes for bases and, therefore, will save some ops by
 // avoiding unnecessary conversions
 
-// [[Rcpp::export]]
+template<int usebed>                                                            // 0 to not use BED; 1 for simple overlap; 2 for clipping to BED
 Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        // file name
+                                         Rcpp::DataFrame &bed,                  // BED data.table
                                          const int min_mapq,                    // min read mapping quality
                                          const int min_baseq,                   // min base quality
                                          const int min_prob,                    // min probability of 5mC modification
@@ -391,6 +580,11 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
   hts_base_mod base_mods[max_nmods];                                            // allocate an array of MAX 16 possible modifications per base
   int mod_pos = 0, nmods = 0;                                                   // position of modified base in the query, number of modifications at that base
 
+  T_granges targets;                                                            // define targets object
+  if (usebed>0) {                                                               // if use BED data for overlap/clip
+    targets = load_intervals(bed, bam_hdr);                                     // read BED into a set of intervals
+  }
+  
   // main containers
   std::vector<std::string>* seqxm = new std::vector<std::string>;               // SEQXM, leftmost 4 bits are SEQ and rightmost 4 are XM
   std::vector<int> rname, strand, start;                                        // id for RNAME, id for CT==1/GA==2, POS
@@ -429,6 +623,13 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
     query_width = abs(bam_rec->core.l_qseq);                                    // NON-refspaced query width
     record_width = bam_cigar2rlen(n_cigar, record_cigar);                       // reference length for the current query (refspaced)
 
+    if (usebed>0) {                                                             // valid for both simple overlap and clipping
+      const int irange_start = bam_rec->core.pos + trim5;                       // start of the irange, 0-based
+      const int irange_end = irange_start + record_width - trim3;               // end of the irange, 0-based
+      if (!intersects(targets[bam_rec->core.tid], T_irange::closed(irange_start, irange_end))) // if does not overlap
+        continue;                                                               // next record
+    }
+    
     // resize containers if necessary
     if (query_width > max_query_width) {
       max_query_width = query_width;                                            // expand template holders
@@ -526,13 +727,32 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
 
     // pushing record data to vectors, once for the record strand (even if there are no 'C+m') and once again if the other strand has mods too (has 'G-m')
     strand_has_mods[record_strand] = 1;                                         // always push at least one context string
-    for (int s=0; s<2; s++) {
-      if (strand_has_mods[s]) {
-        rname.push_back(bam_rec->core.tid + 1);                                 // RNAME+1
-        strand.push_back(s + 1);                                                // STRAND is 1 if "CT"/"+", 2 if "GA"/"-"
-        start.push_back(bam_rec->core.pos + trim5 + 1);                         // POS+1
-        seqxm->emplace_back( (const char*) record_seqxm_rs[s] + trim5, dest_pos - (trim5+trim3)); // SEQXM
-        npushed++;                                                              // +1
+    if (usebed<2) {                                                             // valid for both skip-BED and simple overlap
+      for (int s=0; s<2; s++) {
+        if (strand_has_mods[s]) {
+          rname.push_back(bam_rec->core.tid + 1);                               // RNAME+1
+          strand.push_back(s + 1);                                              // STRAND is 1 if "CT"/"+", 2 if "GA"/"-"
+          start.push_back(bam_rec->core.pos + trim5 + 1);                       // POS+1
+          seqxm->emplace_back( (const char*) record_seqxm_rs[s] + trim5, dest_pos - (trim5+trim3)); // SEQXM
+          npushed++;                                                            // +1
+        }
+      }
+    } else {                                                                    // clip to BED
+      const int irange_start = bam_rec->core.pos + trim5;                       // start of the irange, 0-based
+      const int irange_end = irange_start + dest_pos - trim3;                   // end of the irange, 0-based
+      for (T_irangeset::const_iterator it = find(targets[bam_rec->core.tid], T_irange::closed(irange_start, irange_end));
+           it != targets[bam_rec->core.tid].end() && it->lower() <= irange_end; ++it) { // iterate over all overlapping regions
+        const int overlap_start = std::max(it->lower(), irange_start);          // start of the overlap
+        const int overlap_end = std::min(it->upper(), irange_end);              // end of the overlap
+        for (int s=0; s<2; s++) {
+          if (strand_has_mods[s]) {
+            rname.push_back(bam_rec->core.tid + 1);                             // RNAME+1
+            strand.push_back(s + 1);                                            // STRAND is 1 if "CT"/"+", 2 if "GA"/"-"
+            start.push_back(overlap_start + 1);                                 // POS+1
+            seqxm->emplace_back( (const char*) record_seqxm_rs[s] + (overlap_start - bam_rec->core.pos), overlap_end-overlap_start+1); // SEQXM
+            npushed++;                                                          // +1
+          }
+        }
       }
     }
   }
@@ -575,6 +795,43 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
   return(res);
 }
 
+
+
+// [[Rcpp::export]]
+Rcpp::DataFrame rcpp_read_bam_mm_single_all (
+    std::string fn, Rcpp::DataFrame &bed, const int min_mapq,
+    const int min_baseq, const int min_prob, const bool highest_prob,
+    const uint16_t skip_flags, const int trim5, const int trim3,
+    const int nthreads)
+{
+  return rcpp_read_bam_mm_single<0>(fn, bed, min_mapq, min_baseq, min_prob,
+                                    highest_prob, skip_flags, trim5, trim3,
+                                    nthreads);
+}
+
+// [[Rcpp::export]]
+Rcpp::DataFrame rcpp_read_bam_mm_single_usebed (
+    std::string fn, Rcpp::DataFrame &bed, const int min_mapq,
+    const int min_baseq, const int min_prob, const bool highest_prob,
+    const uint16_t skip_flags, const int trim5, const int trim3,
+    const int nthreads)
+{
+  return rcpp_read_bam_mm_single<1>(fn, bed, min_mapq, min_baseq, min_prob,
+                                    highest_prob, skip_flags, trim5, trim3,
+                                    nthreads);
+}
+
+// [[Rcpp::export]]
+Rcpp::DataFrame rcpp_read_bam_mm_single_cliptobed (
+    std::string fn, Rcpp::DataFrame &bed, const int min_mapq,
+    const int min_baseq, const int min_prob, const bool highest_prob,
+    const uint16_t skip_flags, const int trim5, const int trim3,
+    const int nthreads)
+{
+  return rcpp_read_bam_mm_single<2>(fn, bed, min_mapq, min_baseq, min_prob,
+                                    highest_prob, skip_flags, trim5, trim3,
+                                    nthreads);
+}
 
 
 

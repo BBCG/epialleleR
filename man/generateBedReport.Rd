@@ -14,9 +14,9 @@ generateAmpliconReport(
   match.tolerance = 1,
   cytosine.context = c("CG", "CHG", "CHH", "CxG", "CX"),
   filter.reads = TRUE,
+  min.context.sites = 0,
   max.outofcontext.beta = 0.1,
   threshold.reads = TRUE,
-  min.context.sites = 2,
   min.context.beta = 0.5,
   ...,
   gzip = FALSE,
@@ -31,9 +31,9 @@ generateCaptureReport(
   match.min.overlap = 1,
   cytosine.context = c("CG", "CHG", "CHH", "CxG", "CX"),
   filter.reads = TRUE,
+  min.context.sites = 0,
   max.outofcontext.beta = 0.1,
   threshold.reads = TRUE,
-  min.context.sites = 2,
   min.context.beta = 0.5,
   ...,
   gzip = FALSE,
@@ -50,9 +50,9 @@ generateBedReport(
   match.min.overlap = 1,
   cytosine.context = c("CG", "CHG", "CHH", "CxG", "CX"),
   filter.reads = TRUE,
+  min.context.sites = 0,
   max.outofcontext.beta = 0.1,
   threshold.reads = TRUE,
-  min.context.sites = 2,
   min.context.beta = 0.5,
   ...,
   gzip = FALSE,
@@ -76,7 +76,7 @@ pairs) matching both strands are separately counted and reported.}
 (the default) then report is returned as a
 \code{\link[data.table]{data.table}} object.}
 
-\item{zero.based.bed}{boolean defining if BED coordinates are zero based
+\item{zero.based.bed}{boolean defining if BED coordinates are zero-based
 (default: FALSE).}
 
 \item{match.tolerance}{integer for the largest difference between read's and
@@ -96,10 +96,19 @@ for filtering and/or thresholding the reads:
   effectively results in no thresholding
 }}
 
-\item{filter.reads}{boolean defining if sequence reads with too high
-out-of-context cytosine methylation should be filtered out (e.g.,
-reads resulting from incompletely bisulfite-converted templates).
-Default: TRUE.}
+\item{filter.reads}{boolean defining if sequence reads with too few context
+bases or too high out-of-context cytosine methylation should be filtered
+out (e.g., reads resulting from incompletely bisulfite-converted templates).
+Default: TRUE. Filtering is strongly recommended for short-read sequencing
+(bisulfite or enzymatic) because it removes reads from incompletely
+converted DNA molecules.}
+
+\item{min.context.sites}{non-negative integer for minimum number of cytosines
+within the `cytosine.context` (default: 0, i.e., all reads will satisfy this
+criterion). When `min.context.sites`>0, reads containing \strong{fewer}
+within-the-context cytosines
+will not be thresholded and will be ignored in further computations.
+This option has no effect when read filtering is disabled.}
 
 \item{max.outofcontext.beta}{real number in the range [0;1] (default: 0.1).
 Reads with average beta value for out-of-context cytosines \strong{above}
@@ -112,15 +121,7 @@ TRUE). Disabling thresholding is possible but makes no sense in the context
 of this function, because
 all the reads will be assigned to the variant epiallele, which will result
 in VEF==1 (in such case `NA` VEF values are returned in order to avoid
-confusion). As thresholding is \strong{not} recommended for long-read
-sequencing data, this function is \strong{not} recommended for such data
-either.}
-
-\item{min.context.sites}{non-negative integer for minimum number of cytosines
-within the `cytosine.context` (default: 2). Reads containing \strong{fewer}
-within-the-context cytosines are considered completely unmethylated (thus
-belonging to the reference epiallele). This option has no effect when read
-thresholding is disabled.}
+confusion).}
 
 \item{min.context.beta}{real number in the range [0;1] (default: 0.5). Reads
 with average beta value for within-the-context cytosines \strong{below} this
@@ -179,7 +180,7 @@ The report columns are:
   \item nreads- -- number of valid reads (pairs) mapped to the reverse ("-")
   strand
   \item nfiltered -- number of invalid reads (pairs) filtered out due to
-  too high out-of-context cytosine methylation
+  too few context bases or too high out-of-context cytosine methylation
   (`NA` if filtering was disabled)
   \item VEF -- fraction of valid reads passing the threshold
   (`NA` if thresholding was disabled)
@@ -207,33 +208,35 @@ the bottom of this page.
 
 Suppose there is a BAM file with four reads, all mapped to the "+"
 strand of chromosome 1, positions 1-16. The genomic range is supplied as a
-parameter `bed = as("chr1:1-100", "GRanges")`. Assuming the default values
+parameter `bed = as("chr1:1-100", "GRanges")`. Assuming the following values
 for the filtering and thresholding parameters (cytosine.context = "CG",
-filter.reads = TRUE, max.outofcontext.beta = 0.1,
-threshold.reads = TRUE, min.context.sites = 2, min.context.beta = 0.5),
+filter.reads = TRUE, min.context.sites = 2, max.outofcontext.beta = 0.1,
+threshold.reads = TRUE, min.context.beta = 0.5),
 the input and the output results will look as follows:
 
 \tabular{llll}{
   methylation string \tab filter \tab threshold \tab explained \cr
-  ...Z..x+.h..x..h. \tab pass \tab below \tab min.context.sites < 2 (only one zZ base) \cr
+  ...Z..x+.h..x..h. \tab excluded \tab <NA> \tab min.context.sites < 2 (only one zZ base) \cr
   ...Z..z.h..x..h.  \tab pass \tab above \tab pass all criteria \cr
   ...Z..z.h..X..h.  \tab excluded \tab <NA> \tab max.outofcontext.beta > 0.1 (1XH / 3xXhH = 0.33) \cr
   ...Z..z.h..z-.h.  \tab pass \tab below \tab min.context.beta < 0.5 (1Z / 3zZ = 0.33)
 }
 
-Since the read number three is filtered out, and only the second read will
-satisfy all of the thresholding criteria, the following BED report will be 
-produced (again, given that all reads map to chr1:+:1-16):
+Since the reads number one and three are filtered out, and only the second
+read will satisfy the thresholding criteria, the following BED report
+will be produced (again, given that all reads map to chr1:+:1-16):
 
 \tabular{lllllllll}{
   seqnames \tab start \tab end \tab width \tab strand \tab nreads+ \tab nreads- \tab nfiltered \tab VEF \cr
-  chr1 \tab 1 \tab 100 \tab 100 \tab * \tab 3 \tab 0 \tab 1 \tab 0.3333333
+  chr1 \tab 1 \tab 100 \tab 100 \tab * \tab 2 \tab 0 \tab 2 \tab 0.5
 }
 
 Please note, that read thresholding by an average methylation level
 (as explained above) makes little sense for long-read sequencing alignments,
 as such reads can cover multiple regions with very different DNA methylation
-properties. Instead, one should use \code{\link{extractPatterns}}, limiting
+properties. If necessary, one could either clip long sequencing reads to
+narrow `targets` in \code{\link{preprocessBam}} function during BAM loading
+or use \code{\link{extractPatterns}}, limiting
 pattern output to the region of interest only.
 }
 \examples{
@@ -244,6 +247,11 @@ pattern output to the region of interest only.
                                  package="epialleleR")
   amplicon.report <- generateAmpliconReport(bam=amplicon.bam,
                                             bed=amplicon.bed)
+  plotPatterns(
+    extractPatterns(
+      bam=amplicon.bam, bed=amplicon.bed, match.min.overlap=100
+    ), npatterns.per.bin=Inf
+  )
   
   # capture NGS
   capture.bam    <- system.file("extdata", "capture.bam",
@@ -258,16 +266,39 @@ pattern output to the region of interest only.
                                   bed.type="capture")
   identical(capture.report, bed.report)
   
+  # long-read data can be used if clipped to a narrow target area(s)
+  long.bam <- system.file("extdata", "longread.bam", package="epialleleR")
+  long.bed <- as("chr17:43124909-43125554", "GRanges")
+  long.data <- preprocessBam(
+    bam=long.bam, targets=long.bed, clip.to.targets=TRUE,
+    min.mapq=30, min.baseq=20, min.prob=178
+  )
+  long.report <- generateBedReport(
+    bam=long.data, bed=long.bed, bed.type="capture", filter.reads=FALSE
+  )
+  plotPatterns(
+    extractPatterns(bam=long.data, bed=long.bed),
+    npatterns.per.bin=Inf
+  )
+  
   # toy example from the description
-  temp.bam <- tempfile(fileext=".bam") 
+  temp.bam <- tempfile(fileext=".bam")
+  temp.bed <- as("chr1:1-100", "GRanges")
   simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
-              XM=c("...Z..x+.h..x..h.", "...Z..z.h..x..h.",
-                   "...Z..z.h..X..h.",  "...Z..z.h..z-.h."))
+              seq=c("AGACGTTAGTAATAGTA", "AAACGTTGTAATAGTA",
+                    "AGACGTTGTAACAGTA",  "AAACGTTGTAATGTA"),
+              XM=c( "...Z..x+.h..x..h.", "...Z..z.h..x..h.",
+                    "...Z..z.h..X..h.",  "...Z..z.h..z.h."),
+              cigar=c("7M1I9M", "16M", "16M", "12M1D3M"))
   # with read filtering
-  generateBedReport(bam=temp.bam, bed=as("chr1:1-100", "GRanges"))
+  generateBedReport(bam=temp.bam, bed=temp.bed, min.context.sites=2)
   # without read filtering
-  generateBedReport(bam=temp.bam, bed=as("chr1:1-100", "GRanges"),
-                    filter.reads=FALSE)
+  generateBedReport(bam=temp.bam, bed=temp.bed, filter.reads=FALSE)
+  # patterns plotted
+  plotPatterns(
+    extractPatterns(bam=temp.bam, bed=temp.bed, extract.context="CX"),
+    plot.context="CX", npatterns.per.bin=Inf
+  )
 }
 \seealso{
 \code{\link{preprocessBam}} for preloading BAM data,

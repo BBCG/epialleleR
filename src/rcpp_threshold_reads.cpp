@@ -1,15 +1,15 @@
 #include <Rcpp.h>
 #include "epialleleR.h"
-// using namespace Rcpp;
 
 // Read thresholding
 // Output: bool vector with "true" for reads passing/above thresholding criteria
 //
 // This one would def benefit from:
 // [ ] OpenMP
-// [ ] fewer branches
-// [x] FALSE as a default
-// [x] filter hyper-ooctx-methylated (NA_LOGICAL)
+// [x] fewer branches
+// [x] FALSE as a default (now NA_LOGICAL)
+// [x] filter out hyper-ooctx-methylated (NA_LOGICAL)
+// [x] filter out ones with too few context bases (NA_LOGICAL)
 
 // filtering + thresholding, vectorised, ascii-based
 template<bool filter, bool threshold>                                           // templated for 'filter' and 'threshold'
@@ -41,7 +41,7 @@ Rcpp::LogicalVector rcpp_fltthrshld_reads(Rcpp::DataFrame &df,                  
   const char* ooctx_unmeth_cstr = ooctx_unmeth.c_str();
   const unsigned int ooctx_unmeth_size = ooctx_unmeth.size();
   
-  std::vector<int> res (seqxm->size(), threshold ? false : true);               // must be <int> because <bool> doesn't store NA_LOGICAL
+  std::vector<int> res (seqxm->size(), NA_LOGICAL);                             // must be <int> because <bool> doesn't store NA_LOGICAL
   for (unsigned int x=0; x<seqxm->size(); x++) {
     // checking for the interrupt
     if ((x & 0xFFFFF) == 0) Rcpp::checkUserInterrupt();
@@ -53,45 +53,37 @@ Rcpp::LogicalVector rcpp_fltthrshld_reads(Rcpp::DataFrame &df,                  
       ctx_map[unpack_ctx_idx(seqxm_x[i])]++;                                    // extract lower 4 bits (XM) and count them;
     }
     
+    unsigned int n_ctx_meth = 0;
+    unsigned int n_ctx_unmeth = 0;
+    unsigned int n_ooctx_meth = 0;
+    unsigned int n_ooctx_unmeth = 0;
+    
+    for (unsigned int i=0; i<ctx_meth_size; i++)
+      n_ctx_meth += ctx_map[ctx_to_idx(ctx_meth_cstr[i])];                      // count ctx-methylated bases
+    for (unsigned int i=0; i<ctx_unmeth_size; i++)
+      n_ctx_unmeth += ctx_map[ctx_to_idx(ctx_unmeth_cstr[i])];                  // count ctx-unmethylated bases
+    const unsigned int n_ctx_all = n_ctx_meth + n_ctx_unmeth;                   // all bases within ctx
+    
+    
     if (filter) {
-      unsigned int n_ooctx_meth = 0;
-      for (unsigned int i=0; i<ooctx_meth_size; i++) {
-        n_ooctx_meth += ctx_map[ctx_to_idx(ooctx_meth_cstr[i])];                // count ooctx-methylated bases;
-      }
+      if (n_ctx_all<min_n_ctx) continue;                                        // next read (keep NA_LOGICAL) if total number of context bases is less than min_n_ctx
+      for (unsigned int i=0; i<ooctx_meth_size; i++)
+        n_ooctx_meth += ctx_map[ctx_to_idx(ooctx_meth_cstr[i])];                // count ooctx-methylated bases
       if (n_ooctx_meth>0) {                                                     // only if there are any ooctx-methylated bases
-        unsigned int n_ooctx_unmeth = 0;
-        for (unsigned int i=0; i<ooctx_unmeth_size; i++) {
-          n_ooctx_unmeth += ctx_map[ctx_to_idx(ooctx_unmeth_cstr[i])];          // count ooctx-unmethylated bases;
-        }
-        unsigned int n_ooctx_all = n_ooctx_meth + n_ooctx_unmeth;
-        double ooctx_meth_frac = (double)n_ooctx_meth / n_ooctx_all;
-        if (ooctx_meth_frac>max_ooctx_meth_frac) {
-          res[x] = NA_LOGICAL;                                                  // NA_LOGICAL if average out-of-context beta is higher than max_ooctx_meth_frac
-          continue;
-        }
+        for (unsigned int i=0; i<ooctx_unmeth_size; i++)
+          n_ooctx_unmeth += ctx_map[ctx_to_idx(ooctx_unmeth_cstr[i])];          // count ooctx-unmethylated bases
+        const unsigned int n_ooctx_all = n_ooctx_meth + n_ooctx_unmeth;         // all bases outside of ctx
+        const double ooctx_meth_frac = (double)n_ooctx_meth / std::max(n_ooctx_all, 1U); // account for possible 0 ooctx sites
+        if (ooctx_meth_frac>max_ooctx_meth_frac) continue;                      // next read (keep NA_LOGICAL) if average out-of-context beta is higher than max_ooctx_meth_frac
       }
     }
     
     if (threshold) {
-      unsigned int n_ctx_meth = 0;
-      for (unsigned int i=0; i<ctx_meth_size; i++) {
-        n_ctx_meth += ctx_map[ctx_to_idx(ctx_meth_cstr[i])];                    // count ctx-methylated bases;
-      }
-      if (n_ctx_meth==0) continue;                                              // next read if no methylated context bases
-      
-      unsigned int n_ctx_unmeth = 0;
-      for (unsigned int i=0; i<ctx_unmeth_size; i++) {
-        n_ctx_unmeth += ctx_map[ctx_to_idx(ctx_unmeth_cstr[i])];                // count ctx-unmethylated bases;
-      }
-      unsigned int n_ctx_all = n_ctx_meth + n_ctx_unmeth;
-      if (n_ctx_all<min_n_ctx) continue;                                        // next read if total number of context bases is less than min_n_ctx
-      
-      double ctx_meth_frac = (double)n_ctx_meth / n_ctx_all;
-      if (ctx_meth_frac<min_ctx_meth_frac) continue;                            // next read if average context beta is less than min_ctx_meth_frac
-      
-      res[x] = true;                                                            // otherwise, TRUE, as read has passed all the thresholds
+      double ctx_meth_frac = (double)n_ctx_meth / std::max(n_ctx_all, 1U);      // account for possible 0 ctx sites
+      res[x] = (ctx_meth_frac>=min_ctx_meth_frac);                              // true if average context beta is more or equal to min_ctx_meth_frac, false otherwise
+    } else {
+      res[x] = true;
     }
-    
   }
   
   Rcpp::LogicalVector res_bool = Rcpp::wrap(res);

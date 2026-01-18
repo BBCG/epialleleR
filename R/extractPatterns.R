@@ -103,6 +103,20 @@
 #'   # and then plot them
 #'   plotPatterns(patterns)
 #'   
+#'   # patterns from long reads, clipped to two narrow areas of interest
+#'   long.bam <- system.file("extdata", "longread.bam", package="epialleleR")
+#'   long.bed <- as(c("chr17:43125000-43125999", "chr17:43126001-43126999"),
+#'                  "GRanges")
+#'   long.data <- preprocessBam(
+#'     bam=long.bam, targets=long.bed, clip.to.targets=TRUE,
+#'     min.mapq=30, min.baseq=20, min.prob=178
+#'   )
+#'   plotPatterns(
+#'     extractPatterns(bam=long.data,
+#'                     bed=as("chr17:43125000-43127000", "GRanges")),
+#'     npatterns.per.bin=Inf
+#'   )
+#'   
 #' @export
 extractPatterns <- function (bam,
                              bed,

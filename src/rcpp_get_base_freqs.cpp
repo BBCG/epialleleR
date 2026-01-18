@@ -4,9 +4,9 @@
 
 // Matches reads with given 1-base positions (VCF) and returns base frequencies.
 // FUNCTION ASSUMES THAT BOTH READS AND VCF ENTRIES ARE SORTED!
-// Return value: std::array<int,20> for each position in VCF
+// Return value: std::array<int,21> for each position in VCF
 // Array indices are 0123 for ACGT, and 4 for N and extended IUPAC,
-// thus they appear as following: U+*5, U-*5, M+*5, M-*5
+// thus they appear as following: U+*5, U-*5, M+*5, M-*5, nfiltered
 
 
 // MATCH VCF ENTRIES, RETURN BASE FREQS
@@ -25,15 +25,12 @@ Rcpp::NumericMatrix rcpp_get_base_freqs(Rcpp::DataFrame &df,                    
   Rcpp::IntegerVector vcf_chr = vcf["seqnames"];                                // VCF rname
   Rcpp::IntegerVector vcf_pos = vcf["start"];                                   // VCF start
   
-  Rcpp::NumericMatrix res(vcf_pos.size(),20);
+  Rcpp::NumericMatrix res(vcf_pos.size(),21);
   
   int cur_vcf=0;
   for (unsigned int x=0; x<read_start.size(); x++) {
     // checking for the interrupt
     if ((x & 0xFFFFF) == 0) Rcpp::checkUserInterrupt();
-    
-    // skip the read if filtered out
-    if (pass[x]==NA_LOGICAL) continue;
     
     const int read_rname_x = read_rname[x];
     const int read_start_x = read_start[x];
@@ -52,10 +49,14 @@ Rcpp::NumericMatrix rcpp_get_base_freqs(Rcpp::DataFrame &df,                    
       }
       if (vcf_chr_i==read_rname_x &&
           vcf_pos_i>=read_start_x && vcf_pos_i<=read_end_x) {                   // match found
-        int idx = seq_nt16_int[unpack_seq_idx(seqxm->at(templid[x])[vcf_pos_i-read_start_x])]; // index of a base, [0;4]
-        idx += (read_strand[x]-1) * 5;                                          // shift by 5 if '-' strand (==2)
-        idx += ((bool)(pass[x])) * 10;                                          // shift by 10 if pass==TRUE (==1)
-        res(i,idx)++;
+        if (pass[x]==NA_LOGICAL) {
+          res(i,20)++;                                                          // nfiltered++
+        } else {
+          int idx = seq_nt16_int[unpack_seq_idx(seqxm->at(templid[x])[vcf_pos_i-read_start_x])]; // index of a base, [0;4]
+          idx += (read_strand[x]-1) * 5;                                        // shift by 5 if '-' strand (==2)
+          idx += ((bool)(pass[x])) * 10;                                        // shift by 10 if pass==TRUE (==1)
+          res(i,idx)++;
+        }
       }
     }
   }

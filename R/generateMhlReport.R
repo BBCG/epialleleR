@@ -115,6 +115,9 @@
 #' out-of-context cytosine methylation (specified by `max.outofcontext.beta`)
 #' or too few within-the-context bases (specified by `min.haplotype.length`)
 #' should be filtered out. Default: TRUE.
+#' Filtering is strongly recommended for short-read sequencing
+#' (bisulfite or enzymatic) because it removes reads from incompletely
+#' converted DNA molecules.
 #' @param min.haplotype.length non-negative integer for minimum length of a
 #' haplotype (default: 0 will include haplotypes of any length).
 #' When `min.haplotype.length`>0, reads
@@ -174,6 +177,14 @@
 #'     mhl.report[, .(rname, strand, pos, context, value=lmhl)],
 #'     cg.report[ , .(rname, strand, pos, context, value=meth/(meth+unmeth))]
 #'   )
+#'   
+#'   # Long-read sequencing with filtering disabled, using window of 10 CpGs
+#'   long.bam <- system.file("extdata", "longread.bam", package="epialleleR")
+#'   long.data <- preprocessBam(bam=long.bam, min.mapq=30, min.baseq=20,
+#'                              min.prob=178)
+#'   mhl.report <- generateMhlReport(bam=long.data, max.haplotype.window=10,
+#'                                   filter.reads=FALSE)
+#'   plot(mhl.report[, .(pos, lmhl=data.table::frollmean(lmhl, 100))], type="l")
 #'   
 #'   ## toy examples to illustrate the logic of computations
 #'   temp.bam <- tempfile(fileext=".bam")

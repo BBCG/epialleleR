@@ -13,9 +13,9 @@ generateVcfReport(
   zero.based.bed = FALSE,
   cytosine.context = c("CG", "CHG", "CHH", "CxG", "CX"),
   filter.reads = TRUE,
+  min.context.sites = 0,
   max.outofcontext.beta = 0.1,
   threshold.reads = TRUE,
-  min.context.sites = 2,
   min.context.beta = 0.5,
   ...,
   gzip = FALSE,
@@ -69,10 +69,19 @@ for filtering and/or thresholding the reads:
   effectively results in no thresholding
 }}
 
-\item{filter.reads}{boolean defining if sequence reads with too high
-out-of-context cytosine methylation should be filtered out (e.g.,
-reads resulting from incompletely bisulfite-converted templates).
-Default: TRUE.}
+\item{filter.reads}{boolean defining if sequence reads with too few context
+bases or too high out-of-context cytosine methylation should be filtered
+out (e.g., reads resulting from incompletely bisulfite-converted templates).
+Default: TRUE. Filtering is strongly recommended for short-read sequencing
+(bisulfite or enzymatic) because it removes reads from incompletely
+converted DNA molecules.}
+
+\item{min.context.sites}{non-negative integer for minimum number of cytosines
+within the `cytosine.context` (default: 0, i.e., all reads will satisfy this
+criterion). When `min.context.sites`>0, reads containing \strong{fewer}
+within-the-context cytosines
+will not be thresholded and will be ignored in further computations.
+This option has no effect when read filtering is disabled.}
 
 \item{max.outofcontext.beta}{real number in the range [0;1] (default: 0.1).
 Reads with average beta value for out-of-context cytosines \strong{above}
@@ -85,15 +94,7 @@ thresholded before counting bases in reference and variant epialleles
 the context of this function, because
 all the reads will be assigned to the variant epiallele,
 which will result in Fisher's Exact test p-value of 1 (in columns `FEp+` and
-`FEP-`). As thresholding is \strong{not} recommended for long-read
-sequencing data, this function is \strong{not} recommended for such data
-either.}
-
-\item{min.context.sites}{non-negative integer for minimum number of cytosines
-within the `cytosine.context` (default: 2). Reads containing \strong{fewer}
-within-the-context cytosines are considered completely unmethylated (thus
-belonging to the reference epiallele). This option has no effect when read
-thresholding is disabled.}
+`FEP-`).}
 
 \item{min.context.beta}{real number in the range [0;1] (default: 0.5). Reads
 with average beta value for within-the-context cytosines \strong{below} this
@@ -118,6 +119,7 @@ NULL if report.file was specified. The report columns are:
   \item range -- genomic coordinates of the variation
   \item REF -- base at the reference allele
   \item ALT -- base at the alternative allele
+  \item nfiltered -- number of filtered out reads
   \item [M|U][+|-][Ref|Alt] -- number of \strong{Ref}erence or
   \strong{Alt}ernative bases that were found at this particular position
   within \strong{M}ethylated (above threshold) or \strong{U}nmethylated
@@ -176,14 +178,16 @@ Please note that the final report currently includes only the VCF entries
 with single-base REF and ALT alleles. Also, the default (`min.baseq=0`)
 output of `generateVcfReport` is equivalent to the one of
 `samtools mplieup -Q 0 ...`, and therefore may result in false SNVs caused
-by misalignments. Remember to increase `min.baseq` (`samtools mplieup -Q`
+by misalignments. Remember to increase `min.baseq` (`samtools mpileup -Q`
 default value is 13) to obtain higher-quality results.
 
 Read thresholding by an average methylation level used in this function
 makes little sense for long-read sequencing alignments,
 as such reads can cover multiple regions with very different DNA methylation
-properties. Instead, please use \code{\link{extractPatterns}},
-limiting pattern output to the region of interest only.
+properties. If necessary, one could either clip long sequencing reads to
+narrow `targets` in \code{\link{preprocessBam}} function during BAM loading
+or use \code{\link{extractPatterns}}, limiting
+pattern output to the region of interest only.
 }
 \examples{
   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
@@ -200,8 +204,8 @@ limiting pattern output to the region of interest only.
     # simulate toy BAM
     temp.bam <- tempfile(fileext=".bam")
     simulateBam(output.bam.file=temp.bam, rname="chr1", XG="CT",
-                seq=c("AGACGTTAGTAATAGTA", "AAACGTTGTAATAGTA",
-                      "AGACGTTGTAACAGTA",  "AAACGTTGTAATGTA"),
+                seq=c("AGACGTTAGTAATAGTA", "AGACGTTGTAATAGTA",
+                      "AAACGTTGTAACAGTA",  "AAACGTTGTAATGTA"),
                 XM=c( "...Z..x+.h..x..h.", "...Z..z.h..x..h.",
                       "...Z..z.h..X..h.",  "...Z..z.h..z.h."),
                 cigar=c("7M1I9M", "16M", "16M", "12M1D3M"))
@@ -211,8 +215,9 @@ limiting pattern output to the region of interest only.
     VariantAnnotation::ref(vcf) <- as("A", "DNAStringSet")
     VariantAnnotation::alt(vcf) <- as("G", "DNAStringSet")
     
-    # read filtering will exclude third read from BAM file because it has
-    # too many out-of-context methylated cytosines (in position #12).
+    # when default values of filtering and thresholding parameters are used,
+    # read filtering will exclude the third read from this BAM file
+    # because it has too many outside-of-context methylated cytosines.
     
     # results with read filtering and thresholding
     generateVcfReport(bam=temp.bam, vcf=vcf)
