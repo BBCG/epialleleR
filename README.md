@@ -7,20 +7,23 @@
 
 ## Introduction
 
-*`epialleleR`* is an R package for calling and reporting cytosine methylation
-and hypermethylated variant epiallele frequencies (VEF) at the level of
-genomic regions or individual cytosines
-in next-generation sequencing data using binary alignment map (BAM) files as
-an input. See below for additional functionality.
+*`epialleleR`* is an R package for calling and reporting cytosine DNA
+methylation in many useful ways. Developed to help identify and quantify
+epimutations (aberrant DNA methylation), it has now acquired multiple
+additional functions to dissect DNA methylation. But the main feature of the
+package is to report frequencies of epimutations (variant epiallele
+frequencies, VEF) at the level of genomic regions or individual cytosines. All
+you need in order to use it is a binary alignment map (BAM) file from
+basically any next-generation (methylation or native) sequencing experiment.
 
 ![](./vignettes/epialleles.png)
 
 ### Current Features
 
- * calling cytosine methylation and saving calls in BAM file
+ * calling cytosine methylation and saving calls in a new BAM file
  (*`callMethylation`*)
- * creating sample BAM files given mandatory and optional BAM fields
- (*`simulateBam`*)
+ * creating sample BAM files from scratch given mandatory and optional
+ BAM fields (*`simulateBam`*)
  * conventional reporting of cytosine methylation (*`generateCytosineReport`*)
  * reporting the hypermethylated variant epiallele frequency (VEF) at the
  level of genomic regions (*`generate[Bed|Amplicon|Capture]Report`*) or
@@ -35,22 +38,30 @@ an input. See below for additional functionality.
  * assessing the distribution of per-read beta values for genomic regions of
  interest (*`generateBedEcdf`*)
  
+### Input Data
+
+* short-read and long-read (native)
+* paired-end and single-end
+* whole-genome, genome-wide (e.g., hybridization capture or adaptive sampling),
+  and narrowly targeted (e.g., amplicon panels)
+
 ### Recent improvements
 
 ##### v1.20 [BioC 3.23]
 
+ * using genomic coordinates of targets, only a subset of BAM reads or only
+ fragments of BAM reads that are overlapping the targets can now be loaded
  * disrupting API changes in `generate*Report` (from version 1.19.1 onwards):
  new parameter `filter.reads` regulates filtering of reads with too few
  cytosines or presumable incomplete conversion of cytosines;
  `cytosine.context` parameter instead of
  `threshold.context`/`haplotype.context`
  * disrupting change in thresholding logic (from version 1.19.1 onwards):
- reads with too few within-the-context cytosines or
- out-of-context cytosine methylation higher than
+ reads with too few within-the-context cytosines (less than `min.context.sites`)
+ or out-of-context cytosine methylation higher than
  `max.outofcontext.beta` are filtered out (discarded) instead of being counted
  as hypomethylated reads (as was in v1.19.0 and earlier)
- * using genomic coordinates of targets, only a subset of BAM reads or only
- fragments of BAM reads that are overlapping the targets can now be loaded
+ * new default value of 0 for `min.context.sites`
 
 ##### v1.14 [BioC 3.20]
 
@@ -147,6 +158,10 @@ bam.data <- preprocessBam(amplicon.bam)
 # methylation patterns and their plot
 patterns <- extractPatterns(bam=amplicon.bam, bed=amplicon.bed, bed.row=3)
 plotPatterns(patterns)
+
+# conventional cytosine report
+cx.report <- generateCytosineReport(bam.data, filter.reads=FALSE,
+                                    threshold.reads=FALSE, report.context="CX")
 
 # CpG VEF report for individual bases
 cg.vef.report <- generateCytosineReport(bam.data)
