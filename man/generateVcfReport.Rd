@@ -72,12 +72,15 @@ for filtering and/or thresholding the reads:
 \item{filter.reads}{boolean defining if sequence reads with too few context
 bases or too high out-of-context cytosine methylation should be filtered
 out (e.g., reads resulting from incompletely bisulfite-converted templates).
-Default: TRUE.}
+Default: TRUE. Filtering is strongly recommended for short-read sequencing
+(bisulfite or enzymatic) because it removes reads from incompletely
+converted DNA molecules.}
 
 \item{min.context.sites}{non-negative integer for minimum number of cytosines
-within the `cytosine.context` (default: 0). Reads containing \strong{fewer}
-within-the-context cytosines will not be thresholded and will be ignored
-in further computations.
+within the `cytosine.context` (default: 0, i.e., all reads will satisfy this
+criterion). When `min.context.sites`>0, reads containing \strong{fewer}
+within-the-context cytosines
+will not be thresholded and will be ignored in further computations.
 This option has no effect when read filtering is disabled.}
 
 \item{max.outofcontext.beta}{real number in the range [0;1] (default: 0.1).
@@ -211,9 +214,9 @@ pattern output to the region of interest only.
     VariantAnnotation::ref(vcf) <- as("A", "DNAStringSet")
     VariantAnnotation::alt(vcf) <- as("G", "DNAStringSet")
     
-    # read filtering will exclude the first and the third reads from this
-    # BAM file because they have too few context bases or
-    # too many out-of-context methylated cytosines, respectively.
+    # when default values of filtering and thresholding parameters are used,
+    # read filtering will exclude the third read from this BAM file
+    # because it has too many outside-of-context methylated cytosines.
     
     # results with read filtering and thresholding
     generateVcfReport(bam=temp.bam, vcf=vcf)

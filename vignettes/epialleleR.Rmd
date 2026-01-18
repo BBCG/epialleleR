@@ -218,7 +218,7 @@ related files are:
 | capture.vcf.gz | VCF | a relevant subset of sequence variations |
 | capture.vcf.gz.tbi | tabix | tabix file for the capture.vcf.gz |
 
-### Long-read native NGS data
+### Long-read native NGS data (adaptive sampling)
 
 The blood DNA was fragmented, ligated with adapters, and sequenced using 
 Oxford Nanopore PromethION P2 Solo system. Base calling and CpG cytosine
@@ -257,8 +257,8 @@ in help pages for `generate*Report` functions.
 
 As mentioned earlier, *`epialleleR`* uses data stored in Binary Alignment Map
 (BAM) files as its input and currently allows to load both short-read
-(e.g., bisulfite) and long-read (native) sequencing alignments. Specific
-requirements for these types of data are given below. Additionally, 
+(e.g., bisulfite or EM-seq) and long-read (native) sequencing alignments.
+Specific requirements for these types of data are given below. Additionally, 
 please check the *`preprocessBam`* function help file for a full description
 of available parameters, as well as explanation of the function's logic.
 
@@ -298,8 +298,8 @@ function is also used internally when a BAM file location string is supplied as
 an input for other *`epialleleR`* methods.
 
 *`preprocessBam`* automatically determines if BAM file contains paired- or
-single-end alignments and has all the necessary tags (XM/XG) available. It is
-recommended to use *`verbose`* processing and check messages for correct
+single-end alignments and has all the necessary tags (XM+XG, MM+ML) available.
+It is recommended to use *`verbose`* processing and check messages for correct
 identification of alignment endness. Otherwise, if the *`paired`* parameter is
 set explicitly, exception (or warning if *`override.check=TRUE`*) is thrown
 when expected endness differs from the auto detected one.
@@ -335,7 +335,7 @@ reads.
 It is also possible to load only a subset of reads (read pairs) of interest
 or only fragments of such reads by supplying a list of targets (see description
 of *`targets`* and other related options in the help page for *`preprocessBam`*
-function). The subsetting is performed without using BAM index.
+function). Currently, the subsetting is performed without using BAM index.
 
 ### Specific considerations for long-read sequencing data:
 
@@ -365,7 +365,8 @@ library(epialleleR)
 
 # short-read sequencing
 capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
-bam.data    <- preprocessBam(capture.bam)
+capture.bed <- system.file("extdata", "capture.bed", package="epialleleR")
+bam.data    <- preprocessBam(capture.bam, targets=capture.bed)
 generateCytosineReport(bam.data)
 
 # long-read sequencing
@@ -428,7 +429,11 @@ Also, by default, *`generateCytosineReport`* (as well as *`generateBedReport`*,
 have too few cytosines within the context or too high out-of-context
 cytosine methylation (presumably, resulting from
 incomplete cytosine conversion). To disable this behaviour, run the method with
-the following parameters: *`filter.reads=FALSE`* (although, not recommended).
+the following parameters: *`filter.reads=FALSE`*.
+
+Please note that the iltering is strongly recommended for short-read sequencing
+(bisulfite or enzymatic) because it removes reads from incompletely
+converted DNA molecules.
 
 ```{r}
 # data.table::data.table object for
@@ -543,6 +548,18 @@ capture.patterns <- extractPatterns(
 # let's plot all the patterns using discrete genomic scale
 plotPatterns(capture.patterns, npatterns.per.bin=Inf,
              genomic.scale="discrete", context.size=1)
+
+# patterns from long-read data
+long.bam <- system.file("extdata", "longread.bam", package="epialleleR")
+long.bed <- as("chr17:43124909-43125554", "GRanges")
+long.data <- preprocessBam(
+  bam=long.bam, targets=long.bed, clip.to.targets=TRUE,
+  min.mapq=30, min.baseq=20, min.prob=178
+)
+plotPatterns(
+  extractPatterns(bam=long.data, bed=long.bed),
+  npatterns.per.bin=Inf
+)
 ```
 
 ## Exploring sequence variants in epialleles
@@ -573,8 +590,8 @@ vcf.report <- generateVcfReport(
   bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
   bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
   vcf=system.file("extdata", "amplicon.vcf.gz", package="epialleleR"),
-  # thresholds on alignment and base quality
-  min.mapq=30, min.baseq=13,
+  # higher thresholds on alignment and base quality
+  min.mapq=30, min.baseq=20,
   # when VCF seqlevels are different from BED and BAM it is possible
   # to convert them internally
   vcf.style="NCBI"

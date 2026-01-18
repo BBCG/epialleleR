@@ -63,7 +63,10 @@ explanation and more examples, see Details section and vignette.}
 \item{filter.reads}{boolean defining if sequence reads with too high
 out-of-context cytosine methylation (specified by `max.outofcontext.beta`)
 or too few within-the-context bases (specified by `min.haplotype.length`)
-should be filtered out. Default: TRUE.}
+should be filtered out. Default: TRUE.
+Filtering is strongly recommended for short-read sequencing
+(bisulfite or enzymatic) because it removes reads from incompletely
+converted DNA molecules.}
 
 \item{min.haplotype.length}{non-negative integer for minimum length of a
 haplotype (default: 0 will include haplotypes of any length).

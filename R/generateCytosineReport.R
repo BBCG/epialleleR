@@ -17,10 +17,10 @@
 #' the bottom of this page.
 #' 
 #' Let's suppose we have a BAM file with four reads, all mapped to the "+"
-#' strand of chromosome 1, positions 1-16. Assuming the default values
-#' for the thresholding parameters (cytosine.context = "CG",
-#' filter.reads=TRUE, max.outofcontext.beta = 0.1,
-#' threshold.reads = TRUE, min.context.sites = 2, min.context.beta = 0.5),
+#' strand of chromosome 1, positions 1-16. Assuming the following values
+#' for the filtering and thresholding parameters (cytosine.context = "CG",
+#' filter.reads=TRUE, min.context.sites = 2, max.outofcontext.beta = 0.1,
+#' threshold.reads = TRUE, min.context.beta = 0.5),
 #' the input and results will look as following:
 #' 
 #' \tabular{lllll}{
@@ -108,11 +108,14 @@
 #' @param filter.reads boolean defining if sequence reads with too few context
 #' bases or too high out-of-context cytosine methylation should be filtered
 #' out (e.g., reads resulting from incompletely bisulfite-converted templates).
-#' Default: TRUE.
+#' Default: TRUE. Filtering is strongly recommended for short-read sequencing
+#' (bisulfite or enzymatic) because it removes reads from incompletely
+#' converted DNA molecules.
 #' @param min.context.sites non-negative integer for minimum number of cytosines
-#' within the `cytosine.context` (default: 0). Reads containing \strong{fewer}
-#' within-the-context cytosines will not be thresholded and will be ignored
-#' in further computations.
+#' within the `cytosine.context` (default: 0, i.e., all reads will satisfy this
+#' criterion). When `min.context.sites`>0, reads containing \strong{fewer}
+#' within-the-context cytosines
+#' will not be thresholded and will be ignored in further computations.
 #' This option has no effect when read filtering is disabled.
 #' @param max.outofcontext.beta real number in the range [0;1] (default: 0.1).
 #' Reads with average beta value for out-of-context cytosines \strong{above}
@@ -162,10 +165,10 @@
 #' @examples
 #'   capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
 #'   
-#'   # CpG report with thresholding
+#'   # CpG report with filtering and thresholding
 #'   cg.report <- generateCytosineReport(capture.bam)
 #'   
-#'   # CX report without thresholding
+#'   # CX report with filtering but without thresholding
 #'   cx.report <- generateCytosineReport(capture.bam, threshold.reads=FALSE,
 #'                report.context="CX")
 #'   
@@ -186,8 +189,11 @@
 #'               XM=c( "...Z..x+.h..x..h.", "...Z..z.h..x..h.",
 #'                     "...Z..z.h..X..h.",  "...Z..z.h..z.h."),
 #'               cigar=c("7M1I9M", "16M", "16M", "12M1D3M"))
-#'   # with read filtering and thresholding
+#'   # with read filtering and thresholding (default)
 #'   generateCytosineReport(bam=temp.bam, report.context="CX")
+#'   # with read filtering (nondefault min.context.sites) and thresholding
+#'   generateCytosineReport(bam=temp.bam, report.context="CX",
+#'                          min.context.sites=2)
 #'   # without read filtering
 #'   generateCytosineReport(bam=temp.bam, report.context="CX",
 #'                          filter.reads=FALSE)

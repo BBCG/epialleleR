@@ -99,12 +99,15 @@ for filtering and/or thresholding the reads:
 \item{filter.reads}{boolean defining if sequence reads with too few context
 bases or too high out-of-context cytosine methylation should be filtered
 out (e.g., reads resulting from incompletely bisulfite-converted templates).
-Default: TRUE.}
+Default: TRUE. Filtering is strongly recommended for short-read sequencing
+(bisulfite or enzymatic) because it removes reads from incompletely
+converted DNA molecules.}
 
 \item{min.context.sites}{non-negative integer for minimum number of cytosines
-within the `cytosine.context` (default: 0). Reads containing \strong{fewer}
-within-the-context cytosines will not be thresholded and will be ignored in
-further computations.
+within the `cytosine.context` (default: 0, i.e., all reads will satisfy this
+criterion). When `min.context.sites`>0, reads containing \strong{fewer}
+within-the-context cytosines
+will not be thresholded and will be ignored in further computations.
 This option has no effect when read filtering is disabled.}
 
 \item{max.outofcontext.beta}{real number in the range [0;1] (default: 0.1).
@@ -205,7 +208,7 @@ the bottom of this page.
 
 Suppose there is a BAM file with four reads, all mapped to the "+"
 strand of chromosome 1, positions 1-16. The genomic range is supplied as a
-parameter `bed = as("chr1:1-100", "GRanges")`. Assuming the default values
+parameter `bed = as("chr1:1-100", "GRanges")`. Assuming the following values
 for the filtering and thresholding parameters (cytosine.context = "CG",
 filter.reads = TRUE, min.context.sites = 2, max.outofcontext.beta = 0.1,
 threshold.reads = TRUE, min.context.beta = 0.5),
@@ -288,7 +291,7 @@ pattern output to the region of interest only.
                     "...Z..z.h..X..h.",  "...Z..z.h..z.h."),
               cigar=c("7M1I9M", "16M", "16M", "12M1D3M"))
   # with read filtering
-  generateBedReport(bam=temp.bam, bed=temp.bed)
+  generateBedReport(bam=temp.bam, bed=temp.bed, min.context.sites=2)
   # without read filtering
   generateBedReport(bam=temp.bam, bed=temp.bed, filter.reads=FALSE)
   # patterns plotted
