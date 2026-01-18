@@ -113,7 +113,7 @@
 #' out (e.g., reads resulting from incompletely bisulfite-converted templates).
 #' Default: TRUE.
 #' @param min.context.sites non-negative integer for minimum number of cytosines
-#' within the `cytosine.context` (default: 2). Reads containing \strong{fewer}
+#' within the `cytosine.context` (default: 0). Reads containing \strong{fewer}
 #' within-the-context cytosines will not be thresholded and will be ignored in
 #' further computations.
 #' This option has no effect when read filtering is disabled.
@@ -239,7 +239,7 @@
 generateAmpliconReport <- function (
   bam, bed, report.file=NULL, zero.based.bed=FALSE, match.tolerance=1,
   cytosine.context=c("CG", "CHG", "CHH", "CxG", "CX"),
-  filter.reads=TRUE, min.context.sites=2, max.outofcontext.beta=0.1,
+  filter.reads=TRUE, min.context.sites=0, max.outofcontext.beta=0.1,
   threshold.reads=TRUE, min.context.beta=0.5, ..., gzip=FALSE, verbose=TRUE)
 {
   generateBedReport(
@@ -257,7 +257,7 @@ generateAmpliconReport <- function (
 generateCaptureReport <- function (
   bam, bed, report.file=NULL, zero.based.bed=FALSE, match.min.overlap=1,
   cytosine.context=c("CG", "CHG", "CHH", "CxG", "CX"),
-  filter.reads=TRUE, min.context.sites=2, max.outofcontext.beta=0.1,
+  filter.reads=TRUE, min.context.sites=0, max.outofcontext.beta=0.1,
   threshold.reads=TRUE, min.context.beta=0.5, ..., gzip=FALSE, verbose=TRUE)
 {
   generateBedReport(
@@ -281,7 +281,7 @@ generateBedReport <- function (bam,
                                match.min.overlap=1,
                                cytosine.context=c("CG", "CHG", "CHH", "CxG", "CX"),
                                filter.reads=TRUE,
-                               min.context.sites=2,
+                               min.context.sites=0,
                                max.outofcontext.beta=0.1,
                                threshold.reads=TRUE,
                                min.context.beta=0.5,

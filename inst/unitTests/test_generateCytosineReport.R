@@ -7,7 +7,7 @@ test_generateCytosineReport <- function () {
   
   RUnit::checkEquals(
     amplicon.filter[, c(sum(meth), sum(unmeth))],
-    c(632, 6430)
+    c(633, 6437)
   )
   RUnit::checkEquals(
     amplicon.nofilter[, c(sum(meth), sum(unmeth))],
@@ -15,7 +15,7 @@ test_generateCytosineReport <- function () {
   )
   RUnit::checkEquals(
     amplicon.nothresh[, c(sum(meth), sum(unmeth))],
-    c(679, 6383)
+    c(680, 6390)
   )
   RUnit::checkEquals(
     amplicon.donothing[, c(sum(meth), sum(unmeth))],
@@ -26,9 +26,6 @@ test_generateCytosineReport <- function () {
   cg.report   <- generateCytosineReport(capture.bam, verbose=TRUE)
   cx.report   <- generateCytosineReport(capture.bam, threshold.reads=FALSE,
                                         report.context="CX", verbose=FALSE)
-  cx.nofilt   <- generateCytosineReport(capture.bam, threshold.reads=FALSE,
-                                        filter.reads=FALSE, report.context="CX")
-  
   RUnit::checkEquals(
     nrow(cx.report[duplicated(paste(rname,pos))]),
     0
@@ -36,115 +33,81 @@ test_generateCytosineReport <- function () {
   
   RUnit::checkEquals(
     as.numeric(table(cx.report$strand)[c("+", "-")]),
-    c(41522, 41233)
-  )
-  
-  RUnit::checkEquals(
-    as.numeric(table(cx.nofilt$strand)[c("+", "-")]),
     c(48517, 48669)
   )
   
   RUnit::checkEquals(
     as.numeric(table(cx.report$context)[c("CHH", "CHG", "CG")]),
-    c(47319, 20269, 15167)
-  )
-  
-  RUnit::checkEquals(
-    as.numeric(table(cx.nofilt$context)[c("CHH", "CHG", "CG")]),
     c(58292, 23486, 15408)
   )
   
   RUnit::checkEquals(
     as.numeric(table(cx.report[strand=="+"]$context)[c("CHH", "CHG", "CG")]),
-    c(23515, 10222, 7785)
-  )
-  
-  RUnit::checkEquals(
-    as.numeric(table(cx.nofilt[strand=="+"]$context)[c("CHH", "CHG", "CG")]),
     c(28762, 11853, 7902)
   )
   
   RUnit::checkEquals(
     as.numeric(table(cx.report[strand=="-"]$context)[c("CHH", "CHG", "CG")]),
-    c(23804, 10047, 7382)
-  )
-  
-  RUnit::checkEquals(
-    as.numeric(table(cx.nofilt[strand=="-"]$context)[c("CHH", "CHG", "CG")]),
     c(29530, 11633, 7506)
   )
   
   RUnit::checkEquals(
     dim(cg.report),
-    c(15167,6)
+    c(15408,6)
   )
   
   RUnit::checkEquals(
     dim(cx.report),
-    c(82755,6)
-  )
-  
-  RUnit::checkEquals(
-    dim(cx.nofilt),
     c(97186,6)
   )
   
   RUnit::checkEquals(
     sum(cg.report$meth),
-    4974
+    5199
   )
 
   RUnit::checkEquals(
     sum(cg.report$unmeth),
-    14859
+    15020
   )
   
   RUnit::checkEquals(
     sum(cx.report$meth),
-    5732
-  )
-  
-  RUnit::checkEquals(
-    sum(cx.report$unmeth),
-    103454
-  )
-  
-  RUnit::checkEquals(
-    sum(cx.nofilt$meth),
     6051
   )
   
   RUnit::checkEquals(
-    sum(cx.nofilt$unmeth),
+    sum(cx.report$unmeth),
     125903
   )
   
+  
   # some extended consistency checks
   RUnit::checkEquals(
-    cx.nofilt[context=="CG", sum(meth), by=.(rname, strand, context)][order(rname, strand, context)]$V1,
+    cx.report[context=="CG", sum(meth), by=.(rname, strand, context)][order(rname, strand, context)]$V1,
     c(222, 242, 128, 91, 167, 172, 101, 77, 85, 18, 81, 64, 159, 240, 116, 105, 129, 140, 16, 39, 107, 81,
       161, 62, 59, 31, 140, 104, 73, 37, 181, 103, 406, 457, 13, 4, 63, 90, 253, 438, 91, 56, 15, 22, 106, 91)
   )
   RUnit::checkEquals(
-    cx.nofilt[context=="CG", sum(unmeth), by=.(rname, strand, context)][order(rname, strand, context)]$V1,
+    cx.report[context=="CG", sum(unmeth), by=.(rname, strand, context)][order(rname, strand, context)]$V1,
     c(556, 713, 295, 316, 446, 679, 162, 115, 109, 82, 404, 289, 256, 336, 341, 326, 326, 102, 328, 207, 446, 609, 328,
       180, 148, 163, 243, 267, 283, 198, 535, 482, 1035, 1064, 97, 80, 177, 270, 447, 394, 65, 37, 92, 157, 197, 201)
   )
   RUnit::checkEquals(
-    cx.nofilt[context=="CHG", sum(meth), by=.(rname, strand, context)][order(rname, strand, context)]$V1,
+    cx.report[context=="CHG", sum(meth), by=.(rname, strand, context)][order(rname, strand, context)]$V1,
     c(4, 6, 2, 1, 5, 7, 2, 1, 1, 2, 4, 1, 1, 2, 3, 4, 3, 4, 4, 1, 2, 4, 1, 1, 5, 2, 3, 0, 1, 2, 2, 5, 11, 5, 1, 0, 1, 1, 8, 3, 1, 2, 0, 1, 1, 2)
   )
   RUnit::checkEquals(
-    cx.nofilt[context=="CHG", sum(unmeth), by=.(rname, strand, context)][order(rname, strand, context)]$V1,
+    cx.report[context=="CHG", sum(unmeth), by=.(rname, strand, context)][order(rname, strand, context)]$V1,
     c(1149, 1258, 767, 693, 937, 1204, 349, 312, 291, 226, 754, 524, 616, 819, 683, 849, 825, 472, 393, 349, 821, 955, 751,
       462, 301, 270, 582, 546, 574, 384, 1267, 1063, 2488, 2507, 110, 67, 448, 496, 883, 1287, 285, 191, 150, 191, 595, 550)
   )
   RUnit::checkEquals(
-    cx.nofilt[context=="CHH", sum(meth), by=.(rname, strand, context)][order(rname, strand, context)]$V1,
+    cx.report[context=="CHH", sum(meth), by=.(rname, strand, context)][order(rname, strand, context)]$V1,
     c(9, 14, 6, 6, 14, 12, 1, 4, 3, 4, 8, 6, 3, 10, 9, 8, 6, 6, 2, 4, 4, 10, 6, 3, 3, 5, 6, 0, 4, 6, 10, 9, 26, 17, 1, 0, 3, 7, 11, 8, 2, 3, 3, 0, 5, 5)
   )
   RUnit::checkEquals(
-    cx.nofilt[context=="CHH", sum(unmeth), by=.(rname, strand, context)][order(rname, strand, context)]$V1,
+    cx.report[context=="CHH", sum(unmeth), by=.(rname, strand, context)][order(rname, strand, context)]$V1,
     c(2921, 3293, 1615, 1589, 2415, 3348, 735, 983, 720, 674, 1824, 1306, 1495, 1886, 2008, 2295, 1925, 1366, 950, 850, 2199, 2487, 1732,
       1026, 846, 829, 1567, 1212, 1249, 956, 2675, 2522, 6963, 6300, 304, 204, 968, 1350, 2144, 2775, 620, 513, 344, 371, 1634, 1638)
   )
@@ -179,7 +142,6 @@ test_generateCytosineReport <- function () {
   cg.quality  <- generateCytosineReport(capture.bam, verbose=TRUE,
                                         min.mapq=30, min.baseq=20)
   cx.quality  <- generateCytosineReport(capture.bam, threshold.reads=FALSE,
-                                        filter.reads=FALSE, 
                                         min.mapq=30, min.baseq=20,
                                         report.context="CX", verbose=FALSE)
   cx.filt     <- generateCytosineReport(capture.bam, threshold.reads=FALSE,
@@ -190,7 +152,7 @@ test_generateCytosineReport <- function () {
   
   RUnit::checkEquals(
     dim(cg.quality),
-    c(14947,6)
+    c(15197,6)
   )
   
   RUnit::checkEquals(
@@ -205,12 +167,12 @@ test_generateCytosineReport <- function () {
   
   RUnit::checkEquals(
     sum(cg.quality$meth),
-    4830
+    5057
   )
   
   RUnit::checkEquals(
     sum(cg.quality$unmeth),
-    14670
+    14835
   )
   
   RUnit::checkEquals(
