@@ -119,6 +119,7 @@ NULL if report.file was specified. The report columns are:
   \item range -- genomic coordinates of the variation
   \item REF -- base at the reference allele
   \item ALT -- base at the alternative allele
+  \item nfiltered -- number of filtered out reads
   \item [M|U][+|-][Ref|Alt] -- number of \strong{Ref}erence or
   \strong{Alt}ernative bases that were found at this particular position
   within \strong{M}ethylated (above threshold) or \strong{U}nmethylated

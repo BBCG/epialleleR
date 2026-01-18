@@ -36,7 +36,7 @@ utils::globalVariables(
     "templid", "FALSE+", "FALSE-", "TRUE+", "TRUE-", "NA+", "NA-", "REF", "ALT",
     "M+Ref","U+Ref","M+Alt","U+Alt", "M-Ref","U-Ref","M-Alt","U-Alt",
     "M+A", "M+C", "M+G", "M+T", "M-A", "M-C", "M-G", "M-T",
-    "U+A", "U+C", "U+G", "U+T", "U-A", "U-C", "U-G", "U-T",
+    "U+A", "U+C", "U+G", "U+T", "U-A", "U-C", "U-G", "U-T", "nfiltered",
     ".SD", "bin", "count", "code", "pos", "cntx", "base", "meth", "x", "y",
     "label")
 )
@@ -655,12 +655,13 @@ utils::globalVariables(
   colnames(freqs) <- c("U+A","U+C","U+G","U+T","U+N",
                        "U-A","U-C","U-G","U-T","U-N",
                        "M+A","M+C","M+G","M+T","M+N",
-                       "M-A","M-C","M-G","M-T","M-N")
+                       "M-A","M-C","M-G","M-T","M-N",
+                       "nfiltered")
   
   bf.report <- data.table::data.table(
     name=names(vcf.ranges),
     vcf.dt[,.(seqnames, range=start, REF, ALT)],
-    freqs[,grep("[ACTG]$",colnames(freqs)), drop=FALSE]
+    freqs[,grep("[ACTGd]$",colnames(freqs)), drop=FALSE]
   )
   
   bf.report[REF=="A" & ALT=="C", `:=` (`M+Ref`=`M+A`,       `U+Ref`=`U+A`,       `M-Ref`=`M-A`,       `U-Ref`=`U-A`,

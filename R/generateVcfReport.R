@@ -122,6 +122,7 @@
 #'   \item range -- genomic coordinates of the variation
 #'   \item REF -- base at the reference allele
 #'   \item ALT -- base at the alternative allele
+#'   \item nfiltered -- number of filtered out reads
 #'   \item [M|U][+|-][Ref|Alt] -- number of \strong{Ref}erence or
 #'   \strong{Alt}ernative bases that were found at this particular position
 #'   within \strong{M}ethylated (above threshold) or \strong{U}nmethylated
@@ -252,8 +253,11 @@ generateVcfReport <- function (bam,
   vcf.report <- .getBaseFreqReport(bam.processed=bam, pass=pass,
                                    vcf=vcf, verbose=verbose)
   
-  vcf.report <- vcf.report[, grep("nam|ran|ref|alt|fep", colnames(vcf.report),
+  vcf.report <- vcf.report[, grep("nam|ran|ref|alt|fe|fi", colnames(vcf.report),
                                   ignore.case=TRUE), with=FALSE]
+  
+  if (!filter.reads)
+    vcf.report[, nfiltered:=NA]
   
   if (is.null(report.file))
     return(vcf.report)

@@ -34,8 +34,30 @@ test_generateVcfReport <- function () {
     vcf.style="NCBI", min.mapq=30, min.baseq=30, filter.reads=FALSE, verbose=FALSE
   )
   
+  RUnit::checkEquals(
+    sum(amplicon.report$nfiltered, na.rm=TRUE),
+    23
+  )
+  
+  RUnit::checkEquals(
+    sum(amplicon.quality$nfiltered, na.rm=TRUE),
+    0
+  )
+  
   RUnit::checkTrue(
-    identical(amplicon.quality, amplicon.quality.nofilter)
+    !any(is.na(amplicon.quality[, nfiltered]))
+  )
+  
+  RUnit::checkTrue(
+    all(is.na(amplicon.quality.nofilter[, nfiltered]))
+  )
+  
+  RUnit::checkTrue(
+    identical(amplicon.quality[, -6], amplicon.quality.nofilter[, -6])
+  )
+  
+  RUnit::checkTrue(
+    !identical(amplicon.quality, amplicon.quality.nofilter)
   )
   
   capture.vcf <- VariantAnnotation::readVcf(
@@ -64,7 +86,7 @@ test_generateVcfReport <- function () {
   
   RUnit::checkEquals(
     dim(amplicon.report),
-    c(56,17)
+    c(56,18)
   )
   
   RUnit::checkTrue(
@@ -73,7 +95,7 @@ test_generateVcfReport <- function () {
   
   RUnit::checkEquals(
     dim(capture.report),
-    c(26292,17)
+    c(26292,18)
   )
   
   RUnit::checkException(
@@ -166,6 +188,11 @@ test_generateVcfReport <- function () {
     18138
   )
   
+  RUnit::checkEquals(
+    sum(capture.report$nfiltered, na.rm=TRUE),
+    0
+  )
+  
   # more extended consistency checks
   RUnit::checkEquals(
     capture.report[, .N, by=.(REF,ALT)][order(REF, ALT)]$N,
@@ -203,7 +230,7 @@ test_generateVcfReport <- function () {
   
   RUnit::checkEquals(
     dim(nothreshold.report),
-    c(56,17)
+    c(56,18)
   )
   
   RUnit::checkEquals(
@@ -248,6 +275,11 @@ test_generateVcfReport <- function () {
   RUnit::checkEquals(
     sum(quality.report$SumAlt, na.rm=TRUE),
     4
+  )
+  
+  RUnit::checkEquals(
+    sum(quality.report$nfiltered, na.rm=TRUE),
+    0
   )
   
   ### if suggested library is not available
