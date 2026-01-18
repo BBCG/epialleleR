@@ -18,6 +18,13 @@ basically any next-generation (methylation or native) sequencing experiment.
 
 ![](./vignettes/epialleles.png)
 
+### Input Data
+
+* short-read and long-read (native)
+* paired-end and single-end
+* whole-genome, genome-wide (e.g., hybridization capture or adaptive sampling),
+  and narrowly targeted (e.g., amplicon panels)
+
 ### Current Features
 
  * calling cytosine methylation and saving calls in a new BAM file
@@ -38,30 +45,23 @@ basically any next-generation (methylation or native) sequencing experiment.
  * assessing the distribution of per-read beta values for genomic regions of
  interest (*`generateBedEcdf`*)
  
-### Input Data
-
-* short-read and long-read (native)
-* paired-end and single-end
-* whole-genome, genome-wide (e.g., hybridization capture or adaptive sampling),
-  and narrowly targeted (e.g., amplicon panels)
-
 ### Recent improvements
 
 ##### v1.20 [BioC 3.23]
 
  * using genomic coordinates of targets, only a subset of BAM reads or only
  fragments of BAM reads that are overlapping the targets can now be loaded
- * disrupting API changes in `generate*Report` (from version 1.19.1 onwards):
- new parameter `filter.reads` regulates filtering of reads with too few
- cytosines or presumable incomplete conversion of cytosines;
- `cytosine.context` parameter instead of
- `threshold.context`/`haplotype.context`
- * disrupting change in thresholding logic (from version 1.19.1 onwards):
- reads with too few within-the-context cytosines (less than `min.context.sites`)
- or out-of-context cytosine methylation higher than
- `max.outofcontext.beta` are filtered out (discarded) instead of being counted
- as hypomethylated reads (as was in v1.19.0 and earlier)
- * new default value of 0 for `min.context.sites`
+ * disrupting changes in all `generate*Report` functions
+ (from version 1.19.1 onwards):
+     - `cytosine.context` parameter instead of
+     `threshold.context`/`haplotype.context`
+     - new parameter `filter.reads` regulates filtering of reads with too few
+     cytosines or presumable incomplete conversion of cytosines
+     - reads with too few within-the-context cytosines (less than
+     `min.context.sites`) or out-of-context cytosine methylation higher than
+     `max.outofcontext.beta` are filtered out (discarded) instead of being
+     counted as hypomethylated reads (as was in v1.19.0 and earlier)
+     - new default value of 0 for `min.context.sites`
 
 ##### v1.14 [BioC 3.20]
 
