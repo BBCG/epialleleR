@@ -46,7 +46,7 @@ sequencing alignments only. According to SAM/BAM specification, the
 continuous base modification probability range 0.0 to 1.0 is
 remapped in equal sized portions to the discrete integers 0 to 255
 inclusively. Default is -1, however a higher value (e.g., 178 which
-corresponds to a modification probability of ~0.7) is recommended.
+corresponds to a modification probability of ~0.7) is strongly recommended.
 Also, when default (-1), all C+m and G-m cytosine
 methylation modifications recorded in MM/Mm tag will be included, even if
 ML/Ml tag with probabilities is absent (in such case, probability of
