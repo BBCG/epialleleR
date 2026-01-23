@@ -127,10 +127,13 @@
 #' remapped in equal sized portions to the discrete integers 0 to 255
 #' inclusively. Default is -1, however a higher value (e.g., 178 which
 #' corresponds to a modification probability of ~0.7) is strongly recommended.
-#' Also, when default (-1), all C+m and G-m cytosine
+#' When default (-1), all C+m and G-m cytosine
 #' methylation modifications recorded in MM/Mm tag will be included, even if
 #' ML/Ml tag with probabilities is absent (in such case, probability of
-#' modification equals -1).
+#' modification equals -1). If a base has at least one modifications, and
+#' neither the probability of any of modifications nor the probability of the
+#' conventional base reach the `min.prob`, this base will be masked in this
+#' particular read and not counted neither as modified nor as conventional.
 #' @param highest.prob boolean defining if methylation modification must have
 #' the highest probability among all modifications at a particular base to be
 #' considered in the analyses (default: TRUE). Affects processing long-read
