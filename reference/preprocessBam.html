@@ -106,11 +106,14 @@ sequencing alignments only. According to SAM/BAM specification, the
 continuous base modification probability range 0.0 to 1.0 is
 remapped in equal sized portions to the discrete integers 0 to 255
 inclusively. Default is -1, however a higher value (e.g., 178 which
-corresponds to a modification probability of ~0.7) is recommended.
-Also, when default (-1), all C+m and G-m cytosine
+corresponds to a modification probability of ~0.7) is strongly recommended.
+When default (-1), all C+m and G-m cytosine
 methylation modifications recorded in MM/Mm tag will be included, even if
 ML/Ml tag with probabilities is absent (in such case, probability of
-modification equals -1).</p></dd>
+modification equals -1). If a base has at least one modifications, and
+neither the probability of any of modifications nor the probability of the
+conventional base reach the `min.prob`, this base will be masked in this
+particular read and not counted neither as modified nor as conventional.</p></dd>
 
 
 <dt id="arg-highest-prob">highest.prob<a class="anchor" aria-label="anchor" href="#arg-highest-prob"></a></dt>
@@ -329,12 +332,12 @@ and <a href="https://support.illumina.com/content/dam/illumina-support/help/Illu
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.013s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
 <span class="r-in"><span>  <span class="fu"><a href="generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">capture.data</span>, threshold.reads<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering and thresholding reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing cytosine report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      rname strand      pos context  meth unmeth</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     &lt;fctr&gt; &lt;fctr&gt;    &lt;int&gt;  &lt;fctr&gt; &lt;int&gt;  &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1:  chr17      - 43123785      CG     1      0</span>
@@ -394,12 +397,12 @@ and <a href="https://support.illumina.com/content/dam/illumina-support/help/Illu
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> long-read, single-end, unsorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.006s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.004s]</span>
 <span class="r-in"><span>  <span class="fu"><a href="generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">longread.data</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing cytosine report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.028s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.025s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       rname strand      pos context  meth unmeth</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;fctr&gt; &lt;fctr&gt;    &lt;int&gt;  &lt;fctr&gt; &lt;int&gt;  &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   1:  chr17      - 43115270      CG     1      0</span>
@@ -408,11 +411,11 @@ and <a href="https://support.illumina.com/content/dam/illumina-support/help/Illu
 <span class="r-out co"><span class="r-pr">#&gt;</span>   4:  chr17      - 43115417      CG     1      0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   5:  chr17      - 43115427      CG     1      0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  ---                                            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 909:  chr17      + 43136994      CG     0      1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 910:  chr17      + 43137174      CG     1      0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 911:  chr17      + 43137332      CG     1      0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 912:  chr17      + 43137364      CG     1      0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 913:  chr17      + 43137391      CG     1      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 903:  chr17      + 43136994      CG     0      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 904:  chr17      + 43137174      CG     1      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 905:  chr17      + 43137332      CG     1      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 906:  chr17      + 43137364      CG     1      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 907:  chr17      + 43137391      CG     1      0</span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># Specifics of long-read alignment processing</span></span></span>
 <span class="r-in"><span>  <span class="va">out.bam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>pattern<span class="op">=</span><span class="st">"out-"</span>, fileext<span class="op">=</span><span class="st">".bam"</span><span class="op">)</span></span></span>
@@ -430,11 +433,11 @@ and <a href="https://support.illumina.com/content/dam/illumina-support/help/Illu
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> long-read, single-end, unsorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing cytosine report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     rname strand   pos context  meth unmeth</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;fctr&gt; &lt;fctr&gt; &lt;int&gt;  &lt;fctr&gt; &lt;int&gt;  &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:   chrS      +     2      CG     1      0</span>
@@ -452,13 +455,13 @@ and <a href="https://support.illumina.com/content/dam/illumina-support/help/Illu
 <span class="r-in"><span>    output.bam.file<span class="op">=</span><span class="va">out.bam</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Writing sample BAM </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.003s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
 <span class="r-in"><span>  <span class="fu"><a href="generateCytosineReport.html">generateCytosineReport</a></span><span class="op">(</span><span class="va">out.bam</span>, threshold.reads<span class="op">=</span><span class="cn">FALSE</span>, report.context<span class="op">=</span><span class="st">"CX"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> long-read, single-end, unsorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing cytosine report </span>
@@ -489,11 +492,11 @@ and <a href="https://support.illumina.com/content/dam/illumina-support/help/Illu
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> long-read, single-end, unsorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing cytosine report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      rname strand   pos context  meth unmeth</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     &lt;fctr&gt; &lt;fctr&gt; &lt;int&gt;  &lt;fctr&gt; &lt;int&gt;  &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1:   chrS      +     2      CG     1      0</span>

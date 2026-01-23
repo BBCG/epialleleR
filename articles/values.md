@@ -39,7 +39,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.111s]
+#> Writing sample BAM [0.108s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), 0, title="no epimutations")
 ```
@@ -83,7 +83,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.108s]
+#> Writing sample BAM [0.105s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="one partial epimutation")
 ```
@@ -105,7 +105,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.152s]
+#> Writing sample BAM [0.146s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="another partial epimutation")
 ```
@@ -130,7 +130,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.114s]
+#> Writing sample BAM [0.111s]
 #> [1] 1009
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="several partial epimutations")
 ```
@@ -155,7 +155,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.104s]
+#> Writing sample BAM [0.103s]
 #> [1] 1009
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="several short partial epimutations")
 ```
@@ -178,7 +178,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.004s]
+#> Writing sample BAM [0.005s]
 #> [1] 20
 plotMetrics(out.bam, as("chrS:1-20", "GRanges"), title="several overlapping partial epimutations")
 ```
@@ -323,7 +323,7 @@ plotMetrics(
 ``` r
 
 sessionInfo()
-#> R Under development (unstable) (2026-01-15 r89304)
+#> R Under development (unstable) (2026-01-22 r89323)
 #> Platform: x86_64-pc-linux-gnu
 #> Running under: Ubuntu 24.04.3 LTS
 #> 
@@ -356,6 +356,6 @@ sessionInfo()
 #> [21] RColorBrewer_1.1-3 rlang_1.1.7        cachem_1.1.0       xfun_0.56          fs_1.6.6          
 #> [26] sass_0.4.10        S7_0.2.1           otel_0.2.0         cli_3.6.5          withr_3.0.2       
 #> [31] pkgdown_2.2.0.9000 magrittr_2.0.4     digest_0.6.39      grid_4.6.0         lifecycle_1.0.5   
-#> [36] vctrs_0.7.0        evaluate_1.0.5     glue_1.8.0         farver_2.1.2       ragg_1.5.0        
+#> [36] vctrs_0.7.1        evaluate_1.0.5     glue_1.8.0         farver_2.1.2       ragg_1.5.0        
 #> [41] rmarkdown_2.30     pkgconfig_2.0.3    tools_4.6.0        htmltools_0.5.9
 ```

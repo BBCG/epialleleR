@@ -328,9 +328,9 @@ the seqlevels style.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.005s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.004s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering and thresholding reads </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing amplicon report </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.015s]</span>
 <span class="r-in"><span>  <span class="fu"><a href="plotPatterns.html">plotPatterns</a></span><span class="op">(</span></span></span>
@@ -343,7 +343,7 @@ the seqlevels style.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.004s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.005s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting methylation patterns </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 156 patterns supplied</span>
@@ -375,13 +375,13 @@ the seqlevels style.</p></div>
 <span class="r-in"><span>  <span class="va">bed.report</span> <span class="op">&lt;-</span> <span class="fu">generateBedReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">capture.bam</span>, bed<span class="op">=</span><span class="va">capture.bed</span>,</span></span>
 <span class="r-in"><span>                                  bed.type<span class="op">=</span><span class="st">"capture"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.008s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.007s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.014s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.011s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering and thresholding reads </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing capture report </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.017s]</span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">capture.report</span>, <span class="va">bed.report</span><span class="op">)</span></span></span>
@@ -404,18 +404,18 @@ the seqlevels style.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing capture report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.011s]</span>
 <span class="r-in"><span>  <span class="fu"><a href="plotPatterns.html">plotPatterns</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="fu"><a href="extractPatterns.html">extractPatterns</a></span><span class="op">(</span>bam<span class="op">=</span><span class="va">long.data</span>, bed<span class="op">=</span><span class="va">long.bed</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    npatterns.per.bin<span class="op">=</span><span class="cn">Inf</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting methylation patterns </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.018s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.017s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 20 patterns supplied</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 20 unique</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 20 most frequent unique patterns were selected for plotting using 10 beta value bins:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>      16         1         0         0         0         0         0         1         2       0</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>      16         1         0         0         0         0         0         0         1       2</span>
 <span class="r-plt img"><img src="generateBedReport-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># toy example from the description</span></span></span>
@@ -435,11 +435,11 @@ the seqlevels style.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.003s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering and thresholding reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Preparing amplicon report </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.011s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    seqnames start   end width strand nreads+ nreads- nfiltered   VEF</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;fctr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;fctr&gt;   &lt;int&gt;   &lt;int&gt;     &lt;int&gt; &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:     chr1     1   100   100      *       2       0         2   0.5</span>
@@ -466,7 +466,7 @@ the seqlevels style.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting methylation patterns </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.008s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.007s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 4 patterns supplied</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 4 unique</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 4 most frequent unique patterns were selected for plotting using 10 beta value bins:</span>

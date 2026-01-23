@@ -61,10 +61,15 @@ preprocessBam(
   base modification probability range 0.0 to 1.0 is remapped in equal
   sized portions to the discrete integers 0 to 255 inclusively. Default
   is -1, however a higher value (e.g., 178 which corresponds to a
-  modification probability of ~0.7) is recommended. Also, when default
-  (-1), all C+m and G-m cytosine methylation modifications recorded in
-  MM/Mm tag will be included, even if ML/Ml tag with probabilities is
-  absent (in such case, probability of modification equals -1).
+  modification probability of ~0.7) is strongly recommended. When
+  default (-1), all C+m and G-m cytosine methylation modifications
+  recorded in MM/Mm tag will be included, even if ML/Ml tag with
+  probabilities is absent (in such case, probability of modification
+  equals -1). If a base has at least one modifications, and neither the
+  probability of any of modifications nor the probability of the
+  conventional base reach the \`min.prob\`, this base will be masked in
+  this particular read and not counted neither as modified nor as
+  conventional.
 
 - highest.prob:
 
@@ -295,12 +300,12 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.013s]
+#> [0.012s]
   generateCytosineReport(capture.data, threshold.reads=TRUE)
 #> Filtering and thresholding reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.001s]
+#> [0.000s]
 #>      rname strand      pos context  meth unmeth
 #>     <fctr> <fctr>    <int>  <fctr> <int>  <int>
 #>  1:  chr17      - 43123785      CG     1      0
@@ -360,12 +365,12 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 #> Checking BAM file: 
 #> long-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.006s]
+#> [0.004s]
   generateCytosineReport(longread.data, threshold.reads=FALSE)
 #> Filtering reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.028s]
+#> [0.025s]
 #>       rname strand      pos context  meth unmeth
 #>      <fctr> <fctr>    <int>  <fctr> <int>  <int>
 #>   1:  chr17      - 43115270      CG     1      0
@@ -374,11 +379,11 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 #>   4:  chr17      - 43115417      CG     1      0
 #>   5:  chr17      - 43115427      CG     1      0
 #>  ---                                            
-#> 909:  chr17      + 43136994      CG     0      1
-#> 910:  chr17      + 43137174      CG     1      0
-#> 911:  chr17      + 43137332      CG     1      0
-#> 912:  chr17      + 43137364      CG     1      0
-#> 913:  chr17      + 43137391      CG     1      0
+#> 903:  chr17      + 43136994      CG     0      1
+#> 904:  chr17      + 43137174      CG     1      0
+#> 905:  chr17      + 43137332      CG     1      0
+#> 906:  chr17      + 43137364      CG     1      0
+#> 907:  chr17      + 43137391      CG     1      0
   
   # Specifics of long-read alignment processing
   out.bam <- tempfile(pattern="out-", fileext=".bam")
@@ -396,11 +401,11 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 #> Checking BAM file: 
 #> long-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.002s]
+#> [0.001s]
 #> Filtering reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.000s]
+#> [0.001s]
 #>     rname strand   pos context  meth unmeth
 #>    <fctr> <fctr> <int>  <fctr> <int>  <int>
 #> 1:   chrS      +     2      CG     1      0
@@ -418,13 +423,13 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
     output.bam.file=out.bam
   )
 #> Writing sample BAM 
-#> [0.003s]
+#> [0.002s]
 #> [1] 1
   generateCytosineReport(out.bam, threshold.reads=FALSE, report.context="CX")
 #> Checking BAM file: 
 #> long-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.001s]
+#> [0.002s]
 #> Filtering reads 
 #> [0.000s]
 #> Preparing cytosine report 
@@ -455,11 +460,11 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 #> Checking BAM file: 
 #> long-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.002s]
+#> [0.001s]
 #> Filtering reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.000s]
+#> [0.001s]
 #>      rname strand   pos context  meth unmeth
 #>     <fctr> <fctr> <int>  <fctr> <int>  <int>
 #>  1:   chrS      +     2      CG     1      0

@@ -277,17 +277,17 @@ the seqlevels style.</p></div>
 <span class="r-in"><span>                                  vcf<span class="op">=</span><span class="va">capture.vcf</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: VariantAnnotation</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.025s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.024s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading VCF file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [5.682s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [4.649s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.012s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering and thresholding reads </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting base frequences </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.144s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.136s]</span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># toy example to illustrate the logic of computations</span></span></span>
 <span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"VariantAnnotation"</span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -315,7 +315,7 @@ the seqlevels style.</p></div>
 <span class="r-in"><span>    <span class="fu">generateVcfReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">temp.bam</span>, vcf<span class="op">=</span><span class="va">vcf</span>, filter.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Writing sample BAM </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.003s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
@@ -323,7 +323,7 @@ the seqlevels style.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering and thresholding reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting base frequences </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.034s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.033s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
@@ -331,7 +331,7 @@ the seqlevels style.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting base frequences </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.034s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.032s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    seqnames range    REF    ALT nfiltered M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;fctr&gt; &lt;int&gt; &lt;char&gt; &lt;char&gt;    &lt;lgcl&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:     chr1     2      A      G        NA     1     1    NA    NA     2     0</span>
