@@ -358,11 +358,11 @@ test_generateCytosineReport <- function () {
   )
   RUnit::checkEquals(
     cg.quality[context=="CG", sum(unmeth), by=.(rname, strand, context)][order(rname, strand, context)]$V1,
-    c(744, 504)
+    c(684, 418)
   )
   RUnit::checkEquals(
     cg.quality[context=="CG", sum(as.numeric(pos)), by=.(rname, strand, context)][order(rname, strand, context)]$V1,
-    c(20700942290, 18673334762)
+    c(20614690350, 18500851427)
   )
   
   
@@ -376,7 +376,7 @@ test_generateCytosineReport <- function () {
     seq=c("AGCTCTCCAGAGTCGNACGCCATYCGCGCGCCACCA"),
     pos=1,
     Mm=c("C+m,2,2,1,4,1;C+76792,6,7;N+n,15;"),
-    Ml=list(as.integer(c(102,128,153,179,161,187,212,169))),
+    Ml=list(as.integer(c(102,28,53,179,161,187,212,169))),
     output.bam.file=output.bam
   )
   cx.report <- generateCytosineReport(output.bam, filter.reads=FALSE, threshold.reads=FALSE, report.context="CX")
@@ -392,7 +392,7 @@ test_generateCytosineReport <- function () {
     )
   )
   cx.report <- generateCytosineReport(output.bam, filter.reads=FALSE, threshold.reads=FALSE, report.context="CX",
-                                      min.prob=160, highest.prob=FALSE)
+                                      min.prob=128, highest.prob=FALSE)
   RUnit::checkEquals(
     cx.report[, .(strand, pos, context, meth, unmeth)],
     data.table::data.table(
@@ -404,6 +404,19 @@ test_generateCytosineReport <- function () {
       unmeth=as.integer(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0))
     )
   )
+  cx.report <- generateCytosineReport(output.bam, filter.reads=FALSE, threshold.reads=FALSE, report.context="CX",
+                                      min.prob=160, highest.prob=FALSE)
+  RUnit::checkEquals(
+    cx.report[, .(strand, pos, context, meth, unmeth)],
+    data.table::data.table(
+      strand=factor("+", levels=c("+","-")),
+      pos=as.integer(c(3, 5, 8, 14, 18, 20, 21, 25, 27, 29, 31, 32, 34, 35)),
+      context=factor(c(2, 2, 6, 7, 7, 2, 2, 7, 7, 7, 2, 2, 2, 2), levels=1:7,
+                     labels=c("NA1", "CHH", "NA3", "NA4", "NA5", "CHG", "CG")),
+      meth=  as.integer(c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1)),
+      unmeth=as.integer(c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0))
+    )
+  )
   
   # C+m and chebi for C+m
   # modified from htslib/test/base_mods/MM-chebi.sam
@@ -412,7 +425,7 @@ test_generateCytosineReport <- function () {
     seq=c("AGCTCTCCAGAGTCGNACGCCATYCGCGCGCCACCA"),
     pos=1,
     Mm=c("C+m,2,2,1,4,1;C+27551,6,7;N+n,15;"),
-    Ml=list(as.integer(c(102,128,153,179,161,187,212,169))),
+    Ml=list(as.integer(c(102,28,53,179,161,187,212,169))),
     output.bam.file=output.bam
   )
   cx.report <- generateCytosineReport(output.bam, filter.reads=FALSE, threshold.reads=FALSE, report.context="CX")
@@ -428,7 +441,7 @@ test_generateCytosineReport <- function () {
     )
   )
   cx.report <- generateCytosineReport(output.bam, filter.reads=FALSE, threshold.reads=FALSE, report.context="CX",
-                                      min.prob=160)
+                                      min.prob=128)
   RUnit::checkEquals(
     cx.report[, .(strand, pos, context, meth, unmeth)],
     data.table::data.table(

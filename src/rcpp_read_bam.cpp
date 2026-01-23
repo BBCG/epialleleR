@@ -668,8 +668,10 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
     while ((nmods = bam_next_basemod(bam_rec, mod_state, base_mods, max_nmods, &mod_pos)) > 0) { // cycle through modified bases
       int ismeth[2] = {0, 0},                                                   // bool array for pos having meth mod at fwd==[0] or rev==[1] strand;
         meth_prob[2] = {-2, -2},                                                // int array for probability of meth mod at fwd==[0] or rev==[1] strand;
+        conv_prob[2] = {256, 256},                                              // int array for probability of conventional base (C) at fwd==[0] or rev==[1] strand;
         max_other_prob[2] = {-2, -2};                                           // int array for probability of any other mod at fwd==[0] or rev==[1] strand;
       for (int i=0; i<nmods; i++) {                                             // cycle through all mods of a current base
+        conv_prob[base_mods[i].strand] -= base_mods[i].qual;                    // subtract probabilities of all mods from max possible value
         if (base_mods[i].modified_base=='m' || base_mods[i].modified_base==-27551) { // if it's a 5mC (and any of 'C+m' or 'G-m')
           ismeth[base_mods[i].strand] = 1;                                      // base has meth mod
           meth_prob[base_mods[i].strand] = base_mods[i].qual;                   // record meth prob
@@ -685,6 +687,10 @@ Rcpp::DataFrame rcpp_read_bam_mm_single (std::string fn,                        
             record_xm[ctx_strand][mod_pos]>'A') {                               // and its not a '.-'
           record_xm[ctx_strand][mod_pos] &= 0b11011111;                         // uppercase the context char
           strand_has_mods[ctx_strand] = 1;                                      // record that the context string for this strand has mods
+        } else if (nmods &&                                                     // only if there are any modifications
+                   max_other_prob[s]<min_prob &&                                // and the highest probability of any mod is less than min_prob
+                   conv_prob[s]<min_prob) {                                     // and the probability of the conventional base is less than min_prob
+          record_xm[ctx_strand][mod_pos]='-';                                   // this base is gone missing now - we don't know whether it's a mod or a conventional base
         }
       }
     }
