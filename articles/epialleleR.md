@@ -53,10 +53,10 @@ methylation events.
 *`epialleleR`* is a very fast and scalable solution for analysis of data
 obtained by next-generation methylation/native sequencing of DNA
 samples. The minimum requirement for the input is a Binary Alignment Map
-(BAM) file containing sequencing reads. These reads can be obtained from
-either deep or ultra-deep sequencing, using either narrowly targeted
-gene panels (amplicon sequencing), larger methylation capture panels, or
-even whole-genome approaches.
+(BAM) file containing sequencing reads. *`epialleleR`* works equally
+well with shallow, deep or even ultra-deep sequencing data, obtained
+using narrowly targeted gene panels (amplicon sequencing), larger
+methylation capture panels, or even whole-genome approaches.
 
 ### Current Features
 
@@ -104,6 +104,126 @@ short reads per second) for a single core of a relatively modern CPU
 Major bottlenecks (in BAM loading and preprocessing) were removed in the
 release v1.2, full multithreading and minor improvements are expected in
 the future.
+
+### Reference-free processing
+
+Unlike many other tools for methylation/modification reporting,
+*`epialleleR`* does not require reference (genome) sequence for the
+majority of analyses (all but methylation calling for short-read
+methylation sequencing data, where it is absolutely necessary). Cytosine
+methylation and its genomic context for both short-read and long-read
+data are reported based on what is actually observed in sequencing
+reads. The consequences (benefits and drawbacks) of that are as follows:
+
+- the reported numbers of modified and unmodified bases may differ from
+  the output of other tools — although there is a noticeable inter-tool
+  disagreement even for the tools that use reference genome sequence
+- there might occur *de novo* cytosines and/or *de novo* genomic
+  contexts as a result of, e.g., single-nucleotide variation or small
+  indels — they are reported as long as they are observed in a majority
+  of reads covering that position
+- the potential drawback of slow processing is nivellated by very
+  efficient C/C++ code — even in a single-threaded mode, *`epialleleR`*
+  reports cytosine methylation not slower (often much faster) than,
+  e.g., Bismark, Illumina DRAGEN, or Oxford Nanopore Technologies Modkit
+- small but noticeable increase in the accuracy of reported methylation
+  — which in case of the paired-end short-read data may be attributed
+  not only to reference-free processing but also to quality-based read
+  merging (see *`epialleleR`* publication). When tested on a 5mC subset
+  of Modkit validation data
+  (`s3://ont-open-data/modbase-validation_2024.10/`), methylation
+  frequencies (beta values) reported by *`epialleleR`* were closer to
+  the ground truth frequencies than the ones reported by Modkit, using
+  the very same modification probability cutoffs (automatically
+  determined by Modkit)
+
+&nbsp;
+
+    # input data from s3://ont-open-data/modbase-validation_2024.10/
+    # explained at https://epi2me.nanoporetech.com/mod-validation-data/
+
+    # summarise methylation using Modkit
+
+    $ modkit pileup "5mC_rep1.bam" "5mC_rep1.cx.bedMethyl" -s 8 -t 8 --modified-bases 5mC --reference "all_5mers.fa"
+    > discarded 0 contigs with zero aligned reads
+    > parsed 1 base modification(s). Base modifictions other than 'C:m' will be counted as 'N_other'.
+    > adding single-base motif: 'C 0'
+    > attempting to sample 10042 reads
+    > Threshold of 0.66796875 for base C is low. Consider increasing the filter-percentile or specifying a higher threshold.
+    > Threshold of 0.6699219 for base A is low. Consider increasing the filter-percentile or specifying a higher threshold.
+    > using optimized workers for A,C all-context
+    > Done, processed 1537 rows.
+
+    $ modkit pileup "5mC_rep2.bam" "5mC_rep2.cx.bedMethyl" -s 8 -t 8 --modified-bases 5mC --reference "all_5mers.fa"
+    > discarded 0 contigs with zero aligned reads
+    > parsed 1 base modification(s). Base modifictions other than 'C:m' will be counted as 'N_other'.
+    > adding single-base motif: 'C 0'
+    > attempting to sample 10042 reads
+    > Threshold of 0.67578125 for base C is low. Consider increasing the filter-percentile or specifying a higher threshold.
+    > Threshold of 0.6738281 for base A is low. Consider increasing the filter-percentile or specifying a higher threshold.
+    > using optimized workers for A,C all-context
+    > Done, processed 1624 rows.
+
+    # compare in R
+
+    library(epialleleR)
+    library(data.table)
+
+    # summarize cytosine methylation using epialleleR with Modkit's thresholds
+    generateCytosineReport(
+      bam="5mC_rep1.bam", report.file="5mC_rep1.cx.tsv",
+      threshold.reads=FALSE, filter.reads=FALSE, cytosine.context="CX", report.context="CX",
+      min.mapq=0, min.baseq=0, min.prob=round(256*0.66796875), nthreads=4
+    )
+    generateCytosineReport(
+      bam="5mC_rep2.bam", report.file="5mC_rep2.cx.tsv",
+      threshold.reads=FALSE, filter.reads=FALSE, cytosine.context="CX", report.context="CX",
+      min.mapq=0, min.baseq=0, min.prob=round(256*0.67578125), nthreads=4
+    )
+
+    # load methylation summaries: true positive sites with methylation, by epialleleR, by Modkit
+    dt.tp <- fread("all_5mers_5mC_sites.bed", col.names=c("rname", "V2", "pos", "V4", "V5", "strand"))
+    dt.epi <- rbindlist(lapply(list(rep1="5mC_rep1.cx.tsv", rep2="5mC_rep2.cx.tsv"), fread), idcol="rep")
+    dt.modkit <- rbindlist(lapply(list(rep1="5mC_rep1.cx.bedMethyl", rep2="5mC_rep2.cx.bedMethyl"), fread,
+                                  col.names=c("rname", "V2", "pos", "V4", "cov", "strand", "V7", "V8", "V9",
+                                              "V10", "V11", "meth", "V13", "V14", "V15", "V16", "V17", "V18")), idcol="rep")
+    # combine all
+    dt.all <- merge.data.table(
+      merge.data.table(
+        dt.epi[, .(rep, rname, pos, strand, context, meth.epi=meth, cov.epi=meth+unmeth, beta.epi=meth/(meth+unmeth))],
+        dt.modkit[, .(rep, rname, pos, strand, meth.modkit=meth, cov.modkit=cov, beta.modkit=meth/cov)],
+        by=c("rep", "rname", "pos", "strand"), all=TRUE
+      ),
+      dt.tp[, .(rname, pos, strand, TP=TRUE)], by=c("rname", "pos", "strand"), all=TRUE
+    )
+
+    # epialleleR beta values are higher for the majority of true positive sites
+    dt.all[TP==TRUE, as.list(table(beta.epi>beta.modkit)), by=rep]
+    #       rep FALSE  TRUE
+    #    <char> <int> <int>
+    # 1:   rep1    15   241
+    # 2:   rep2    15   241
+
+    # and are lower for the majority of true negative sites
+    dt.all[is.na(TP), as.list(table(beta.epi<beta.modkit)), by=rep]
+    #       rep FALSE  TRUE
+    #    <char> <int> <int>
+    # 1:   rep1   525   739
+    # 2:   rep2   634   727
+
+    # which then results is slightly higher accuracy for epialleleR methylation reports
+    lapply(list("epi"="epi", "modkit"="modkit"), function (tool) {
+      TP <- sum(dt.all[TP==TRUE, get(paste0("meth.", tool))], na.rm=TRUE)
+      TN <- sum(dt.all[is.na(TP), get(paste0("cov.", tool))-get(paste0("meth.", tool))], na.rm=TRUE)
+      FP <- sum(dt.all[is.na(TP), get(paste0("meth.", tool))], na.rm=TRUE)
+      FN <- sum(dt.all[TP==TRUE, get(paste0("cov.", tool))-get(paste0("meth.", tool))], na.rm=TRUE)
+      ACC <- (TP+TN)/(TP+TN+FP+FN)
+    })
+    # $epi
+    # [1] 0.9787987
+    # 
+    # $modkit
+    # [1] 0.9760796
 
 ------------------------------------------------------------------------
 
@@ -170,7 +290,7 @@ methylation reporting as described later:
 
 bam.file <- tempfile(pattern="simulated", fileext=".bam")
 simulateBam(output.bam.file=bam.file, XM=c("ZZzZZ", "zzZzz"), XG="CT")
-#> Writing sample BAM [0.006s]
+#> Writing sample BAM [0.007s]
 #> [1] 2
 # one can view the resulting file using `samtools view -h <bam.file>`
 # or, if desired, file can be converted to SAM using `samtools view`,
@@ -304,8 +424,8 @@ capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
 capture.bed <- system.file("extdata", "capture.bed", package="epialleleR")
 bam.data    <- preprocessBam(capture.bam, targets=capture.bed)
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading BED file [0.035s]
-#> Reading paired-end BAM file [0.019s]
+#> Reading BED file [0.034s]
+#> Reading paired-end BAM file [0.018s]
 generateCytosineReport(bam.data)
 #> Filtering and thresholding reads [0.001s]
 #> Preparing cytosine report [0.011s]
@@ -332,7 +452,7 @@ longread.data <- preprocessBam(
 #> Reading single-end BAM file [0.005s]
 generateCytosineReport(longread.data, threshold.reads=FALSE)
 #> Filtering reads [0.000s]
-#> Preparing cytosine report [0.027s]
+#> Preparing cytosine report [0.028s]
 #>       rname strand      pos context  meth unmeth
 #>      <fctr> <fctr>    <int>  <fctr> <int>  <int>
 #>   1:  chr17      - 43115270      CG     1      0
@@ -355,11 +475,11 @@ simulateBam(
   Ml=list(as.integer(c(102,128,153,138,101,96))),
   output.bam.file=out.bam
   )
-#> Writing sample BAM [0.002s]
+#> Writing sample BAM [0.003s]
 #> [1] 1
 generateCytosineReport(out.bam, threshold.reads=FALSE, report.context="CX")
 #> Checking BAM file: long-read, single-end, unsorted alignment detected
-#> Reading single-end BAM file [0.001s]
+#> Reading single-end BAM file [0.002s]
 #> Filtering reads [0.000s]
 #> Preparing cytosine report [0.001s]
 #>      rname strand   pos context  meth unmeth
@@ -392,7 +512,7 @@ output.bam <- tempfile(pattern="output-", fileext=".bam")
 
 # sample reference genome
 genome <- preprocessGenome(system.file("extdata", "test", "reference.fasta.gz", package="epialleleR"))
-#> Reading reference genome file [0.001s]
+#> Reading reference genome file [0.000s]
 
 # calls cytosine methylation and stores it in the output BAM
 # Input BAM has 100 records of which 73 are mapped to the genome
@@ -451,7 +571,7 @@ head(cg.vef.report[order(meth+unmeth, decreasing=TRUE)])
 # CpG cytosine report
 cg.report <- generateCytosineReport(bam.data, threshold.reads=FALSE)
 #> Filtering reads [0.001s]
-#> Preparing cytosine report [0.012s]
+#> Preparing cytosine report [0.011s]
 head(cg.report[order(meth+unmeth, decreasing=TRUE)])
 #>     rname strand      pos context  meth unmeth
 #>    <fctr> <fctr>    <int>  <fctr> <int>  <int>
@@ -466,7 +586,7 @@ head(cg.report[order(meth+unmeth, decreasing=TRUE)])
 cx.report <- generateCytosineReport(bam.data, threshold.reads=FALSE,
                                     report.context="CX")
 #> Filtering reads [0.001s]
-#> Preparing cytosine report [0.012s]
+#> Preparing cytosine report [0.013s]
 head(cx.report[order(meth+unmeth, decreasing=TRUE)])
 #>     rname strand      pos context  meth unmeth
 #>    <fctr> <fctr>    <int>  <fctr> <int>  <int>
@@ -504,9 +624,9 @@ amplicon.report <- generateAmpliconReport(
 )
 #> Reading BED file [0.008s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.005s]
+#> Reading paired-end BAM file [0.004s]
 #> Filtering and thresholding reads [0.000s]
-#> Preparing amplicon report [0.036s]
+#> Preparing amplicon report [0.037s]
 amplicon.report
 #>    seqnames    start      end width strand amplicon nreads+ nreads- nfiltered        VEF
 #>      <fctr>    <int>    <int> <int> <fctr>   <char>   <int>   <int>     <int>      <num>
@@ -522,9 +642,9 @@ capture.report <- generateCaptureReport(
   bam=system.file("extdata", "capture.bam", package="epialleleR"),
   bed=system.file("extdata", "capture.bed", package="epialleleR")
 )
-#> Reading BED file [0.007s]
+#> Reading BED file [0.008s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.012s]
+#> Reading paired-end BAM file [0.013s]
 #> Filtering and thresholding reads [0.001s]
 #> Preparing capture report [0.016s]
 head(capture.report)
@@ -545,7 +665,7 @@ bed.report <- generateBedReport(
 )
 #> Reading BED file [0.008s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.013s]
+#> Reading paired-end BAM file [0.014s]
 #> Filtering and thresholding reads [0.001s]
 #> Preparing capture report [0.016s]
 identical(capture.report, bed.report)
@@ -596,7 +716,7 @@ patterns <- extractPatterns(
 )
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file [0.004s]
-#> Extracting methylation patterns [0.021s]
+#> Extracting methylation patterns [0.029s]
 
 # that many read pairs overlap genomic region of interest
 nrow(patterns)
@@ -652,7 +772,7 @@ plotPatterns(
   extractPatterns(bam=long.data, bed=long.bed),
   npatterns.per.bin=Inf
 )
-#> Extracting methylation patterns [0.017s]
+#> Extracting methylation patterns [0.018s]
 #> 20 patterns supplied
 #> 20 unique
 #> 20 most frequent unique patterns were selected for plotting using 10 beta value bins:
@@ -701,12 +821,12 @@ vcf.report <- generateVcfReport(
 )
 #> Loading required namespace: VariantAnnotation
 #> Loading required namespace: GenomeInfoDb
-#> Reading BED file [0.022s]
-#> Reading VCF file [1.074s]
+#> Reading BED file [0.024s]
+#> Reading VCF file [0.986s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file [0.004s]
 #> Filtering and thresholding reads [0.000s]
-#> Extracting base frequences [0.046s]
+#> Extracting base frequences [0.052s]
 
 # NA values are shown for the C->T variants on the "+" and G->A on the "-"
 # strands, because bisulfite conversion makes their counting impossible
@@ -815,10 +935,10 @@ amplicon.ecdfs <- generateBedEcdf(
   bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
   bed.rows=NULL
 )
-#> Reading BED file [0.007s]
+#> Reading BED file [0.008s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.004s]
-#> Computing ECDFs for within- and out-of-context per-read beta values [0.008s]
+#> Reading paired-end BAM file [0.005s]
+#> Computing ECDFs for within- and out-of-context per-read beta values [0.007s]
 
 # there are 5 items in amplicon.ecdfs, let's plot all of them
 par(mfrow=c(1,length(amplicon.ecdfs)))

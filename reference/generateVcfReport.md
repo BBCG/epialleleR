@@ -272,9 +272,9 @@ function for getting or setting the seqlevels style.
                                   vcf=capture.vcf)
 #> Loading required namespace: VariantAnnotation
 #> Reading BED file 
-#> [0.024s]
+#> [0.023s]
 #> Reading VCF file 
-#> [4.649s]
+#> [5.768s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
@@ -282,7 +282,7 @@ function for getting or setting the seqlevels style.
 #> Filtering and thresholding reads 
 #> [0.001s]
 #> Extracting base frequences 
-#> [0.136s]
+#> [0.146s]
   
   # toy example to illustrate the logic of computations
   if (requireNamespace("VariantAnnotation", quietly=TRUE)) {
@@ -326,7 +326,7 @@ function for getting or setting the seqlevels style.
 #> Thresholding reads 
 #> [0.000s]
 #> Extracting base frequences 
-#> [0.032s]
+#> [0.033s]
 #>    seqnames range    REF    ALT nfiltered M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt
 #>      <fctr> <int> <char> <char>    <lgcl> <num> <num> <num> <num> <num> <num>
 #> 1:     chr1     2      A      G        NA     1     1    NA    NA     2     0

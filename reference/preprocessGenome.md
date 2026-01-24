@@ -69,5 +69,5 @@ Block compression/decompression utility
   genome.file <- system.file("extdata", "test", "reference.fasta.gz", package="epialleleR")
   genome.data <- preprocessGenome(genome.file)
 #> Reading reference genome file 
-#> [0.001s]
+#> [0.000s]
 ```

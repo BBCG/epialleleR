@@ -183,7 +183,7 @@ vignettes for the description of usage and sample data.
 #> Reading paired-end BAM file 
 #> [0.009s]
 #> Extracting methylation patterns 
-#> [0.027s]
+#> [0.028s]
   
   # and then plot them
   plotPatterns(patterns)
@@ -212,7 +212,7 @@ vignettes for the description of usage and sample data.
     npatterns.per.bin=Inf
   )
 #> Extracting methylation patterns 
-#> [0.054s]
+#> [0.055s]
 #> 37 patterns supplied
 #> 37 unique
 #> 37 most frequent unique patterns were selected for plotting using 10 beta value bins:
