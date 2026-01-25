@@ -39,7 +39,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.107s]
+#> Writing sample BAM [0.109s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), 0, title="no epimutations")
 ```
@@ -61,7 +61,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.104s]
+#> Writing sample BAM [0.106s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="one complete epimutation")
 ```
@@ -83,7 +83,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.106s]
+#> Writing sample BAM [0.104s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="one partial epimutation")
 ```
@@ -105,7 +105,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.141s]
+#> Writing sample BAM [0.147s]
 #> [1] 1000
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="another partial epimutation")
 ```
@@ -130,7 +130,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.108s]
+#> Writing sample BAM [0.111s]
 #> [1] 1009
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="several partial epimutations")
 ```
@@ -155,7 +155,7 @@ simulateBam(
   ),
   XG="CT"
 )
-#> Writing sample BAM [0.101s]
+#> Writing sample BAM [0.103s]
 #> [1] 1009
 plotMetrics(out.bam, as("chrS:1-10", "GRanges"), title="several short partial epimutations")
 ```

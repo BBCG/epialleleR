@@ -61,14 +61,14 @@ preprocessBam(
   base modification probability range 0.0 to 1.0 is remapped in equal
   sized portions to the discrete integers 0 to 255 inclusively. Default
   is -1, however a higher value (e.g., 178 which corresponds to a
-  modification probability of ~0.7) is strongly recommended. When
-  default (-1), all C+m and G-m cytosine methylation modifications
-  recorded in MM/Mm tag will be included, even if ML/Ml tag with
-  probabilities is absent (in such case, probability of modification
-  equals -1). If a base has at least one modifications, and neither the
-  probability of any of modifications nor the probability of the
-  conventional base reach the \`min.prob\`, this base will be masked in
-  this particular read and not counted neither as modified nor as
+  continuous base modification probability of ~0.7) is strongly
+  recommended. When default (-1), all C+m and G-m cytosine methylation
+  modifications recorded in MM/Mm tag will be included, even if ML/Ml
+  tag with probabilities is absent (in such case, probability of
+  modification equals -1). If a base has at least one modifications, and
+  neither the probability of any of modifications nor the probability of
+  the conventional base reach the \`min.prob\`, this base will be masked
+  in this particular read and not counted neither as modified nor as
   conventional.
 
 - highest.prob:
@@ -305,7 +305,7 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 #> Filtering and thresholding reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.000s]
+#> [0.001s]
 #>      rname strand      pos context  meth unmeth
 #>     <fctr> <fctr>    <int>  <fctr> <int>  <int>
 #>  1:  chr17      - 43123785      CG     1      0
@@ -365,12 +365,12 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 #> Checking BAM file: 
 #> long-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.005s]
+#> [0.004s]
   generateCytosineReport(longread.data, threshold.reads=FALSE)
 #> Filtering reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.026s]
+#> [0.025s]
 #>       rname strand      pos context  meth unmeth
 #>      <fctr> <fctr>    <int>  <fctr> <int>  <int>
 #>   1:  chr17      - 43115270      CG     1      0

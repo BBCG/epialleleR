@@ -214,25 +214,31 @@ reads. The consequences (benefits and drawbacks) of that are as follows:
 
     # which then results is slightly higher accuracy for epialleleR methylation reports
     lapply(list("epi"="epi", "modkit"="modkit"), function (tool) {
-      TP <- sum(dt.all[TP==TRUE, get(paste0("meth.", tool))], na.rm=TRUE)
-      TN <- sum(dt.all[is.na(TP), get(paste0("cov.", tool))-get(paste0("meth.", tool))], na.rm=TRUE)
-      FP <- sum(dt.all[is.na(TP), get(paste0("meth.", tool))], na.rm=TRUE)
-      FN <- sum(dt.all[TP==TRUE, get(paste0("cov.", tool))-get(paste0("meth.", tool))], na.rm=TRUE)
+      TP <- as.numeric(sum(dt.all[TP==TRUE, get(paste0("meth.", tool))], na.rm=TRUE))
+      TN <- as.numeric(sum(dt.all[is.na(TP), get(paste0("cov.", tool))-get(paste0("meth.", tool))], na.rm=TRUE))
+      FP <- as.numeric(sum(dt.all[is.na(TP), get(paste0("meth.", tool))], na.rm=TRUE))
+      FN <- as.numeric(sum(dt.all[TP==TRUE, get(paste0("cov.", tool))-get(paste0("meth.", tool))], na.rm=TRUE))
       ACC <- (TP+TN)/(TP+TN+FP+FN)
+      MCC <- (TP*TN-FP*FN)/sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
+      c(accuracy=ACC, MCC=MCC)
     })
     # $epi
-    # [1] 0.9787987
+    #  accuracy       MCC 
+    # 0.9787987 0.9464980 
     # 
     # $modkit
-    # [1] 0.9760796
+    #  accuracy       MCC 
+    # 0.9760796 0.9395759 
 
     # The accuracy is even higher when recommended values for mapping
     # and base quality are used (min.mapq=30, min.baseq=13)
     # $epi
-    # [1] 0.9868576
+    #  accuracy       MCC 
+    # 0.9868576 0.9669984 
     # 
     # $modkit
-    # [1] 0.9760796
+    #  accuracy       MCC 
+    # 0.9760796 0.9395759 
 
 ------------------------------------------------------------------------
 
@@ -433,11 +439,11 @@ capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
 capture.bed <- system.file("extdata", "capture.bed", package="epialleleR")
 bam.data    <- preprocessBam(capture.bam, targets=capture.bed)
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading BED file [0.032s]
+#> Reading BED file [0.035s]
 #> Reading paired-end BAM file [0.018s]
 generateCytosineReport(bam.data)
 #> Filtering and thresholding reads [0.001s]
-#> Preparing cytosine report [0.010s]
+#> Preparing cytosine report [0.017s]
 #>         rname strand       pos context  meth unmeth
 #>        <fctr> <fctr>     <int>  <fctr> <int>  <int>
 #>     1:   chr1      -   3067907      CG     1      0
@@ -458,10 +464,10 @@ longread.data <- preprocessBam(
   min.mapq=30, min.baseq=20, min.prob=178
 )
 #> Checking BAM file: long-read, single-end, unsorted alignment detected
-#> Reading single-end BAM file [0.004s]
+#> Reading single-end BAM file [0.005s]
 generateCytosineReport(longread.data, threshold.reads=FALSE)
 #> Filtering reads [0.000s]
-#> Preparing cytosine report [0.025s]
+#> Preparing cytosine report [0.028s]
 #>       rname strand      pos context  meth unmeth
 #>      <fctr> <fctr>    <int>  <fctr> <int>  <int>
 #>   1:  chr17      - 43115270      CG     1      0
@@ -484,13 +490,13 @@ simulateBam(
   Ml=list(as.integer(c(102,128,153,138,101,96))),
   output.bam.file=out.bam
   )
-#> Writing sample BAM [0.003s]
+#> Writing sample BAM [0.002s]
 #> [1] 1
 generateCytosineReport(out.bam, threshold.reads=FALSE, report.context="CX")
 #> Checking BAM file: long-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file [0.002s]
 #> Filtering reads [0.000s]
-#> Preparing cytosine report [0.001s]
+#> Preparing cytosine report [0.000s]
 #>      rname strand   pos context  meth unmeth
 #>     <fctr> <fctr> <int>  <fctr> <int>  <int>
 #>  1:   chrS      +     2      CG     1      0
@@ -566,7 +572,7 @@ incompletely converted DNA molecules.
 # CpG VEF report
 cg.vef.report <- generateCytosineReport(bam.data)
 #> Filtering and thresholding reads [0.001s]
-#> Preparing cytosine report [0.010s]
+#> Preparing cytosine report [0.011s]
 head(cg.vef.report[order(meth+unmeth, decreasing=TRUE)])
 #>     rname strand      pos context  meth unmeth
 #>    <fctr> <fctr>    <int>  <fctr> <int>  <int>
@@ -633,9 +639,9 @@ amplicon.report <- generateAmpliconReport(
 )
 #> Reading BED file [0.008s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.004s]
-#> Filtering and thresholding reads [0.001s]
-#> Preparing amplicon report [0.037s]
+#> Reading paired-end BAM file [0.005s]
+#> Filtering and thresholding reads [0.000s]
+#> Preparing amplicon report [0.039s]
 amplicon.report
 #>    seqnames    start      end width strand amplicon nreads+ nreads- nfiltered        VEF
 #>      <fctr>    <int>    <int> <int> <fctr>   <char>   <int>   <int>     <int>      <num>
@@ -653,8 +659,8 @@ capture.report <- generateCaptureReport(
 )
 #> Reading BED file [0.008s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.011s]
-#> Filtering and thresholding reads [0.001s]
+#> Reading paired-end BAM file [0.014s]
+#> Filtering and thresholding reads [0.002s]
 #> Preparing capture report [0.019s]
 head(capture.report)
 #>    seqnames    start      end width strand     V4 nreads+ nreads- nfiltered       VEF
@@ -672,11 +678,11 @@ bed.report <- generateBedReport(
   bed=system.file("extdata", "capture.bed", package="epialleleR"),
   bed.type="capture"
 )
-#> Reading BED file [0.007s]
+#> Reading BED file [0.008s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.011s]
+#> Reading paired-end BAM file [0.013s]
 #> Filtering and thresholding reads [0.001s]
-#> Preparing capture report [0.020s]
+#> Preparing capture report [0.018s]
 identical(capture.report, bed.report)
 #> [1] TRUE
 ```
@@ -704,8 +710,8 @@ mhl.report <- generateMhlReport(
   bam=system.file("extdata", "capture.bam", package="epialleleR")
 )
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.011s]
-#> Preparing lMHL report [0.020s]
+#> Reading paired-end BAM file [0.013s]
+#> Preparing lMHL report [0.019s]
 ```
 
 ### Exploring DNA methylation patterns
@@ -725,7 +731,7 @@ patterns <- extractPatterns(
 )
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file [0.004s]
-#> Extracting methylation patterns [0.027s]
+#> Extracting methylation patterns [0.029s]
 
 # that many read pairs overlap genomic region of interest
 nrow(patterns)
@@ -776,7 +782,7 @@ long.data <- preprocessBam(
   min.mapq=30, min.baseq=20, min.prob=178
 )
 #> Checking BAM file: long-read, single-end, unsorted alignment detected
-#> Reading single-end BAM file [0.007s]
+#> Reading single-end BAM file [0.012s]
 plotPatterns(
   extractPatterns(bam=long.data, bed=long.bed),
   npatterns.per.bin=Inf
@@ -831,11 +837,11 @@ vcf.report <- generateVcfReport(
 #> Loading required namespace: VariantAnnotation
 #> Loading required namespace: GenomeInfoDb
 #> Reading BED file [0.022s]
-#> Reading VCF file [0.547s]
+#> Reading VCF file [1.244s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.003s]
+#> Reading paired-end BAM file [0.004s]
 #> Filtering and thresholding reads [0.000s]
-#> Extracting base frequences [0.045s]
+#> Extracting base frequences [0.042s]
 
 # NA values are shown for the C->T variants on the "+" and G->A on the "-"
 # strands, because bisulfite conversion makes their counting impossible
@@ -944,10 +950,10 @@ amplicon.ecdfs <- generateBedEcdf(
   bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
   bed.rows=NULL
 )
-#> Reading BED file [0.008s]
+#> Reading BED file [0.007s]
 #> Checking BAM file: short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file [0.004s]
-#> Computing ECDFs for within- and out-of-context per-read beta values [0.007s]
+#> Computing ECDFs for within- and out-of-context per-read beta values [0.008s]
 
 # there are 5 items in amplicon.ecdfs, let's plot all of them
 par(mfrow=c(1,length(amplicon.ecdfs)))
