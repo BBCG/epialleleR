@@ -282,8 +282,8 @@ dt.all[is.na(TP), as.list(table(beta.epi<beta.modkit)), by=rep]
 # 1:   rep1   525   739
 # 2:   rep2   634   727
 
-# which then results is slightly higher accuracy for epialleleR methylation reports
-lapply(list("epi"="epi", "modkit"="modkit"), function (tool) {
+# which then results in a slightly higher accuracy for epialleleR methylation reports
+lapply(list(epialleleR="epi", modkit="modkit"), function (tool) {
   TP <- as.numeric(sum(dt.all[TP==TRUE, get(paste0("meth.", tool))], na.rm=TRUE))
   TN <- as.numeric(sum(dt.all[is.na(TP), get(paste0("cov.", tool))-get(paste0("meth.", tool))], na.rm=TRUE))
   FP <- as.numeric(sum(dt.all[is.na(TP), get(paste0("meth.", tool))], na.rm=TRUE))
@@ -292,7 +292,7 @@ lapply(list("epi"="epi", "modkit"="modkit"), function (tool) {
   MCC <- (TP*TN-FP*FN)/sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
   c(accuracy=ACC, MCC=MCC)
 })
-# $epi
+# $epialleleR
 #  accuracy       MCC 
 # 0.9787987 0.9464980 
 # 
@@ -302,7 +302,7 @@ lapply(list("epi"="epi", "modkit"="modkit"), function (tool) {
 
 # The accuracy is even higher when recommended values for mapping
 # and base quality are used (min.mapq=30, min.baseq=13)
-# $epi
+# $epialleleR
 #  accuracy       MCC 
 # 0.9868576 0.9669984 
 # 
