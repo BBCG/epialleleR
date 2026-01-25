@@ -166,13 +166,13 @@ description of usage and sample data.
   amplicon.ecdfs <- generateBedEcdf(bam=amplicon.bam, bed=amplicon.bed,
                                     bed.rows=NULL)
 #> Reading BED file 
-#> [0.008s]
+#> [0.007s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
 #> [0.004s]
 #> Computing ECDFs for within- and out-of-context per-read beta values 
-#> [0.023s]
+#> [0.022s]
   
   # there are 5 items in amplicon.ecdfs, let's plot them all
   par(mfrow=c(1,length(amplicon.ecdfs)))

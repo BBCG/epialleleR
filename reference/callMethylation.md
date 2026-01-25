@@ -126,9 +126,9 @@ Platform](https://support-docs.illumina.com/SW/dragen_v42/Content/SW/DRAGEN/MPip
     genome=system.file("extdata", "test", "reference.fasta.gz", package="epialleleR")
   )
 #> Reading reference genome file 
-#> [0.000s]
+#> [0.001s]
 #> Making methylation calls 
-#> [0.027s]
+#> [0.029s]
 #> $nrecs
 #> [1] 100
 #> 
