@@ -69,6 +69,17 @@
 <p><em><code>epialleleR</code></em> is an R package for calling and reporting cytosine DNA methylation. Developed to help identify and quantify epimutations (aberrant DNA methylation events), it has now acquired multiple additional functions to dissect DNA methylation in many useful ways. But the main feature of the package is to report frequencies of epimutations (variant epiallele frequencies, VEF) at the level of genomic regions or individual cytosines. All you need in order to use it, is a binary alignment map (BAM) file from basically any next-generation (methylation or native) sequencing experiment.</p>
 <p><img src="./articles/epialleles.png"></p>
 <div class="section level3">
+<h3 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
+</h3>
+<ul>
+<li>very fast!</li>
+<li>reference-free</li>
+<li>designed with epimutation studies in mind</li>
+<li>probably, the most accurate tool for conventional cytosine methylation reporting</li>
+</ul>
+<p>For details, see the related <a href="https://doi.org/10.1093/gigascience/giad087" class="external-link">publication</a> and <a href="https://bbcg.github.io/epialleleR/articles/epialleleR.html" class="external-link">vignette</a>.</p>
+</div>
+<div class="section level3">
 <h3 id="input-data">Input Data<a class="anchor" aria-label="anchor" href="#input-data"></a>
 </h3>
 <ul>
@@ -78,18 +89,18 @@
 </ul>
 </div>
 <div class="section level3">
-<h3 id="current-features">Current Features<a class="anchor" aria-label="anchor" href="#current-features"></a>
+<h3 id="capabilities">Capabilities<a class="anchor" aria-label="anchor" href="#capabilities"></a>
 </h3>
 <ul>
-<li>calling cytosine methylation and saving calls in a new BAM file (<em><code>callMethylation</code></em>)</li>
-<li>creating sample BAM files from scratch given mandatory and optional BAM fields (<em><code>simulateBam</code></em>)</li>
-<li>conventional reporting of cytosine methylation (<em><code>generateCytosineReport</code></em>)</li>
-<li>reporting the hypermethylated variant epiallele frequency (VEF) at the level of genomic regions (<em><code>generate[Bed|Amplicon|Capture]Report</code></em>) or individual cytosines (<em><code>generateCytosineReport</code></em>)</li>
-<li>reporting linearised Methylated Haplotype Load (lMHL, <em><code>generateMhlReport</code></em>)</li>
-<li>extracting methylation patterns for genomic region of interest (<em><code>extractPatterns</code></em>)</li>
-<li>visualising methylation patterns (<em><code>plotPatterns</code></em>)</li>
-<li>testing for the association between epiallele methylation status and sequence variations (<em><code>generateVcfReport</code></em>)</li>
-<li>assessing the distribution of per-read beta values for genomic regions of interest (<em><code>generateBedEcdf</code></em>)</li>
+<li>call cytosine methylation and save calls in a new BAM file (<em><code>callMethylation</code></em>)</li>
+<li>create sample BAM files from scratch given mandatory and optional BAM fields (<em><code>simulateBam</code></em>)</li>
+<li>create conventional reports of cytosine methylation (<em><code>generateCytosineReport</code></em>)</li>
+<li>evaluate epimutation frequencies both at the level of genomic regions (<em><code>generate[Bed|Amplicon|Capture]Report</code></em>) and individual cytosines (<em><code>generateCytosineReport</code></em>)</li>
+<li>evaluate linearised Methylated Haplotype Load (lMHL, <em><code>generateMhlReport</code></em>)</li>
+<li>extract methylation patterns for genomic region of interest (<em><code>extractPatterns</code></em>)</li>
+<li>visualise methylation patterns (<em><code>plotPatterns</code></em>)</li>
+<li>test for the association between epiallele methylation status and sequence variations (<em><code>generateVcfReport</code></em>)</li>
+<li>assess the distribution of per-read beta values for genomic regions of interest (<em><code>generateBedEcdf</code></em>)</li>
 </ul>
 </div>
 <div class="section level3">

@@ -87,7 +87,7 @@ generateBedReport(
 
   file location string to write the BED report. If NULL (the default)
   then report is returned as a
-  [`data.table`](https://rdatatable.gitlab.io/data.table/reference/data.table.html)
+  [`data.table`](https://rdrr.io/pkg/data.table/man/data.table.html)
   object.
 
 - zero.based.bed:
@@ -209,7 +209,7 @@ generateBedReport(
 
 ## Value
 
-[`data.table`](https://rdatatable.gitlab.io/data.table/reference/data.table.html)
+[`data.table`](https://rdrr.io/pkg/data.table/man/data.table.html)
 object containing VEF report for BED
 [`GRanges`](https://rdrr.io/pkg/GenomicRanges/man/GRanges-class.html) or
 NULL if report.file was specified. If BAM file contains reads that would
@@ -323,7 +323,7 @@ function for getting or setting the seqlevels style.
   amplicon.report <- generateAmpliconReport(bam=amplicon.bam,
                                             bed=amplicon.bed)
 #> Reading BED file 
-#> [0.007s]
+#> [0.008s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
@@ -331,14 +331,14 @@ function for getting or setting the seqlevels style.
 #> Filtering and thresholding reads 
 #> [0.000s]
 #> Preparing amplicon report 
-#> [0.014s]
+#> [0.013s]
   plotPatterns(
     extractPatterns(
       bam=amplicon.bam, bed=amplicon.bed, match.min.overlap=100
     ), npatterns.per.bin=Inf
   )
 #> Reading BED file 
-#> [0.007s]
+#> [0.006s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
@@ -359,26 +359,26 @@ function for getting or setting the seqlevels style.
                                 package="epialleleR")
   capture.report <- generateCaptureReport(bam=capture.bam, bed=capture.bed)
 #> Reading BED file 
-#> [0.008s]
+#> [0.009s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.013s]
+#> [0.011s]
 #> Filtering and thresholding reads 
 #> [0.001s]
 #> Preparing capture report 
-#> [0.016s]
+#> [0.018s]
   
   # generateAmpliconReport and generateCaptureReport are just aliases
   # of the generateBedReport
   bed.report <- generateBedReport(bam=capture.bam, bed=capture.bed,
                                   bed.type="capture")
 #> Reading BED file 
-#> [0.007s]
+#> [0.008s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.013s]
+#> [0.011s]
 #> Filtering and thresholding reads 
 #> [0.001s]
 #> Preparing capture report 
@@ -403,13 +403,13 @@ function for getting or setting the seqlevels style.
 #> Thresholding reads 
 #> [0.000s]
 #> Preparing capture report 
-#> [0.011s]
+#> [0.013s]
   plotPatterns(
     extractPatterns(bam=long.data, bed=long.bed),
     npatterns.per.bin=Inf
   )
 #> Extracting methylation patterns 
-#> [0.015s]
+#> [0.017s]
 #> 20 patterns supplied
 #> 20 unique
 #> 20 most frequent unique patterns were selected for plotting using 10 beta value bins:
@@ -427,7 +427,7 @@ function for getting or setting the seqlevels style.
                     "...Z..z.h..X..h.",  "...Z..z.h..z.h."),
               cigar=c("7M1I9M", "16M", "16M", "12M1D3M"))
 #> Writing sample BAM 
-#> [0.003s]
+#> [0.002s]
 #> [1] 4
   # with read filtering
   generateBedReport(bam=temp.bam, bed=temp.bed, min.context.sites=2)
@@ -447,11 +447,11 @@ function for getting or setting the seqlevels style.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.001s]
+#> [0.002s]
 #> Thresholding reads 
 #> [0.000s]
 #> Preparing amplicon report 
-#> [0.010s]
+#> [0.013s]
 #>    seqnames start   end width strand nreads+ nreads- nfiltered   VEF
 #>      <fctr> <int> <int> <int> <fctr>   <int>   <int>     <int> <num>
 #> 1:     chr1     1   100   100      *       4       0        NA  0.75
@@ -465,7 +465,7 @@ function for getting or setting the seqlevels style.
 #> Reading single-end BAM file 
 #> [0.002s]
 #> Extracting methylation patterns 
-#> [0.006s]
+#> [0.008s]
 #> 4 patterns supplied
 #> 4 unique
 #> 4 most frequent unique patterns were selected for plotting using 10 beta value bins:

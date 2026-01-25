@@ -42,7 +42,7 @@ plotPatterns(
 
   output of [`preprocessBam`](preprocessBam.md) function (methylation
   patterns as a
-  [`data.table`](https://rdatatable.gitlab.io/data.table/reference/data.table.html)
+  [`data.table`](https://rdrr.io/pkg/data.table/man/data.table.html)
   object).
 
 - order.by:
@@ -196,7 +196,7 @@ plotPatterns(
 
   boolean. If \`TRUE\` (the default), patterns are plotted, and the
   selected ones are silently returned as a
-  [`data.table`](https://rdatatable.gitlab.io/data.table/reference/data.table.html)
+  [`data.table`](https://rdrr.io/pkg/data.table/man/data.table.html)
   object. If \`FALSE\`, the
   [`grob table`](https://gtable.r-lib.org/reference/gtable.html) object
   is returned instead.
@@ -208,7 +208,7 @@ plotPatterns(
 ## Value
 
 the plot and (silently) the
-[`data.table`](https://rdatatable.gitlab.io/data.table/reference/data.table.html)
+[`data.table`](https://rdrr.io/pkg/data.table/man/data.table.html)
 object containing plotted methylation patterns (if \`plot==TRUE\`), or
 [`grob table`](https://gtable.r-lib.org/reference/gtable.html) object
 (if \`plot==FALSE\`).
@@ -257,7 +257,7 @@ vignettes for the description of usage and sample data.
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.005s]
+#> [0.004s]
 #> Extracting methylation patterns 
 #> [0.013s]
   

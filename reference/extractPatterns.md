@@ -112,7 +112,7 @@ extractPatterns(
 
 ## Value
 
-[`data.table`](https://rdatatable.gitlab.io/data.table/reference/data.table.html)
+[`data.table`](https://rdrr.io/pkg/data.table/man/data.table.html)
 object containing per-read (pair) base methylation information for the
 genomic region of interest. The report columns are:
 
@@ -177,11 +177,11 @@ vignettes for the description of usage and sample data.
   # extract patterns
   patterns <- extractPatterns(bam=amplicon.bam, bed=amplicon.bed, bed.row=3)
 #> Reading BED file 
-#> [0.031s]
+#> [0.032s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.010s]
+#> [0.009s]
 #> Extracting methylation patterns 
 #> [0.026s]
   
@@ -205,14 +205,14 @@ vignettes for the description of usage and sample data.
 #> Checking BAM file: 
 #> long-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.026s]
+#> [0.028s]
   plotPatterns(
     extractPatterns(bam=long.data,
                     bed=as("chr17:43125000-43127000", "GRanges")),
     npatterns.per.bin=Inf
   )
 #> Extracting methylation patterns 
-#> [0.049s]
+#> [0.053s]
 #> 37 patterns supplied
 #> 37 unique
 #> 37 most frequent unique patterns were selected for plotting using 10 beta value bins:

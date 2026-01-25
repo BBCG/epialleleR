@@ -30,7 +30,7 @@ simulateBam(
 
   output BAM file location string. If NULL (default), records are not
   written to BAM but returned as a
-  [`data.table`](https://rdatatable.gitlab.io/data.table/reference/data.table.html)
+  [`data.table`](https://rdrr.io/pkg/data.table/man/data.table.html)
   object for review.
 
 - qname:
@@ -121,7 +121,7 @@ simulateBam(
 ## Value
 
 number of BAM records written (if \`output.bam.file\` is not NULL) or
-[`data.table`](https://rdatatable.gitlab.io/data.table/reference/data.table.html)
+[`data.table`](https://rdrr.io/pkg/data.table/man/data.table.html)
 object containing final records prepared for writing. NB: this object
 has 0-based coordinates and numerically encoded reference names.
 

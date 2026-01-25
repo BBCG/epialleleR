@@ -35,7 +35,7 @@ generateCytosineReport(
 
   file location string to write the cytosine report. If NULL (the
   default) then report is returned as a
-  [`data.table`](https://rdatatable.gitlab.io/data.table/reference/data.table.html)
+  [`data.table`](https://rdrr.io/pkg/data.table/man/data.table.html)
   object.
 
 - cytosine.context:
@@ -119,7 +119,7 @@ generateCytosineReport(
 
 ## Value
 
-[`data.table`](https://rdatatable.gitlab.io/data.table/reference/data.table.html)
+[`data.table`](https://rdrr.io/pkg/data.table/man/data.table.html)
 object containing cytosine report in Bismark-like format or NULL if
 report.file was specified. The report columns are:
 
@@ -243,9 +243,9 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.013s]
+#> [0.011s]
 #> Filtering and thresholding reads 
-#> [0.002s]
+#> [0.001s]
 #> Preparing cytosine report 
 #> [0.011s]
   
@@ -255,11 +255,11 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.013s]
+#> [0.011s]
 #> Filtering reads 
 #> [0.001s]
 #> Preparing cytosine report 
-#> [0.012s]
+#> [0.011s]
   
   # Long-read sequencing with both filtering and thresholding disabled
   long.bam <- system.file("extdata", "longread.bam", package="epialleleR")
@@ -274,7 +274,7 @@ for analysing the distribution of per-read beta values.
 #> Skipping filtering/thresholding 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.030s]
+#> [0.026s]
   plot(cg.report[, .(pos, beta=data.table::frollmean(meth/(meth+unmeth), 100))], type="l")
 
   
@@ -295,7 +295,7 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.003s]
+#> [0.001s]
 #> Filtering and thresholding reads 
 #> [0.000s]
 #> Preparing cytosine report 
@@ -334,7 +334,7 @@ for analysing the distribution of per-read beta values.
 #> Thresholding reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.000s]
+#> [0.001s]
 #>     rname strand   pos context  meth unmeth
 #>    <fctr> <fctr> <int>  <fctr> <int>  <int>
 #> 1:   chr1      +     4      CG     3      1
@@ -352,7 +352,7 @@ for analysing the distribution of per-read beta values.
 #> Filtering reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.000s]
+#> [0.001s]
 #>     rname strand   pos context  meth unmeth
 #>    <fctr> <fctr> <int>  <fctr> <int>  <int>
 #> 1:   chr1      +     4      CG     3      0
@@ -366,7 +366,7 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.002s]
+#> [0.001s]
 #> Skipping filtering/thresholding 
 #> [0.000s]
 #> Preparing cytosine report 
@@ -386,9 +386,9 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.002s]
+#> [0.001s]
 #> Extracting methylation patterns 
-#> [0.007s]
+#> [0.008s]
 #> 4 patterns supplied
 #> 4 unique
 #> 4 most frequent unique patterns were selected for plotting using 10 beta value bins:

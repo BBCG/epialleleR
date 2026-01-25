@@ -147,7 +147,7 @@ preprocessBam(
 
 ## Value
 
-[`data.table`](https://rdatatable.gitlab.io/data.table/reference/data.table.html)
+[`data.table`](https://rdrr.io/pkg/data.table/man/data.table.html)
 object containing preprocessed BAM data.
 
 NB: most of the BAM data is stored not in the data.table *per se*, but
@@ -370,7 +370,7 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 #> Filtering reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.030s]
+#> [0.026s]
 #>       rname strand      pos context  meth unmeth
 #>      <fctr> <fctr>    <int>  <fctr> <int>  <int>
 #>   1:  chr17      - 43115270      CG     1      0
@@ -429,11 +429,11 @@ Platform](https://support.illumina.com/content/dam/illumina-support/help/Illumin
 #> Checking BAM file: 
 #> long-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.002s]
+#> [0.001s]
 #> Filtering reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.000s]
+#> [0.001s]
 #>      rname strand   pos context  meth unmeth
 #>     <fctr> <fctr> <int>  <fctr> <int>  <int>
 #>  1:   chrS      +     2      CG     0      1

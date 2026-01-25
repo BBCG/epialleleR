@@ -20,6 +20,18 @@ or native) sequencing experiment.
 
 ![](./articles/epialleles.png)
 
+### Features
+
+- very fast!
+- reference-free
+- designed with epimutation studies in mind
+- probably, the most accurate tool for conventional cytosine methylation
+  reporting
+
+For details, see the related
+[publication](https://doi.org/10.1093/gigascience/giad087) and
+[vignette](https://bbcg.github.io/epialleleR/articles/epialleleR.html).
+
 ### Input Data
 
 - short-read and long-read (native)
@@ -27,26 +39,26 @@ or native) sequencing experiment.
 - whole-genome, genome-wide (e.g., hybridization capture or adaptive
   sampling), and narrowly targeted (e.g., amplicon panels)
 
-### Current Features
+### Capabilities
 
-- calling cytosine methylation and saving calls in a new BAM file
+- call cytosine methylation and save calls in a new BAM file
   (*`callMethylation`*)
-- creating sample BAM files from scratch given mandatory and optional
-  BAM fields (*`simulateBam`*)
-- conventional reporting of cytosine methylation
+- create sample BAM files from scratch given mandatory and optional BAM
+  fields (*`simulateBam`*)
+- create conventional reports of cytosine methylation
   (*`generateCytosineReport`*)
-- reporting the hypermethylated variant epiallele frequency (VEF) at the
-  level of genomic regions (*`generate[Bed|Amplicon|Capture]Report`*) or
-  individual cytosines (*`generateCytosineReport`*)
-- reporting linearised Methylated Haplotype Load (lMHL,
+- evaluate epimutation frequencies both at the level of genomic regions
+  (*`generate[Bed|Amplicon|Capture]Report`*) and individual cytosines
+  (*`generateCytosineReport`*)
+- evaluate linearised Methylated Haplotype Load (lMHL,
   *`generateMhlReport`*)
-- extracting methylation patterns for genomic region of interest
+- extract methylation patterns for genomic region of interest
   (*`extractPatterns`*)
-- visualising methylation patterns (*`plotPatterns`*)
-- testing for the association between epiallele methylation status and
+- visualise methylation patterns (*`plotPatterns`*)
+- test for the association between epiallele methylation status and
   sequence variations (*`generateVcfReport`*)
-- assessing the distribution of per-read beta values for genomic regions
-  of interest (*`generateBedEcdf`*)
+- assess the distribution of per-read beta values for genomic regions of
+  interest (*`generateBedEcdf`*)
 
 ### Recent improvements
 

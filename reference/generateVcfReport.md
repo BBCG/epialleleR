@@ -70,7 +70,7 @@ generateVcfReport(
 
   file location string to write the VCF report. If NULL (the default)
   then report is returned as a
-  [`data.table`](https://rdatatable.gitlab.io/data.table/reference/data.table.html)
+  [`data.table`](https://rdrr.io/pkg/data.table/man/data.table.html)
   object.
 
 - zero.based.bed:
@@ -153,7 +153,7 @@ generateVcfReport(
 
 ## Value
 
-[`data.table`](https://rdatatable.gitlab.io/data.table/reference/data.table.html)
+[`data.table`](https://rdrr.io/pkg/data.table/man/data.table.html)
 object containing VCF report or NULL if report.file was specified. The
 report columns are:
 
@@ -272,9 +272,9 @@ function for getting or setting the seqlevels style.
                                   vcf=capture.vcf)
 #> Loading required namespace: VariantAnnotation
 #> Reading BED file 
-#> [0.022s]
+#> [0.023s]
 #> Reading VCF file 
-#> [4.708s]
+#> [4.719s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
@@ -282,7 +282,7 @@ function for getting or setting the seqlevels style.
 #> Filtering and thresholding reads 
 #> [0.001s]
 #> Extracting base frequences 
-#> [0.133s]
+#> [0.135s]
   
   # toy example to illustrate the logic of computations
   if (requireNamespace("VariantAnnotation", quietly=TRUE)) {
@@ -322,7 +322,7 @@ function for getting or setting the seqlevels style.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.002s]
+#> [0.001s]
 #> Thresholding reads 
 #> [0.000s]
 #> Extracting base frequences 
