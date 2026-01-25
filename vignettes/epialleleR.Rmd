@@ -126,9 +126,9 @@ if (require("ggplot2", quietly=TRUE)) {
 }
 ```
 
-*`epialleleR`* is a very fast and scalable solution for analysis of data
-obtained by next-generation methylation/native sequencing of DNA samples. The
-minimum requirement for the input is a Binary Alignment Map (BAM) file
+*`epialleleR`* is a very fast, accurate, and scalable solution for analysis of
+data obtained by next-generation methylation/native sequencing of DNA samples.
+The minimum requirement for the input is a Binary Alignment Map (BAM) file
 containing sequencing reads. *`epialleleR`* works equally well with shallow,
 deep or even ultra-deep sequencing data, obtained using narrowly targeted gene
 panels (amplicon sequencing), larger methylation capture panels,
@@ -292,6 +292,14 @@ lapply(list("epi"="epi", "modkit"="modkit"), function (tool) {
 })
 # $epi
 # [1] 0.9787987
+# 
+# $modkit
+# [1] 0.9760796
+
+# The accuracy is even higher when recommended values for mapping
+# and base quality are used (min.mapq=30, min.baseq=13)
+# $epi
+# [1] 0.9868576
 # 
 # $modkit
 # [1] 0.9760796

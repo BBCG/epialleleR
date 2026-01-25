@@ -112,3 +112,6 @@ Changes in version 1.19.2 (2026-01-19)
 + filtering by number of context sites
 + new defaults for filtering
 
+Changes in version 1.19.3 (2026-01-25)
++ checks conventional base probabilities in long-read data
++ accuracy comparison vs modkit
