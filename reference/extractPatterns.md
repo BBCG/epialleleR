@@ -177,13 +177,13 @@ vignettes for the description of usage and sample data.
   # extract patterns
   patterns <- extractPatterns(bam=amplicon.bam, bed=amplicon.bed, bed.row=3)
 #> Reading BED file 
-#> [0.033s]
+#> [0.031s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
 #> [0.010s]
 #> Extracting methylation patterns 
-#> [0.028s]
+#> [0.026s]
   
   # and then plot them
   plotPatterns(patterns)
@@ -205,14 +205,14 @@ vignettes for the description of usage and sample data.
 #> Checking BAM file: 
 #> long-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.029s]
+#> [0.026s]
   plotPatterns(
     extractPatterns(bam=long.data,
                     bed=as("chr17:43125000-43127000", "GRanges")),
     npatterns.per.bin=Inf
   )
 #> Extracting methylation patterns 
-#> [0.056s]
+#> [0.049s]
 #> 37 patterns supplied
 #> 37 unique
 #> 37 most frequent unique patterns were selected for plotting using 10 beta value bins:

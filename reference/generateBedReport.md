@@ -323,15 +323,15 @@ function for getting or setting the seqlevels style.
   amplicon.report <- generateAmpliconReport(bam=amplicon.bam,
                                             bed=amplicon.bed)
 #> Reading BED file 
-#> [0.008s]
+#> [0.007s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
 #> [0.004s]
 #> Filtering and thresholding reads 
-#> [0.001s]
+#> [0.000s]
 #> Preparing amplicon report 
-#> [0.013s]
+#> [0.014s]
   plotPatterns(
     extractPatterns(
       bam=amplicon.bam, bed=amplicon.bed, match.min.overlap=100
@@ -344,7 +344,7 @@ function for getting or setting the seqlevels style.
 #> Reading paired-end BAM file 
 #> [0.004s]
 #> Extracting methylation patterns 
-#> [0.012s]
+#> [0.011s]
 #> 156 patterns supplied
 #> 10 unique
 #> 10 most frequent unique patterns were selected for plotting using 10 beta value bins:
@@ -359,22 +359,22 @@ function for getting or setting the seqlevels style.
                                 package="epialleleR")
   capture.report <- generateCaptureReport(bam=capture.bam, bed=capture.bed)
 #> Reading BED file 
-#> [0.009s]
+#> [0.008s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.011s]
+#> [0.013s]
 #> Filtering and thresholding reads 
 #> [0.001s]
 #> Preparing capture report 
-#> [0.017s]
+#> [0.016s]
   
   # generateAmpliconReport and generateCaptureReport are just aliases
   # of the generateBedReport
   bed.report <- generateBedReport(bam=capture.bam, bed=capture.bed,
                                   bed.type="capture")
 #> Reading BED file 
-#> [0.008s]
+#> [0.007s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
@@ -396,7 +396,7 @@ function for getting or setting the seqlevels style.
 #> Checking BAM file: 
 #> long-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.007s]
+#> [0.006s]
   long.report <- generateBedReport(
     bam=long.data, bed=long.bed, bed.type="capture", filter.reads=FALSE
   )
@@ -409,7 +409,7 @@ function for getting or setting the seqlevels style.
     npatterns.per.bin=Inf
   )
 #> Extracting methylation patterns 
-#> [0.018s]
+#> [0.015s]
 #> 20 patterns supplied
 #> 20 unique
 #> 20 most frequent unique patterns were selected for plotting using 10 beta value bins:
@@ -434,7 +434,7 @@ function for getting or setting the seqlevels style.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.001s]
+#> [0.002s]
 #> Filtering and thresholding reads 
 #> [0.000s]
 #> Preparing amplicon report 
@@ -447,7 +447,7 @@ function for getting or setting the seqlevels style.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.002s]
+#> [0.001s]
 #> Thresholding reads 
 #> [0.000s]
 #> Preparing amplicon report 
@@ -463,9 +463,9 @@ function for getting or setting the seqlevels style.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.001s]
+#> [0.002s]
 #> Extracting methylation patterns 
-#> [0.007s]
+#> [0.006s]
 #> 4 patterns supplied
 #> 4 unique
 #> 4 most frequent unique patterns were selected for plotting using 10 beta value bins:
