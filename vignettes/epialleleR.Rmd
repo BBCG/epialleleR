@@ -200,17 +200,17 @@ position
 C/C++ code --- even in a single-threaded mode, *`epialleleR`* reports cytosine
 methylation not slower (often much faster) than, e.g., Bismark, Illumina DRAGEN,
 or Oxford Nanopore Technologies Modkit
-* small but noticeable increase in the accuracy of reported methylation ---
-which in case of the paired-end short-read data may be attributed not only to
-reference-free processing but also to quality-based read merging
-(see *`epialleleR`* publication). When tested on a 5mC subset of Modkit
+* small but noticeable increase in the accuracy of reported methylation
+(see *`epialleleR`* publication) --- which in case of the paired-end short-read
+data may be attributed not only to reference-free processing but also to
+quality-based read merging. When tested on a 5mC subset of Modkit
 validation data (`s3://ont-open-data/modbase-validation_2024.10/`), methylation
 frequencies (beta values) reported by *`epialleleR`* were closer to the ground
 truth frequencies than the ones reported by Modkit, using the very same
 modification probability cutoffs (automatically determined by Modkit)
 
 ```
-# input data from s3://ont-open-data/modbase-validation_2024.10/
+# long-read input data from s3://ont-open-data/modbase-validation_2024.10/
 # explained at https://epi2me.nanoporetech.com/mod-validation-data/
 
 # summarise methylation using Modkit
