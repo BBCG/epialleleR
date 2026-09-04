@@ -13,27 +13,37 @@ export(plotPatterns)
 export(preprocessBam)
 export(preprocessGenome)
 export(simulateBam)
-importFrom(BiocGenerics,sort)
-importFrom(BiocGenerics,width)
-importFrom(GenomicRanges,makeGRangesFromDataFrame)
-importFrom(GenomicRanges,reduce)
-importFrom(GenomicRanges,seqnames)
+importFrom(BiocGenerics,
+  sort,
+  width
+)
+importFrom(GenomicRanges,
+  makeGRangesFromDataFrame,
+  reduce,
+  seqnames
+)
 importFrom(Rcpp,evalCpp)
-importFrom(data.table,as.data.table)
-importFrom(data.table,data.table)
-importFrom(data.table,dcast)
-importFrom(data.table,fread)
-importFrom(data.table,fwrite)
-importFrom(data.table,merge.data.table)
-importFrom(data.table,setDT)
-importFrom(data.table,setattr)
-importFrom(data.table,setkey)
-importFrom(data.table,setorder)
+importFrom(data.table,
+  as.data.table,
+  data.table,
+  dcast,
+  fread,
+  fwrite,
+  merge.data.table,
+  setDT,
+  setattr,
+  setkey,
+  setorder
+)
 importFrom(methods,is)
-importFrom(stats,density)
-importFrom(stats,ecdf)
-importFrom(stats,setNames)
-importFrom(utils,globalVariables)
-importFrom(utils,head)
-importFrom(utils,packageVersion)
+importFrom(stats,
+  density,
+  ecdf,
+  setNames
+)
+importFrom(utils,
+  globalVariables,
+  head,
+  packageVersion
+)
 useDynLib(epialleleR, .registration=TRUE)
