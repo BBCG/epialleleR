@@ -170,7 +170,7 @@ description of usage and sample data.
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.004s]
+#> [0.005s]
 #> Computing ECDFs for within- and out-of-context per-read beta values 
 #> [0.022s]
   

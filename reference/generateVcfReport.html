@@ -5,7 +5,7 @@
       fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
     }
   };
-</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="generateVcfReport — generateVcfReport"><meta name="description" content="This function reports base frequencies at particular genomic positions and
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="generateVcfReport — generateVcfReport"><meta name="description" content="This function reports base frequencies at particular genomic positions and
 tests their association with the methylation status of the sequencing reads."><meta property="og:description" content="This function reports base frequencies at particular genomic positions and
 tests their association with the methylation status of the sequencing reads."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -15,7 +15,7 @@ tests their association with the methylation status of the sequencing reads."></
 
     <a class="navbar-brand me-2" href="../index.html">epialleleR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.19.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.21.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -277,17 +277,17 @@ the seqlevels style.</p></div>
 <span class="r-in"><span>                                  vcf<span class="op">=</span><span class="va">capture.vcf</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: VariantAnnotation</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading BED file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.023s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.021s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading VCF file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [5.430s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [5.425s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, paired-end, name-sorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading paired-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.011s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.013s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering and thresholding reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting base frequences </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.138s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.117s]</span>
 <span class="r-in"><span>  </span></span>
 <span class="r-in"><span>  <span class="co"># toy example to illustrate the logic of computations</span></span></span>
 <span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"VariantAnnotation"</span>, quietly<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
@@ -315,7 +315,7 @@ the seqlevels style.</p></div>
 <span class="r-in"><span>    <span class="fu">generateVcfReport</span><span class="op">(</span>bam<span class="op">=</span><span class="va">temp.bam</span>, vcf<span class="op">=</span><span class="va">vcf</span>, filter.reads<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Writing sample BAM </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.003s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
@@ -323,15 +323,15 @@ the seqlevels style.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Filtering and thresholding reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting base frequences </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.032s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.033s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking BAM file: </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> short-read, single-end, unsorted alignment detected</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Reading single-end BAM file </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.002s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.001s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Thresholding reads </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> [0.000s]</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting base frequences </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.031s]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [0.033s]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    seqnames range    REF    ALT nfiltered M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;fctr&gt; &lt;int&gt; &lt;char&gt; &lt;char&gt;    &lt;lgcl&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1:     chr1     2      A      G        NA     1     1    NA    NA     2     0</span>
@@ -349,7 +349,7 @@ the seqlevels style.</p></div>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.9000.</p>
 </div>
 
     </footer></div>

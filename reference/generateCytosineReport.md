@@ -247,7 +247,7 @@ for analysing the distribution of per-read beta values.
 #> Filtering and thresholding reads 
 #> [0.001s]
 #> Preparing cytosine report 
-#> [0.010s]
+#> [0.012s]
   
   # CX report with filtering but without thresholding
   cx.report <- generateCytosineReport(capture.bam, threshold.reads=FALSE,
@@ -255,11 +255,11 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.013s]
+#> [0.014s]
 #> Filtering reads 
-#> [0.002s]
+#> [0.001s]
 #> Preparing cytosine report 
-#> [0.012s]
+#> [0.013s]
   
   # Long-read sequencing with both filtering and thresholding disabled
   long.bam <- system.file("extdata", "longread.bam", package="epialleleR")
@@ -268,13 +268,13 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> long-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.005s]
+#> [0.006s]
   cg.report <- generateCytosineReport(bam=long.data, filter.reads=FALSE,
                                       threshold.reads=FALSE)
 #> Skipping filtering/thresholding 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.026s]
+#> [0.022s]
   plot(cg.report[, .(pos, beta=data.table::frollmean(meth/(meth+unmeth), 100))], type="l")
 
   
@@ -288,18 +288,18 @@ for analysing the distribution of per-read beta values.
                     "...Z..z.h..X..h.",  "...Z..z.h..z.h."),
               cigar=c("7M1I9M", "16M", "16M", "12M1D3M"))
 #> Writing sample BAM 
-#> [0.002s]
+#> [0.003s]
 #> [1] 4
   # with read filtering and thresholding (default)
   generateCytosineReport(bam=temp.bam, report.context="CX")
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.001s]
+#> [0.002s]
 #> Filtering and thresholding reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.000s]
+#> [0.001s]
 #>     rname strand   pos context  meth unmeth
 #>    <fctr> <fctr> <int>  <fctr> <int>  <int>
 #> 1:   chr1      +     4      CG     2      1
@@ -313,11 +313,11 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.001s]
+#> [0.002s]
 #> Filtering and thresholding reads 
 #> [0.000s]
 #> Preparing cytosine report 
-#> [0.000s]
+#> [0.001s]
 #>     rname strand   pos context  meth unmeth
 #>    <fctr> <fctr> <int>  <fctr> <int>  <int>
 #> 1:   chr1      +     4      CG     1      1
@@ -330,7 +330,7 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.002s]
+#> [0.001s]
 #> Thresholding reads 
 #> [0.000s]
 #> Preparing cytosine report 
@@ -348,7 +348,7 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.002s]
+#> [0.001s]
 #> Filtering reads 
 #> [0.000s]
 #> Preparing cytosine report 
@@ -366,7 +366,7 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.002s]
+#> [0.001s]
 #> Skipping filtering/thresholding 
 #> [0.000s]
 #> Preparing cytosine report 

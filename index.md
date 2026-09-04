@@ -1,4 +1,6 @@
-# Fast, accurate, epiallele-aware methylation caller and reporter [![logo](articles/epialleleR_logo.svg)](https://github.com/BBCG/epialleleR)
+Fast, accurate, epiallele-aware\
+methylation caller and reporter [![logo](articles/epialleleR_logo.svg)](https://github.com/BBCG/epialleleR)
+===========================================================================================================
 
 [![](https://github.com/BBCG/epialleleR/workflows/R-CMD-check-bioc/badge.svg)](https://github.com/BBCG/epialleleR/actions)
 [![](https://codecov.io/gh/BBCG/epialleleR/branch/devel/graph/badge.svg)](https://app.codecov.io/gh/BBCG/epialleleR/tree/devel)
@@ -120,23 +122,11 @@ check out NEWS for more!
 
 ### install via Bioconductor
 
-``` r
-
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-BiocManager::install("epialleleR")
-```
+`if`` ``(``!`[`requireNamespace`](https://rdrr.io/r/base/ns-load.html)`(``"BiocManager"``, quietly ``=`` ``TRUE``)``)`` `` `[`install.packages`](https://rdrr.io/r/utils/install.packages.html)`(``"BiocManager"``)`` `` ``BiocManager``::`[`install`](https://bioconductor.github.io/BiocManager/reference/install.html)`(``"epialleleR"``)`
 
 ### Install the latest version via install_github
 
-``` r
-
-library(devtools)
-install_github("BBCG/epialleleR", build_vignettes=FALSE,
-  repos=BiocManager::repositories(),
-  dependencies=TRUE, type="source")
-```
+[`library`](https://rdrr.io/r/base/library.html)`(`[`devtools`](https://devtools.r-lib.org/)`)`` `[`install_github`](https://devtools.r-lib.org/reference/install-deprecated.html)`(``"BBCG/epialleleR"``, build_vignettes``=``FALSE``,`` `` repos``=``BiocManager``::`[`repositories`](https://bioconductor.github.io/BiocManager/reference/repositories.html)`(``)``,`` `` dependencies``=``TRUE``, type``=``"source"``)`
 
 ------------------------------------------------------------------------
 
@@ -156,52 +146,7 @@ vignette
 
 Very brief synopsis:
 
-``` r
-
-library(epialleleR)
-
-# make methylation calls if necessary
-callMethylation(
-  input.bam.file=system.file("extdata", "test", "dragen-se-unsort-xg.bam", package="epialleleR"),
-  output.bam.file=tempfile(pattern="output-", fileext=".bam"),
-  genome=system.file("extdata", "test", "reference.fasta.gz", package="epialleleR")
-)
-
-# make a sample BAM file from scratch
-simulateBam(output.bam.file=tempfile(pattern="simulated-", fileext=".bam"),
-            pos=c(1, 2), XM=c("ZZZzzZZZ", "ZZzzzzZZ"), XG=c("CT", "AG"))
-
-# or use external files
-amplicon.bam <- system.file("extdata", "amplicon010meth.bam",
-                            package="epialleleR")
-amplicon.bed <- system.file("extdata", "amplicon.bed", package="epialleleR")
-amplicon.vcf <- system.file("extdata", "amplicon.vcf.gz", package="epialleleR")
-
-# preload the data
-bam.data <- preprocessBam(amplicon.bam)
-
-# methylation patterns and their plot
-patterns <- extractPatterns(bam=amplicon.bam, bed=amplicon.bed, bed.row=3)
-plotPatterns(patterns)
-
-# conventional cytosine report
-cx.report <- generateCytosineReport(bam.data, filter.reads=FALSE,
-                                    threshold.reads=FALSE, report.context="CX")
-
-# CpG VEF report for individual bases
-cg.vef.report <- generateCytosineReport(bam.data)
-
-# BED-guided VEF report for genomic ranges
-bed.report <- generateBedReport(bam=amplicon.bam, bed=amplicon.bed,
-                                bed.type="capture")
-
-# VCF report
-vcf.report <- generateVcfReport(bam=amplicon.bam, bed=amplicon.bed,
-                                vcf=amplicon.vcf, vcf.style="NCBI")
-
-# lMHL report
-mhl.report <- generateMhlReport(bam=amplicon.bam)
-```
+[`library`](https://rdrr.io/r/base/library.html)`(`[`epialleleR`](https://github.com/BBCG/epialleleR)`)`` `` ``# make methylation calls if necessary`` `[`callMethylation`](reference/callMethylation.md)`(`` `` input.bam.file``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"test"``, ``"dragen-se-unsort-xg.bam"``, package``=``"epialleleR"``)``,`` `` output.bam.file``=`[`tempfile`](https://rdrr.io/r/base/tempfile.html)`(``pattern``=``"output-"``, fileext``=``".bam"``)``,`` `` genome``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"test"``, ``"reference.fasta.gz"``, package``=``"epialleleR"``)`` ``)`` `` ``# make a sample BAM file from scratch`` `[`simulateBam`](reference/simulateBam.md)`(``output.bam.file``=`[`tempfile`](https://rdrr.io/r/base/tempfile.html)`(``pattern``=``"simulated-"``, fileext``=``".bam"``)``,`` `` pos``=`[`c`](https://rdrr.io/r/base/c.html)`(``1``, ``2``)``, XM``=`[`c`](https://rdrr.io/r/base/c.html)`(``"ZZZzzZZZ"``, ``"ZZzzzzZZ"``)``, XG``=`[`c`](https://rdrr.io/r/base/c.html)`(``"CT"``, ``"AG"``)``)`` `` ``# or use external files`` ``amplicon.bam`` ``<-`` `[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"amplicon010meth.bam"``,`` `` package``=``"epialleleR"``)`` ``amplicon.bed`` ``<-`` `[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"amplicon.bed"``, package``=``"epialleleR"``)`` ``amplicon.vcf`` ``<-`` `[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"amplicon.vcf.gz"``, package``=``"epialleleR"``)`` `` ``# preload the data`` ``bam.data`` ``<-`` `[`preprocessBam`](reference/preprocessBam.md)`(``amplicon.bam``)`` `` ``# methylation patterns and their plot`` ``patterns`` ``<-`` `[`extractPatterns`](reference/extractPatterns.md)`(``bam``=``amplicon.bam``, bed``=``amplicon.bed``, bed.row``=``3``)`` `[`plotPatterns`](reference/plotPatterns.md)`(``patterns``)`` `` ``# conventional cytosine report`` ``cx.report`` ``<-`` `[`generateCytosineReport`](reference/generateCytosineReport.md)`(``bam.data``, filter.reads``=``FALSE``,`` `` threshold.reads``=``FALSE``, report.context``=``"CX"``)`` `` ``# CpG VEF report for individual bases`` ``cg.vef.report`` ``<-`` `[`generateCytosineReport`](reference/generateCytosineReport.md)`(``bam.data``)`` `` ``# BED-guided VEF report for genomic ranges`` ``bed.report`` ``<-`` `[`generateBedReport`](reference/generateBedReport.md)`(``bam``=``amplicon.bam``, bed``=``amplicon.bed``,`` `` bed.type``=``"capture"``)`` `` ``# VCF report`` ``vcf.report`` ``<-`` `[`generateVcfReport`](reference/generateVcfReport.md)`(``bam``=``amplicon.bam``, bed``=``amplicon.bed``,`` `` vcf``=``amplicon.vcf``, vcf.style``=``"NCBI"``)`` `` ``# lMHL report`` ``mhl.report`` ``<-`` `[`generateMhlReport`](reference/generateMhlReport.md)`(``bam``=``amplicon.bam``)`
 
 ------------------------------------------------------------------------
 

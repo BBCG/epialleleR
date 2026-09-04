@@ -301,16 +301,7 @@ mandatory and optional BAM file tags. The following code will create a
 small BAM file that contains methylation calls and can be used for
 methylation reporting as described later:
 
-``` r
-
-bam.file <- tempfile(pattern="simulated", fileext=".bam")
-simulateBam(output.bam.file=bam.file, XM=c("ZZzZZ", "zzZzz"), XG="CT")
-#> Writing sample BAM [0.007s]
-#> [1] 2
-# one can view the resulting file using `samtools view -h <bam.file>`
-# or, if desired, file can be converted to SAM using `samtools view`,
-# manually corrected and converted back to BAM
-```
+`bam.file`` ``<-`` `[`tempfile`](https://rdrr.io/r/base/tempfile.html)`(``pattern``=``"simulated"``, fileext``=``".bam"``)`` `[`simulateBam`](../reference/simulateBam.md)`(``output.bam.file``=``bam.file``, XM``=`[`c`](https://rdrr.io/r/base/c.html)`(``"ZZzZZ"``, ``"zzZzz"``)``, XG``=``"CT"``)`` ``#> Writing sample BAM [0.007s]`` ``#> [1] 2`` ``` # one can view the resulting file using `samtools view -h <bam.file>` ``` ``` # or, if desired, file can be converted to SAM using `samtools view`, ``` ``# manually corrected and converted back to BAM`
 
 Check *`simulateBam`* method help page for more information on
 parameters and their default values. More examples that use
@@ -430,86 +421,7 @@ the opposite strand having cytosine modifications \* if both `C+m` and
 `G-m` are present, then this record is treated as two reads, with both
 strands having cytosine modifications
 
-``` r
-
-library(epialleleR)
-
-# short-read sequencing
-capture.bam <- system.file("extdata", "capture.bam", package="epialleleR")
-capture.bed <- system.file("extdata", "capture.bed", package="epialleleR")
-bam.data    <- preprocessBam(capture.bam, targets=capture.bed)
-#> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading BED file [0.033s]
-#> Reading paired-end BAM file [0.017s]
-generateCytosineReport(bam.data)
-#> Filtering and thresholding reads [0.001s]
-#> Preparing cytosine report [0.011s]
-#>         rname strand       pos context  meth unmeth
-#>        <fctr> <fctr>     <int>  <fctr> <int>  <int>
-#>     1:   chr1      -   3067907      CG     1      0
-#>     2:   chr1      -   3067912      CG     1      0
-#>     3:   chr1      -   3067934      CG     1      0
-#>     4:   chr1      -   3067962      CG     1      0
-#>     5:   chr1      -   3067973      CG     1      0
-#>    ---                                             
-#> 15404:   chrX      + 136196775      CG     1      1
-#> 15405:   chrX      - 136196776      CG     1      0
-#> 15406:   chrX      + 136196793      CG     1      0
-#> 15407:   chrX      - 136196794      CG     1      0
-#> 15408:   chrX      + 136197192      CG     0      1
-
-# long-read sequencing
-longread.data <- preprocessBam(
-  system.file("extdata", "longread.bam", package="epialleleR"),
-  min.mapq=30, min.baseq=20, min.prob=178
-)
-#> Checking BAM file: long-read, single-end, unsorted alignment detected
-#> Reading single-end BAM file [0.004s]
-generateCytosineReport(longread.data, threshold.reads=FALSE)
-#> Filtering reads [0.000s]
-#> Preparing cytosine report [0.025s]
-#>       rname strand      pos context  meth unmeth
-#>      <fctr> <fctr>    <int>  <fctr> <int>  <int>
-#>   1:  chr17      - 43115270      CG     1      0
-#>   2:  chr17      - 43115300      CG     1      0
-#>   3:  chr17      - 43115371      CG     1      0
-#>   4:  chr17      - 43115417      CG     1      0
-#>   5:  chr17      - 43115427      CG     1      0
-#>  ---                                            
-#> 903:  chr17      + 43136994      CG     0      1
-#> 904:  chr17      + 43137174      CG     1      0
-#> 905:  chr17      + 43137332      CG     1      0
-#> 906:  chr17      + 43137364      CG     1      0
-#> 907:  chr17      + 43137391      CG     1      0
-
-# Specifics of long-read alignment processing
-out.bam <- tempfile(pattern="out-", fileext=".bam")
-simulateBam(
-  seq=c("ACGCCATYCGCGCCA"),
-  Mm=c("C+m,0,2,0;G-m,0,0,0;"),
-  Ml=list(as.integer(c(102,128,153,138,101,96))),
-  output.bam.file=out.bam
-  )
-#> Writing sample BAM [0.002s]
-#> [1] 1
-generateCytosineReport(out.bam, threshold.reads=FALSE, report.context="CX")
-#> Checking BAM file: long-read, single-end, unsorted alignment detected
-#> Reading single-end BAM file [0.001s]
-#> Filtering reads [0.000s]
-#> Preparing cytosine report [0.001s]
-#>      rname strand   pos context  meth unmeth
-#>     <fctr> <fctr> <int>  <fctr> <int>  <int>
-#>  1:   chrS      +     2      CG     1      0
-#>  2:   chrS      -     3      CG     1      0
-#>  3:   chrS      +     4     CHH     0      1
-#>  4:   chrS      +     5     CHH     0      1
-#>  5:   chrS      +     9      CG     1      0
-#>  6:   chrS      -    10      CG     1      0
-#>  7:   chrS      +    11      CG     1      0
-#>  8:   chrS      -    12      CG     1      0
-#>  9:   chrS      +    13     CHH     0      1
-#> 10:   chrS      +    14     CHH     0      1
-```
+[`library`](https://rdrr.io/r/base/library.html)`(`[`epialleleR`](https://github.com/BBCG/epialleleR)`)`` `` ``# short-read sequencing`` ``capture.bam`` ``<-`` `[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"capture.bam"``, package``=``"epialleleR"``)`` ``capture.bed`` ``<-`` `[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"capture.bed"``, package``=``"epialleleR"``)`` ``bam.data`` ``<-`` `[`preprocessBam`](../reference/preprocessBam.md)`(``capture.bam``, targets``=``capture.bed``)`` ``#> Checking BAM file: short-read, paired-end, name-sorted alignment detected`` ``#> Reading BED file [0.032s]`` ``#> Reading paired-end BAM file [0.019s]`` `[`generateCytosineReport`](../reference/generateCytosineReport.md)`(``bam.data``)`` ``#> Filtering and thresholding reads [0.001s]`` ``#> Preparing cytosine report [0.012s]`` ``#> rname strand pos context meth unmeth`` ``#> <fctr> <fctr> <int> <fctr> <int> <int>`` ``#> 1: chr1 - 3067907 CG 1 0`` ``#> 2: chr1 - 3067912 CG 1 0`` ``#> 3: chr1 - 3067934 CG 1 0`` ``#> 4: chr1 - 3067962 CG 1 0`` ``#> 5: chr1 - 3067973 CG 1 0`` ``#> --- `` ``#> 15404: chrX + 136196775 CG 1 1`` ``#> 15405: chrX - 136196776 CG 1 0`` ``#> 15406: chrX + 136196793 CG 1 0`` ``#> 15407: chrX - 136196794 CG 1 0`` ``#> 15408: chrX + 136197192 CG 0 1`` `` ``# long-read sequencing`` ``longread.data`` ``<-`` `[`preprocessBam`](../reference/preprocessBam.md)`(`` `` `[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"longread.bam"``, package``=``"epialleleR"``)``,`` `` min.mapq``=``30``, min.baseq``=``20``, min.prob``=``178`` ``)`` ``#> Checking BAM file: long-read, single-end, unsorted alignment detected`` ``#> Reading single-end BAM file [0.005s]`` `[`generateCytosineReport`](../reference/generateCytosineReport.md)`(``longread.data``, threshold.reads``=``FALSE``)`` ``#> Filtering reads [0.000s]`` ``#> Preparing cytosine report [0.023s]`` ``#> rname strand pos context meth unmeth`` ``#> <fctr> <fctr> <int> <fctr> <int> <int>`` ``#> 1: chr17 - 43115270 CG 1 0`` ``#> 2: chr17 - 43115300 CG 1 0`` ``#> 3: chr17 - 43115371 CG 1 0`` ``#> 4: chr17 - 43115417 CG 1 0`` ``#> 5: chr17 - 43115427 CG 1 0`` ``#> --- `` ``#> 903: chr17 + 43136994 CG 0 1`` ``#> 904: chr17 + 43137174 CG 1 0`` ``#> 905: chr17 + 43137332 CG 1 0`` ``#> 906: chr17 + 43137364 CG 1 0`` ``#> 907: chr17 + 43137391 CG 1 0`` `` ``# Specifics of long-read alignment processing`` ``out.bam`` ``<-`` `[`tempfile`](https://rdrr.io/r/base/tempfile.html)`(``pattern``=``"out-"``, fileext``=``".bam"``)`` `[`simulateBam`](../reference/simulateBam.md)`(`` `` seq``=`[`c`](https://rdrr.io/r/base/c.html)`(``"ACGCCATYCGCGCCA"``)``,`` `` Mm``=`[`c`](https://rdrr.io/r/base/c.html)`(``"C+m,0,2,0;G-m,0,0,0;"``)``,`` `` Ml``=`[`list`](https://rdrr.io/r/base/list.html)`(`[`as.integer`](https://rdrr.io/r/base/integer.html)`(`[`c`](https://rdrr.io/r/base/c.html)`(``102``,``128``,``153``,``138``,``101``,``96``)``)``)``,`` `` output.bam.file``=``out.bam`` `` ``)`` ``#> Writing sample BAM [0.002s]`` ``#> [1] 1`` `[`generateCytosineReport`](../reference/generateCytosineReport.md)`(``out.bam``, threshold.reads``=``FALSE``, report.context``=``"CX"``)`` ``#> Checking BAM file: long-read, single-end, unsorted alignment detected`` ``#> Reading single-end BAM file [0.002s]`` ``#> Filtering reads [0.000s]`` ``#> Preparing cytosine report [0.000s]`` ``#> rname strand pos context meth unmeth`` ``#> <fctr> <fctr> <int> <fctr> <int> <int>`` ``#> 1: chrS + 2 CG 1 0`` ``#> 2: chrS - 3 CG 1 0`` ``#> 3: chrS + 4 CHH 0 1`` ``#> 4: chrS + 5 CHH 0 1`` ``#> 5: chrS + 9 CG 1 0`` ``#> 6: chrS - 10 CG 1 0`` ``#> 7: chrS + 11 CG 1 0`` ``#> 8: chrS - 12 CG 1 0`` ``#> 9: chrS + 13 CHH 0 1`` ``#> 10: chrS + 14 CHH 0 1`
 
 ### Optional calling of cytosine methylation
 
@@ -517,31 +429,7 @@ If short-read BAM file lacks XG/XM tags (e.g., is an output of bwa-meth
 or BSMAP), preprocessing will fail with the message that cytosine
 methylation calling must be performed. This can be done as follows:
 
-``` r
-
-# bwa-meth sample output
-input.bam <- system.file("extdata", "test", "bwameth-se-unsort-yd.bam", package="epialleleR")
-
-# resulting BAM with XG/XM tags
-output.bam <- tempfile(pattern="output-", fileext=".bam")
-
-# sample reference genome
-genome <- preprocessGenome(system.file("extdata", "test", "reference.fasta.gz", package="epialleleR"))
-#> Reading reference genome file [0.000s]
-
-# calls cytosine methylation and stores it in the output BAM
-# Input BAM has 100 records of which 73 are mapped to the genome
-callMethylation(input.bam, output.bam, genome)
-#> Making methylation calls [0.021s]
-#> $nrecs
-#> [1] 100
-#> 
-#> $ncalled
-#> [1] 73
-
-# process this data further
-# bam.data <- preprocessBam(output.bam)
-```
+`# bwa-meth sample output`` ``input.bam`` ``<-`` `[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"test"``, ``"bwameth-se-unsort-yd.bam"``, package``=``"epialleleR"``)`` `` ``# resulting BAM with XG/XM tags`` ``output.bam`` ``<-`` `[`tempfile`](https://rdrr.io/r/base/tempfile.html)`(``pattern``=``"output-"``, fileext``=``".bam"``)`` `` ``# sample reference genome`` ``genome`` ``<-`` `[`preprocessGenome`](../reference/preprocessGenome.md)`(`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"test"``, ``"reference.fasta.gz"``, package``=``"epialleleR"``)``)`` ``#> Reading reference genome file [0.000s]`` `` ``# calls cytosine methylation and stores it in the output BAM`` ``# Input BAM has 100 records of which 73 are mapped to the genome`` `[`callMethylation`](../reference/callMethylation.md)`(``input.bam``, ``output.bam``, ``genome``)`` ``#> Making methylation calls [0.021s]`` ``#> $nrecs`` ``#> [1] 100`` ``#> `` ``#> $ncalled`` ``#> [1] 73`` `` ``# process this data further`` ``# bam.data <- preprocessBam(output.bam)`
 
 ### Making cytosine reports
 
@@ -566,52 +454,7 @@ Please note that the iltering is strongly recommended for short-read
 sequencing (bisulfite or enzymatic) because it removes reads from
 incompletely converted DNA molecules.
 
-``` r
-
-# data.table::data.table object for
-# CpG VEF report
-cg.vef.report <- generateCytosineReport(bam.data)
-#> Filtering and thresholding reads [0.001s]
-#> Preparing cytosine report [0.011s]
-head(cg.vef.report[order(meth+unmeth, decreasing=TRUE)])
-#>     rname strand      pos context  meth unmeth
-#>    <fctr> <fctr>    <int>  <fctr> <int>  <int>
-#> 1:  chr17      + 61864475      CG     8      8
-#> 2:  chr17      + 61864486      CG    10      6
-#> 3:  chr17      + 61864504      CG     9      7
-#> 4:  chr20      - 57267455      CG    13      1
-#> 5:  chr17      - 61863826      CG     0     13
-#> 6:  chr17      - 61863830      CG     0     13
-
-# CpG cytosine report
-cg.report <- generateCytosineReport(bam.data, threshold.reads=FALSE)
-#> Filtering reads [0.001s]
-#> Preparing cytosine report [0.010s]
-head(cg.report[order(meth+unmeth, decreasing=TRUE)])
-#>     rname strand      pos context  meth unmeth
-#>    <fctr> <fctr>    <int>  <fctr> <int>  <int>
-#> 1:  chr17      + 61864475      CG     8      8
-#> 2:  chr17      + 61864486      CG    10      6
-#> 3:  chr17      + 61864504      CG    10      6
-#> 4:  chr20      - 57267455      CG    13      1
-#> 5:  chr17      - 61863826      CG     0     13
-#> 6:  chr17      - 61863830      CG     0     13
-
-# CX cytosine report
-cx.report <- generateCytosineReport(bam.data, threshold.reads=FALSE,
-                                    report.context="CX")
-#> Filtering reads [0.001s]
-#> Preparing cytosine report [0.012s]
-head(cx.report[order(meth+unmeth, decreasing=TRUE)])
-#>     rname strand      pos context  meth unmeth
-#>    <fctr> <fctr>    <int>  <fctr> <int>  <int>
-#> 1:  chr17      + 61864338     CHG     1     25
-#> 2:  chr17      + 61864348     CHH     0     24
-#> 3:  chr17      + 61864364     CHH     0     24
-#> 4:  chr17      + 61864365     CHH     0     24
-#> 5:  chr17      + 61864373     CHH     0     24
-#> 6:  chr17      + 61864324     CHG     0     23
-```
+`# data.table::data.table object for`` ``# CpG VEF report`` ``cg.vef.report`` ``<-`` `[`generateCytosineReport`](../reference/generateCytosineReport.md)`(``bam.data``)`` ``#> Filtering and thresholding reads [0.001s]`` ``#> Preparing cytosine report [0.012s]`` `[`head`](https://rdrr.io/r/utils/head.html)`(``cg.vef.report``[`[`order`](https://rdrr.io/r/base/order.html)`(``meth``+``unmeth``, decreasing``=``TRUE``)``]``)`` ``#> rname strand pos context meth unmeth`` ``#> <fctr> <fctr> <int> <fctr> <int> <int>`` ``#> 1: chr17 + 61864475 CG 8 8`` ``#> 2: chr17 + 61864486 CG 10 6`` ``#> 3: chr17 + 61864504 CG 9 7`` ``#> 4: chr20 - 57267455 CG 13 1`` ``#> 5: chr17 - 61863826 CG 0 13`` ``#> 6: chr17 - 61863830 CG 0 13`` `` ``# CpG cytosine report`` ``cg.report`` ``<-`` `[`generateCytosineReport`](../reference/generateCytosineReport.md)`(``bam.data``, threshold.reads``=``FALSE``)`` ``#> Filtering reads [0.001s]`` ``#> Preparing cytosine report [0.011s]`` `[`head`](https://rdrr.io/r/utils/head.html)`(``cg.report``[`[`order`](https://rdrr.io/r/base/order.html)`(``meth``+``unmeth``, decreasing``=``TRUE``)``]``)`` ``#> rname strand pos context meth unmeth`` ``#> <fctr> <fctr> <int> <fctr> <int> <int>`` ``#> 1: chr17 + 61864475 CG 8 8`` ``#> 2: chr17 + 61864486 CG 10 6`` ``#> 3: chr17 + 61864504 CG 10 6`` ``#> 4: chr20 - 57267455 CG 13 1`` ``#> 5: chr17 - 61863826 CG 0 13`` ``#> 6: chr17 - 61863830 CG 0 13`` `` ``# CX cytosine report`` ``cx.report`` ``<-`` `[`generateCytosineReport`](../reference/generateCytosineReport.md)`(``bam.data``, threshold.reads``=``FALSE``,`` `` report.context``=``"CX"``)`` ``#> Filtering reads [0.001s]`` ``#> Preparing cytosine report [0.014s]`` `[`head`](https://rdrr.io/r/utils/head.html)`(``cx.report``[`[`order`](https://rdrr.io/r/base/order.html)`(``meth``+``unmeth``, decreasing``=``TRUE``)``]``)`` ``#> rname strand pos context meth unmeth`` ``#> <fctr> <fctr> <int> <fctr> <int> <int>`` ``#> 1: chr17 + 61864338 CHG 1 25`` ``#> 2: chr17 + 61864348 CHH 0 24`` ``#> 3: chr17 + 61864364 CHH 0 24`` ``#> 4: chr17 + 61864365 CHH 0 24`` ``#> 5: chr17 + 61864373 CHH 0 24`` ``#> 6: chr17 + 61864324 CHG 0 23`
 
 ### Making VEF reports for a set of genomic regions
 
@@ -629,63 +472,7 @@ targets — by the overlap. For this, *`epialleleR`* provides generic
 *`generateAmpliconReport`* (for amplicon-based NGS) and
 *`generateCaptureReport`* (for capture-based NGS).
 
-``` r
-
-# report for amplicon-based data
-# matching is done by exact start or end positions plus/minus tolerance
-amplicon.report <- generateAmpliconReport(
-  bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
-  bed=system.file("extdata", "amplicon.bed", package="epialleleR")
-)
-#> Reading BED file [0.008s]
-#> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.005s]
-#> Filtering and thresholding reads [0.000s]
-#> Preparing amplicon report [0.036s]
-amplicon.report
-#>    seqnames    start      end width strand amplicon nreads+ nreads- nfiltered        VEF
-#>      <fctr>    <int>    <int> <int> <fctr>   <char>   <int>   <int>     <int>      <num>
-#> 1:    chr17 43125624 43126026   403      * CpG00-13       0     155         1 0.08387097
-#> 2:    chr17 43125270 43125640   371      * CpG14-31       0      61         0 0.11475410
-#> 3:    chr17 43125171 43125550   380      * CpG17-34       0      93         0 0.05376344
-#> 4:    chr17 43124861 43125249   389      * CpG33-49       0      84         0 0.10714286
-#> 5:     <NA>       NA       NA    NA   <NA>     <NA>      54      44         8 0.15306122
-
-# report for capture-based data
-# matching is done by overlap
-capture.report <- generateCaptureReport(
-  bam=system.file("extdata", "capture.bam", package="epialleleR"),
-  bed=system.file("extdata", "capture.bed", package="epialleleR")
-)
-#> Reading BED file [0.007s]
-#> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.013s]
-#> Filtering and thresholding reads [0.001s]
-#> Preparing capture report [0.018s]
-head(capture.report)
-#>    seqnames    start      end width strand     V4 nreads+ nreads- nfiltered       VEF
-#>      <fctr>    <int>    <int> <int> <fctr> <char>   <int>   <int>     <int>     <num>
-#> 1:     chr1  3067647  3069703  2057      * PRDM16       2       1         0 1.0000000
-#> 2:     chr1  3651039  3653096  2058      *   TP73       0       2         0 0.5000000
-#> 3:     chr1  3689153  3691202  2050      *   TP73       0       2         0 1.0000000
-#> 4:     chr1  3696519  3698570  2052      *   TP73       1       2         0 1.0000000
-#> 5:     chr1  6179609  6181670  2062      *   CHD5       0       3         0 0.6666667
-#> 6:     chr1 13698869 13699064   196      *  PRDM2      NA      NA        NA        NA
-
-# generateBedReport is a generic function for BED-guided reports
-bed.report <- generateBedReport(
-  bam=system.file("extdata", "capture.bam", package="epialleleR"),
-  bed=system.file("extdata", "capture.bed", package="epialleleR"),
-  bed.type="capture"
-)
-#> Reading BED file [0.007s]
-#> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.013s]
-#> Filtering and thresholding reads [0.001s]
-#> Preparing capture report [0.018s]
-identical(capture.report, bed.report)
-#> [1] TRUE
-```
+`# report for amplicon-based data`` ``# matching is done by exact start or end positions plus/minus tolerance`` ``amplicon.report`` ``<-`` `[`generateAmpliconReport`](../reference/generateBedReport.md)`(`` `` bam``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"amplicon010meth.bam"``, package``=``"epialleleR"``)``,`` `` bed``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"amplicon.bed"``, package``=``"epialleleR"``)`` ``)`` ``#> Reading BED file [0.008s]`` ``#> Checking BAM file: short-read, paired-end, name-sorted alignment detected`` ``#> Reading paired-end BAM file [0.005s]`` ``#> Filtering and thresholding reads [0.001s]`` ``#> Preparing amplicon report [0.016s]`` ``amplicon.report`` ``#> seqnames start end width strand amplicon nreads+ nreads- nfiltered VEF`` ``#> <fctr> <int> <int> <int> <fctr> <char> <int> <int> <int> <num>`` ``#> 1: chr17 43125624 43126026 403 * CpG00-13 0 155 1 0.08387097`` ``#> 2: chr17 43125270 43125640 371 * CpG14-31 0 61 0 0.11475410`` ``#> 3: chr17 43125171 43125550 380 * CpG17-34 0 93 0 0.05376344`` ``#> 4: chr17 43124861 43125249 389 * CpG33-49 0 84 0 0.10714286`` ``#> 5: <NA> NA NA NA <NA> <NA> 54 44 8 0.15306122`` `` ``# report for capture-based data`` ``# matching is done by overlap`` ``capture.report`` ``<-`` `[`generateCaptureReport`](../reference/generateBedReport.md)`(`` `` bam``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"capture.bam"``, package``=``"epialleleR"``)``,`` `` bed``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"capture.bed"``, package``=``"epialleleR"``)`` ``)`` ``#> Reading BED file [0.008s]`` ``#> Checking BAM file: short-read, paired-end, name-sorted alignment detected`` ``#> Reading paired-end BAM file [0.014s]`` ``#> Filtering and thresholding reads [0.002s]`` ``#> Preparing capture report [0.017s]`` `[`head`](https://rdrr.io/r/utils/head.html)`(``capture.report``)`` ``#> seqnames start end width strand V4 nreads+ nreads- nfiltered VEF`` ``#> <fctr> <int> <int> <int> <fctr> <char> <int> <int> <int> <num>`` ``#> 1: chr1 3067647 3069703 2057 * PRDM16 2 1 0 1.0000000`` ``#> 2: chr1 3651039 3653096 2058 * TP73 0 2 0 0.5000000`` ``#> 3: chr1 3689153 3691202 2050 * TP73 0 2 0 1.0000000`` ``#> 4: chr1 3696519 3698570 2052 * TP73 1 2 0 1.0000000`` ``#> 5: chr1 6179609 6181670 2062 * CHD5 0 3 0 0.6666667`` ``#> 6: chr1 13698869 13699064 196 * PRDM2 NA NA NA NA`` `` ``# generateBedReport is a generic function for BED-guided reports`` ``bed.report`` ``<-`` `[`generateBedReport`](../reference/generateBedReport.md)`(`` `` bam``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"capture.bam"``, package``=``"epialleleR"``)``,`` `` bed``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"capture.bed"``, package``=``"epialleleR"``)``,`` `` bed.type``=``"capture"`` ``)`` ``#> Reading BED file [0.008s]`` ``#> Checking BAM file: short-read, paired-end, name-sorted alignment detected`` ``#> Reading paired-end BAM file [0.012s]`` ``#> Filtering and thresholding reads [0.002s]`` ``#> Preparing capture report [0.017s]`` `[`identical`](https://rdrr.io/r/base/identical.html)`(``capture.report``, ``bed.report``)`` ``#> [1] TRUE`
 
 ### Linearized MHL reports
 
@@ -703,16 +490,7 @@ al., 2017 [^7]) sought to be faster and applicable for a wider range of
 sequencing data. More information on this is given in the help page for
 the *`generateMhlReport`* as well as in the `values` vignette.
 
-``` r
-
-# lMHL report can be generated using
-mhl.report <- generateMhlReport(
-  bam=system.file("extdata", "capture.bam", package="epialleleR")
-)
-#> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.011s]
-#> Preparing lMHL report [0.019s]
-```
+`# lMHL report can be generated using`` ``mhl.report`` ``<-`` `[`generateMhlReport`](../reference/generateMhlReport.md)`(`` `` bam``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"capture.bam"``, package``=``"epialleleR"``)`` ``)`` ``#> Checking BAM file: short-read, paired-end, name-sorted alignment detected`` ``#> Reading paired-end BAM file [0.012s]`` ``#> Preparing lMHL report [0.020s]`
 
 ### Exploring DNA methylation patterns
 
@@ -721,79 +499,15 @@ methylation patters within a genomic region of interest. For this,
 *`epialleleR`* provides methods *`extractPatterns`* and *`plotPatterns`*
 which can be used as follows:
 
-``` r
-
-# First, let's extract base methylation information for sequencing reads
-# of 1:9 mix of methylated and non-methylated control DNA
-patterns <- extractPatterns(
-  bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
-  bed=as("chr17:43125200-43125600","GRanges")
-)
-#> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.004s]
-#> Extracting methylation patterns [0.028s]
-
-# that many read pairs overlap genomic region of interest
-nrow(patterns)
-#> [1] 238
-
-# now we can plot the most abundant them of them using default parameters
-plotPatterns(patterns)
-#> 238 patterns supplied
-#> 45 unique
-#> 9 most frequent unique patterns were selected for plotting using 10 beta value bins:
-#> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]
-#>       2         1         1         0         0         0         0         1         2       2
-```
+`# First, let's extract base methylation information for sequencing reads`` ``# of 1:9 mix of methylated and non-methylated control DNA`` ``patterns`` ``<-`` `[`extractPatterns`](../reference/extractPatterns.md)`(`` `` bam``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"amplicon010meth.bam"``, package``=``"epialleleR"``)``,`` `` bed``=``as``(``"chr17:43125200-43125600"``,``"GRanges"``)`` ``)`` ``#> Checking BAM file: short-read, paired-end, name-sorted alignment detected`` ``#> Reading paired-end BAM file [0.004s]`` ``#> Extracting methylation patterns [0.020s]`` `` ``# that many read pairs overlap genomic region of interest`` `[`nrow`](https://rdrr.io/r/base/nrow.html)`(``patterns``)`` ``#> [1] 238`` `` ``# now we can plot the most abundant them of them using default parameters`` `[`plotPatterns`](../reference/plotPatterns.md)`(``patterns``)`` ``#> 238 patterns supplied`` ``#> 45 unique`` ``#> 9 most frequent unique patterns were selected for plotting using 10 beta value bins:`` ``#> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]`` ``#> 2 1 1 0 0 0 0 1 2 2`
 
 ![](epialleleR_files/figure-html/unnamed-chunk-9-1.png)
 
-``` r
-
-
-# now let's explore methylation patterns in RAD51C gene promoter using
-# methylation capture data
-capture.patterns <- extractPatterns(
-  bam=system.file("extdata", "capture.bam", package="epialleleR"),
-  bed=as("chr17:58691673-58693108", "GRanges"),
-  verbose=FALSE
-)
-
-# let's plot all the patterns using discrete genomic scale
-plotPatterns(capture.patterns, npatterns.per.bin=Inf,
-             genomic.scale="discrete", context.size=1)
-#> 59 patterns supplied
-#> 56 unique
-#> 56 most frequent unique patterns were selected for plotting using 10 beta value bins:
-#> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]
-#>      22         3         1         2         3         1         2         0        11      11
-```
+` ``# now let's explore methylation patterns in RAD51C gene promoter using`` ``# methylation capture data`` ``capture.patterns`` ``<-`` `[`extractPatterns`](../reference/extractPatterns.md)`(`` `` bam``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"capture.bam"``, package``=``"epialleleR"``)``,`` `` bed``=``as``(``"chr17:58691673-58693108"``, ``"GRanges"``)``,`` `` verbose``=``FALSE`` ``)`` `` ``# let's plot all the patterns using discrete genomic scale`` `[`plotPatterns`](../reference/plotPatterns.md)`(``capture.patterns``, npatterns.per.bin``=``Inf``,`` `` genomic.scale``=``"discrete"``, context.size``=``1``)`` ``#> 59 patterns supplied`` ``#> 56 unique`` ``#> 56 most frequent unique patterns were selected for plotting using 10 beta value bins:`` ``#> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]`` ``#> 22 3 1 2 3 1 2 0 11 11`
 
 ![](epialleleR_files/figure-html/unnamed-chunk-9-2.png)
 
-``` r
-
-
-# patterns from long-read data
-long.bam <- system.file("extdata", "longread.bam", package="epialleleR")
-long.bed <- as("chr17:43124909-43125554", "GRanges")
-long.data <- preprocessBam(
-  bam=long.bam, targets=long.bed, clip.to.targets=TRUE,
-  min.mapq=30, min.baseq=20, min.prob=178
-)
-#> Checking BAM file: long-read, single-end, unsorted alignment detected
-#> Reading single-end BAM file [0.011s]
-plotPatterns(
-  extractPatterns(bam=long.data, bed=long.bed),
-  npatterns.per.bin=Inf
-)
-#> Extracting methylation patterns [0.018s]
-#> 20 patterns supplied
-#> 20 unique
-#> 20 most frequent unique patterns were selected for plotting using 10 beta value bins:
-#> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]
-#>      16         1         0         0         0         0         0         0         1       2
-```
+` ``# patterns from long-read data`` ``long.bam`` ``<-`` `[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"longread.bam"``, package``=``"epialleleR"``)`` ``long.bed`` ``<-`` ``as``(``"chr17:43124909-43125554"``, ``"GRanges"``)`` ``long.data`` ``<-`` `[`preprocessBam`](../reference/preprocessBam.md)`(`` `` bam``=``long.bam``, targets``=``long.bed``, clip.to.targets``=``TRUE``,`` `` min.mapq``=``30``, min.baseq``=``20``, min.prob``=``178`` ``)`` ``#> Checking BAM file: long-read, single-end, unsorted alignment detected`` ``#> Reading single-end BAM file [0.007s]`` `[`plotPatterns`](../reference/plotPatterns.md)`(`` `` `[`extractPatterns`](../reference/extractPatterns.md)`(``bam``=``long.data``, bed``=``long.bed``)``,`` `` npatterns.per.bin``=``Inf`` ``)`` ``#> Extracting methylation patterns [0.023s]`` ``#> 20 patterns supplied`` ``#> 20 unique`` ``#> 20 most frequent unique patterns were selected for plotting using 10 beta value bins:`` ``#> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]`` ``#> 16 1 0 0 0 0 0 0 1 2`
 
 ![](epialleleR_files/figure-html/unnamed-chunk-9-3.png)
 
@@ -821,103 +535,7 @@ result in false SNVs caused by misalignments. Remember to increase
 `min.baseq` (`samtools mplieup -Q` default value is 13) to obtain
 results of a higher quality.
 
-``` r
-
-# VCF report
-vcf.report <- generateVcfReport(
-  bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
-  bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
-  vcf=system.file("extdata", "amplicon.vcf.gz", package="epialleleR"),
-  # higher thresholds on alignment and base quality
-  min.mapq=30, min.baseq=20,
-  # when VCF seqlevels are different from BED and BAM it is possible
-  # to convert them internally
-  vcf.style="NCBI"
-)
-#> Loading required namespace: VariantAnnotation
-#> Loading required namespace: GenomeInfoDb
-#> Reading BED file [0.024s]
-#> Reading VCF file [0.755s]
-#> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.004s]
-#> Filtering and thresholding reads [0.000s]
-#> Extracting base frequences [0.048s]
-
-# NA values are shown for the C->T variants on the "+" and G->A on the "-"
-# strands, because bisulfite conversion makes their counting impossible
-head(vcf.report)
-#>           name seqnames    range    REF    ALT nfiltered M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt
-#>         <char>   <fctr>    <int> <char> <char>     <num> <num> <num> <num> <num> <num> <num> <num>
-#> 1: rs546660277    chr17 43124874      A      C         0     0     0     9    74     0     0     0
-#> 2: rs574263814    chr17 43124891      G      A         0     0     0    NA    NA     0     0    NA
-#> 3:   rs8176076    chr17 43124935      G      A         0     0     0    NA    NA     0     0    NA
-#> 4: rs535977743    chr17 43125016      C      T         0    NA    NA     9    72    NA    NA     0
-#> 5: rs191784032    chr17 43125050      C      A         0     0     0     8    71     0     0     0
-#> 6: rs111956204    chr17 43125083      C      A         0     0     0     8    68     0     0     0
-#>    U-Alt SumRef SumAlt  FEp+  FEp-
-#>    <num>  <num>  <num> <num> <num>
-#> 1:     0     83      0     1     1
-#> 2:    NA      0      0     1    NA
-#> 3:    NA      0      0     1    NA
-#> 4:     0     81      0    NA     1
-#> 5:     1     79      1     1     1
-#> 6:     0     76      0     1     1
-
-# let's sort the report by increasing Fisher's exact test's p-values.
-# the p-values are given separately for reads that map to the "+"
-head(vcf.report[order(`FEp-`, na.last=TRUE)])
-#>           name seqnames    range    REF    ALT nfiltered M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt
-#>         <char>   <fctr>    <int> <char> <char>     <num> <num> <num> <num> <num> <num> <num> <num>
-#> 1: rs546660277    chr17 43124874      A      C         0     0     0     9    74     0     0     0
-#> 2: rs535977743    chr17 43125016      C      T         0    NA    NA     9    72    NA    NA     0
-#> 3: rs191784032    chr17 43125050      C      A         0     0     0     8    71     0     0     0
-#> 4: rs111956204    chr17 43125083      C      A         0     0     0     8    68     0     0     0
-#> 5:  rs55680227    chr17 43125086      A      C         0     0     0     7    59     0     0     0
-#> 6: rs539733232    chr17 43125088      C      A         0     0     0     8    69     0     0     0
-#>    U-Alt SumRef SumAlt  FEp+  FEp-
-#>    <num>  <num>  <num> <num> <num>
-#> 1:     0     83      0     1     1
-#> 2:     0     81      0    NA     1
-#> 3:     1     79      1     1     1
-#> 4:     0     76      0     1     1
-#> 5:     0     66      0     1     1
-#> 6:     0     77      0     1     1
-
-# and to the "-" strand
-head(vcf.report[order(`FEp+`, na.last=TRUE)])
-#>           name seqnames    range    REF    ALT nfiltered M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt
-#>         <char>   <fctr>    <int> <char> <char>     <num> <num> <num> <num> <num> <num> <num> <num>
-#> 1: rs546660277    chr17 43124874      A      C         0     0     0     9    74     0     0     0
-#> 2: rs574263814    chr17 43124891      G      A         0     0     0    NA    NA     0     0    NA
-#> 3:   rs8176076    chr17 43124935      G      A         0     0     0    NA    NA     0     0    NA
-#> 4: rs191784032    chr17 43125050      C      A         0     0     0     8    71     0     0     0
-#> 5: rs111956204    chr17 43125083      C      A         0     0     0     8    68     0     0     0
-#> 6:  rs55680227    chr17 43125086      A      C         0     0     0     7    59     0     0     0
-#>    U-Alt SumRef SumAlt  FEp+  FEp-
-#>    <num>  <num>  <num> <num> <num>
-#> 1:     0     83      0     1     1
-#> 2:    NA      0      0     1    NA
-#> 3:    NA      0      0     1    NA
-#> 4:     1     79      1     1     1
-#> 5:     0     76      0     1     1
-#> 6:     0     66      0     1     1
-
-# and finally, let's plot methylation patterns overlapping one of the most
-# covered SNPs in the methylation capture test data set - rs573296191
-# (chr17:61864584) in BRIP1 gene
-brip1.patterns <- extractPatterns(
-  bam=system.file("extdata", "capture.bam", package="epialleleR"),
-  bed=as("chr17:61864583-61864585", "GRanges"),
-  highlight.positions=61864584,
-  verbose=FALSE
-)
-plotPatterns(brip1.patterns)
-#> 24 patterns supplied
-#> 17 unique
-#> 9 most frequent unique patterns were selected for plotting using 10 beta value bins:
-#> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]
-#>       2         0         0         1         0         1         2         1         0       2
-```
+`# VCF report`` ``vcf.report`` ``<-`` `[`generateVcfReport`](../reference/generateVcfReport.md)`(`` `` bam``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"amplicon010meth.bam"``, package``=``"epialleleR"``)``,`` `` bed``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"amplicon.bed"``, package``=``"epialleleR"``)``,`` `` vcf``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"amplicon.vcf.gz"``, package``=``"epialleleR"``)``,`` `` ``# higher thresholds on alignment and base quality`` `` min.mapq``=``30``, min.baseq``=``20``,`` `` ``# when VCF seqlevels are different from BED and BAM it is possible`` `` ``# to convert them internally`` `` vcf.style``=``"NCBI"`` ``)`` ``#> Loading required namespace: VariantAnnotation`` ``#> Loading required namespace: GenomeInfoDb`` ``#> Reading BED file [0.022s]`` ``#> Reading VCF file [1.345s]`` ``#> Checking BAM file: short-read, paired-end, name-sorted alignment detected`` ``#> Reading paired-end BAM file [0.004s]`` ``#> Filtering and thresholding reads [0.001s]`` ``#> Extracting base frequences [0.046s]`` `` ``# NA values are shown for the C->T variants on the "+" and G->A on the "-"`` ``# strands, because bisulfite conversion makes their counting impossible`` `[`head`](https://rdrr.io/r/utils/head.html)`(``vcf.report``)`` ``#> name seqnames range REF ALT nfiltered M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt`` ``#> <char> <fctr> <int> <char> <char> <num> <num> <num> <num> <num> <num> <num> <num>`` ``#> 1: rs546660277 chr17 43124874 A C 0 0 0 9 74 0 0 0`` ``#> 2: rs574263814 chr17 43124891 G A 0 0 0 NA NA 0 0 NA`` ``#> 3: rs8176076 chr17 43124935 G A 0 0 0 NA NA 0 0 NA`` ``#> 4: rs535977743 chr17 43125016 C T 0 NA NA 9 72 NA NA 0`` ``#> 5: rs191784032 chr17 43125050 C A 0 0 0 8 71 0 0 0`` ``#> 6: rs111956204 chr17 43125083 C A 0 0 0 8 68 0 0 0`` ``#> U-Alt SumRef SumAlt FEp+ FEp-`` ``#> <num> <num> <num> <num> <num>`` ``#> 1: 0 83 0 1 1`` ``#> 2: NA 0 0 1 NA`` ``#> 3: NA 0 0 1 NA`` ``#> 4: 0 81 0 NA 1`` ``#> 5: 1 79 1 1 1`` ``#> 6: 0 76 0 1 1`` `` ``# let's sort the report by increasing Fisher's exact test's p-values.`` ``# the p-values are given separately for reads that map to the "+"`` `[`head`](https://rdrr.io/r/utils/head.html)`(``vcf.report``[`[`order`](https://rdrr.io/r/base/order.html)`(``` `FEp-` ```, na.last``=``TRUE``)``]``)`` ``#> name seqnames range REF ALT nfiltered M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt`` ``#> <char> <fctr> <int> <char> <char> <num> <num> <num> <num> <num> <num> <num> <num>`` ``#> 1: rs546660277 chr17 43124874 A C 0 0 0 9 74 0 0 0`` ``#> 2: rs535977743 chr17 43125016 C T 0 NA NA 9 72 NA NA 0`` ``#> 3: rs191784032 chr17 43125050 C A 0 0 0 8 71 0 0 0`` ``#> 4: rs111956204 chr17 43125083 C A 0 0 0 8 68 0 0 0`` ``#> 5: rs55680227 chr17 43125086 A C 0 0 0 7 59 0 0 0`` ``#> 6: rs539733232 chr17 43125088 C A 0 0 0 8 69 0 0 0`` ``#> U-Alt SumRef SumAlt FEp+ FEp-`` ``#> <num> <num> <num> <num> <num>`` ``#> 1: 0 83 0 1 1`` ``#> 2: 0 81 0 NA 1`` ``#> 3: 1 79 1 1 1`` ``#> 4: 0 76 0 1 1`` ``#> 5: 0 66 0 1 1`` ``#> 6: 0 77 0 1 1`` `` ``# and to the "-" strand`` `[`head`](https://rdrr.io/r/utils/head.html)`(``vcf.report``[`[`order`](https://rdrr.io/r/base/order.html)`(``` `FEp+` ```, na.last``=``TRUE``)``]``)`` ``#> name seqnames range REF ALT nfiltered M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt M-Alt`` ``#> <char> <fctr> <int> <char> <char> <num> <num> <num> <num> <num> <num> <num> <num>`` ``#> 1: rs546660277 chr17 43124874 A C 0 0 0 9 74 0 0 0`` ``#> 2: rs574263814 chr17 43124891 G A 0 0 0 NA NA 0 0 NA`` ``#> 3: rs8176076 chr17 43124935 G A 0 0 0 NA NA 0 0 NA`` ``#> 4: rs191784032 chr17 43125050 C A 0 0 0 8 71 0 0 0`` ``#> 5: rs111956204 chr17 43125083 C A 0 0 0 8 68 0 0 0`` ``#> 6: rs55680227 chr17 43125086 A C 0 0 0 7 59 0 0 0`` ``#> U-Alt SumRef SumAlt FEp+ FEp-`` ``#> <num> <num> <num> <num> <num>`` ``#> 1: 0 83 0 1 1`` ``#> 2: NA 0 0 1 NA`` ``#> 3: NA 0 0 1 NA`` ``#> 4: 1 79 1 1 1`` ``#> 5: 0 76 0 1 1`` ``#> 6: 0 66 0 1 1`` `` ``# and finally, let's plot methylation patterns overlapping one of the most`` ``# covered SNPs in the methylation capture test data set - rs573296191`` ``# (chr17:61864584) in BRIP1 gene`` ``brip1.patterns`` ``<-`` `[`extractPatterns`](../reference/extractPatterns.md)`(`` `` bam``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"capture.bam"``, package``=``"epialleleR"``)``,`` `` bed``=``as``(``"chr17:61864583-61864585"``, ``"GRanges"``)``,`` `` highlight.positions``=``61864584``,`` `` verbose``=``FALSE`` ``)`` `[`plotPatterns`](../reference/plotPatterns.md)`(``brip1.patterns``)`` ``#> 24 patterns supplied`` ``#> 17 unique`` ``#> 9 most frequent unique patterns were selected for plotting using 10 beta value bins:`` ``#> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]`` ``#> 2 0 0 1 0 1 2 1 0 2`
 
 ![](epialleleR_files/figure-html/unnamed-chunk-10-1.png)
 
@@ -937,82 +555,11 @@ the expected 1-VEF values for the corresponding control DNA samples:
   observed 1-eCDF(0.5) ≈ 0.1
 - and fully methylated DNA — expected VEF = 1, observed 1-eCDF(0.5) ≈ 1
 
-``` r
-
-# First, let's visualise eCDFs for within- and out-of-context beta values
-# for all four amplicons and unmatched reads. Note that within-the-context eCDF
-# of 0.5 is very close to the expected 1-VEF value (0.1) for all amplicons
-# produced from this 1:9 mix of methylated and non-methylated control DNA
-
-# let's compute eCDF
-amplicon.ecdfs <- generateBedEcdf(
-  bam=system.file("extdata", "amplicon010meth.bam", package="epialleleR"),
-  bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
-  bed.rows=NULL
-)
-#> Reading BED file [0.008s]
-#> Checking BAM file: short-read, paired-end, name-sorted alignment detected
-#> Reading paired-end BAM file [0.005s]
-#> Computing ECDFs for within- and out-of-context per-read beta values [0.007s]
-
-# there are 5 items in amplicon.ecdfs, let's plot all of them
-par(mfrow=c(1,length(amplicon.ecdfs)))
-
-# cycle through items
-for (x in 1:length(amplicon.ecdfs)) {
-  # four of them have names corresponding to genomic regions of amplicon.bed
-  # fifth - NA for all the reads that don't match to any of those regions
-  main <- if (is.na(names(amplicon.ecdfs[x]))) "unmatched"
-          else names(amplicon.ecdfs[x])
-  
-  # plotting eCDF for within-the-context per-read beta values (in red)
-  plot(amplicon.ecdfs[[x]]$context, col="red", verticals=TRUE, do.points=FALSE,
-       xlim=c(0,1), xlab="per-read beta value", ylab="cumulative density",
-       main=main)
-  
-  # adding eCDF for out-of-context per-read beta values (in blue)
-  plot(amplicon.ecdfs[[x]]$out.of.context, add=TRUE, col="blue",
-       verticals=TRUE, do.points=FALSE)
-}
-```
+`# First, let's visualise eCDFs for within- and out-of-context beta values`` ``# for all four amplicons and unmatched reads. Note that within-the-context eCDF`` ``# of 0.5 is very close to the expected 1-VEF value (0.1) for all amplicons`` ``# produced from this 1:9 mix of methylated and non-methylated control DNA`` `` ``# let's compute eCDF`` ``amplicon.ecdfs`` ``<-`` `[`generateBedEcdf`](../reference/generateBedEcdf.md)`(`` `` bam``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"amplicon010meth.bam"``, package``=``"epialleleR"``)``,`` `` bed``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"amplicon.bed"``, package``=``"epialleleR"``)``,`` `` bed.rows``=``NULL`` ``)`` ``#> Reading BED file [0.008s]`` ``#> Checking BAM file: short-read, paired-end, name-sorted alignment detected`` ``#> Reading paired-end BAM file [0.004s]`` ``#> Computing ECDFs for within- and out-of-context per-read beta values [0.008s]`` `` ``# there are 5 items in amplicon.ecdfs, let's plot all of them`` `[`par`](https://rdrr.io/r/graphics/par.html)`(``mfrow``=`[`c`](https://rdrr.io/r/base/c.html)`(``1``,`[`length`](https://rdrr.io/r/base/length.html)`(``amplicon.ecdfs``)``)``)`` `` ``# cycle through items`` ``for`` ``(``x`` ``in`` ``1``:`[`length`](https://rdrr.io/r/base/length.html)`(``amplicon.ecdfs``)``)`` ``{`` `` ``# four of them have names corresponding to genomic regions of amplicon.bed`` `` ``# fifth - NA for all the reads that don't match to any of those regions`` `` ``main`` ``<-`` ``if`` ``(`[`is.na`](https://rdrr.io/r/base/NA.html)`(`[`names`](https://rdrr.io/r/base/names.html)`(``amplicon.ecdfs``[``x``]``)``)``)`` ``"unmatched"`` `` ``else`` `[`names`](https://rdrr.io/r/base/names.html)`(``amplicon.ecdfs``[``x``]``)`` `` `` `` ``# plotting eCDF for within-the-context per-read beta values (in red)`` `` `[`plot`](https://rdrr.io/r/graphics/plot.default.html)`(``amplicon.ecdfs``[[``x``]``]``$``context``, col``=``"red"``, verticals``=``TRUE``, do.points``=``FALSE``,`` `` xlim``=`[`c`](https://rdrr.io/r/base/c.html)`(``0``,``1``)``, xlab``=``"per-read beta value"``, ylab``=``"cumulative density"``,`` `` main``=``main``)`` `` `` `` ``# adding eCDF for out-of-context per-read beta values (in blue)`` `` `[`plot`](https://rdrr.io/r/graphics/plot.default.html)`(``amplicon.ecdfs``[[``x``]``]``$``out.of.context``, add``=``TRUE``, col``=``"blue"``,`` `` verticals``=``TRUE``, do.points``=``FALSE``)`` ``}`
 
 ![](epialleleR_files/figure-html/unnamed-chunk-11-1.png)
 
-``` r
-
-
-
-# Second, let's compare eCDFs for within-the-context beta values for only one
-# amplicon but all three sequenced samples: pure non-methylated DNA, 1:9 mix of
-# methylated and non-methylated DNA, and fully methylated DNA
-
-# our files
-bam.files <- c("amplicon000meth.bam", "amplicon010meth.bam",
-               "amplicon100meth.bam")
-
-# let's plot all of them
-par(mfrow=c(1,length(bam.files)))
-
-# cycle through items
-for (f in bam.files) {
-  # let's compute eCDF
-  amplicon.ecdfs <- generateBedEcdf(
-    bam=system.file("extdata", f, package="epialleleR"),
-    bed=system.file("extdata", "amplicon.bed", package="epialleleR"),
-    # only the second amplicon
-    bed.rows=2, verbose=FALSE
-  )
-  
-  # plotting eCDF for within-the-context per-read beta values (in red)
-  plot(amplicon.ecdfs[[1]]$context, col="red", verticals=TRUE, do.points=FALSE,
-       xlim=c(0,1), xlab="per-read beta value", ylab="cumulative density",
-       main=f)
-  
-   # adding eCDF for out-of-context per-read beta values (in blue)
-  plot(amplicon.ecdfs[[1]]$out.of.context, add=TRUE, col="blue",
-       verticals=TRUE, do.points=FALSE)
-}
-```
+` `` ``# Second, let's compare eCDFs for within-the-context beta values for only one`` ``# amplicon but all three sequenced samples: pure non-methylated DNA, 1:9 mix of`` ``# methylated and non-methylated DNA, and fully methylated DNA`` `` ``# our files`` ``bam.files`` ``<-`` `[`c`](https://rdrr.io/r/base/c.html)`(``"amplicon000meth.bam"``, ``"amplicon010meth.bam"``,`` `` ``"amplicon100meth.bam"``)`` `` ``# let's plot all of them`` `[`par`](https://rdrr.io/r/graphics/par.html)`(``mfrow``=`[`c`](https://rdrr.io/r/base/c.html)`(``1``,`[`length`](https://rdrr.io/r/base/length.html)`(``bam.files``)``)``)`` `` ``# cycle through items`` ``for`` ``(``f`` ``in`` ``bam.files``)`` ``{`` `` ``# let's compute eCDF`` `` ``amplicon.ecdfs`` ``<-`` `[`generateBedEcdf`](../reference/generateBedEcdf.md)`(`` `` bam``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``f``, package``=``"epialleleR"``)``,`` `` bed``=`[`system.file`](https://rdrr.io/r/base/system.file.html)`(``"extdata"``, ``"amplicon.bed"``, package``=``"epialleleR"``)``,`` `` ``# only the second amplicon`` `` bed.rows``=``2``, verbose``=``FALSE`` `` ``)`` `` `` `` ``# plotting eCDF for within-the-context per-read beta values (in red)`` `` `[`plot`](https://rdrr.io/r/graphics/plot.default.html)`(``amplicon.ecdfs``[[``1``]``]``$``context``, col``=``"red"``, verticals``=``TRUE``, do.points``=``FALSE``,`` `` xlim``=`[`c`](https://rdrr.io/r/base/c.html)`(``0``,``1``)``, xlab``=``"per-read beta value"``, ylab``=``"cumulative density"``,`` `` main``=``f``)`` `` `` `` ``# adding eCDF for out-of-context per-read beta values (in blue)`` `` `[`plot`](https://rdrr.io/r/graphics/plot.default.html)`(``amplicon.ecdfs``[[``1``]``]``$``out.of.context``, add``=``TRUE``, col``=``"blue"``,`` `` verticals``=``TRUE``, do.points``=``FALSE``)`` ``}`
 
 ![](epialleleR_files/figure-html/unnamed-chunk-11-2.png)
 
@@ -1063,66 +610,7 @@ diffuse large B-cell lymphomas. *Clinical Epigenetics* 2025.
 
 ### Session Info
 
-``` r
-
-sessionInfo()
-#> R Under development (unstable) (2026-01-22 r89323)
-#> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.3 LTS
-#> 
-#> Matrix products: default
-#> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
-#> LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
-#> 
-#> locale:
-#>  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=en_US.UTF-8       
-#>  [4] LC_COLLATE=en_US.UTF-8     LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
-#>  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                  LC_ADDRESS=C              
-#> [10] LC_TELEPHONE=C             LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
-#> 
-#> time zone: UTC
-#> tzcode source: system (glibc)
-#> 
-#> attached base packages:
-#> [1] stats     graphics  grDevices utils     datasets  methods   base     
-#> 
-#> other attached packages:
-#> [1] ggplot2_4.0.1     epialleleR_1.19.3
-#> 
-#> loaded via a namespace (and not attached):
-#>  [1] tidyselect_1.2.1            dplyr_1.1.4                 farver_2.1.2               
-#>  [4] blob_1.3.0                  Biostrings_2.79.4           S7_0.2.1                   
-#>  [7] bitops_1.0-9                fastmap_1.2.0               RCurl_1.98-1.17            
-#> [10] VariantAnnotation_1.57.1    GenomicAlignments_1.47.0    XML_3.99-0.20              
-#> [13] digest_0.6.39               lifecycle_1.0.5             KEGGREST_1.51.1            
-#> [16] RSQLite_2.4.5               magrittr_2.0.4              compiler_4.6.0             
-#> [19] rlang_1.1.7                 sass_0.4.10                 tools_4.6.0                
-#> [22] yaml_2.3.12                 data.table_1.18.0           rtracklayer_1.71.3         
-#> [25] knitr_1.51                  S4Arrays_1.11.1             labeling_0.4.3             
-#> [28] htmlwidgets_1.6.4           bit_4.6.0                   curl_7.0.0                 
-#> [31] DelayedArray_0.37.0         RColorBrewer_1.1-3          abind_1.4-8                
-#> [34] BiocParallel_1.45.0         withr_3.0.2                 BiocGenerics_0.57.0        
-#> [37] desc_1.4.3                  grid_4.6.0                  stats4_4.6.0               
-#> [40] scales_1.4.0                SummarizedExperiment_1.41.0 cli_3.6.5                  
-#> [43] rmarkdown_2.30              crayon_1.5.3                ragg_1.5.0                 
-#> [46] generics_0.1.4              otel_0.2.0                  httr_1.4.7                 
-#> [49] rjson_0.2.23                DBI_1.2.3                   cachem_1.1.0               
-#> [52] parallel_4.6.0              AnnotationDbi_1.73.0        XVector_0.51.0             
-#> [55] restfulr_0.0.16             matrixStats_1.5.0           vctrs_0.7.1                
-#> [58] Matrix_1.7-4                jsonlite_2.0.0              IRanges_2.45.0             
-#> [61] S4Vectors_0.49.0            bit64_4.6.0-1               systemfonts_1.3.1          
-#> [64] GenomicFeatures_1.63.1      jquerylib_0.1.4             glue_1.8.0                 
-#> [67] pkgdown_2.2.0.9000          codetools_0.2-20            gtable_0.3.6               
-#> [70] GenomeInfoDb_1.47.2         UCSC.utils_1.7.1            GenomicRanges_1.63.1       
-#> [73] BiocIO_1.21.0               tibble_3.3.1                pillar_1.11.1              
-#> [76] htmltools_0.5.9             Seqinfo_1.1.0               BSgenome_1.79.1            
-#> [79] R6_2.6.1                    textshaping_1.0.4           evaluate_1.0.5             
-#> [82] lattice_0.22-7              Biobase_2.71.0              png_0.1-8                  
-#> [85] Rsamtools_2.27.0            cigarillo_1.1.0             memoise_2.0.1              
-#> [88] bslib_0.9.0                 Rcpp_1.1.1                  SparseArray_1.11.10        
-#> [91] xfun_0.56                   fs_1.6.6                    MatrixGenerics_1.23.0      
-#> [94] pkgconfig_2.0.3
-```
+[`sessionInfo`](https://rdrr.io/r/utils/sessionInfo.html)`(``)`` ``#> R version 4.6.1 (2026-06-24)`` ``#> Platform: x86_64-pc-linux-gnu`` ``#> Running under: Ubuntu 24.04.4 LTS`` ``#> `` ``#> Matrix products: default`` ``#> BLAS: /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 `` ``#> LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so; LAPACK version 3.12.0`` ``#> `` ``#> locale:`` ``#> [1] LC_CTYPE=en_US.UTF-8 LC_NUMERIC=C LC_TIME=en_US.UTF-8 `` ``#> [4] LC_COLLATE=en_US.UTF-8 LC_MONETARY=en_US.UTF-8 LC_MESSAGES=en_US.UTF-8 `` ``#> [7] LC_PAPER=en_US.UTF-8 LC_NAME=C LC_ADDRESS=C `` ``#> [10] LC_TELEPHONE=C LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C `` ``#> `` ``#> time zone: UTC`` ``#> tzcode source: system (glibc)`` ``#> `` ``#> attached base packages:`` ``#> [1] stats graphics grDevices utils datasets methods base `` ``#> `` ``#> other attached packages:`` ``#> [1] ggplot2_4.0.3 epialleleR_1.21.1`` ``#> `` ``#> loaded via a namespace (and not attached):`` ``#> [1] tidyselect_1.2.1 dplyr_1.2.1 farver_2.1.2 `` ``#> [4] blob_1.3.0 Biostrings_2.81.8 S7_0.2.2 `` ``#> [7] bitops_1.1-0 fastmap_1.2.0 RCurl_1.98-1.20 `` ``#> [10] VariantAnnotation_1.59.4 GenomicAlignments_1.49.2 XML_3.99-0.24 `` ``#> [13] digest_0.6.39 lifecycle_1.0.5 KEGGREST_1.53.6 `` ``#> [16] RSQLite_3.53.3 magrittr_2.0.5 compiler_4.6.1 `` ``#> [19] rlang_1.3.0 sass_0.4.10 tools_4.6.1 `` ``#> [22] yaml_2.3.12 data.table_1.18.6.1 rtracklayer_1.73.0 `` ``#> [25] knitr_1.51 S4Arrays_1.13.0 labeling_0.4.3 `` ``#> [28] htmlwidgets_1.6.4 bit_4.6.0 curl_8.0.0 `` ``#> [31] DelayedArray_0.39.6 RColorBrewer_1.1-3 abind_1.4-8 `` ``#> [34] BiocParallel_1.47.0 withr_3.0.3 BiocGenerics_0.59.12 `` ``#> [37] desc_1.4.3 grid_4.6.1 stats4_4.6.1 `` ``#> [40] scales_1.4.0 SummarizedExperiment_1.43.0 cli_3.6.6 `` ``#> [43] rmarkdown_2.32 crayon_1.5.3 ragg_1.5.2 `` ``#> [46] generics_0.1.4 otel_0.2.0 httr_1.4.9 `` ``#> [49] rjson_0.2.23 BiocBaseUtils_1.15.1 DBI_1.3.0 `` ``#> [52] cachem_1.1.0 parallel_4.6.1 AnnotationDbi_1.75.2 `` ``#> [55] XVector_0.53.0 restfulr_0.0.17 matrixStats_1.5.0 `` ``#> [58] vctrs_0.7.3 Matrix_1.7-6 jsonlite_2.0.0 `` ``#> [61] IRanges_2.47.5 S4Vectors_0.51.9 bit64_4.8.6 `` ``#> [64] systemfonts_1.3.2 GenomicFeatures_1.65.0 jquerylib_0.1.4 `` ``#> [67] glue_1.8.1 pkgdown_2.2.1.9000 codetools_0.2-20 `` ``#> [70] gtable_0.3.6 GenomeInfoDb_1.49.1 UCSC.utils_1.9.0 `` ``#> [73] GenomicRanges_1.65.4 BiocIO_1.23.3 tibble_3.3.1 `` ``#> [76] pillar_1.11.1 htmltools_0.5.9 Seqinfo_1.3.2 `` ``#> [79] BSgenome_1.81.1 R6_2.6.1 textshaping_1.0.5 `` ``#> [82] evaluate_1.0.5 lattice_0.23-1 Biobase_2.73.2 `` ``#> [85] png_0.1-9 Rsamtools_2.29.0 cigarillo_1.3.1 `` ``#> [88] memoise_2.0.1 bslib_0.12.0 Rcpp_1.1.2 `` ``#> [91] SparseArray_1.13.2 xfun_0.60 fs_2.1.0 `` ``#> [94] MatrixGenerics_1.25.0 pkgconfig_2.0.3`
 
 ------------------------------------------------------------------------
 

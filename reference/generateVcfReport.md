@@ -272,17 +272,17 @@ function for getting or setting the seqlevels style.
                                   vcf=capture.vcf)
 #> Loading required namespace: VariantAnnotation
 #> Reading BED file 
-#> [0.023s]
+#> [0.021s]
 #> Reading VCF file 
-#> [5.430s]
+#> [5.425s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.011s]
+#> [0.013s]
 #> Filtering and thresholding reads 
 #> [0.001s]
 #> Extracting base frequences 
-#> [0.138s]
+#> [0.117s]
   
   # toy example to illustrate the logic of computations
   if (requireNamespace("VariantAnnotation", quietly=TRUE)) {
@@ -310,7 +310,7 @@ function for getting or setting the seqlevels style.
     generateVcfReport(bam=temp.bam, vcf=vcf, filter.reads=FALSE)
   }
 #> Writing sample BAM 
-#> [0.002s]
+#> [0.003s]
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
@@ -318,15 +318,15 @@ function for getting or setting the seqlevels style.
 #> Filtering and thresholding reads 
 #> [0.000s]
 #> Extracting base frequences 
-#> [0.032s]
+#> [0.033s]
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.002s]
+#> [0.001s]
 #> Thresholding reads 
 #> [0.000s]
 #> Extracting base frequences 
-#> [0.031s]
+#> [0.033s]
 #>    seqnames range    REF    ALT nfiltered M+Ref U+Ref M-Ref U-Ref M+Alt U+Alt
 #>      <fctr> <int> <char> <char>    <lgcl> <num> <num> <num> <num> <num> <num>
 #> 1:     chr1     2      A      G        NA     1     1    NA    NA     2     0

@@ -327,9 +327,9 @@ function for getting or setting the seqlevels style.
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.004s]
+#> [0.005s]
 #> Filtering and thresholding reads 
-#> [0.000s]
+#> [0.001s]
 #> Preparing amplicon report 
 #> [0.013s]
   plotPatterns(
@@ -342,7 +342,7 @@ function for getting or setting the seqlevels style.
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.003s]
+#> [0.005s]
 #> Extracting methylation patterns 
 #> [0.011s]
 #> 156 patterns supplied
@@ -363,9 +363,9 @@ function for getting or setting the seqlevels style.
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.011s]
+#> [0.012s]
 #> Filtering and thresholding reads 
-#> [0.001s]
+#> [0.002s]
 #> Preparing capture report 
 #> [0.017s]
   
@@ -374,11 +374,11 @@ function for getting or setting the seqlevels style.
   bed.report <- generateBedReport(bam=capture.bam, bed=capture.bed,
                                   bed.type="capture")
 #> Reading BED file 
-#> [0.008s]
+#> [0.007s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.011s]
+#> [0.014s]
 #> Filtering and thresholding reads 
 #> [0.001s]
 #> Preparing capture report 
@@ -401,15 +401,15 @@ function for getting or setting the seqlevels style.
     bam=long.data, bed=long.bed, bed.type="capture", filter.reads=FALSE
   )
 #> Thresholding reads 
-#> [0.001s]
+#> [0.000s]
 #> Preparing capture report 
-#> [0.013s]
+#> [0.011s]
   plotPatterns(
     extractPatterns(bam=long.data, bed=long.bed),
     npatterns.per.bin=Inf
   )
 #> Extracting methylation patterns 
-#> [0.017s]
+#> [0.016s]
 #> 20 patterns supplied
 #> 20 unique
 #> 20 most frequent unique patterns were selected for plotting using 10 beta value bins:
@@ -427,7 +427,7 @@ function for getting or setting the seqlevels style.
                     "...Z..z.h..X..h.",  "...Z..z.h..z.h."),
               cigar=c("7M1I9M", "16M", "16M", "12M1D3M"))
 #> Writing sample BAM 
-#> [0.003s]
+#> [0.002s]
 #> [1] 4
   # with read filtering
   generateBedReport(bam=temp.bam, bed=temp.bed, min.context.sites=2)
@@ -438,7 +438,7 @@ function for getting or setting the seqlevels style.
 #> Filtering and thresholding reads 
 #> [0.000s]
 #> Preparing amplicon report 
-#> [0.013s]
+#> [0.010s]
 #>    seqnames start   end width strand nreads+ nreads- nfiltered   VEF
 #>      <fctr> <int> <int> <int> <fctr>   <int>   <int>     <int> <num>
 #> 1:     chr1     1   100   100      *       2       0         2   0.5
@@ -451,7 +451,7 @@ function for getting or setting the seqlevels style.
 #> Thresholding reads 
 #> [0.000s]
 #> Preparing amplicon report 
-#> [0.013s]
+#> [0.010s]
 #>    seqnames start   end width strand nreads+ nreads- nfiltered   VEF
 #>      <fctr> <int> <int> <int> <fctr>   <int>   <int>     <int> <num>
 #> 1:     chr1     1   100   100      *       4       0        NA  0.75
