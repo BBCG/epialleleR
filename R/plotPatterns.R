@@ -169,11 +169,14 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   
   # all bases
   base.positions <- grep("^[0-9]+$", colnames(patterns), value=TRUE)
+  base.levels <- c("NA1", "H", "A", "C", "NA5","X", "Z", "NA8", "NA9", "h", "G", "T", "N",  "x", "z","NA16")
+  if (!all(patterns[, sapply(.SD, function (x) {is.factor(x) & identical(levels(x), base.levels)}), .SDcols=base.positions]))
+    patterns[, c(base.positions):=lapply(.SD, factor, levels=base.levels), .SDcols=base.positions]
   patterns.summary <- patterns[, .(count=.N), by=c("pattern", base.positions)]
   
   context.to.factors <- lapply(.context.to.bases[[bin.context]], function (subctx) {
     bases <- unlist(strsplit(subctx, ""))
-    match(bases, levels(patterns[[base.positions[1]]]))
+    match(bases, base.levels)
   })
   
   patterns.summary[, beta:=apply(patterns.summary[, lapply(.SD, as.integer), .SDcols=base.positions], MARGIN=1, function (x) {
@@ -203,7 +206,7 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
     patterns.selected, measure.vars=base.positions, variable.name="pos", value.name="code", variable.factor=FALSE
   )[!is.na(code)]
   plot.data[, `:=` (
-    base=factor(code, levels=c("A", "C", "G", "N", "T")),
+    base=factor(code, levels=c("A", "C", "G", "T", "N")),
     meth=factor(!code %in% c("h", "x", "z")),
     cntx=factor(tolower(code), levels=c("h", "x", "z"), labels=c("CHH", "CHG", "CG"))
   )]
@@ -223,7 +226,11 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
   
   # get title from bed
   if (identical(title, TRUE)) {
-    title <- attr(patterns, "bed")
+    if (!is.null(attr(patterns, "bed"))) {
+      title <- attr(patterns, "bed")
+    } else {
+      title <- patterns[, sprintf("%s:%i-%i", unique(seqnames), min(start), max(end))]
+    }
   }
   
   # get some subtitle stats
@@ -249,7 +256,9 @@ plotPatterns <- function (patterns, order.by=c("beta", "count"),
     ggplot2::geom_label(data=plot.data[!is.na(base)], mapping=ggplot2::aes(label=base, colour=base), size=base.size) +
     ggplot2::geom_point(data=plot.data[!is.na(cntx) & cntx %in% plot.context], mapping=ggplot2::aes(size=cntx, fill=meth), shape=21, colour=methylation.fill[2]) +
     ggplot2::scale_size_manual(name="context", values=setNames(context.size, c("CHH", "CHG", "CG"))) +
+    ggplot2::scale_color_manual(name="base", values=c("A"="#1B9E77", "C"="#D95F02", "G"="#7570B3", "T"="#E7298A", "N"="#666666")) +
     ggplot2::scale_fill_manual(name="methylated", values=methylation.fill, drop=FALSE) +
+    ggplot2::guides(color=ggplot2::guide_legend(order=1), size=ggplot2::guide_legend(order=2), fill=ggplot2::guide_legend(order=3)) +
     ggplot2::scale_y_discrete(name=NULL, breaks=NULL, labels=NULL) +
     ggplot2::theme_light() +
     ggplot2::theme(plot.margin=grid::unit(c(5.5, 5.5, 5.5, 0), "points")) +

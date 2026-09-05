@@ -38,7 +38,7 @@ utils::globalVariables(
     "M+A", "M+C", "M+G", "M+T", "M-A", "M-C", "M-G", "M-T",
     "U+A", "U+C", "U+G", "U+T", "U-A", "U-C", "U-G", "U-T", "nfiltered",
     ".SD", "bin", "count", "code", "pos", "cntx", "base", "meth", "x", "y",
-    "label")
+    "label", "end")
 )
 
 .onUnload <- function (libpath) {library.dynam.unload("epialleleR", libpath)}
