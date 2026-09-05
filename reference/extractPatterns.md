@@ -177,13 +177,13 @@ vignettes for the description of usage and sample data.
   # extract patterns
   patterns <- extractPatterns(bam=amplicon.bam, bed=amplicon.bed, bed.row=3)
 #> Reading BED file 
-#> [0.031s]
+#> [0.035s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
 #> [0.010s]
 #> Extracting methylation patterns 
-#> [0.026s]
+#> [0.029s]
   
   # and then plot them
   plotPatterns(patterns)
@@ -192,6 +192,8 @@ vignettes for the description of usage and sample data.
 #> 9 most frequent unique patterns were selected for plotting using 10 beta value bins:
 #> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]
 #>       2         1         1         0         0         0         0         1         2       2
+#> Warning: No shared levels found between `names(values)` of the manual scale and the
+#> data's colour values.
 
   
   # patterns from long reads, clipped to two narrow areas of interest
@@ -205,19 +207,21 @@ vignettes for the description of usage and sample data.
 #> Checking BAM file: 
 #> long-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.007s]
+#> [0.008s]
   plotPatterns(
     extractPatterns(bam=long.data,
                     bed=as("chr17:43125000-43127000", "GRanges")),
     npatterns.per.bin=Inf
   )
 #> Extracting methylation patterns 
-#> [0.043s]
+#> [0.056s]
 #> 37 patterns supplied
 #> 37 unique
 #> 37 most frequent unique patterns were selected for plotting using 10 beta value bins:
 #> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]
 #>      16         0         0         1         1         1         1         0         6      11
+#> Warning: No shared levels found between `names(values)` of the manual scale and the
+#> data's colour values.
 
   
 ```

@@ -327,29 +327,31 @@ function for getting or setting the seqlevels style.
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.005s]
+#> [0.004s]
 #> Filtering and thresholding reads 
-#> [0.001s]
+#> [0.000s]
 #> Preparing amplicon report 
-#> [0.013s]
+#> [0.014s]
   plotPatterns(
     extractPatterns(
       bam=amplicon.bam, bed=amplicon.bed, match.min.overlap=100
     ), npatterns.per.bin=Inf
   )
 #> Reading BED file 
-#> [0.007s]
+#> [0.008s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.005s]
+#> [0.004s]
 #> Extracting methylation patterns 
-#> [0.011s]
+#> [0.013s]
 #> 156 patterns supplied
 #> 10 unique
 #> 10 most frequent unique patterns were selected for plotting using 10 beta value bins:
 #> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]
 #>       6         0         0         0         1         0         0         0         1       2
+#> Warning: No shared levels found between `names(values)` of the manual scale and the
+#> data's colour values.
 
   
   # capture NGS
@@ -359,7 +361,7 @@ function for getting or setting the seqlevels style.
                                 package="epialleleR")
   capture.report <- generateCaptureReport(bam=capture.bam, bed=capture.bed)
 #> Reading BED file 
-#> [0.008s]
+#> [0.009s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
@@ -374,15 +376,15 @@ function for getting or setting the seqlevels style.
   bed.report <- generateBedReport(bam=capture.bam, bed=capture.bed,
                                   bed.type="capture")
 #> Reading BED file 
-#> [0.007s]
+#> [0.008s]
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.014s]
+#> [0.011s]
 #> Filtering and thresholding reads 
 #> [0.001s]
 #> Preparing capture report 
-#> [0.016s]
+#> [0.018s]
   identical(capture.report, bed.report)
 #> [1] TRUE
   
@@ -401,20 +403,22 @@ function for getting or setting the seqlevels style.
     bam=long.data, bed=long.bed, bed.type="capture", filter.reads=FALSE
   )
 #> Thresholding reads 
-#> [0.000s]
+#> [0.001s]
 #> Preparing capture report 
-#> [0.011s]
+#> [0.012s]
   plotPatterns(
     extractPatterns(bam=long.data, bed=long.bed),
     npatterns.per.bin=Inf
   )
 #> Extracting methylation patterns 
-#> [0.016s]
+#> [0.019s]
 #> 20 patterns supplied
 #> 20 unique
 #> 20 most frequent unique patterns were selected for plotting using 10 beta value bins:
 #> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]
 #>      16         1         0         0         0         0         0         0         1       2
+#> Warning: No shared levels found between `names(values)` of the manual scale and the
+#> data's colour values.
 
   
   # toy example from the description
@@ -438,7 +442,7 @@ function for getting or setting the seqlevels style.
 #> Filtering and thresholding reads 
 #> [0.000s]
 #> Preparing amplicon report 
-#> [0.010s]
+#> [0.011s]
 #>    seqnames start   end width strand nreads+ nreads- nfiltered   VEF
 #>      <fctr> <int> <int> <int> <fctr>   <int>   <int>     <int> <num>
 #> 1:     chr1     1   100   100      *       2       0         2   0.5
@@ -451,7 +455,7 @@ function for getting or setting the seqlevels style.
 #> Thresholding reads 
 #> [0.000s]
 #> Preparing amplicon report 
-#> [0.010s]
+#> [0.012s]
 #>    seqnames start   end width strand nreads+ nreads- nfiltered   VEF
 #>      <fctr> <int> <int> <int> <fctr>   <int>   <int>     <int> <num>
 #> 1:     chr1     1   100   100      *       4       0        NA  0.75
@@ -463,12 +467,14 @@ function for getting or setting the seqlevels style.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.001s]
+#> [0.002s]
 #> Extracting methylation patterns 
-#> [0.007s]
+#> [0.008s]
 #> 4 patterns supplied
 #> 4 unique
 #> 4 most frequent unique patterns were selected for plotting using 10 beta value bins:
 #> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]
 #>       0         0         0         1         0         2         0         0         0       1
+#> Warning: No shared levels found between `names(values)` of the manual scale and the
+#> data's colour values.
 ```

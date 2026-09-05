@@ -19,4 +19,5 @@ https://doi.org/10.1093/gigascience/giad087
 allele-specific methylation analysis in NGS data}, author = {Oleksii
 Nikolaienko and Per Eystein Lønning and Stian Knappskog}, journal =
 {GigaScience}, volume = {12}, pages = {giad087}, year = {2023}, month =
-{10}, url = {https://doi.org/10.1093/gigascience/giad087}, }
+{10}, doi = {10.1093/gigascience/giad087}, url =
+{https://doi.org/10.1093/gigascience/giad087}, }

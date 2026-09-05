@@ -259,7 +259,7 @@ vignettes for the description of usage and sample data.
 #> Reading paired-end BAM file 
 #> [0.004s]
 #> Extracting methylation patterns 
-#> [0.013s]
+#> [0.015s]
   
   # default plot + silently returned plotted patterns
   selected.patterns <- plotPatterns(patterns)
@@ -268,6 +268,8 @@ vignettes for the description of usage and sample data.
 #> 7 most frequent unique patterns were selected for plotting using 10 beta value bins:
 #> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]
 #>       2         1         1         0         0         0         0         1         0       2
+#> Warning: No shared levels found between `names(values)` of the manual scale and the
+#> data's colour values.
 
   
   # all unique patterns with their counts as a margin, categorical positions,
@@ -279,6 +281,8 @@ vignettes for the description of usage and sample data.
 #> 21 most frequent unique patterns were selected for plotting using 10 beta value bins:
 #> [0,0.1) [0.1,0.2) [0.2,0.3) [0.3,0.4) [0.4,0.5) [0.5,0.6) [0.6,0.7) [0.7,0.8) [0.8,0.9) [0.9,1]
 #>      14         1         1         0         0         0         0         1         0       4
+#> Warning: No shared levels found between `names(values)` of the manual scale and the
+#> data's colour values.
   
   # which can be plotted later
   grid::grid.newpage()

@@ -231,9 +231,9 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.013s]
+#> [0.011s]
 #> Preparing lMHL report 
-#> [0.021s]
+#> [0.019s]
   
   # lMHL report with a `max.haplotype.window` of 1 is identical to a
   # conventional cytosine report (or nearly identical when sequencing errors
@@ -242,18 +242,18 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.014s]
+#> [0.011s]
 #> Preparing lMHL report 
-#> [0.020s]
+#> [0.019s]
   cg.report  <- generateCytosineReport(capture.bam, threshold.reads=FALSE)
 #> Checking BAM file: 
 #> short-read, paired-end, name-sorted alignment detected
 #> Reading paired-end BAM file 
-#> [0.014s]
-#> Filtering reads 
-#> [0.002s]
-#> Preparing cytosine report 
 #> [0.012s]
+#> Filtering reads 
+#> [0.001s]
+#> Preparing cytosine report 
+#> [0.011s]
   identical(
     mhl.report[, .(rname, strand, pos, context, value=lmhl)],
     cg.report[ , .(rname, strand, pos, context, value=meth/(meth+unmeth))]
@@ -271,7 +271,7 @@ for analysing the distribution of per-read beta values.
   mhl.report <- generateMhlReport(bam=long.data, max.haplotype.window=10,
                                   filter.reads=FALSE)
 #> Preparing lMHL report 
-#> [0.044s]
+#> [0.049s]
   plot(mhl.report[, .(pos, lmhl=data.table::frollmean(lmhl, 100))], type="l")
 
   
@@ -288,7 +288,7 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.001s]
+#> [0.002s]
 #> Preparing lMHL report 
 #> [0.001s]
 #>     rname strand   pos context coverage length  lmhl
@@ -309,7 +309,7 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.002s]
+#> [0.001s]
 #> Preparing lMHL report 
 #> [0.001s]
 #>     rname strand   pos context coverage length      lmhl
@@ -332,7 +332,7 @@ for analysing the distribution of per-read beta values.
 #> Reading single-end BAM file 
 #> [0.002s]
 #> Preparing lMHL report 
-#> [0.001s]
+#> [0.000s]
 #>     rname strand   pos context coverage length      lmhl
 #>    <fctr> <fctr> <int>  <fctr>    <int>  <num>     <num>
 #> 1:   chr1      +     4      CG        2      5 0.5000000
@@ -351,7 +351,7 @@ for analysing the distribution of per-read beta values.
 #> Checking BAM file: 
 #> short-read, single-end, unsorted alignment detected
 #> Reading single-end BAM file 
-#> [0.001s]
+#> [0.002s]
 #> Preparing lMHL report 
 #> [0.001s]
 #>     rname strand   pos context coverage length       lmhl
