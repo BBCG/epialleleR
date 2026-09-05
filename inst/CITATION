@@ -9,6 +9,7 @@ bibentry(
   pages    = "giad087",
   year     = "2023",
   month    = "10",
+  doi      = "10.1093/gigascience/giad087",
   url      = "https://doi.org/10.1093/gigascience/giad087",
   textVersion = "Oleksii Nikolaienko, Per Eystein L\u00f8nning, Stian Knappskog. epialleleR: an R/Bioconductor package for sensitive allele-specific methylation analysis in NGS data. GigaScience, Volume 12, 2023, giad087, https://doi.org/10.1093/gigascience/giad087"
 )
