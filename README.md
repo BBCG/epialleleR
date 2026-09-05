@@ -216,13 +216,13 @@ Oleksii Nikolaienko, Garnet L Anderson, Rowan T Chlebowski, Su Yon Jung, Holly R
 
 This project relies heavily on the following open-source language ecosystems and libraries:
 
-* **[The R Project for Statistical Computing](https://www.r-project.org/)** - The foundational environment and high-performance computing capabilities.
-* **[Bioconductor](https://www.bioconductor.org/)** – Core genomic data structures and packages that make high-throughput genomic analysis possible.
-* **[data.table](https://github.com/rdatatable/data.table)** – Lightning-fast data aggregation and manipulation of massive genomic datasets in R.
-* **[BH (Boost Headers for R)](https://github.com/eddelbuettel/bh)** - Seamless and efficient linking of Boost templates into R.
-* **[Rcpp](https://github.com/RcppCore/Rcpp)** – Seamless, high-performance integration between R and underlying C++ code.
-* **[HTSlib](https://github.com/samtools/htslib)** - High-throughput C library interface for seamless reading and writing sequencing data formats (BAM/CRAM/VCF).
-* **[Boost C++ Libraries](https://www.boost.org/)** - Peer-reviewed, highly efficient portable C++ template libraries.
+ * [The R Project for Statistical Computing](https://www.r-project.org/) - The foundational environment and high-performance computing capabilities.
+ * [Bioconductor](https://www.bioconductor.org/) – Core genomic data structures and packages that make high-throughput genomic analysis possible.
+ * [data.table](https://github.com/rdatatable/data.table) – Lightning-fast data aggregation and manipulation of massive genomic datasets in R.
+ * [BH (Boost Headers for R)](https://github.com/eddelbuettel/bh) - Seamless and efficient linking of Boost templates into R.
+ * [Rcpp](https://github.com/RcppCore/Rcpp) – Seamless, high-performance integration between R and underlying C++ code.
+ * [HTSlib](https://github.com/samtools/htslib) - High-throughput C library interface for seamless reading and writing sequencing data formats (BAM/CRAM/VCF).
+ * [Boost C++ Libraries](https://www.boost.org/) - Peer-reviewed, highly efficient portable C++ template libraries.
 
 -------
 
