@@ -115,3 +115,8 @@ Changes in version 1.19.2 (2026-01-19)
 Changes in version 1.19.3 (2026-01-25)
 + checks conventional base probabilities in long-read data
 + accuracy comparison vs modkit
+
+Changes in version 1.21.2 (2026-09-05)
++ improvments for plotPatterns
++ acknowledgements in README
+
